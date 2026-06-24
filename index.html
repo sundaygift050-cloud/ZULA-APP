@@ -542,6 +542,91 @@ p{color:var(--text2);margin:0 0 1em;}
 .code-input-row input{width:100%;text-align:center;letter-spacing:.3em;font-size:24px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:14px;color:var(--text);font-family:var(--font-display);margin-bottom:16px;}
 .or-divider{text-align:center;color:var(--text3);font-size:12px;margin:12px 0;}
 </style>
+
+<!-- ══ FIREBASE SDK ══ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
+           updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+           from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── YOUR FIREBASE CONFIG ─────────────────────────────────────────────────
+  // IMPORTANT: Replace these values with your own from Firebase Console
+  // Go to: console.firebase.google.com → Your Project → Project Settings → Your apps → Web app
+  const firebaseConfig = {
+    apiKey:            "REPLACE_WITH_YOUR_API_KEY",
+    authDomain:        "REPLACE_WITH_YOUR_AUTH_DOMAIN",
+    projectId:         "REPLACE_WITH_YOUR_PROJECT_ID",
+    storageBucket:     "REPLACE_WITH_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
+    appId:             "REPLACE_WITH_YOUR_APP_ID"
+  };
+  // ────────────────────────────────────────────────────────────────────────
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── EXPOSE to window so non-module functions can call them ───────────────
+  window._zulaAuth = auth;
+  window._zulaDb   = db;
+  window._zulaFns  = {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    signOut,
+    sendPasswordResetEmail,
+    updateProfile,
+    doc, setDoc, getDoc, serverTimestamp
+  };
+
+  // ── AUTH STATE LISTENER ──────────────────────────────────────────────────
+  // Runs on every page load and whenever auth state changes
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is signed in
+      if (!user.emailVerified) {
+        // Not verified — show verification wall
+        window._zulaCurrentUser = null;
+        showPage('verify-email');
+        if (document.getElementById('verify-email-addr')) {
+          document.getElementById('verify-email-addr').textContent = user.email;
+        }
+        return;
+      }
+      // Verified user — load their profile from Firestore
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        window._zulaCurrentUser = snap.exists() ? snap.data() : { email: user.email };
+      } catch(e) {
+        window._zulaCurrentUser = { email: user.email };
+      }
+      // Update header name display
+      const nameEl = document.getElementById('hdr-user-name');
+      if (nameEl && window._zulaCurrentUser) {
+        const name = window._zulaCurrentUser.firstName || user.displayName || 'Account';
+        nameEl.textContent = name + ' ▾';
+      }
+    } else {
+      // Not signed in — show login page
+      window._zulaCurrentUser = null;
+      const activePage = document.querySelector('.page.active');
+      const protectedPages = ['home','browse','product','digital','course','cart',
+        'orders','affiliate','seller','admin','checkout','downloads','player',
+        'addproduct','profile','profile-v2','messaging','settings','notifications'];
+      if (activePage) {
+        const pid = activePage.id.replace('page-','');
+        if (protectedPages.includes(pid)) {
+          showPage('login');
+        }
+      } else {
+        showPage('login');
+      }
+    }
+  });
+</script>
 </head>
 <body>
 
@@ -616,14 +701,14 @@ p{color:var(--text2);margin:0 0 1em;}
         <span style="position:relative;cursor:pointer;" onclick="toggleNotif()">🔔<span class="cart-dot" id="notif-count">3</span></span>
         <span class="cart-btn" onclick="showPage('cart')">🛒<span class="cart-dot">3</span></span>
         <a onclick="showPage('messaging')" style="cursor:pointer;">💬</a>
-        <span onclick="showPage('profile-v2')" style="cursor:pointer;">Ada O. ▾</span>
+        <span id="hdr-user-name" onclick="showPage('profile-v2')" style="cursor:pointer;">Account ▾</span>
       </nav>
     </div>
   </header>
 </template>
 
 <!-- ======== HOME ======== -->
-<div class="page active" id="page-home">
+<div class="page" id="page-home">
   <div id="hdr-home"></div>
   <section class="hero">
     <div class="hero-bg"></div>
@@ -1560,14 +1645,11 @@ const hdrHtml = document.getElementById('hdr-tpl').innerHTML;
 });
 
 function showPage(name){
-  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
-  const tab=document.querySelector('.ptab[data-page="'+name+'"]');
-  if(tab) tab.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+  var target = document.getElementById('page-'+name);
+  if(target) target.classList.add('active');
   window.scrollTo(0,0);
 }
-document.querySelectorAll('.ptab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 
 function setGal(el,e){
   document.querySelectorAll('.gallery-thumbs div').forEach(d=>d.classList.remove('active'));
@@ -2062,8 +2144,10 @@ newPages.forEach(p=>{
 });
 
 function showCheckoutSuccess(){
-  document.querySelector('#page-checkout .cart-wrap').style.display='none';
-  document.getElementById('checkout-success').style.display='block';
+  var cw = document.querySelector('#page-checkout .cart-wrap');
+  if(cw) cw.style.display='none';
+  var cs = document.getElementById('checkout-success');
+  if(cs) cs.style.display='block';
 }
 
 function setLesson(n, title){
@@ -2214,29 +2298,7 @@ document.addEventListener('click', e=>{
 .fee-example{font-size:12px;color:var(--text3);}
 </style>
 
-<!-- TAB: Add new preview tabs -->
-<script>
-// inject new tabs into pbar
-(function(){
-  const pbar = document.querySelector('.pbar');
-  const hint = pbar.querySelector('.ptab-hint');
-  const newTabs = [
-    {page:'sellerprofile', label:'Seller Profile'},
-    {page:'myprofile', label:'My Profile (owner)'},
-    {page:'messages', label:'Messages'},
-    {page:'delivery', label:'Delivery & Escrow'},
-    {page:'platformfees', label:'Platform Fees (Admin)'},
-  ];
-  newTabs.forEach(t=>{
-    const btn = document.createElement('button');
-    btn.className='ptab';
-    btn.dataset.page=t.page;
-    btn.textContent=t.label;
-    btn.addEventListener('click',()=>showPage(t.page));
-    pbar.insertBefore(btn, hint);
-  });
-})();
-</script>
+
 
 <!-- ======== SELLER PUBLIC PROFILE ======== -->
 <div class="page" id="page-sellerprofile">
@@ -4568,6 +4630,38 @@ function lbTab(period, btn){
     <button class="msg-send" onclick="sendFloatMsg()">➤</button>
   </div>
 </div>
+
+
+function zulaSignOut(){
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showPage('login'); return; }
+  fns.signOut(auth).then(function(){
+    window._zulaCurrentUser = null;
+    showToast('👋 You have been signed out.');
+    showPage('login');
+  });
+}
+function resendVerificationEmail(){
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns || !auth.currentUser){ showToast('⚠️ No user session found.'); return; }
+  fns.sendEmailVerification(auth.currentUser)
+    .then(function(){ showToast('📧 Verification email resent! Check your inbox.'); })
+    .catch(function(){ showToast('⚠️ Could not resend. Please wait a minute and try again.'); });
+}
+function checkEmailVerified(){
+  var auth = window._zulaAuth;
+  if(!auth || !auth.currentUser){ showPage('login'); return; }
+  auth.currentUser.reload().then(function(){
+    if(auth.currentUser.emailVerified){
+      showToast('✅ Email verified! Welcome to ZÚLA!');
+      showPage('home');
+    } else {
+      showToast('⏳ Not verified yet — check your inbox and click the link.');
+    }
+  });
+}
 
 </body>
 </html>
@@ -6902,7 +6996,7 @@ function toggleSetting(el, key) {
 <!-- ══════════════════════════════════════════════
      LOGIN PAGE
 ══════════════════════════════════════════════ -->
-<div class="page" id="page-login">
+<div class="page active" id="page-login">
   <div id="hdr-login"></div>
   <div class="auth-shell">
     <div class="auth-card">
@@ -7514,21 +7608,118 @@ function togglePass(inputId, btn){
   btn.textContent = inp.type==='password' ? '👁' : '🙈';
 }
 function doLogin(){
-  var email=document.getElementById('login-email').value.trim();
-  var pass=document.getElementById('login-pass').value;
-  if(!email){document.getElementById('login-email-err').classList.add('show');return;}
-  if(!pass){document.getElementById('login-pass-err').classList.add('show');return;}
+  var email = document.getElementById('login-email').value.trim();
+  var pass  = document.getElementById('login-pass').value;
+  if(!email){ document.getElementById('login-email-err').classList.add('show'); return; }
+  if(!pass){  document.getElementById('login-pass-err').classList.add('show'); return; }
+
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready. Check your config.'); return; }
+
   showToast('🔐 Signing in…');
-  setTimeout(function(){ showPage('home'); showToast('✅ Welcome back to ZÚLA!'); }, 900);
+  var btn = document.querySelector('#page-login .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Signing in…'; }
+
+  fns.signInWithEmailAndPassword(auth, email, pass)
+    .then(function(result){
+      var user = result.user;
+      if(!user.emailVerified){
+        showToast('📧 Please verify your email first. Check your inbox.');
+        if(document.getElementById('verify-email-addr'))
+          document.getElementById('verify-email-addr').textContent = user.email;
+        showPage('verify-email');
+      } else {
+        showToast('✅ Welcome back to ZÚLA!');
+        showPage('home');
+      }
+    })
+    .catch(function(err){
+      var msg = 'Sign in failed. Please try again.';
+      if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential')
+        msg = 'Wrong email or password.';
+      else if(err.code === 'auth/too-many-requests')
+        msg = 'Too many attempts. Try again in a few minutes.';
+      else if(err.code === 'auth/invalid-email')
+        msg = 'Please enter a valid email address.';
+      showToast('❌ ' + msg);
+      document.getElementById('login-pass-err').textContent = msg;
+      document.getElementById('login-pass-err').classList.add('show');
+    })
+    .finally(function(){
+      if(btn){ btn.disabled = false; btn.textContent = 'Sign in →'; }
+    });
 }
 function doSignup(){
-  var agree=document.getElementById('su-agree').checked;
-  var email=document.getElementById('su-email').value.trim();
-  if(!email){document.getElementById('su-email-err').classList.add('show');return;}
-  if(!agree){showToast('⚠️ Please agree to the Terms of Service to continue.');return;}
-  document.getElementById('verify-email-addr').textContent = email || 'your email';
-  showToast('📧 Verification code sent!');
-  setTimeout(function(){ showPage('verify-email'); }, 700);
+  var firstName = document.getElementById('su-fname').value.trim();
+  var lastName  = document.getElementById('su-lname').value.trim();
+  var email     = document.getElementById('su-email').value.trim();
+  var pass      = document.getElementById('su-pass').value;
+  var agree     = document.getElementById('su-agree').checked;
+
+  if(!firstName){ showToast('⚠️ Please enter your first name.'); return; }
+  if(!email){ document.getElementById('su-email-err').classList.add('show'); return; }
+  if(!pass || pass.length < 8){ showToast('⚠️ Password must be at least 8 characters.'); return; }
+  if(!agree){ showToast('⚠️ Please agree to the Terms of Service to continue.'); return; }
+
+  var auth = window._zulaAuth;
+  var db   = window._zulaDb;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready. Check your config.'); return; }
+
+  var btn = document.querySelector('#page-signup .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating account…'; }
+  showToast('⏳ Creating your account…');
+
+  fns.createUserWithEmailAndPassword(auth, email, pass)
+    .then(function(result){
+      var user = result.user;
+      var fullName = firstName + (lastName ? ' ' + lastName : '');
+
+      // Update Firebase Auth display name
+      var profilePromise = fns.updateProfile(user, { displayName: fullName });
+
+      // Send verification email
+      var verifyPromise = fns.sendEmailVerification(user);
+
+      // Save profile to Firestore users collection
+      var userRef = fns.doc(db, 'users', user.uid);
+      var dbPromise = fns.setDoc(userRef, {
+        uid:       user.uid,
+        firstName: firstName,
+        lastName:  lastName,
+        fullName:  fullName,
+        email:     email,
+        phone:     document.getElementById('su-phone') ? document.getElementById('su-phone').value.trim() : '',
+        joinedAt:  fns.serverTimestamp(),
+        role:      'buyer',
+        verified:  false,
+        avatarUrl: ''
+      });
+
+      return Promise.all([profilePromise, verifyPromise, dbPromise]);
+    })
+    .then(function(){
+      showToast('📧 Verification email sent! Check your inbox.');
+      if(document.getElementById('verify-email-addr'))
+        document.getElementById('verify-email-addr').textContent = email;
+      showPage('verify-email');
+    })
+    .catch(function(err){
+      var msg = 'Could not create account. Please try again.';
+      if(err.code === 'auth/email-already-in-use')
+        msg = 'This email is already registered.';
+      else if(err.code === 'auth/invalid-email')
+        msg = 'Please enter a valid email address.';
+      else if(err.code === 'auth/weak-password')
+        msg = 'Password is too weak. Use at least 8 characters.';
+      showToast('❌ ' + msg);
+      document.getElementById('su-email-err').textContent = msg + ' Sign in instead?';
+      document.getElementById('su-email-err').classList.add('show');
+    })
+    .finally(function(){
+      if(btn){ btn.disabled = false; btn.textContent = 'Create account →'; }
+    });
 }
 function checkStrength(val){
   var segs=['str1','str2','str3','str4'];
@@ -7552,11 +7743,23 @@ function checkStrengthForgot(val){
   });
 }
 function sendResetLink(){
-  var email=document.getElementById('forgot-email').value.trim();
-  if(!email){showToast('⚠️ Please enter your email address.');return;}
-  document.getElementById('forgot-sent-email').textContent=email;
-  forgotStep(2);
-  showToast('📬 Reset link sent to '+email);
+  var email = document.getElementById('forgot-email').value.trim();
+  if(!email){ showToast('⚠️ Please enter your email address.'); return; }
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready.'); return; }
+  fns.sendPasswordResetEmail(auth, email)
+    .then(function(){
+      if(document.getElementById('forgot-sent-email'))
+        document.getElementById('forgot-sent-email').textContent = email;
+      forgotStep(2);
+      showToast('📬 Reset link sent to ' + email);
+    })
+    .catch(function(err){
+      var msg = 'Could not send reset email.';
+      if(err.code === 'auth/user-not-found') msg = 'No account found with that email.';
+      showToast('❌ ' + msg);
+    });
 }
 function resendResetLink(){showToast('📬 Reset link resent!');}
 function forgotStep(n){
