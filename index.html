@@ -31,16 +31,10 @@ p{color:var(--text2);margin:0 0 1em;}
 .page{display:none;}
 .page.active{display:block;}
 
-/* PREVIEW BAR */
-.pbar{position:sticky;top:0;z-index:300;background:#09090b;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:8px 14px;flex-wrap:wrap;}
-.pbar-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-right:4px;}
-.ptab{background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:12px;font-family:var(--font-body);padding:6px 12px;border-radius:6px;cursor:pointer;}
-.ptab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.ptab-hint{color:var(--text3);font-size:11px;margin-left:auto;}
 
 /* HEADER */
-.hdr{position:sticky;top:69px;z-index:100;background:rgba(13,13,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
-.currency-bar{top:41px;}
+.hdr{position:sticky;top:31px;z-index:100;background:rgba(13,13,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.currency-bar{top:0;}
 .hdr-inner{display:flex;align-items:center;gap:16px;height:68px;}
 .logo{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.02em;}
 .logo span{color:var(--accent);}
@@ -451,6 +445,17 @@ p{color:var(--text2);margin:0 0 1em;}
 .aff-tier-name{font-size:16px;font-weight:700;margin-bottom:6px;}
 .aff-tier-rate{font-size:24px;font-weight:800;color:var(--accent);margin-bottom:4px;}
 .aff-tier-desc{font-size:12.5px;color:var(--text3);}
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
+.lb-podium-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 22px;text-align:center;min-width:160px;}
+.lb-podium-card.gold{border-color:var(--gold2);order:2;padding-top:28px;background:linear-gradient(180deg,rgba(245,200,66,.1),var(--surface));}
+.lb-podium-card.silver{order:1;}
+.lb-podium-card.bronze{order:3;}
+.lb-rank{font-size:26px;margin-bottom:6px;}
+.lb-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;margin:0 auto 10px;}
+.lb-avatar-sm{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;flex-shrink:0;}
+.lb-name{font-weight:700;font-size:14px;margin-bottom:6px;}
+.lb-tier{margin-bottom:8px;}
+.lb-amount{font-weight:800;font-size:16px;color:var(--text);}
 
 /* ── ADMIN: USER MANAGEMENT ── */
 .user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
@@ -537,58 +542,95 @@ p{color:var(--text2);margin:0 0 1em;}
 .code-input-row input{width:100%;text-align:center;letter-spacing:.3em;font-size:24px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:14px;color:var(--text);font-family:var(--font-display);margin-bottom:16px;}
 .or-divider{text-align:center;color:var(--text3);font-size:12px;margin:12px 0;}
 </style>
+
+<!-- ══ FIREBASE SDK ══ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
+           updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+           from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── YOUR FIREBASE CONFIG ─────────────────────────────────────────────────
+  // IMPORTANT: Replace these values with your own from Firebase Console
+  // Go to: console.firebase.google.com → Your Project → Project Settings → Your apps → Web app
+  const firebaseConfig = {
+    apiKey:            "REPLACE_WITH_YOUR_API_KEY",
+    authDomain:        "REPLACE_WITH_YOUR_AUTH_DOMAIN",
+    projectId:         "REPLACE_WITH_YOUR_PROJECT_ID",
+    storageBucket:     "REPLACE_WITH_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
+    appId:             "REPLACE_WITH_YOUR_APP_ID"
+  };
+  // ────────────────────────────────────────────────────────────────────────
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── EXPOSE to window so non-module functions can call them ───────────────
+  window._zulaAuth = auth;
+  window._zulaDb   = db;
+  window._zulaFns  = {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    signOut,
+    sendPasswordResetEmail,
+    updateProfile,
+    doc, setDoc, getDoc, serverTimestamp
+  };
+
+  // ── AUTH STATE LISTENER ──────────────────────────────────────────────────
+  // Runs on every page load and whenever auth state changes
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is signed in
+      if (!user.emailVerified) {
+        // Not verified — show verification wall
+        window._zulaCurrentUser = null;
+        showPage('verify-email');
+        if (document.getElementById('verify-email-addr')) {
+          document.getElementById('verify-email-addr').textContent = user.email;
+        }
+        return;
+      }
+      // Verified user — load their profile from Firestore
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        window._zulaCurrentUser = snap.exists() ? snap.data() : { email: user.email };
+      } catch(e) {
+        window._zulaCurrentUser = { email: user.email };
+      }
+      // Update header name display
+      const nameEl = document.getElementById('hdr-user-name');
+      if (nameEl && window._zulaCurrentUser) {
+        const name = window._zulaCurrentUser.firstName || user.displayName || 'Account';
+        nameEl.textContent = name + ' ▾';
+      }
+    } else {
+      // Not signed in — show login page
+      window._zulaCurrentUser = null;
+      const activePage = document.querySelector('.page.active');
+      const protectedPages = ['home','browse','product','digital','course','cart',
+        'orders','affiliate','seller','admin','checkout','downloads','player',
+        'addproduct','profile','profile-v2','messaging','settings','notifications'];
+      if (activePage) {
+        const pid = activePage.id.replace('page-','');
+        if (protectedPages.includes(pid)) {
+          showPage('login');
+        }
+      } else {
+        showPage('login');
+      }
+    }
+  });
+</script>
 </head>
 <body>
 
 <!-- PREVIEW NAV -->
-<div class="pbar">
-  <span class="pbar-label">Preview</span>
-  <button class="ptab active" data-page="home">Home</button>
-  <button class="ptab" data-page="browse">Browse</button>
-  <button class="ptab" data-page="product">Physical Product</button>
-  <button class="ptab" data-page="digital">Digital / Ebook</button>
-  <button class="ptab" data-page="course">Course</button>
-  <button class="ptab" data-page="cart">Cart</button>
-  <button class="ptab" data-page="orders">My Orders</button>
-  <button class="ptab" data-page="affiliate">Affiliate Hub</button>
-  <button class="ptab" data-page="seller">Seller Dashboard</button>
-  <button class="ptab" data-page="admin">Admin Panel</button>
-  <button class="ptab" data-page="checkout">Checkout</button>
-  <button class="ptab" data-page="downloads">My Downloads</button>
-  <button class="ptab" data-page="player">Course Player</button>
-  <button class="ptab" data-page="addproduct">Add Product</button>
-  <button class="ptab" data-page="profile">My Profile</button>
-  <button class="ptab" data-page="adminaff">Admin: Affiliates</button>
-  <button class="ptab" data-page="admineng">Admin: Engagement $</button>
-  <button class="ptab" data-page="verification">Seller Verification</button>
-  <button class="ptab" data-page="restricted">Blocked Seller View</button>
-  <button class="ptab" data-page="sellerorders">Seller Orders</button>
-  <button class="ptab" data-page="payout">Seller Payouts</button>
-  <button class="ptab" data-page="inventory">Inventory</button>
-  <button class="ptab" data-page="analytics">Seller Analytics</button>
-  <button class="ptab" data-page="checkout">Checkout</button>
-  <button class="ptab" data-page="dispute">Dispute Centre</button>
-  <button class="ptab" data-page="howworks">How It Works</button>
-  <button class="ptab" data-page="referral">Referral Programme</button>
-  <button class="ptab" data-page="affiliatesignup">Affiliate Sign Up</button>
-  <button class="ptab" data-page="notifications">Notifications</button>
-  <button class="ptab" data-page="adminusers">Admin: Users</button>
-  <button class="ptab" data-page="adminverif">Admin: Verif Queue</button>
-  <button class="ptab" data-page="terms">Terms of Service</button>
-  <button class="ptab" data-page="privacy">Privacy Policy</button>
-  <button class="ptab" data-page="help">Help Centre</button>
-    <button class="ptab" data-page="twofa">2FA Setup (User)</button>
-  <button class="ptab" data-page="adminuserdetail">Admin: User Detail</button>
-  <button class="ptab" data-page="verifstatus">Auto-Verif Status</button>
-    <button class="ptab" data-page="messaging">💬 Full Messaging</button>
-  <button class="ptab" data-page="adminmsg">🛡 Admin: Message Monitor</button>
-    <button class="ptab" data-page="settings">⚙️ Settings</button>
-  <button class="ptab" data-page="language">🌐 Language</button>
-  <button class="ptab" data-page="locationverif">📍 Location Verify</button>
-  <button class="ptab" data-page="profile-v2">👤 Profile (updated)</button>
-  <span class="ptab-hint">Everything is interactive — try all tabs ↑</span>
-</div>
-
 <!-- CURRENCY BAR (appears above all headers) -->
 <div class="currency-bar" id="currency-bar">
   <span class="cb-flag" id="cb-flag">🌍</span>
@@ -659,14 +701,14 @@ p{color:var(--text2);margin:0 0 1em;}
         <span style="position:relative;cursor:pointer;" onclick="toggleNotif()">🔔<span class="cart-dot" id="notif-count">3</span></span>
         <span class="cart-btn" onclick="showPage('cart')">🛒<span class="cart-dot">3</span></span>
         <a onclick="showPage('messaging')" style="cursor:pointer;">💬</a>
-        <span onclick="showPage('profile-v2')" style="cursor:pointer;">Ada O. ▾</span>
+        <span id="hdr-user-name" onclick="showPage('profile-v2')" style="cursor:pointer;">Account ▾</span>
       </nav>
     </div>
   </header>
 </template>
 
 <!-- ======== HOME ======== -->
-<div class="page active" id="page-home">
+<div class="page" id="page-home">
   <div id="hdr-home"></div>
   <section class="hero">
     <div class="hero-bg"></div>
@@ -919,6 +961,18 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="pdetail-price">NGN 18,500.00</div>
         <div class="pdetail-original">NGN 22,000.00</div>
         <div class="rating-row"><span class="stars">★★★★☆</span><span style="font-size:13.5px;font-weight:600;color:var(--text);">4.3</span><span class="rating-count">(128 reviews)</span></div>
+        <!-- TRUST SCORE BREAKDOWN -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 14px;margin-bottom:16px;">
+          <div style="font-size:11.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Rating breakdown</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--gold);min-width:16px;">5★</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:67%;height:100%;background:var(--gold);border-radius:3px;"></div></div><span style="color:var(--text3);min-width:24px;">86</span><span class="tag tag-green" style="font-size:10px;padding:1px 6px;">✓ Verified</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--gold);min-width:16px;">4★</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:20%;height:100%;background:var(--gold);opacity:.7;border-radius:3px;"></div></div><span style="color:var(--text3);min-width:24px;">26</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--gold);min-width:16px;">3★</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:8%;height:100%;background:var(--gold);opacity:.5;border-radius:3px;"></div></div><span style="color:var(--text3);min-width:24px;">10</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--gold);min-width:16px;">2★</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:3%;height:100%;background:var(--red);opacity:.6;border-radius:3px;"></div></div><span style="color:var(--text3);min-width:24px;">4</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--gold);min-width:16px;">1★</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:1%;height:100%;background:var(--red);border-radius:3px;"></div></div><span style="color:var(--text3);min-width:24px;">2</span></div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:14px;font-size:11.5px;color:var(--text3);"><span>✓ 98 verified purchases</span><span>🔒 Escrow protected</span><span>↩ 7-day returns</span></div>
+        </div>
         <p class="desc-text">Handwoven raffia tote, lined interior, sturdy leather handles. Fits a 13" laptop comfortably. Available in three natural colors: sand, brown, and black.</p>
         <ul class="feature-list">
           <li>Ships within 2–3 business days across Nigeria</li>
@@ -929,12 +983,22 @@ p{color:var(--text2);margin:0 0 1em;}
           <button class="qty-btn">−</button>
           <span class="qty-val">1</span>
           <button class="qty-btn">+</button>
-          <span style="font-size:12.5px;color:var(--text3);">12 left in stock</span>
+          <span style="font-size:12.5px;color:var(--text3);">12 left in stock · <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px;border-color:transparent;color:var(--accent);" onclick="toggleWaitlistDemo()">👁 Demo: Out of stock?</button></span>
+        </div>
+        <div id="waitlist-box" style="display:none;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:16px;">
+          <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">😔 This item is currently out of stock</div>
+          <p style="font-size:13px;margin-bottom:10px;">Join the waitlist and we'll email you the moment it's back.</p>
+          <div style="display:flex;gap:8px;"><input id="waitlist-email" style="flex:1;background:var(--surface);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="your@email.com"><button class="btn btn-primary btn-sm" onclick="joinWaitlist()">🔔 Notify me</button></div>
         </div>
         <div class="pdetail-actions">
           <button class="btn btn-ghost" onclick="showPage('cart')">Add to cart</button>
           <button class="btn btn-primary" onclick="showPage('cart')">Buy now</button>
           <button class="btn btn-ghost" onclick="toggleWishDetail(this)" title="Save to wishlist" style="padding:11px 14px;">♡</button>
+        </div>
+        <!-- BNPL + PARTIAL PAYMENT -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <button class="btn btn-ghost btn-block" style="border-color:rgba(56,152,236,.4);color:#5ba8f5;" onclick="openBNPL()">💳 Pay in 3 instalments — NGN 6,167/month (0% interest)</button>
+          <button class="btn btn-ghost btn-block" style="border-color:rgba(245,200,66,.3);color:var(--gold);" onclick="openDeposit()">🤝 Pay deposit — NGN 9,250 now, balance on delivery</button>
         </div>
         <div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" style="color:var(--text3);border-color:transparent;" onclick="openReportModal('this listing')">⚑ Report this listing</button></div>
         <!-- AFFILIATE BOX -->
@@ -952,15 +1016,60 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="section" style="border-top:1px solid var(--border);padding-top:36px;">
       <div class="section-hd"><h2>Customer reviews</h2></div>
       <div class="review-grid">
-        <div class="review-card"><div class="review-top"><div class="review-avatar">AO</div><div><div class="review-name">Ada O.</div><div class="stars" style="font-size:12px;">★★★★★</div></div></div><div class="review-text">Absolutely beautiful bag! Arrived well-packaged and exactly as described. The leather handles are very sturdy.</div></div>
-        <div class="review-card"><div class="review-top"><div class="review-avatar">TM</div><div><div class="review-name">Tolu M.</div><div class="stars" style="font-size:12px;">★★★★☆</div></div></div><div class="review-text">Great quality for the price. The interior lining is really nice. Only wish it came in more colors.</div></div>
-        <div class="review-card"><div class="review-top"><div class="review-avatar">KC</div><div><div class="review-name">Kemi C.</div><div class="stars" style="font-size:12px;">★★★★★</div></div></div><div class="review-text">My third order from Chioma's Closet. Never disappoints! Fast shipping and the bag is even nicer in person.</div></div>
+        <div class="review-card"><div class="review-top"><div class="review-avatar">AO</div><div><div class="review-name">Ada O.</div><div class="stars" style="font-size:12px;">★★★★★</div></div></div><div class="review-text">Absolutely beautiful bag! Arrived well-packaged and exactly as described. The leather handles are very sturdy.</div><div style="font-size:11px;color:var(--green);margin-top:6px;">✓ Verified purchase</div></div>
+        <div class="review-card"><div class="review-top"><div class="review-avatar">TM</div><div><div class="review-name">Tolu M.</div><div class="stars" style="font-size:12px;">★★★★☆</div></div></div><div class="review-text">Great quality for the price. The interior lining is really nice. Only wish it came in more colors.</div><div style="font-size:11px;color:var(--green);margin-top:6px;">✓ Verified purchase</div></div>
+        <div class="review-card"><div class="review-top"><div class="review-avatar">KC</div><div><div class="review-name">Kemi C.</div><div class="stars" style="font-size:12px;">★★★★★</div></div></div><div class="review-text">My third order from Chioma's Closet. Never disappoints! Fast shipping and the bag is even nicer in person.</div><div style="font-size:11px;color:var(--green);margin-top:6px;">✓ Verified purchase</div></div>
       </div>
+    </div>
+    <!-- RELATED / SIMILAR PRODUCTS -->
+    <div class="section" style="border-top:1px solid var(--border);padding-top:36px;">
+      <div class="section-hd"><h2>You might also like</h2><a onclick="showPage('browse')">See all →</a></div>
+      <div class="pgrid">
+        <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👛<span class="heart-btn" onclick="toggleWish(event,this)">♡</span></div><div class="pcard-body"><div class="pcard-name">Leather Clutch</div><div class="pcard-seller">Chioma's Closet</div><div class="pcard-foot"><span class="pcard-price">NGN 12,000</span><span class="pcard-type">Physical</span></div></div></div>
+        <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👗<span class="heart-btn" onclick="toggleWish(event,this)">♡</span></div><div class="pcard-body"><div class="pcard-name">Ankara Wrap Dress</div><div class="pcard-seller">Adire &amp; Co</div><div class="pcard-foot"><span class="pcard-price">NGN 15,000</span><span class="pcard-type">Physical</span></div></div></div>
+        <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👟<span class="heart-btn" onclick="toggleWish(event,this)">♡</span></div><div class="pcard-body"><div class="pcard-name">Canvas Sneakers</div><div class="pcard-seller">Step Up Lagos</div><div class="pcard-foot"><span class="pcard-price">NGN 24,000</span><span class="pcard-type">Physical</span></div></div></div>
+        <div class="pcard" onclick="showPage('product')"><div class="pcard-img">💄<span class="heart-btn" onclick="toggleWish(event,this)">♡</span></div><div class="pcard-body"><div class="pcard-name">Natural Glow Skincare Set</div><div class="pcard-seller">Glow by Nne</div><div class="pcard-foot"><span class="pcard-price">NGN 11,000</span><span class="pcard-type">Physical</span></div></div></div>
+      </div>
+    </div>
+    <!-- OUT-OF-STOCK WAITLIST (hidden by default, toggle for demo) -->
+    <div id="waitlist-banner" style="display:none;margin:16px 0;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-sm);padding:16px 20px;display:none;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">😔 This item is currently out of stock</div>
+      <p style="font-size:13px;margin-bottom:12px;">Join the waitlist and we'll email you the moment it's back.</p>
+      <div style="display:flex;gap:8px;"><input id="waitlist-email" style="flex:1;background:var(--surface);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="your@email.com"><button class="btn btn-primary btn-sm" onclick="joinWaitlist()">🔔 Notify me</button></div>
     </div>
   </div>
 </div>
 
-<!-- ======== DIGITAL / EBOOK ======== -->
+<!-- ======== BNPL MODAL ======== -->
+<div class="modal-bg" id="bnpl-modal">
+  <div class="modal-box">
+    <div class="modal-icon">💳</div>
+    <div class="modal-title">Pay in 3 instalments</div>
+    <div class="modal-desc">Split NGN 18,500 into 3 equal payments. 0% interest. Powered by ZÚLA Pay.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <div style="background:var(--bg3);border:1px solid var(--accent);border-radius:var(--radius-xs);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:600;">Instalment 1</div><div style="font-size:12px;color:var(--text3);">Due today</div></div><div style="font-size:16px;font-weight:700;color:var(--accent);">NGN 6,167</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:600;">Instalment 2</div><div style="font-size:12px;color:var(--text3);">Due Jul 24, 2026</div></div><div style="font-size:16px;font-weight:700;">NGN 6,167</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:600;">Instalment 3</div><div style="font-size:12px;color:var(--text3);">Due Aug 24, 2026</div></div><div style="font-size:16px;font-weight:700;">NGN 6,166</div></div>
+    </div>
+    <div style="background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);margin-bottom:16px;">🔒 Payments are automatically charged on due dates. Item ships after first payment. Escrow protected.</div>
+    <div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" onclick="closeBNPL()">Cancel</button><button class="btn btn-primary" style="flex:1;" onclick="closeBNPL();showPage('cart');showToast('✅ BNPL selected — pay NGN 6,167 today')">Pay NGN 6,167 now →</button></div>
+  </div>
+</div>
+
+<!-- ======== DEPOSIT / PARTIAL PAYMENT MODAL ======== -->
+<div class="modal-bg" id="deposit-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🤝</div>
+    <div class="modal-title">Pay a deposit</div>
+    <div class="modal-desc">Reserve this item with 50% now. Pay the balance when your order is confirmed for shipping.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <div style="background:var(--bg3);border:1px solid var(--accent);border-radius:var(--radius-xs);padding:14px 16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Deposit due now (50%)</span><span style="font-size:16px;font-weight:700;color:var(--accent);">NGN 9,250</span></div><div style="font-size:12px;color:var(--text3);">Paid via Paystack — secures your item immediately</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Balance due on dispatch (50%)</span><span style="font-size:16px;font-weight:700;">NGN 9,250</span></div><div style="font-size:12px;color:var(--text3);">Charged when seller confirms item is ready to ship</div></div>
+    </div>
+    <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);margin-bottom:16px;">🛡 If the seller cannot fulfil your order, your deposit is fully refunded within 24 hours.</div>
+    <div style="display:flex;gap:10px;"><button class="btn btn-ghost" style="flex:1;" onclick="closeDeposit()">Cancel</button><button class="btn btn-gold" style="flex:1;" onclick="closeDeposit();showPage('cart');showToast('✅ Deposit plan selected — pay NGN 9,250 now')">Pay deposit →</button></div>
+  </div>
+</div>
 <div class="page" id="page-digital">
   <div id="hdr-digital"></div>
   <div class="wrap">
@@ -1089,20 +1198,25 @@ p{color:var(--text2);margin:0 0 1em;}
   <div class="cart-wrap">
     <h1 style="font-size:24px;font-weight:700;margin-bottom:20px;">Your cart (3 items)</h1>
     <div class="aff-banner"><span class="aff-icon">💰</span><span>You saved <strong>NGN 1,950</strong> via affiliate discounts on this order!</span></div>
-    <div class="cart-line">
+    <div class="cart-line" id="cart-item-tote">
       <div class="cart-thumb">👜</div>
-      <div class="cart-info"><div class="cart-name">Woven Tote Bag</div><div class="cart-seller">Chioma's Closet · Physical · Ships in 2–3 days</div><div class="qty-row" style="margin:8px 0 0;"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button></div></div>
+      <div class="cart-info"><div class="cart-name">Woven Tote Bag</div><div class="cart-seller">Chioma's Closet · Physical · Ships in 2–3 days</div><div class="qty-row" style="margin:8px 0 0;"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button></div><div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="saveForLater('cart-item-tote','👜','Woven Tote Bag','Chioma\'s Closet','NGN 18,500')">🔖 Save for later</button><button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:transparent;" onclick="document.getElementById('cart-item-tote').remove();showToast('🗑 Item removed')">Remove</button></div></div>
       <div class="cart-price">NGN 18,500</div>
     </div>
-    <div class="cart-line">
+    <div class="cart-line" id="cart-item-ebook">
       <div class="cart-thumb">📚</div>
-      <div class="cart-info"><div class="cart-name">6-Figure Business Blueprint</div><div class="cart-seller">Coach Emeka · Digital PDF · Instant download</div></div>
+      <div class="cart-info"><div class="cart-name">6-Figure Business Blueprint</div><div class="cart-seller">Coach Emeka · Digital PDF · Instant download</div><div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="saveForLater('cart-item-ebook','📚','6-Figure Business Blueprint','Coach Emeka','NGN 4,500')">🔖 Save for later</button><button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:transparent;" onclick="document.getElementById('cart-item-ebook').remove();showToast('🗑 Item removed')">Remove</button></div></div>
       <div class="cart-price">NGN 4,500</div>
     </div>
-    <div class="cart-line">
+    <div class="cart-line" id="cart-item-course">
       <div class="cart-thumb">🎓</div>
-      <div class="cart-info"><div class="cart-name">Excel &amp; Data Analysis Masterclass</div><div class="cart-seller">TechLearn NG · Online course · Lifetime access</div></div>
+      <div class="cart-info"><div class="cart-name">Excel &amp; Data Analysis Masterclass</div><div class="cart-seller">TechLearn NG · Online course · Lifetime access</div><div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="saveForLater('cart-item-course','🎓','Excel & Data Analysis Masterclass','TechLearn NG','NGN 12,000')">🔖 Save for later</button><button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:transparent;" onclick="document.getElementById('cart-item-course').remove();showToast('🗑 Item removed')">Remove</button></div></div>
       <div class="cart-price">NGN 12,000</div>
+    </div>
+    <!-- SAVED FOR LATER -->
+    <div id="saved-for-later-section" style="margin-top:28px;display:none;">
+      <div style="font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">🔖 Saved for later</div>
+      <div id="saved-items-list"></div>
     </div>
     <div class="cart-summary">
       <div class="promo-input-row">
@@ -1181,9 +1295,12 @@ p{color:var(--text2);margin:0 0 1em;}
 <div class="page" id="page-affiliate">
   <div id="hdr-affiliate"></div>
   <div class="wrap" style="padding:32px 24px 70px;">
-    <div style="margin-bottom:28px;">
-      <h1 style="font-size:26px;font-weight:700;margin-bottom:6px;">Your Affiliate Hub</h1>
-      <p>Share products and earn commission on every sale.</p>
+    <div style="margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1 style="font-size:26px;font-weight:700;margin-bottom:6px;">Your Affiliate Hub</h1>
+        <p>Share products and earn commission on every sale.</p>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="showPage('affleaderboard')">🏆 View leaderboard</button>
     </div>
     <!-- tier + main link -->
     <div class="aff-hero">
@@ -1238,6 +1355,90 @@ p{color:var(--text2);margin:0 0 1em;}
   </div>
 </div>
 
+<!-- ======== AFFILIATE LEADERBOARD ======== -->
+<div class="page" id="page-affleaderboard">
+  <div id="hdr-affleaderboard"></div>
+  <div class="wrap" style="padding:32px 24px 70px;">
+    <div style="margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1 style="font-size:26px;font-weight:700;margin-bottom:6px;">🏆 Affiliate Leaderboard</h1>
+        <p>Top earners this month. Climb the ranks, hit the next tier, win bragging rights.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('affiliate')">← Back to my hub</button>
+    </div>
+
+    <!-- PERIOD FILTER -->
+    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+      <button class="fpill active" onclick="lbTab('month',this)">This month</button>
+      <button class="fpill" onclick="lbTab('week',this)">This week</button>
+      <button class="fpill" onclick="lbTab('alltime',this)">All time</button>
+    </div>
+
+    <!-- TOP 3 PODIUM -->
+    <div class="lb-podium">
+      <div class="lb-podium-card silver">
+        <div class="lb-rank">🥈</div>
+        <div class="lb-avatar" style="background:#5ba8f5;">TA</div>
+        <div class="lb-name">Tunde Adeleke</div>
+        <div class="lb-tier"><span class="tag tag-blue">🥈 Silver</span></div>
+        <div class="lb-amount">NGN 61,400</div>
+      </div>
+      <div class="lb-podium-card gold">
+        <div class="lb-rank">🥇</div>
+        <div class="lb-avatar" style="background:#7c5cfc;">AO</div>
+        <div class="lb-name">Ada Okafor</div>
+        <div class="lb-tier"><span class="tag tag-gold">⭐ Gold</span></div>
+        <div class="lb-amount">NGN 89,200</div>
+      </div>
+      <div class="lb-podium-card bronze">
+        <div class="lb-rank">🥉</div>
+        <div class="lb-avatar" style="background:#27c97a;">CO</div>
+        <div class="lb-name">Chidi Obi</div>
+        <div class="lb-tier"><span class="tag tag-green">⭐ Gold</span></div>
+        <div class="lb-amount">NGN 54,900</div>
+      </div>
+    </div>
+
+    <!-- YOUR RANK -->
+    <div class="dash-card" style="border-color:rgba(124,92,252,.4);background:rgba(124,92,252,.05);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:22px;font-weight:800;color:var(--accent);min-width:32px;">#7</div>
+          <div class="lb-avatar" style="background:var(--accent);width:40px;height:40px;font-size:14px;">YO</div>
+          <div>
+            <div style="font-weight:700;font-size:14px;">You</div>
+            <div style="font-size:12px;color:var(--text3);">NGN 14,700 this month</div>
+          </div>
+        </div>
+        <div style="font-size:12.5px;color:var(--text2);">🔥 NGN 8,300 to reach #6 · <strong style="color:var(--text);">NGN 35,300</strong> to reach #1</div>
+      </div>
+    </div>
+
+    <!-- FULL TABLE -->
+    <div class="dash-card">
+      <table class="dtable">
+        <thead><tr><th>Rank</th><th>Affiliate</th><th>Tier</th><th>Conversions</th><th>Earned</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700;">1 🥇</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#7c5cfc;">AO</div>Ada Okafor</div></td><td><span class="tag tag-gold">⭐ Gold</span></td><td>112</td><td style="font-weight:700;color:var(--text);">NGN 89,200</td></tr>
+          <tr><td style="font-weight:700;">2 🥈</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#5ba8f5;">TA</div>Tunde Adeleke</div></td><td><span class="tag tag-blue">🥈 Silver</span></td><td>74</td><td style="font-weight:700;color:var(--text);">NGN 61,400</td></tr>
+          <tr><td style="font-weight:700;">3 🥉</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#27c97a;">CO</div>Chidi Obi</div></td><td><span class="tag tag-gold">⭐ Gold</span></td><td>68</td><td style="font-weight:700;color:var(--text);">NGN 54,900</td></tr>
+          <tr><td>4</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#f05252;">AK</div>Amina Kusa</div></td><td><span class="tag tag-green">🥉 Bronze</span></td><td>51</td><td>NGN 38,750</td></tr>
+          <tr><td>5</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#c9a227;">GE</div>Grace Eze</div></td><td><span class="tag tag-blue">🥈 Silver</span></td><td>44</td><td>NGN 29,600</td></tr>
+          <tr><td>6</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#7c5cfc;">SU</div>Step Up Lagos</div></td><td><span class="tag tag-green">🥉 Bronze</span></td><td>33</td><td>NGN 23,000</td></tr>
+          <tr style="background:rgba(124,92,252,.08);"><td style="font-weight:700;color:var(--accent);">7</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:var(--accent);">YO</div><strong>You</strong></div></td><td><span class="tag tag-green">🥉 Bronze</span></td><td>18</td><td>NGN 14,700</td></tr>
+          <tr><td>8</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#5ba8f5;">KC</div>Kemi Cole</div></td><td><span class="tag tag-green">🥉 Bronze</span></td><td>15</td><td>NGN 11,200</td></tr>
+          <tr><td>9</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#f05252;">BO</div>Bayo Olawale</div></td><td>—</td><td>9</td><td>NGN 6,800</td></tr>
+          <tr><td>10</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="lb-avatar-sm" style="background:#27c97a;">FN</div>Funke Nwosu</div></td><td>—</td><td>7</td><td>NGN 4,150</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="text-align:center;margin-top:8px;">
+      <button class="btn btn-gold btn-sm" onclick="showPage('referral')">🚀 Boost your rank — invite more buyers</button>
+    </div>
+  </div>
+</div>
+
 <!-- ======== SELLER DASHBOARD ======== -->
 <div class="page" id="page-seller">
   <div id="hdr-seller"></div>
@@ -1247,9 +1448,14 @@ p{color:var(--text2);margin:0 0 1em;}
       <nav class="dash-nav">
         <a class="active">📦 My Products</a>
         <a>📊 Sales &amp; Earnings</a>
+        <a onclick="openSellerTool('coupon');showPage('seller');">🏷 Coupons &amp; Promos</a>
+        <a onclick="openSellerTool('flash');showPage('seller');">⚡ Flash Sales</a>
+        <a onclick="openSellerTool('bundle');showPage('seller');">📦 Bundle Deals</a>
+        <a onclick="openSellerTool('subscription');showPage('seller');">🔄 Subscriptions</a>
         <a>💰 Affiliate settings</a>
         <a>📤 Payouts</a>
         <a>⭐ Reviews</a>
+        <a onclick="openSellerTool('vacation');showPage('seller');">☀️ Vacation mode</a>
         <a>⚙️ Store settings</a>
       </nav>
     </aside>
@@ -1262,6 +1468,90 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="stat-card"><div class="stat-lbl">Orders</div><div class="stat-val">34</div></div>
         <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val">NGN 42,500</div></div>
         <div class="stat-card"><div class="stat-lbl">Affiliate sales</div><div class="stat-val">12</div></div>
+      </div>
+      <!-- SELLER TOOLS ROW -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+        <button class="btn btn-ghost btn-sm" onclick="openSellerTool('coupon')" style="border-color:var(--accent);color:var(--accent);">🏷 Create coupon</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSellerTool('flash')" style="border-color:#f05252;color:#f05252;">⚡ Flash sale</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSellerTool('bundle')" style="border-color:var(--gold);color:var(--gold);">📦 Bundle deal</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSellerTool('subscription')" style="border-color:var(--green);color:var(--green);">🔄 Subscription</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSellerTool('vacation')" id="vacation-btn">☀️ Vacation mode</button>
+      </div>
+      <!-- SELLER TOOL PANELS -->
+      <div id="seller-tool-panel" style="display:none;margin-bottom:18px;">
+        <!-- COUPON CREATOR -->
+        <div id="stool-coupon" class="dash-card" style="display:none;border-color:rgba(124,92,252,.4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><h3 style="font-size:15px;font-weight:600;">🏷 Create Promo Code</h3><button class="btn btn-ghost btn-sm" onclick="closeSellerTool()">✕ Close</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Code (e.g. SUMMER20)</label><input id="coupon-code-input" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-display);font-size:13px;text-transform:uppercase;letter-spacing:.05em;" placeholder="MY10OFF"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Discount type</label><select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"><option>% off (e.g. 15%)</option><option>Fixed amount off (NGN)</option><option>Free shipping</option></select></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Discount value</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="15"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Max uses</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="100"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Expiry date</label><input type="date" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="2026-07-31"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Apply to</label><select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"><option>All my products</option><option>Woven Tote Bag only</option><option>6-Figure Blueprint only</option><option>All physical products</option><option>All digital products</option></select></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="createCoupon()">✓ Create coupon</button>
+          <div id="coupon-created" style="display:none;margin-top:12px;background:rgba(39,201,122,.08);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;color:var(--green);">✅ Coupon created! Share it with your buyers.</div>
+          <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;"><div style="font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;">Your active coupons</div><table class="dtable"><thead><tr><th>Code</th><th>Discount</th><th>Used</th><th>Expires</th><th></th></tr></thead><tbody><tr><td style="font-family:var(--font-display);font-weight:700;">CHIOMA15</td><td>15% off</td><td>42 / 100</td><td>Jul 31</td><td><button class="btn btn-ghost btn-sm">Pause</button></td></tr><tr><td style="font-family:var(--font-display);font-weight:700;">WELCOME5K</td><td>NGN 5,000 off</td><td>8 / 50</td><td>Jun 30</td><td><button class="btn btn-ghost btn-sm">Pause</button></td></tr></tbody></table></div>
+        </div>
+        <!-- FLASH SALE -->
+        <div id="stool-flash" class="dash-card" style="display:none;border-color:rgba(240,82,82,.4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><h3 style="font-size:15px;font-weight:600;">⚡ Flash Sale — Time-limited Discount</h3><button class="btn btn-ghost btn-sm" onclick="closeSellerTool()">✕ Close</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Product</label><select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"><option>Woven Tote Bag</option><option>6-Figure Blueprint</option><option>Excel & Data Analysis Course</option><option>All products</option></select></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Flash price (NGN)</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="e.g. 14,000" value="14,000"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Sale starts</label><input type="datetime-local" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Sale ends (countdown shown to buyers)</label><input type="datetime-local" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"></div>
+          </div>
+          <div style="background:rgba(240,82,82,.07);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);margin-bottom:14px;">⚡ A countdown timer will appear on your product page when the sale is live. When the timer expires, the price automatically reverts.</div>
+          <button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="showToast('⚡ Flash sale scheduled! Countdown timer will appear on your listing.')">⚡ Schedule flash sale</button>
+          <!-- LIVE PREVIEW -->
+          <div style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px;display:flex;align-items:center;gap:14px;">
+            <span style="font-size:26px;">👜</span>
+            <div><div style="font-size:13px;font-weight:600;">Woven Tote Bag</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><span style="font-size:15px;font-weight:700;color:var(--red);">NGN 14,000</span><span style="font-size:12px;color:var(--text3);text-decoration:line-through;">NGN 18,500</span></div></div>
+            <div style="margin-left:auto;text-align:center;background:rgba(240,82,82,.12);border:1px solid rgba(240,82,82,.3);border-radius:var(--radius-xs);padding:8px 14px;"><div style="font-size:10px;color:var(--red);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Ends in</div><div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--red);" id="flash-countdown">02:47:33</div></div>
+          </div>
+        </div>
+        <!-- BUNDLE DEAL -->
+        <div id="stool-bundle" class="dash-card" style="display:none;border-color:rgba(245,200,66,.4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><h3 style="font-size:15px;font-weight:600;">📦 Product Bundle Deal</h3><button class="btn btn-ghost btn-sm" onclick="closeSellerTool()">✕ Close</button></div>
+          <div style="margin-bottom:12px;"><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Bundle name</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="Chioma's Starter Pack 🎁"></div>
+          <div style="margin-bottom:12px;"><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:8px;">Include in bundle <span style="color:var(--text3);">(select 2–5 products)</span></label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:8px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent);"> 👜 Woven Tote Bag — NGN 18,500</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:8px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent);"> 👛 Leather Clutch — NGN 12,000</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:8px;cursor:pointer;"><input type="checkbox" style="accent-color:var(--accent);"> 👗 Ankara Wrap Dress — NGN 15,000</label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Bundle type</label><select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"><option>Fixed bundle price</option><option>% discount on bundle</option><option>Buy 2 get 1 free</option></select></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Bundle price (NGN)</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="25,000" value="25,000"></div>
+          </div>
+          <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;margin-bottom:14px;">💡 Bundle saves buyer <strong style="color:var(--gold);">NGN 5,500</strong> (18% off) vs buying individually. This will appear as a "Best value" card on each product page.</div>
+          <button class="btn btn-gold btn-sm" onclick="showToast('📦 Bundle created! Showing as "Best Value" on your product pages.')">Create bundle →</button>
+        </div>
+        <!-- SUBSCRIPTION -->
+        <div id="stool-subscription" class="dash-card" style="display:none;border-color:rgba(39,201,122,.4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><h3 style="font-size:15px;font-weight:600;">🔄 Recurring Subscription / Membership</h3><button class="btn btn-ghost btn-sm" onclick="closeSellerTool()">✕ Close</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Subscription name</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="Chioma's VIP Closet Monthly"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Billing cycle</label><select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;"><option>Monthly</option><option>Quarterly (every 3 months)</option><option>Yearly</option><option>Weekly</option></select></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Price per cycle (NGN)</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="9,000"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">What subscribers get</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="e.g. Monthly fashion box + 20% off all orders"></div>
+          </div>
+          <div style="background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);margin-bottom:14px;">🔄 Subscribers are billed automatically each cycle via Paystack recurring billing. You can pause or cancel any subscriber's plan from your dashboard.</div>
+          <button class="btn btn-sm" style="background:var(--green);color:#1a2e1a;font-weight:700;" onclick="showToast('🔄 Subscription plan created! Buyers can now subscribe on your store page.')">Activate subscription →</button>
+        </div>
+        <!-- VACATION MODE -->
+        <div id="stool-vacation" class="dash-card" style="display:none;border-color:rgba(245,200,66,.3);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><h3 style="font-size:15px;font-weight:600;">☀️ Vacation Mode</h3><button class="btn btn-ghost btn-sm" onclick="closeSellerTool()">✕ Close</button></div>
+          <p style="font-size:13.5px;margin-bottom:14px;">Pause your store while you're away. Your listings stay live but show a notice, and buyers can't purchase until you return.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Away from</label><input type="date" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="2026-07-10"></div>
+            <div><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Back on</label><input type="date" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="2026-07-25"></div>
+            <div style="grid-column:span 2;"><label style="font-size:11.5px;color:var(--text3);display:block;margin-bottom:5px;">Message shown to buyers</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;" value="I'm on holiday until Jul 25 — orders resume then! 🌴"></div>
+          </div>
+          <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);margin-bottom:14px;">☀️ Your products remain visible and searchable. Buyers see your message and a "Notify me when open" option.</div>
+          <button class="btn btn-gold btn-sm" onclick="activateVacation()">Activate vacation mode →</button>
+        </div>
       </div>
       <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary">+ Add physical product</button>
@@ -1355,14 +1645,11 @@ const hdrHtml = document.getElementById('hdr-tpl').innerHTML;
 });
 
 function showPage(name){
-  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
-  const tab=document.querySelector('.ptab[data-page="'+name+'"]');
-  if(tab) tab.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+  var target = document.getElementById('page-'+name);
+  if(target) target.classList.add('active');
   window.scrollTo(0,0);
 }
-document.querySelectorAll('.ptab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 
 function setGal(el,e){
   document.querySelectorAll('.gallery-thumbs div').forEach(d=>d.classList.remove('active'));
@@ -1808,10 +2095,11 @@ document.querySelectorAll('.fpill').forEach(p=>{
       <nav class="dash-nav">
         <a onclick="showPage('admin')">📋 Orders</a>
         <a>🛍 All Products</a>
-        <a>🎓 Courses</a>
-        <a>👥 Users</a>
+        <a onclick="showPage('adminmod')">🚩 Moderation</a>
+        <a onclick="showPage('adminusers')">👥 Users</a>
         <a class="active">💰 Affiliate payouts</a>
-        <a>📣 Site content</a>
+        <a onclick="showPage('adminannounce')">📣 Announcements</a>
+        <a onclick="showPage('adminseo')">🔍 SEO</a>
         <a>⚙️ Settings</a>
       </nav>
     </aside>
@@ -1827,6 +2115,7 @@ document.querySelectorAll('.fpill').forEach(p=>{
       <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
         <button class="btn btn-primary btn-sm" onclick="payAllAff()">Pay all pending affiliates</button>
         <button class="btn btn-ghost btn-sm">Export CSV</button>
+        <button class="btn btn-gold btn-sm" onclick="showPage('affleaderboard')">🏆 View public leaderboard</button>
         <select style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:13px;padding:7px 12px;border-radius:var(--radius-xs);">
           <option>All affiliates</option><option>Gold tier</option><option>Silver tier</option><option>Bronze tier</option>
         </select>
@@ -1855,8 +2144,10 @@ newPages.forEach(p=>{
 });
 
 function showCheckoutSuccess(){
-  document.querySelector('#page-checkout .cart-wrap').style.display='none';
-  document.getElementById('checkout-success').style.display='block';
+  var cw = document.querySelector('#page-checkout .cart-wrap');
+  if(cw) cw.style.display='none';
+  var cs = document.getElementById('checkout-success');
+  if(cs) cs.style.display='block';
 }
 
 function setLesson(n, title){
@@ -2007,29 +2298,7 @@ document.addEventListener('click', e=>{
 .fee-example{font-size:12px;color:var(--text3);}
 </style>
 
-<!-- TAB: Add new preview tabs -->
-<script>
-// inject new tabs into pbar
-(function(){
-  const pbar = document.querySelector('.pbar');
-  const hint = pbar.querySelector('.ptab-hint');
-  const newTabs = [
-    {page:'sellerprofile', label:'Seller Profile'},
-    {page:'myprofile', label:'My Profile (owner)'},
-    {page:'messages', label:'Messages'},
-    {page:'delivery', label:'Delivery & Escrow'},
-    {page:'platformfees', label:'Platform Fees (Admin)'},
-  ];
-  newTabs.forEach(t=>{
-    const btn = document.createElement('button');
-    btn.className='ptab';
-    btn.dataset.page=t.page;
-    btn.textContent=t.label;
-    btn.addEventListener('click',()=>showPage(t.page));
-    pbar.insertBefore(btn, hint);
-  });
-})();
-</script>
+
 
 <!-- ======== SELLER PUBLIC PROFILE ======== -->
 <div class="page" id="page-sellerprofile">
@@ -3729,6 +3998,459 @@ function deliveryDone(){
 </div>
 
 <!-- ======================================================
+     ADMIN: CONTENT MODERATION QUEUE
+     ====================================================== -->
+<div class="page" id="page-adminmod">
+  <div id="hdr-adminmod"></div>
+  <div class="admin-shell">
+    <aside class="dash-side">
+      <div class="d-brand">ZÚLA Admin</div>
+      <nav class="dash-nav">
+        <a onclick="showPage('admin')">📊 Overview</a>
+        <a onclick="showPage('adminusers')">👥 Users</a>
+        <a class="active">🚩 Moderation</a>
+        <a onclick="showPage('adminverif')">🛡 Verif queue</a>
+        <a onclick="showPage('adminmsg')">💬 Messages</a>
+        <a onclick="showPage('admineng')">❤️ Engagement</a>
+        <a onclick="showPage('adminaff')">🔗 Affiliates</a>
+        <a onclick="showPage('adminseo')">🔍 SEO</a>
+        <a onclick="showPage('adminannounce')">📣 Announcements</a>
+        <a onclick="showPage('platformfees')">💎 Platform fees</a>
+      </nav>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-h1">Content Moderation Queue</div>
+      <div class="dash-sub">Listings reported by users or flagged automatically need review before they're removed or cleared.</div>
+
+      <!-- STATS -->
+      <div class="stat-row" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-lbl">In queue</div><div class="stat-val" style="color:var(--red);">6</div></div>
+        <div class="stat-card"><div class="stat-lbl">⚠️ Price anomalies</div><div class="stat-val" style="color:var(--gold);">2</div></div>
+        <div class="stat-card"><div class="stat-lbl">User-reported</div><div class="stat-val">3</div></div>
+        <div class="stat-card"><div class="stat-lbl">Avg time to action</div><div class="stat-val">3.4 hrs</div></div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="fpill active" onclick="filterModQueue('all',this)">All flagged (6)</button>
+        <button class="fpill" onclick="filterModQueue('price',this)">💰 Price anomaly (2)</button>
+        <button class="fpill" onclick="filterModQueue('reported',this)">🚩 User-reported (3)</button>
+        <button class="fpill" onclick="filterModQueue('counterfeit',this)">⚠️ Counterfeit / banned (1)</button>
+      </div>
+
+      <!-- CARD: PRICE ANOMALY (gouging) -->
+      <div class="mod-card price" data-cat="price">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">👟</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">Limited Edition Sneakers</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: StepUp Lagos · Listed 40 mins ago</div>
+            </div>
+          </div>
+          <span class="tag tag-red">💰 Price anomaly</span>
+        </div>
+        <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:12px;">
+          🤖 <strong style="color:var(--red);">AI flag:</strong> Listed at <strong style="color:var(--text);">NGN 500,000</strong> — <strong style="color:var(--red);">96% above</strong> the category median (NGN 18,000–24,000 for comparable sneakers) and <strong style="color:var(--red);">28× this seller's own average listing price</strong>. Pattern consistent with pricing error or scam listing.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('📩 Seller asked to confirm or correct the listed price')">📩 Ask seller to confirm price</button>
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing unpublished — pending seller correction')">⛔ Unpublish listing</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Reviewed — price confirmed legitimate (rare drop)')">✓ Confirm legitimate</button>
+        </div>
+      </div>
+
+      <!-- CARD: PRICE ANOMALY 2 (low/scam bait) -->
+      <div class="mod-card price" data-cat="price">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">📱</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">iPhone 16 Pro Max — Sealed</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: New account (3 days old) · Listed 2 hrs ago</div>
+            </div>
+          </div>
+          <span class="tag tag-red">💰 Price anomaly</span>
+        </div>
+        <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:12px;">
+          🤖 <strong style="color:var(--red);">AI flag:</strong> Listed at <strong style="color:var(--text);">NGN 95,000</strong> — <strong style="color:var(--red);">87% below</strong> category median (NGN 750,000+). Combined with new seller account and no prior sales history, this matches a common advance-fee scam pattern.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing removed — seller account restricted pending review')">⛔ Remove &amp; restrict seller</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('📩 Seller asked to verify item and provide proof of stock')">📩 Request proof of stock</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Reviewed — clearance sale, legitimate')">✓ Confirm legitimate</button>
+        </div>
+      </div>
+
+      <!-- CARD: USER REPORTED -->
+      <div class="mod-card reported" data-cat="reported">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">👜</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">"Designer" Tote Bag — Authentic</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: QuickDeals NG · Reported by 4 users</div>
+            </div>
+          </div>
+          <span class="tag tag-gold">🚩 User-reported</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px;">Reports: "stock photos taken from brand's official site", "not authentic, sold as fake on arrival", "misleading authenticity claim".</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing removed — false authenticity claim confirmed')">⛔ Remove listing</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('⚡ Warning issued to QuickDeals NG for misleading claims')">⚡ Warn seller</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Reviewed — listing edited, claim removed')">✓ Dismiss (edited)</button>
+        </div>
+      </div>
+
+      <!-- CARD: USER REPORTED 2 -->
+      <div class="mod-card reported" data-cat="reported">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">🎓</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">"Guaranteed" Forex Trading Course</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: FXMasterClass · Reported by 2 users</div>
+            </div>
+          </div>
+          <span class="tag tag-gold">🚩 User-reported</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px;">Reports: "promises guaranteed returns, looks like a financial scam", "no actual course content after payment".</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing removed — misleading financial claims')">⛔ Remove listing</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('💬 Buyers of this course alerted to open a dispute if undelivered')">💬 Alert past buyers</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Dismiss — no policy violation found')">✓ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- CARD: USER REPORTED 3 -->
+      <div class="mod-card reported" data-cat="reported">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">💊</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">Weight Loss Supplement Pack</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: VitaShop · Reported by 1 user</div>
+            </div>
+          </div>
+          <span class="tag tag-gold">🚩 User-reported</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px;">Report: "no ingredient list or NAFDAC number shown, seems unsafe to sell without it."</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('📩 Seller asked to add NAFDAC number and ingredient list')">📩 Request compliance info</button>
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing unpublished pending compliance documentation')">⛔ Unpublish until resolved</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Dismiss — documentation confirmed on file')">✓ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- CARD: COUNTERFEIT/BANNED -->
+      <div class="mod-card counterfeit" data-cat="counterfeit" style="border-color:rgba(240,82,82,.4);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:12px;">
+            <div class="dthumb" style="width:48px;height:48px;font-size:22px;">🔥</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;">Replica Designer Perfume Set</div>
+              <div style="font-size:12px;color:var(--text3);">Seller: ScentHub247 · 🤖 Auto-detected keyword match</div>
+            </div>
+          </div>
+          <span class="tag tag-red">⚠️ Counterfeit / banned item</span>
+        </div>
+        <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:12px;">
+          🤖 <strong style="color:var(--red);">AI flag:</strong> Listing title and description contain "replica" / "inspired by" alongside a registered brand name — matches Terms of Service §3 prohibition on counterfeit goods.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm" onclick="resolveModCard(this,'⛔ Listing removed — seller issued strike 1 of 3 for counterfeit goods')">⛔ Remove &amp; strike seller</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveModCard(this,'✓ Dismiss — generic dupe, not a brand counterfeit')">✓ Dismiss (not counterfeit)</button>
+        </div>
+      </div>
+
+      <!-- AUTOMATION SETTINGS NOTICE -->
+      <div style="background:rgba(124,92,252,.05);border:1px solid rgba(124,92,252,.15);border-radius:var(--radius-sm);padding:16px 18px;margin-top:8px;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>🤖 <strong style="color:var(--text);">Auto-flagging:</strong> Listings priced 70%+ above or below category median, or matching banned-keyword patterns, are queued here automatically. Nothing is removed without review.</div>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('⚙️ Auto-flagging thresholds — coming soon to Settings')">Adjust thresholds</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ======================================================
+     ADMIN: PLATFORM ANNOUNCEMENTS
+     ====================================================== -->
+<div class="page" id="page-adminannounce">
+  <div id="hdr-adminannounce"></div>
+  <div class="admin-shell">
+    <aside class="dash-side">
+      <div class="d-brand">ZÚLA Admin</div>
+      <nav class="dash-nav">
+        <a onclick="showPage('admin')">📊 Overview</a>
+        <a onclick="showPage('adminusers')">👥 Users</a>
+        <a onclick="showPage('adminmod')">🚩 Moderation</a>
+        <a onclick="showPage('adminverif')">🛡 Verif queue</a>
+        <a onclick="showPage('adminmsg')">💬 Messages</a>
+        <a onclick="showPage('adminaff')">🔗 Affiliates</a>
+        <a onclick="showPage('adminseo')">🔍 SEO</a>
+        <a class="active">📣 Announcements</a>
+        <a onclick="showPage('platformfees')">💎 Platform fees</a>
+      </nav>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-h1">Platform-Wide Announcements</div>
+      <div class="dash-sub">Send a banner, push notification, or email to all users — or target a specific segment.</div>
+
+      <div class="stat-row" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-lbl">Total users</div><div class="stat-val">48,200</div></div>
+        <div class="stat-card"><div class="stat-lbl">Active banner</div><div class="stat-val" style="color:var(--green);">1 live</div></div>
+        <div class="stat-card"><div class="stat-lbl">Last email sent</div><div class="stat-val">Jun 20</div></div>
+        <div class="stat-card"><div class="stat-lbl">Open rate (last)</div><div class="stat-val">61%</div></div>
+      </div>
+
+      <!-- COMPOSER -->
+      <div class="dash-card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">New announcement</h3>
+
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" id="ann-type-banner" onclick="setAnnounceType('banner',this)">🟪 Site banner</button>
+          <button class="btn btn-ghost btn-sm" id="ann-type-email" onclick="setAnnounceType('email',this)">✉️ Email</button>
+          <button class="btn btn-ghost btn-sm" id="ann-type-push" onclick="setAnnounceType('push',this)">🔔 Push notification</button>
+        </div>
+
+        <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Audience</label>
+        <select id="ann-audience" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;">
+          <option>All users (48,200)</option>
+          <option>Buyers only (41,600)</option>
+          <option>Sellers only (6,100)</option>
+          <option>Verified sellers only (3,840)</option>
+          <option>Affiliates only (2,260)</option>
+          <option>Inactive users (90+ days)</option>
+        </select>
+
+        <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Subject / headline</label>
+        <input id="ann-subject" placeholder="e.g. Scheduled maintenance — Sunday 2–4am WAT" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;">
+
+        <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Message</label>
+        <textarea id="ann-body" rows="4" placeholder="Write the announcement message…" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;resize:vertical;"></textarea>
+
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+          <label style="font-size:12.5px;color:var(--text3);">Banner style:</label>
+          <span class="tag tag-blue" style="cursor:pointer;" onclick="pickBannerStyle('info',this)">ℹ️ Info</span>
+          <span class="tag tag-gold" style="cursor:pointer;" onclick="pickBannerStyle('warning',this)">⚠️ Warning</span>
+          <span class="tag tag-green" style="cursor:pointer;" onclick="pickBannerStyle('success',this)">✅ Success</span>
+          <span class="tag tag-red" style="cursor:pointer;" onclick="pickBannerStyle('urgent',this)">🔴 Urgent</span>
+        </div>
+
+        <!-- LIVE PREVIEW -->
+        <div style="font-size:12.5px;color:var(--text3);margin-bottom:8px;">Preview</div>
+        <div id="ann-preview" class="ann-preview-banner ann-info">📣 Your announcement will appear here as users browse the site.</div>
+
+        <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="sendAnnouncement()">🚀 Send now</button>
+          <button class="btn btn-ghost btn-sm" onclick="scheduleAnnouncement()">🕑 Schedule for later</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('💾 Draft saved')">💾 Save as draft</button>
+        </div>
+      </div>
+
+      <!-- ACTIVE BANNER -->
+      <div class="dash-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <h3 style="font-size:15px;font-weight:600;">Currently live</h3>
+          <span class="tag tag-green">● Active</span>
+        </div>
+        <div class="ann-preview-banner ann-warning" style="margin-bottom:10px;">⚠️ Bank transfer delays expected this weekend due to NIBSS maintenance — payouts may take an extra day.</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Edit form pre-filled above')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="this.closest('.dash-card').querySelector('.ann-preview-banner').style.display='none';showToast('🗑 Banner taken down')">🗑 Take down</button>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="dash-card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Recent announcements</h3>
+        <table class="dtable">
+          <thead><tr><th>Type</th><th>Subject</th><th>Audience</th><th>Sent</th><th>Performance</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-blue">✉️ Email</span></td><td>New affiliate tier launched — Platinum 🏆</td><td>Affiliates only</td><td>Jun 20</td><td style="font-size:12px;">61% open · 14% click</td></tr>
+            <tr><td><span class="tag tag-purple">🟪 Banner</span></td><td>Ramadan sale — up to 40% off select stores</td><td>All users</td><td>Jun 14</td><td style="font-size:12px;">2.1M impressions</td></tr>
+            <tr><td><span class="tag tag-blue">✉️ Email</span></td><td>Your seller account needs re-verification</td><td>Verified sellers</td><td>Jun 9</td><td style="font-size:12px;">78% open · 31% click</td></tr>
+            <tr><td><span class="tag tag-gold">🔔 Push</span></td><td>Flash sale ends in 2 hours ⏰</td><td>Buyers only</td><td>Jun 5</td><td style="font-size:12px;">39% open</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ======================================================
+     ADMIN: SEO SETTINGS
+     ====================================================== -->
+<div class="page" id="page-adminseo">
+  <div id="hdr-adminseo"></div>
+  <div class="admin-shell">
+    <aside class="dash-side">
+      <div class="d-brand">ZÚLA Admin</div>
+      <nav class="dash-nav">
+        <a onclick="showPage('admin')">📊 Overview</a>
+        <a onclick="showPage('adminusers')">👥 Users</a>
+        <a onclick="showPage('adminmod')">🚩 Moderation</a>
+        <a onclick="showPage('adminverif')">🛡 Verif queue</a>
+        <a onclick="showPage('adminmsg')">💬 Messages</a>
+        <a onclick="showPage('adminaff')">🔗 Affiliates</a>
+        <a class="active">🔍 SEO</a>
+        <a onclick="showPage('adminannounce')">📣 Announcements</a>
+        <a onclick="showPage('platformfees')">💎 Platform fees</a>
+      </nav>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-h1">SEO Settings</div>
+      <div class="dash-sub">Manage meta titles, descriptions, and search engine indexing across the platform.</div>
+
+      <div class="stat-row" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-lbl">Indexed pages</div><div class="stat-val">1,842</div></div>
+        <div class="stat-card"><div class="stat-lbl">Sitemap last generated</div><div class="stat-val" style="font-size:15px;">Jun 23, 6:00am</div></div>
+        <div class="stat-card"><div class="stat-lbl">Pages missing meta</div><div class="stat-val" style="color:var(--gold);">23</div></div>
+        <div class="stat-card"><div class="stat-lbl">Organic traffic (30d)</div><div class="stat-val" style="color:var(--green);">+18%</div></div>
+      </div>
+
+      <!-- SITEMAP -->
+      <div class="dash-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:15px;font-weight:600;margin-bottom:4px;">XML Sitemap</h3>
+            <p style="font-size:12.5px;color:var(--text2);">Auto-regenerates daily at 6:00am WAT. Includes all live product, course, and store pages.</p>
+            <div style="margin-top:8px;font-size:12.5px;color:var(--text3);">📍 zula.ng/sitemap.xml · 1,842 URLs · 412 KB</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="regenerateSitemap()">🔄 Regenerate now</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📋 https://zula.ng/sitemap.xml copied')">📋 Copy URL</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📤 Submitted to Google Search Console &amp; Bing Webmaster Tools')">📤 Submit to search engines</button>
+          </div>
+        </div>
+        <div id="sitemap-status" style="font-size:12.5px;color:var(--green);margin-top:10px;">✓ Sitemap is up to date</div>
+      </div>
+
+      <!-- ROBOTS -->
+      <div class="dash-card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:10px;">Robots &amp; indexing</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Allow search engines to index the marketplace</span><div class="toggle-switch on" onclick="toggleSetting(this,'seo-index-all');showToast(this.classList.contains('on')?'✓ Indexing enabled site-wide':'⚠️ Site hidden from search engines')"></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Index seller storefronts</span><div class="toggle-switch on" onclick="toggleSetting(this,'seo-index-stores')"></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;"><span style="font-size:13.5px;">Index suspended / removed listings (noindex recommended)</span><div class="toggle-switch" onclick="toggleSetting(this,'seo-index-removed')"></div></div>
+      </div>
+
+      <!-- META TITLE/DESC PER PAGE -->
+      <div class="dash-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+          <h3 style="font-size:15px;font-weight:600;">Page meta settings</h3>
+          <input placeholder="Search pages…" style="background:var(--bg3);border:1px solid var(--border);padding:8px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;">
+        </div>
+
+        <div class="seo-row">
+          <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">🏠 Homepage</span><span class="tag tag-green" style="font-size:10px;">Good</span></div>
+          <label class="seo-label">Meta title <span id="seo-title-len-1" style="color:var(--text3);">(48/60)</span></label>
+          <input class="seo-input" id="seo-title-1" value="ZÚLA — Buy &amp; Sell Anything in Nigeria | Marketplace" oninput="updateSeoCount('seo-title-1','seo-title-len-1',60)">
+          <label class="seo-label">Meta description <span id="seo-desc-len-1" style="color:var(--text3);">(132/160)</span></label>
+          <textarea class="seo-input" id="seo-desc-1" rows="2" oninput="updateSeoCount('seo-desc-1','seo-desc-len-1',160)">Shop physical products, digital downloads, and online courses from verified Nigerian sellers. Escrow-protected payments, fast delivery nationwide.</textarea>
+        </div>
+
+        <div class="seo-row">
+          <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">🛍 Browse / Category pages</span><span class="tag tag-gold" style="font-size:10px;">Needs work</span></div>
+          <label class="seo-label">Meta title template <span id="seo-title-len-2" style="color:var(--text3);">(38/60)</span></label>
+          <input class="seo-input" id="seo-title-2" value="{category} Products in Nigeria | ZÚLA" oninput="updateSeoCount('seo-title-2','seo-title-len-2',60)">
+          <label class="seo-label">Meta description template <span id="seo-desc-len-2" style="color:var(--text3);">(98/160)</span></label>
+          <textarea class="seo-input" id="seo-desc-2" rows="2" oninput="updateSeoCount('seo-desc-2','seo-desc-len-2',160)">Browse {category} from trusted sellers across Nigeria. Compare prices, read reviews, buy with escrow protection.</textarea>
+        </div>
+
+        <div class="seo-row">
+          <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">📦 Product / Listing pages</span><span class="tag tag-green" style="font-size:10px;">Good</span></div>
+          <label class="seo-label">Meta title template <span id="seo-title-len-3" style="color:var(--text3);">(44/60)</span></label>
+          <input class="seo-input" id="seo-title-3" value="{product_name} — {price} | {seller_name} on ZÚLA" oninput="updateSeoCount('seo-title-3','seo-title-len-3',60)">
+          <label class="seo-label">Meta description template <span id="seo-desc-len-3" style="color:var(--text3);">(110/160)</span></label>
+          <textarea class="seo-input" id="seo-desc-3" rows="2" oninput="updateSeoCount('seo-desc-3','seo-desc-len-3',160)">{product_name} from {seller_name}. {short_description} Buy securely with ZÚLA escrow protection.</textarea>
+        </div>
+
+        <div class="seo-row" style="border-color:rgba(245,200,66,.3);">
+          <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">🎓 Course pages</span><span class="tag tag-red" style="font-size:10px;">⚠️ Missing description</span></div>
+          <label class="seo-label">Meta title template <span id="seo-title-len-4" style="color:var(--text3);">(36/60)</span></label>
+          <input class="seo-input" id="seo-title-4" value="{course_name} Online Course | ZÚLA" oninput="updateSeoCount('seo-title-4','seo-title-len-4',60)">
+          <label class="seo-label">Meta description template <span id="seo-desc-len-4" style="color:var(--red);">(0/160)</span></label>
+          <textarea class="seo-input" id="seo-desc-4" rows="2" placeholder="No description template set — add one to improve search rankings" oninput="updateSeoCount('seo-desc-4','seo-desc-len-4',160)"></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-sm" style="margin-top:6px;" onclick="showToast('✅ All SEO meta changes saved')">💾 Save all changes</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Register headers for new admin & leaderboard pages
+['adminmod','adminannounce','adminseo','affleaderboard'].forEach(p=>{
+  const el = document.getElementById('hdr-'+p);
+  if(el) el.innerHTML = document.getElementById('hdr-tpl').innerHTML;
+});
+
+// ── CONTENT MODERATION QUEUE ──────────────────────────────────
+function filterModQueue(cat, btn){
+  document.querySelectorAll('#page-adminmod .fpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#page-adminmod .mod-card').forEach(card=>{
+    card.style.display = (cat==='all' || card.dataset.cat===cat) ? '' : 'none';
+  });
+}
+function resolveModCard(btn, msg){
+  const card = btn.closest('.mod-card');
+  card.classList.add('resolved');
+  card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  showToast(msg);
+}
+
+// ── PLATFORM ANNOUNCEMENTS ──────────────────────────────────
+function setAnnounceType(type, btn){
+  document.querySelectorAll('#page-adminannounce [id^="ann-type-"]').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-ghost');});
+  btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary');
+}
+function pickBannerStyle(style, el){
+  document.querySelectorAll('#page-adminannounce .tag').forEach(t=>t.style.outline='none');
+  el.style.outline='2px solid var(--text)';
+  const preview = document.getElementById('ann-preview');
+  preview.className = 'ann-preview-banner ann-'+style;
+}
+function sendAnnouncement(){
+  const subject = document.getElementById('ann-subject').value.trim();
+  const audience = document.getElementById('ann-audience').value;
+  if(!subject){ showToast('⚠️ Add a subject or headline first'); return; }
+  showToast('🚀 Announcement sent to '+audience);
+}
+function scheduleAnnouncement(){
+  const subject = document.getElementById('ann-subject').value.trim();
+  if(!subject){ showToast('⚠️ Add a subject or headline first'); return; }
+  showToast('🕑 Announcement scheduled');
+}
+
+// ── SEO SETTINGS ──────────────────────────────────
+function updateSeoCount(inputId, labelId, max){
+  const val = document.getElementById(inputId).value;
+  const label = document.getElementById(labelId);
+  label.textContent = '('+val.length+'/'+max+')';
+  label.style.color = val.length > max ? 'var(--red)' : (val.length === 0 ? 'var(--red)' : 'var(--text3)');
+}
+function regenerateSitemap(){
+  const status = document.getElementById('sitemap-status');
+  status.style.color = 'var(--gold)';
+  status.textContent = '⏳ Regenerating sitemap…';
+  setTimeout(()=>{
+    status.style.color = 'var(--green)';
+    status.textContent = '✓ Sitemap regenerated just now — 1,842 URLs';
+    showToast('✅ Sitemap regenerated and ready');
+  }, 1200);
+}
+
+// ── AFFILIATE LEADERBOARD ──────────────────────────────────
+function lbTab(period, btn){
+  document.querySelectorAll('#page-affleaderboard .fpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast('🏆 Showing '+(period==='month'?'this month':period==='week'?'this week':'all-time')+' rankings');
+}
+</script>
+
+<!-- ======================================================
      TERMS OF SERVICE
      ====================================================== -->
 <div class="page" id="page-terms">
@@ -3909,8 +4631,40 @@ function deliveryDone(){
   </div>
 </div>
 
-</body>
-</html>
+
+<script>
+function zulaSignOut(){
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showPage('login'); return; }
+  fns.signOut(auth).then(function(){
+    window._zulaCurrentUser = null;
+    showToast('👋 You have been signed out.');
+    showPage('login');
+  });
+}
+function resendVerificationEmail(){
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns || !auth.currentUser){ showToast('⚠️ No user session found.'); return; }
+  fns.sendEmailVerification(auth.currentUser)
+    .then(function(){ showToast('📧 Verification email resent! Check your inbox.'); })
+    .catch(function(){ showToast('⚠️ Could not resend. Please wait a minute and try again.'); });
+}
+function checkEmailVerified(){
+  var auth = window._zulaAuth;
+  if(!auth || !auth.currentUser){ showPage('login'); return; }
+  auth.currentUser.reload().then(function(){
+    if(auth.currentUser.emailVerified){
+      showToast('✅ Email verified! Welcome to ZÚLA!');
+      showPage('home');
+    } else {
+      showToast('⏳ Not verified yet — check your inbox and click the link.');
+    }
+  });
+}
+</script>
+
 
 <style>
 /* ── 2FA SETUP ── */
@@ -4650,6 +5404,19 @@ function simulateAutoVerif() {
 .flagged-convo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:12px;}
 .flagged-convo-card.high{border-color:rgba(240,82,82,.4);}
 .flagged-convo-card.medium{border-color:rgba(245,200,66,.3);}
+.mod-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:12px;}
+.mod-card.price{border-color:rgba(245,200,66,.35);}
+.mod-card.reported{border-color:rgba(245,200,66,.25);}
+.mod-card.resolved{opacity:.5;}
+.ann-preview-banner{padding:12px 16px;border-radius:var(--radius-xs);font-size:13px;font-weight:500;border:1px solid;}
+.ann-preview-banner.ann-info{background:rgba(56,152,236,.1);border-color:rgba(56,152,236,.3);color:#5ba8f5;}
+.ann-preview-banner.ann-warning{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);color:var(--gold);}
+.ann-preview-banner.ann-success{background:rgba(39,201,122,.1);border-color:rgba(39,201,122,.3);color:var(--green);}
+.ann-preview-banner.ann-urgent{background:rgba(240,82,82,.1);border-color:rgba(240,82,82,.3);color:var(--red);}
+.seo-row{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;}
+.seo-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.seo-label{font-size:11.5px;color:var(--text3);display:block;margin:10px 0 5px;}
+.seo-input{width:100%;background:var(--bg3);border:1px solid var(--border);padding:8px 11px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;resize:vertical;}
 .convo-snippet{background:var(--bg3);border-left:3px solid var(--border2);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:var(--text2);margin:10px 0;}
 .convo-snippet.flagged-text{border-left-color:var(--red);}
 
@@ -6105,9 +6872,1145 @@ function toggleSetting(el, key) {
 
 // ── HEADER INJECTION FOR NEW PAGES ────────────
 (function(){
-  ['settings','language','locationverif','profile-v2'].forEach(function(p){
+  ['settings','language','locationverif','profile-v2',
+   'login','signup','forgot','verify-email','onboarding','search-results','guest-checkout'].forEach(function(p){
     var el = document.getElementById('hdr-'+p);
     if (el) { var tpl = document.getElementById('hdr-tpl'); if (tpl) el.innerHTML = tpl.innerHTML; }
   });
 })();
 </script>
+
+<style>
+/* ═══════════════════════════════════════════
+   AUTH PAGES — Login / Sign Up / Forgot / Email Verify
+═══════════════════════════════════════════ */
+.auth-shell{min-height:calc(100vh - 112px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:100%;max-width:440px;}
+@media(max-width:500px){.auth-card{padding:28px 22px;}}
+.auth-logo{font-family:var(--font-display);font-size:26px;font-weight:800;text-align:center;margin-bottom:6px;color:var(--text);}
+.auth-logo span{color:var(--accent);}
+.auth-tagline{text-align:center;font-size:13px;color:var(--text3);margin-bottom:28px;}
+.auth-h1{font-size:22px;font-weight:700;margin-bottom:4px;text-align:center;}
+.auth-sub{font-size:13.5px;color:var(--text3);text-align:center;margin-bottom:28px;}
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.auth-field input,.auth-field select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;color:var(--text);font-family:var(--font-body);font-size:14px;transition:.15s;}
+.auth-field input:focus,.auth-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.12);}
+.auth-field input.error{border-color:var(--red);}
+.auth-error-msg{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+.auth-error-msg.show{display:block;}
+.auth-pass-wrap{position:relative;}
+.auth-pass-wrap input{padding-right:42px;}
+.auth-pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:15px;color:var(--text3);}
+.auth-forgot{font-size:12.5px;color:var(--accent);text-align:right;margin-top:-10px;margin-bottom:16px;cursor:pointer;display:block;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text3);font-size:12px;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-social-row{display:flex;gap:10px;margin-bottom:20px;}
+.auth-social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:.15s;font-family:var(--font-body);}
+.auth-social-btn:hover{border-color:var(--accent);color:var(--text);}
+.auth-switch{text-align:center;font-size:13px;color:var(--text3);margin-top:22px;}
+.auth-switch a{color:var(--accent);cursor:pointer;font-weight:600;}
+.auth-terms{font-size:11.5px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6;}
+.auth-terms a{color:var(--accent);}
+.strength-bar-wrap{display:flex;gap:4px;margin-top:6px;}
+.strength-seg{flex:1;height:3px;border-radius:2px;background:var(--border2);transition:.2s;}
+.strength-seg.weak{background:var(--red);}
+.strength-seg.ok{background:var(--gold);}
+.strength-seg.strong{background:var(--green);}
+.strength-label{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* EMAIL VERIFY */
+.verify-otp-row{display:flex;gap:10px;justify-content:center;margin:24px 0;}
+.verify-otp-row input{width:52px;height:60px;text-align:center;font-size:24px;font-weight:700;font-family:var(--font-display);background:var(--bg3);border:2px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);transition:.15s;}
+.verify-otp-row input:focus{outline:none;border-color:var(--accent);}
+.verify-otp-row input.filled{border-color:var(--accent);background:rgba(124,92,252,.07);}
+.verify-success{text-align:center;display:none;}
+.verify-success.show{display:block;}
+.verify-success .vs-icon{font-size:64px;margin-bottom:16px;}
+
+/* ═══════════════════════════════════════════
+   ONBOARDING WIZARD
+═══════════════════════════════════════════ */
+.onboard-shell{min-height:calc(100vh - 112px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.onboard-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:100%;max-width:540px;}
+@media(max-width:500px){.onboard-card{padding:28px 22px;}}
+.onboard-progress{display:flex;gap:6px;margin-bottom:32px;}
+.ob-seg{flex:1;height:4px;border-radius:2px;background:var(--border);}
+.ob-seg.done{background:var(--accent);}
+.ob-seg.active{background:rgba(124,92,252,.5);}
+.onboard-step{display:none;}
+.onboard-step.active{display:block;}
+.onboard-title{font-size:22px;font-weight:700;margin-bottom:6px;}
+.onboard-sub{font-size:13.5px;color:var(--text2);margin-bottom:28px;}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+.role-card{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-sm);padding:24px 20px;text-align:center;cursor:pointer;transition:.15s;}
+.role-card:hover,.role-card.selected{border-color:var(--accent);background:rgba(124,92,252,.06);}
+.role-card .rc-icon{font-size:36px;margin-bottom:10px;}
+.role-card .rc-name{font-size:15px;font-weight:700;margin-bottom:4px;}
+.role-card .rc-desc{font-size:12.5px;color:var(--text3);}
+.interest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:28px;}
+.interest-chip{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);padding:12px 10px;text-align:center;cursor:pointer;transition:.15s;}
+.interest-chip:hover,.interest-chip.selected{border-color:var(--accent);background:rgba(124,92,252,.06);}
+.interest-chip .ic-icon{font-size:22px;margin-bottom:4px;}
+.interest-chip .ic-name{font-size:11.5px;font-weight:600;}
+.onboard-nav{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.onboard-step-label{font-size:12px;color:var(--text3);}
+
+/* ═══════════════════════════════════════════
+   SEARCH RESULTS PAGE
+═══════════════════════════════════════════ */
+.search-page-header{padding:28px 0 0;}
+.search-page-query{font-size:22px;font-weight:700;margin-bottom:4px;}
+.search-page-meta{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.search-top-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.search-top-bar input{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:9px 16px;color:var(--text);font-family:var(--font-body);font-size:14px;}
+.search-active-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.active-filter-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(124,92,252,.12);border:1px solid rgba(124,92,252,.3);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--accent);}
+.active-filter-pill button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;line-height:1;padding:0 0 0 2px;}
+.search-layout{display:grid;grid-template-columns:220px 1fr;gap:24px;padding-bottom:60px;}
+@media(max-width:860px){.search-layout{grid-template-columns:1fr;}}
+.search-results-count{font-size:13px;color:var(--text3);margin-bottom:14px;}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:32px;}
+.page-btn{width:36px;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:var(--text2);transition:.15s;}
+.page-btn:hover,.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.no-results{text-align:center;padding:60px 20px;color:var(--text3);}
+.no-results-icon{font-size:52px;margin-bottom:16px;}
+
+/* ═══════════════════════════════════════════
+   GUEST CHECKOUT
+═══════════════════════════════════════════ */
+.guest-checkout-wrap{max-width:800px;margin:0 auto;padding:36px 24px 70px;}
+.guest-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+@media(max-width:620px){.guest-split{grid-template-columns:1fr;}}
+.guest-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.guest-field input,.guest-field select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:10px 13px;color:var(--text);font-family:var(--font-body);font-size:13.5px;}
+.guest-field input:focus,.guest-field select:focus{outline:none;border-color:var(--accent);}
+.guest-section-title{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.guest-account-nudge{background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:24px;display:flex;gap:14px;align-items:flex-start;}
+.gan-icon{font-size:24px;flex-shrink:0;}
+.gan-title{font-size:13.5px;font-weight:700;margin-bottom:3px;}
+.gan-desc{font-size:12.5px;color:var(--text3);}
+.gan-cta{margin-top:10px;display:flex;gap:8px;}
+</style>
+
+<!-- ══════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════ -->
+<div class="page active" id="page-login">
+  <div id="hdr-login"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-logo">ZÚL<span>A</span></div>
+      <div class="auth-tagline">Everything in One Place</div>
+      <div class="auth-h1">Welcome back</div>
+      <div class="auth-sub">Sign in to your ZÚLA account</div>
+
+      <!-- SOCIAL LOGIN -->
+      <div class="auth-social-row">
+        <button class="auth-social-btn" onclick="showToast('🔵 Continuing with Google…')">🟡 Google</button>
+        <button class="auth-social-btn" onclick="showToast('📘 Continuing with Facebook…')">📘 Facebook</button>
+        <button class="auth-social-btn" onclick="showToast('📱 Continuing with Apple…')">🍎 Apple</button>
+      </div>
+      <div class="auth-divider">or sign in with email</div>
+
+      <!-- EMAIL / PHONE -->
+      <div class="auth-field">
+        <label>Email address or phone number</label>
+        <input type="email" id="login-email" placeholder="ada@example.com" oninput="clearAuthError('login-email-err')">
+        <div class="auth-error-msg" id="login-email-err">Please enter a valid email or phone number.</div>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="auth-pass-wrap">
+          <input type="password" id="login-pass" placeholder="Your password" oninput="clearAuthError('login-pass-err')" onkeydown="if(event.key==='Enter')doLogin()">
+          <span class="auth-pass-toggle" onclick="togglePass('login-pass',this)">👁</span>
+        </div>
+        <div class="auth-error-msg" id="login-pass-err">Incorrect password. Try again or reset it below.</div>
+      </div>
+      <a class="auth-forgot" onclick="showPage('forgot')">Forgot your password?</a>
+
+      <button class="btn btn-primary btn-block" onclick="doLogin()" style="margin-bottom:12px;">Sign in →</button>
+      <button class="btn btn-ghost btn-block" onclick="showPage('guest-checkout')" style="font-size:13px;">Continue as guest (no account needed)</button>
+
+      <div class="auth-switch">New to ZÚLA? <a onclick="showPage('signup')">Create a free account →</a></div>
+      <div class="auth-terms">By signing in you agree to our <a onclick="showPage('terms')">Terms of Service</a> and <a onclick="showPage('privacy')">Privacy Policy</a>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SIGN UP PAGE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-signup">
+  <div id="hdr-signup"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-logo">ZÚL<span>A</span></div>
+      <div class="auth-tagline">Everything in One Place</div>
+      <div class="auth-h1">Create your account</div>
+      <div class="auth-sub">Free forever · No card required</div>
+
+      <div class="auth-social-row">
+        <button class="auth-social-btn" onclick="showToast('🟡 Continuing with Google…')">🟡 Google</button>
+        <button class="auth-social-btn" onclick="showToast('📘 Continuing with Facebook…')">📘 Facebook</button>
+        <button class="auth-social-btn" onclick="showToast('🍎 Continuing with Apple…')">🍎 Apple</button>
+      </div>
+      <div class="auth-divider">or create account with email</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="auth-field">
+          <label>First name</label>
+          <input type="text" id="su-fname" placeholder="Ada">
+        </div>
+        <div class="auth-field">
+          <label>Last name</label>
+          <input type="text" id="su-lname" placeholder="Okafor">
+        </div>
+      </div>
+      <div class="auth-field">
+        <label>Email address</label>
+        <input type="email" id="su-email" placeholder="ada@example.com" oninput="clearAuthError('su-email-err')">
+        <div class="auth-error-msg" id="su-email-err">This email is already registered. <a onclick="showPage('login')" style="color:var(--accent);">Sign in instead?</a></div>
+      </div>
+      <div class="auth-field">
+        <label>Phone number <span style="color:var(--text3);font-weight:400;">(optional — for SMS alerts)</span></label>
+        <input type="tel" id="su-phone" placeholder="+234 800 000 0000">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="auth-pass-wrap">
+          <input type="password" id="su-pass" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+          <span class="auth-pass-toggle" onclick="togglePass('su-pass',this)">👁</span>
+        </div>
+        <div class="strength-bar-wrap">
+          <div class="strength-seg" id="str1"></div>
+          <div class="strength-seg" id="str2"></div>
+          <div class="strength-seg" id="str3"></div>
+          <div class="strength-seg" id="str4"></div>
+        </div>
+        <div class="strength-label" id="str-label">Enter a password</div>
+      </div>
+      <div class="auth-field" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;">
+        <input type="checkbox" id="su-agree" style="margin-top:3px;accent-color:var(--accent);width:auto;">
+        <label for="su-agree" style="font-size:12.5px;color:var(--text2);cursor:pointer;">I agree to the <a onclick="showPage('terms')" style="color:var(--accent);">Terms of Service</a> and <a onclick="showPage('privacy')" style="color:var(--accent);">Privacy Policy</a>. I confirm I am 18 or older.</label>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="doSignup()" style="margin-bottom:12px;">Create account →</button>
+      <button class="btn btn-ghost btn-block" onclick="showPage('guest-checkout')" style="font-size:13px;">Continue as guest instead</button>
+
+      <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Sign in →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FORGOT PASSWORD PAGE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-forgot">
+  <div id="hdr-forgot"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div style="text-align:center;font-size:52px;margin-bottom:16px;">🔑</div>
+      <div class="auth-h1">Reset your password</div>
+      <div class="auth-sub">Enter your email and we'll send a reset link — usually arrives within 60 seconds.</div>
+
+      <!-- STEP 1: Enter email -->
+      <div id="forgot-step1">
+        <div class="auth-field">
+          <label>Email address on your account</label>
+          <input type="email" id="forgot-email" placeholder="ada@example.com" onkeydown="if(event.key==='Enter')sendResetLink()">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="sendResetLink()" style="margin-bottom:14px;">Send reset link →</button>
+        <button class="btn btn-ghost btn-block" onclick="showPage('login')">← Back to sign in</button>
+      </div>
+
+      <!-- STEP 2: Check email (shown after submit) -->
+      <div id="forgot-step2" style="display:none;text-align:center;">
+        <div style="font-size:52px;margin-bottom:16px;">📬</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Check your inbox</div>
+        <p style="font-size:13.5px;color:var(--text2);margin-bottom:20px;">We sent a password reset link to <strong id="forgot-sent-email" style="color:var(--text);">ada@example.com</strong>. The link expires in 15 minutes.</p>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;font-size:13px;color:var(--text3);margin-bottom:20px;">
+          Didn't receive it? Check your spam folder, or
+          <a onclick="resendResetLink()" style="color:var(--accent);cursor:pointer;">resend the link</a>.
+        </div>
+        <button class="btn btn-ghost btn-block" onclick="showPage('login')">← Back to sign in</button>
+      </div>
+
+      <!-- STEP 3: New password form -->
+      <div id="forgot-step3" style="display:none;">
+        <div style="background:rgba(39,201,122,.08);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:12px 14px;font-size:13px;color:var(--text2);margin-bottom:20px;">
+          ✅ Reset link verified — set your new password below.
+        </div>
+        <div class="auth-field">
+          <label>New password</label>
+          <div class="auth-pass-wrap">
+            <input type="password" id="new-pass1" placeholder="Min. 8 characters" oninput="checkStrengthForgot(this.value)">
+            <span class="auth-pass-toggle" onclick="togglePass('new-pass1',this)">👁</span>
+          </div>
+          <div class="strength-bar-wrap">
+            <div class="strength-seg" id="fstr1"></div><div class="strength-seg" id="fstr2"></div>
+            <div class="strength-seg" id="fstr3"></div><div class="strength-seg" id="fstr4"></div>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label>Confirm new password</label>
+          <div class="auth-pass-wrap">
+            <input type="password" id="new-pass2" placeholder="Type it again">
+            <span class="auth-pass-toggle" onclick="togglePass('new-pass2',this)">👁</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="saveNewPass()">Save new password →</button>
+      </div>
+
+      <!-- Demo buttons to walk through steps -->
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--text3);margin-right:4px;">Demo steps:</span>
+        <button class="btn btn-ghost btn-sm" onclick="forgotStep(1)">1 Enter email</button>
+        <button class="btn btn-ghost btn-sm" onclick="forgotStep(2)">2 Email sent</button>
+        <button class="btn btn-ghost btn-sm" onclick="forgotStep(3)">3 Set new password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     EMAIL VERIFICATION PAGE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-verify-email">
+  <div id="hdr-verify-email"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <!-- MAIN VERIFY UI -->
+      <div id="verify-main">
+        <div style="text-align:center;font-size:56px;margin-bottom:16px;">📧</div>
+        <div class="auth-h1">Verify your email</div>
+        <div class="auth-sub">We sent a 6-digit code to <strong id="verify-email-addr" style="color:var(--text);">ada@example.com</strong></div>
+
+        <div class="verify-otp-row">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,0)" onkeydown="otpBack(event,this,0)">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,1)" onkeydown="otpBack(event,this,1)">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,2)" onkeydown="otpBack(event,this,2)">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,3)" onkeydown="otpBack(event,this,3)">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,4)" onkeydown="otpBack(event,this,4)">
+          <input type="text" maxlength="1" class="otp-digit" oninput="otpAdvance(this,5)" onkeydown="otpBack(event,this,5)">
+        </div>
+
+        <div id="otp-error" style="display:none;text-align:center;color:var(--red);font-size:13px;margin-bottom:14px;">❌ Incorrect code — please try again.</div>
+
+        <button class="btn btn-primary btn-block" onclick="verifyOTP()" style="margin-bottom:12px;">Verify email →</button>
+        <button class="btn btn-ghost btn-block" onclick="resendOTP()" id="resend-btn">Resend code</button>
+
+        <div id="resend-timer" style="text-align:center;font-size:12.5px;color:var(--text3);margin-top:10px;display:none;">
+          Resend available in <span id="resend-countdown">60</span>s
+        </div>
+
+        <div style="margin-top:20px;text-align:center;font-size:12.5px;color:var(--text3);">
+          Wrong email? <a onclick="showPage('signup')" style="color:var(--accent);cursor:pointer;">Go back and change it</a>
+        </div>
+
+        <!-- Demo: auto-fill correct code -->
+        <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);text-align:center;">
+          <button class="btn btn-ghost btn-sm" onclick="fillOTP('3','7','4','1','9','2')">Demo: fill correct code</button>
+          <button class="btn btn-ghost btn-sm" onclick="fillOTP('0','0','0','0','0','0')">Demo: fill wrong code</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="verify-success" id="verify-success">
+        <div class="vs-icon">🎉</div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:8px;color:var(--green);">Email verified!</div>
+        <p style="font-size:13.5px;color:var(--text2);margin-bottom:24px;">Your account is now active. Let's get you set up on ZÚLA.</p>
+        <button class="btn btn-primary btn-block" onclick="showPage('onboarding')">Set up my account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     ONBOARDING WIZARD
+══════════════════════════════════════════════ -->
+<div class="page" id="page-onboarding">
+  <div id="hdr-onboarding"></div>
+  <div class="onboard-shell">
+    <div class="onboard-card">
+      <!-- PROGRESS BAR -->
+      <div class="onboard-progress">
+        <div class="ob-seg active" id="obs1"></div>
+        <div class="ob-seg" id="obs2"></div>
+        <div class="ob-seg" id="obs3"></div>
+        <div class="ob-seg" id="obs4"></div>
+      </div>
+
+      <!-- STEP 1: Choose role -->
+      <div class="onboard-step active" id="ob-step1">
+        <div class="onboard-title">👋 Welcome to ZÚLA!</div>
+        <div class="onboard-sub">How are you planning to use ZÚLA? You can always change this later.</div>
+        <div class="role-cards">
+          <div class="role-card" id="role-buyer" onclick="selectRole('buyer')">
+            <div class="rc-icon">🛍</div>
+            <div class="rc-name">I want to buy</div>
+            <div class="rc-desc">Browse products, courses &amp; digital downloads</div>
+          </div>
+          <div class="role-card" id="role-seller" onclick="selectRole('seller')">
+            <div class="rc-icon">🏪</div>
+            <div class="rc-name">I want to sell</div>
+            <div class="rc-desc">List products, set up a store, start earning</div>
+          </div>
+          <div class="role-card" id="role-both" onclick="selectRole('both')">
+            <div class="rc-icon">⚡</div>
+            <div class="rc-name">Both — buy &amp; sell</div>
+            <div class="rc-desc">Most users do both. All features unlocked.</div>
+          </div>
+          <div class="role-card" id="role-affiliate" onclick="selectRole('affiliate')">
+            <div class="rc-icon">💰</div>
+            <div class="rc-name">Affiliate / Promoter</div>
+            <div class="rc-desc">Share products &amp; earn commissions</div>
+          </div>
+        </div>
+        <div class="onboard-nav">
+          <span class="onboard-step-label">Step 1 of 4</span>
+          <button class="btn btn-primary" onclick="obNext(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Pick interests -->
+      <div class="onboard-step" id="ob-step2">
+        <div class="onboard-title">What are you into?</div>
+        <div class="onboard-sub">Pick your interests so we can personalise your feed. Choose as many as you like.</div>
+        <div class="interest-grid">
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">👗</div><div class="ic-name">Fashion</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">📚</div><div class="ic-name">Books &amp; Ebooks</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🎓</div><div class="ic-name">Courses</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">💻</div><div class="ic-name">Tech &amp; Gadgets</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🍳</div><div class="ic-name">Food &amp; Recipes</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">💄</div><div class="ic-name">Beauty</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🏋️</div><div class="ic-name">Fitness</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🎵</div><div class="ic-name">Music</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🎨</div><div class="ic-name">Art &amp; Design</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">💼</div><div class="ic-name">Business</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">🏠</div><div class="ic-name">Home &amp; Living</div></div>
+          <div class="interest-chip" onclick="this.classList.toggle('selected')"><div class="ic-icon">📸</div><div class="ic-name">Photography</div></div>
+        </div>
+        <div class="onboard-nav">
+          <button class="btn btn-ghost" onclick="obNext(1)">← Back</button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="onboard-step-label">Step 2 of 4</span>
+            <button class="btn btn-primary" onclick="obNext(3)">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Set location -->
+      <div class="onboard-step" id="ob-step3">
+        <div class="onboard-title">📍 Where are you based?</div>
+        <div class="onboard-sub">This helps us show relevant sellers, delivery options, and prices in your local currency.</div>
+        <div style="margin-bottom:16px;">
+          <div class="auth-field">
+            <label>Country</label>
+            <select id="ob-country">
+              <option selected>Nigeria</option><option>Ghana</option><option>Kenya</option>
+              <option>South Africa</option><option>Ethiopia</option><option>Egypt</option>
+              <option>Tanzania</option><option>Uganda</option><option>United Kingdom</option>
+              <option>United States</option><option>Canada</option><option>Germany</option>
+              <option>France</option><option>India</option><option>Other</option>
+            </select>
+          </div>
+          <div class="auth-field">
+            <label>City / State</label>
+            <input type="text" id="ob-city" placeholder="e.g. Lagos, Abuja, Accra…">
+          </div>
+        </div>
+        <div style="background:rgba(56,152,236,.07);border:1px solid rgba(56,152,236,.15);border-radius:var(--radius-xs);padding:11px 14px;font-size:12.5px;color:var(--text2);margin-bottom:20px;">
+          🔒 Only your country and general city are stored. Your exact location is never shared with sellers.
+        </div>
+        <button class="btn btn-ghost btn-block" onclick="requestGPS();showToast('📍 Requesting GPS…')" style="margin-bottom:12px;">📡 Use my current location instead</button>
+        <div class="onboard-nav">
+          <button class="btn btn-ghost" onclick="obNext(2)">← Back</button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="onboard-step-label">Step 3 of 4</span>
+            <button class="btn btn-primary" onclick="obNext(4)">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: All done -->
+      <div class="onboard-step" id="ob-step4">
+        <div style="text-align:center;">
+          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+          <div class="onboard-title" style="text-align:center;">You're all set!</div>
+          <div class="onboard-sub" style="text-align:center;margin-bottom:28px;">Your ZÚLA account is ready. Here's what you can do next:</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:left;">
+            <div style="display:flex;gap:12px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:13px 16px;cursor:pointer;" onclick="showPage('browse')">
+              <span style="font-size:24px;">🛍</span><div><div style="font-size:13.5px;font-weight:600;">Browse the marketplace</div><div style="font-size:12px;color:var(--text3);">Discover products from African sellers</div></div><span style="margin-left:auto;color:var(--accent);">→</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:13px 16px;cursor:pointer;" onclick="showPage('verification')">
+              <span style="font-size:24px;">🏪</span><div><div style="font-size:13.5px;font-weight:600;">Set up your store</div><div style="font-size:12px;color:var(--text3);">Verify your account and start selling</div></div><span style="margin-left:auto;color:var(--accent);">→</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:13px 16px;cursor:pointer;" onclick="showPage('affiliatesignup')">
+              <span style="font-size:24px;">💰</span><div><div style="font-size:13.5px;font-weight:600;">Join the affiliate programme</div><div style="font-size:12px;color:var(--text3);">Earn commissions promoting products</div></div><span style="margin-left:auto;color:var(--accent);">→</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="showPage('home')">Go to homepage →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SEARCH RESULTS PAGE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-search-results">
+  <div id="hdr-search-results"></div>
+  <div class="wrap">
+    <div class="search-page-header">
+      <!-- TOP BAR -->
+      <div class="search-top-bar">
+        <input type="text" id="search-page-input" value="bags" oninput="liveSearchUpdate(this.value)" onkeydown="if(event.key==='Enter')liveSearchUpdate(this.value)">
+        <button class="btn btn-primary btn-sm" onclick="liveSearchUpdate(document.getElementById('search-page-input').value)">🔍 Search</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <select style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:13px;padding:7px 12px;border-radius:var(--radius-xs);" onchange="showToast('↕ Sorted by: '+this.options[this.selectedIndex].text)">
+            <option>Relevance</option>
+            <option>Newest first</option>
+            <option>Price: low to high</option>
+            <option>Price: high to low</option>
+            <option>Top rated</option>
+            <option>Best selling</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="search-page-meta">
+        Showing results for <strong id="search-query-label" style="color:var(--text);">"bags"</strong> — <span id="search-count-label">48 results</span>
+      </div>
+
+      <!-- ACTIVE FILTERS -->
+      <div class="search-active-filters" id="search-active-filters">
+        <div class="active-filter-pill">Fashion <button onclick="removeFilter(this)">✕</button></div>
+        <div class="active-filter-pill">Under NGN 30,000 <button onclick="removeFilter(this)">✕</button></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()">Clear all</button>
+      </div>
+    </div>
+
+    <div class="search-layout">
+      <!-- FILTER SIDEBAR -->
+      <aside class="filter-panel">
+        <h3>Filters</h3>
+        <div class="filter-group">
+          <h4>Category</h4>
+          <label class="fcheck"><input type="checkbox" checked> Fashion &amp; Accessories</label>
+          <label class="fcheck"><input type="checkbox"> Digital Products</label>
+          <label class="fcheck"><input type="checkbox"> Courses</label>
+          <label class="fcheck"><input type="checkbox"> Home &amp; Living</label>
+          <label class="fcheck"><input type="checkbox"> Beauty &amp; Health</label>
+          <label class="fcheck"><input type="checkbox"> Tech &amp; Electronics</label>
+        </div>
+        <div class="filter-group">
+          <h4>Product type</h4>
+          <label class="fcheck"><input type="checkbox" checked> Physical item</label>
+          <label class="fcheck"><input type="checkbox"> Digital download</label>
+          <label class="fcheck"><input type="checkbox"> Course</label>
+        </div>
+        <div class="filter-group">
+          <h4>Price range (NGN)</h4>
+          <input type="range" class="price-range" min="0" max="100000" value="30000" oninput="document.getElementById('price-val').textContent='Up to NGN '+Number(this.value).toLocaleString()">
+          <div id="price-val" style="font-size:12.5px;color:var(--text2);margin-top:6px;">Up to NGN 30,000</div>
+        </div>
+        <div class="filter-group">
+          <h4>Seller rating</h4>
+          <label class="fcheck"><input type="checkbox" checked> ⭐⭐⭐⭐⭐ 5 stars</label>
+          <label class="fcheck"><input type="checkbox" checked> ⭐⭐⭐⭐ 4+ stars</label>
+          <label class="fcheck"><input type="checkbox"> ⭐⭐⭐ 3+ stars</label>
+        </div>
+        <div class="filter-group" style="margin-bottom:0;">
+          <h4>Location</h4>
+          <label class="fcheck"><input type="checkbox" checked> 🇳🇬 Nigeria</label>
+          <label class="fcheck"><input type="checkbox"> 🇬🇭 Ghana</label>
+          <label class="fcheck"><input type="checkbox"> 🇰🇪 Kenya</label>
+          <label class="fcheck"><input type="checkbox"> 🌍 All countries</label>
+        </div>
+      </aside>
+
+      <!-- RESULTS GRID -->
+      <div>
+        <div class="sort-row">
+          <div class="search-results-count" id="search-results-count">48 products found</div>
+          <div class="filter-pills" style="margin-bottom:0;">
+            <div class="fpill active" onclick="switchView('grid',this)">⊞ Grid</div>
+            <div class="fpill" onclick="switchView('list',this)">☰ List</div>
+          </div>
+        </div>
+
+        <div class="pgrid" id="search-results-grid">
+          <!-- Result cards -->
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👜<div class="pcard-badge"><span class="tag tag-gold">Affiliate</span></div></div><div class="pcard-body"><div class="pcard-name">Woven Raffia Tote Bag</div><div class="pcard-seller">Chioma's Closet · ⭐ 4.9 (128)</div><div class="pcard-foot"><span class="pcard-price">NGN 18,500</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👝<div class="pcard-badge"><span class="tag tag-purple">New</span></div></div><div class="pcard-body"><div class="pcard-name">Leather Crossbody Bag</div><div class="pcard-seller">Adire &amp; Co · ⭐ 4.7 (54)</div><div class="pcard-foot"><span class="pcard-price">NGN 24,000</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">🎒</div><div class="pcard-body"><div class="pcard-name">Ankara Print Backpack</div><div class="pcard-seller">AfroWear Lagos · ⭐ 4.8 (89)</div><div class="pcard-foot"><span class="pcard-price">NGN 15,000</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👛</div><div class="pcard-body"><div class="pcard-name">Beaded Evening Clutch</div><div class="pcard-seller">GoldBead Crafts · ⭐ 5.0 (33)</div><div class="pcard-foot"><span class="pcard-price">NGN 12,500</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">💼<div class="pcard-badge"><span class="tag tag-green">-20%</span></div></div><div class="pcard-body"><div class="pcard-name">Executive Laptop Bag</div><div class="pcard-seller">ProBags NG · ⭐ 4.6 (72)</div><div class="pcard-foot"><span class="pcard-price">NGN 22,000</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">🧳</div><div class="pcard-body"><div class="pcard-name">Wax Print Travel Bag</div><div class="pcard-seller">AfriKraft · ⭐ 4.8 (41)</div><div class="pcard-foot"><span class="pcard-price">NGN 28,000</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">👜</div><div class="pcard-body"><div class="pcard-name">Hand-dyed Aso-Oke Bag</div><div class="pcard-seller">Aso Market · ⭐ 4.9 (61)</div><div class="pcard-foot"><span class="pcard-price">NGN 9,800</span><span class="pcard-type">Physical</span></div></div></div>
+          <div class="pcard" onclick="showPage('product')"><div class="pcard-img">🎽</div><div class="pcard-body"><div class="pcard-name">Gym &amp; Duffel Bag</div><div class="pcard-seller">FitGear Abuja · ⭐ 4.5 (29)</div><div class="pcard-foot"><span class="pcard-price">NGN 11,000</span><span class="pcard-type">Physical</span></div></div></div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+          <div class="page-btn active">1</div>
+          <div class="page-btn" onclick="turnPage(this,2)">2</div>
+          <div class="page-btn" onclick="turnPage(this,3)">3</div>
+          <div class="page-btn" onclick="turnPage(this,4)">4</div>
+          <div class="page-btn" onclick="turnPage(this,5)">…</div>
+          <div class="page-btn" onclick="turnPage(this,6)">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     GUEST CHECKOUT PAGE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-guest-checkout">
+  <div id="hdr-guest-checkout"></div>
+  <div class="guest-checkout-wrap">
+    <h1 style="font-size:24px;font-weight:700;margin-bottom:4px;">Checkout</h1>
+    <p style="font-size:13.5px;color:var(--text3);margin-bottom:24px;">Complete your order below — no account required.</p>
+
+    <!-- ACCOUNT NUDGE BANNER -->
+    <div class="guest-account-nudge">
+      <div class="gan-icon">💡</div>
+      <div>
+        <div class="gan-title">Save time on future orders</div>
+        <div class="gan-desc">Create a free account to track orders, save your address, and earn affiliate rewards — takes 30 seconds.</div>
+        <div class="gan-cta">
+          <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Create free account</button>
+          <button class="btn btn-ghost btn-sm" onclick="this.closest('.guest-account-nudge').style.display='none'">No thanks, continue as guest</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkout-layout">
+      <!-- LEFT: FORM -->
+      <div>
+        <!-- CONTACT INFO -->
+        <div class="dash-card" style="margin-bottom:20px;">
+          <div class="guest-section-title">📋 Contact information</div>
+          <div class="guest-split">
+            <div class="guest-field"><label>First name *</label><input type="text" placeholder="Ada"></div>
+            <div class="guest-field"><label>Last name *</label><input type="text" placeholder="Okafor"></div>
+          </div>
+          <div class="guest-field" style="margin-bottom:12px;"><label>Email address *</label><input type="email" placeholder="ada@example.com"></div>
+          <div class="guest-field"><label>Phone number *</label><input type="tel" placeholder="+234 800 000 0000"></div>
+          <div style="margin-top:12px;background:rgba(56,152,236,.06);border:1px solid rgba(56,152,236,.15);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--text2);">
+            📦 Order confirmation and tracking updates will be sent to your email and phone.
+          </div>
+        </div>
+
+        <!-- DELIVERY ADDRESS -->
+        <div class="dash-card" style="margin-bottom:20px;">
+          <div class="guest-section-title">🚚 Delivery address</div>
+          <div class="guest-field" style="margin-bottom:12px;"><label>Street address *</label><input type="text" placeholder="12 Bode Thomas Street, Surulere"></div>
+          <div class="guest-split">
+            <div class="guest-field"><label>City *</label><input type="text" placeholder="Lagos"></div>
+            <div class="guest-field"><label>State / Region *</label><input type="text" placeholder="Lagos State"></div>
+          </div>
+          <div class="guest-split">
+            <div class="guest-field"><label>Country *</label>
+              <select><option>Nigeria</option><option>Ghana</option><option>Kenya</option><option>South Africa</option><option>United Kingdom</option><option>Other</option></select>
+            </div>
+            <div class="guest-field"><label>Postcode / ZIP</label><input type="text" placeholder="100001"></div>
+          </div>
+          <div style="margin-top:12px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--text2);">
+              <input type="checkbox" style="accent-color:var(--accent);" checked> Save this address for future orders (optional)
+            </label>
+          </div>
+        </div>
+
+        <!-- PAYMENT METHOD -->
+        <div class="dash-card" style="margin-bottom:20px;">
+          <div class="guest-section-title">💳 Payment method</div>
+          <div class="payment-method selected" onclick="selectPayMethod(this)">
+            <input type="radio" name="guest-pay" checked>
+            <div class="payment-icon">💳</div>
+            <div><div class="payment-name">Card payment</div><div class="payment-desc">Visa, Mastercard — secured by Paystack</div></div>
+            <span class="tag tag-green" style="margin-left:auto;">Recommended</span>
+          </div>
+          <div class="payment-method" onclick="selectPayMethod(this)">
+            <input type="radio" name="guest-pay">
+            <div class="payment-icon">🏦</div>
+            <div><div class="payment-name">Bank transfer</div><div class="payment-desc">Pay directly from your bank app</div></div>
+          </div>
+          <div class="payment-method" onclick="selectPayMethod(this)">
+            <input type="radio" name="guest-pay">
+            <div class="payment-icon">📱</div>
+            <div><div class="payment-name">Mobile money</div><div class="payment-desc">MTN MoMo, Airtel Money, Opay</div></div>
+          </div>
+          <div class="payment-method" onclick="selectPayMethod(this)">
+            <input type="radio" name="guest-pay">
+            <div class="payment-icon">💵</div>
+            <div><div class="payment-name">Pay on delivery</div><div class="payment-desc">Cash or POS on delivery — selected areas only</div></div>
+          </div>
+        </div>
+
+        <!-- PROMO CODE -->
+        <div style="margin-bottom:20px;">
+          <div class="promo-input-row">
+            <input type="text" placeholder="Promo or affiliate code" id="guest-promo">
+            <button class="btn btn-ghost" onclick="applyGuestPromo()">Apply</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" style="font-size:15px;padding:14px;" onclick="placeGuestOrder()">
+          🔒 Place order — NGN 18,500
+        </button>
+        <div class="tax-notice" style="margin-top:12px;">
+          <strong>Buyer protection:</strong> Your payment is held in escrow until you confirm delivery. <a onclick="showPage('howworks')">How it works →</a>
+        </div>
+      </div>
+
+      <!-- RIGHT: ORDER SUMMARY -->
+      <div>
+        <div class="cart-summary" style="position:sticky;top:120px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">Order summary</div>
+          <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:10px;">
+            <div style="width:52px;height:52px;background:var(--bg3);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👜</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Woven Raffia Tote Bag</div><div style="font-size:12px;color:var(--text3);">Chioma's Closet · Qty: 1</div></div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--accent);">NGN 18,500</div>
+          </div>
+          <div class="cart-row"><span>Subtotal</span><span>NGN 18,500</span></div>
+          <div class="cart-row"><span>Delivery</span><span style="color:var(--green);">Free</span></div>
+          <div class="cart-row"><span>Escrow fee</span><span>Included</span></div>
+          <div id="guest-promo-row" style="display:none;" class="cart-row"><span style="color:var(--green);">Promo code</span><span id="guest-promo-disc" style="color:var(--green);">− NGN 0</span></div>
+          <div class="cart-total"><span>Total</span><span>NGN 18,500</span></div>
+
+          <div style="margin-top:16px;background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:12px 14px;font-size:12.5px;color:var(--text2);">
+            🛡 Protected by ZÚLA Buyer Guarantee. Full refund if item doesn't arrive or isn't as described.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// AUTH PAGE JS
+// ══════════════════════════════════════════════
+function clearAuthError(id){
+  var el=document.getElementById(id);
+  if(el) el.classList.remove('show');
+}
+function togglePass(inputId, btn){
+  var inp=document.getElementById(inputId);
+  if(!inp) return;
+  inp.type = inp.type==='password' ? 'text' : 'password';
+  btn.textContent = inp.type==='password' ? '👁' : '🙈';
+}
+function doLogin(){
+  var email = document.getElementById('login-email').value.trim();
+  var pass  = document.getElementById('login-pass').value;
+  if(!email){ document.getElementById('login-email-err').classList.add('show'); return; }
+  if(!pass){  document.getElementById('login-pass-err').classList.add('show'); return; }
+
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready. Check your config.'); return; }
+
+  showToast('🔐 Signing in…');
+  var btn = document.querySelector('#page-login .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Signing in…'; }
+
+  fns.signInWithEmailAndPassword(auth, email, pass)
+    .then(function(result){
+      var user = result.user;
+      if(!user.emailVerified){
+        showToast('📧 Please verify your email first. Check your inbox.');
+        if(document.getElementById('verify-email-addr'))
+          document.getElementById('verify-email-addr').textContent = user.email;
+        showPage('verify-email');
+      } else {
+        showToast('✅ Welcome back to ZÚLA!');
+        showPage('home');
+      }
+    })
+    .catch(function(err){
+      var msg = 'Sign in failed. Please try again.';
+      if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential')
+        msg = 'Wrong email or password.';
+      else if(err.code === 'auth/too-many-requests')
+        msg = 'Too many attempts. Try again in a few minutes.';
+      else if(err.code === 'auth/invalid-email')
+        msg = 'Please enter a valid email address.';
+      showToast('❌ ' + msg);
+      document.getElementById('login-pass-err').textContent = msg;
+      document.getElementById('login-pass-err').classList.add('show');
+    })
+    .finally(function(){
+      if(btn){ btn.disabled = false; btn.textContent = 'Sign in →'; }
+    });
+}
+function doSignup(){
+  var firstName = document.getElementById('su-fname').value.trim();
+  var lastName  = document.getElementById('su-lname').value.trim();
+  var email     = document.getElementById('su-email').value.trim();
+  var pass      = document.getElementById('su-pass').value;
+  var agree     = document.getElementById('su-agree').checked;
+
+  if(!firstName){ showToast('⚠️ Please enter your first name.'); return; }
+  if(!email){ document.getElementById('su-email-err').classList.add('show'); return; }
+  if(!pass || pass.length < 8){ showToast('⚠️ Password must be at least 8 characters.'); return; }
+  if(!agree){ showToast('⚠️ Please agree to the Terms of Service to continue.'); return; }
+
+  var auth = window._zulaAuth;
+  var db   = window._zulaDb;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready. Check your config.'); return; }
+
+  var btn = document.querySelector('#page-signup .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating account…'; }
+  showToast('⏳ Creating your account…');
+
+  fns.createUserWithEmailAndPassword(auth, email, pass)
+    .then(function(result){
+      var user = result.user;
+      var fullName = firstName + (lastName ? ' ' + lastName : '');
+
+      // Update Firebase Auth display name
+      var profilePromise = fns.updateProfile(user, { displayName: fullName });
+
+      // Send verification email
+      var verifyPromise = fns.sendEmailVerification(user);
+
+      // Save profile to Firestore users collection
+      var userRef = fns.doc(db, 'users', user.uid);
+      var dbPromise = fns.setDoc(userRef, {
+        uid:       user.uid,
+        firstName: firstName,
+        lastName:  lastName,
+        fullName:  fullName,
+        email:     email,
+        phone:     document.getElementById('su-phone') ? document.getElementById('su-phone').value.trim() : '',
+        joinedAt:  fns.serverTimestamp(),
+        role:      'buyer',
+        verified:  false,
+        avatarUrl: ''
+      });
+
+      return Promise.all([profilePromise, verifyPromise, dbPromise]);
+    })
+    .then(function(){
+      showToast('📧 Verification email sent! Check your inbox.');
+      if(document.getElementById('verify-email-addr'))
+        document.getElementById('verify-email-addr').textContent = email;
+      showPage('verify-email');
+    })
+    .catch(function(err){
+      var msg = 'Could not create account. Please try again.';
+      if(err.code === 'auth/email-already-in-use')
+        msg = 'This email is already registered.';
+      else if(err.code === 'auth/invalid-email')
+        msg = 'Please enter a valid email address.';
+      else if(err.code === 'auth/weak-password')
+        msg = 'Password is too weak. Use at least 8 characters.';
+      showToast('❌ ' + msg);
+      document.getElementById('su-email-err').textContent = msg + ' Sign in instead?';
+      document.getElementById('su-email-err').classList.add('show');
+    })
+    .finally(function(){
+      if(btn){ btn.disabled = false; btn.textContent = 'Create account →'; }
+    });
+}
+function checkStrength(val){
+  var segs=['str1','str2','str3','str4'];
+  var label=document.getElementById('str-label');
+  var cls=val.length===0?'':val.length<6?'weak':val.length<10?'ok':'strong';
+  var filled=val.length===0?0:val.length<6?1:val.length<10?2:val.length<14?3:4;
+  var txt={'':'Enter a password',weak:'Weak — too short',ok:'OK — try adding numbers or symbols',strong:'Strong password ✓'};
+  segs.forEach(function(s,i){
+    var el=document.getElementById(s);
+    if(el){ el.className='strength-seg'; if(i<filled) el.classList.add(cls); }
+  });
+  if(label) label.textContent=txt[cls]||txt[''];
+}
+function checkStrengthForgot(val){
+  var segs=['fstr1','fstr2','fstr3','fstr4'];
+  var cls=val.length===0?'':val.length<6?'weak':val.length<10?'ok':'strong';
+  var filled=val.length===0?0:val.length<6?1:val.length<10?2:val.length<14?3:4;
+  segs.forEach(function(s,i){
+    var el=document.getElementById(s);
+    if(el){ el.className='strength-seg'; if(i<filled) el.classList.add(cls); }
+  });
+}
+function sendResetLink(){
+  var email = document.getElementById('forgot-email').value.trim();
+  if(!email){ showToast('⚠️ Please enter your email address.'); return; }
+  var auth = window._zulaAuth;
+  var fns  = window._zulaFns;
+  if(!auth || !fns){ showToast('⚠️ Firebase not ready.'); return; }
+  fns.sendPasswordResetEmail(auth, email)
+    .then(function(){
+      if(document.getElementById('forgot-sent-email'))
+        document.getElementById('forgot-sent-email').textContent = email;
+      forgotStep(2);
+      showToast('📬 Reset link sent to ' + email);
+    })
+    .catch(function(err){
+      var msg = 'Could not send reset email.';
+      if(err.code === 'auth/user-not-found') msg = 'No account found with that email.';
+      showToast('❌ ' + msg);
+    });
+}
+function resendResetLink(){showToast('📬 Reset link resent!');}
+function forgotStep(n){
+  [1,2,3].forEach(function(i){
+    var el=document.getElementById('forgot-step'+i);
+    if(el) el.style.display=i===n?'block':'none';
+  });
+}
+function saveNewPass(){
+  var p1=document.getElementById('new-pass1').value;
+  var p2=document.getElementById('new-pass2').value;
+  if(!p1||p1.length<8){showToast('⚠️ Password must be at least 8 characters.');return;}
+  if(p1!==p2){showToast('❌ Passwords do not match.');return;}
+  showToast('✅ Password updated! Signing you in…');
+  setTimeout(function(){ showPage('home'); }, 1000);
+}
+
+// ── OTP / EMAIL VERIFY ────────────────────────
+function otpAdvance(inp, idx){
+  inp.classList.add('filled');
+  var digits=document.querySelectorAll('.otp-digit');
+  if(inp.value && idx<5) digits[idx+1].focus();
+  if(idx===5 && inp.value) verifyOTP();
+}
+function otpBack(e, inp, idx){
+  if(e.key==='Backspace'&&!inp.value&&idx>0){
+    var digits=document.querySelectorAll('.otp-digit');
+    digits[idx-1].focus();
+    digits[idx-1].classList.remove('filled');
+  }
+}
+function getOTPValue(){
+  return Array.from(document.querySelectorAll('.otp-digit')).map(function(i){return i.value;}).join('');
+}
+function fillOTP(){
+  var vals=Array.from(arguments);
+  var digits=document.querySelectorAll('.otp-digit');
+  digits.forEach(function(d,i){ d.value=vals[i]||''; d.classList.toggle('filled',!!vals[i]); });
+}
+function verifyOTP(){
+  var code=getOTPValue();
+  if(code.length<6){showToast('⚠️ Enter all 6 digits.');return;}
+  if(code==='374192'){
+    document.getElementById('otp-error').style.display='none';
+    document.getElementById('verify-main').style.display='none';
+    document.getElementById('verify-success').classList.add('show');
+    showToast('✅ Email verified!');
+  } else {
+    document.getElementById('otp-error').style.display='block';
+    document.querySelectorAll('.otp-digit').forEach(function(d){ d.classList.add('error'); });
+    showToast('❌ Incorrect code — try again.');
+  }
+}
+function resendOTP(){
+  document.getElementById('resend-btn').style.display='none';
+  document.getElementById('resend-timer').style.display='block';
+  var count=60;
+  var timer=setInterval(function(){
+    count--;
+    var el=document.getElementById('resend-countdown');
+    if(el) el.textContent=count;
+    if(count<=0){
+      clearInterval(timer);
+      document.getElementById('resend-btn').style.display='block';
+      document.getElementById('resend-timer').style.display='none';
+    }
+  },1000);
+  showToast('📧 New code sent!');
+}
+
+// ── ONBOARDING ────────────────────────────────
+var obCurrentStep=1;
+var selectedRole=null;
+function selectRole(role){
+  selectedRole=role;
+  ['buyer','seller','both','affiliate'].forEach(function(r){
+    var el=document.getElementById('role-'+r);
+    if(el) el.classList.toggle('selected',r===role);
+  });
+}
+function obNext(step){
+  if(step===2&&!selectedRole){showToast('⚠️ Please select how you want to use ZÚLA.');return;}
+  obCurrentStep=step;
+  [1,2,3,4].forEach(function(i){
+    var s=document.getElementById('ob-step'+i);
+    if(s) s.classList.toggle('active',i===step);
+    var seg=document.getElementById('obs'+i);
+    if(seg){ seg.className='ob-seg'+(i<step?' done':i===step?' active':''); }
+  });
+  window.scrollTo(0,0);
+}
+
+// ── SEARCH RESULTS ────────────────────────────
+function liveSearchUpdate(q){
+  var label=document.getElementById('search-query-label');
+  var countLabel=document.getElementById('search-count-label');
+  var resCount=document.getElementById('search-results-count');
+  if(label) label.textContent='"'+q+'"';
+  var n = q.length > 0 ? Math.floor(Math.random()*80)+8 : 0;
+  if(countLabel) countLabel.textContent = n+' results';
+  if(resCount) resCount.textContent = n+' products found';
+  if(q) document.getElementById('search-page-input').value=q;
+  showToast('🔍 Showing results for "'+q+'"');
+}
+function removeFilter(btn){
+  btn.closest('.active-filter-pill').remove();
+  showToast('✓ Filter removed');
+}
+function clearAllFilters(){
+  document.getElementById('search-active-filters').innerHTML='';
+  showToast('✓ All filters cleared');
+}
+function turnPage(btn, page){
+  document.querySelectorAll('.pagination .page-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+  showToast('📄 Page '+page);
+}
+function switchView(mode, btn){
+  document.querySelectorAll('.filter-pills .fpill').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  var grid=document.getElementById('search-results-grid');
+  if(grid) grid.style.gridTemplateColumns = mode==='list' ? '1fr' : '';
+  showToast(mode==='list'?'☰ List view':'⊞ Grid view');
+}
+
+// ── GUEST CHECKOUT ────────────────────────────
+function selectPayMethod(el){
+  document.querySelectorAll('.payment-method').forEach(function(m){ m.classList.remove('selected'); });
+  el.classList.add('selected');
+  el.querySelector('input').checked=true;
+}
+function applyGuestPromo(){
+  var code=document.getElementById('guest-promo').value.trim().toUpperCase();
+  var promoRow=document.getElementById('guest-promo-row');
+  var disc=document.getElementById('guest-promo-disc');
+  if(code==='ZULA10'){
+    if(promoRow) promoRow.style.display='flex';
+    if(disc) disc.textContent='− NGN 1,850';
+    showToast('🎉 Promo code applied — 10% off!');
+  } else if(code==='WELCOME'){
+    if(promoRow) promoRow.style.display='flex';
+    if(disc) disc.textContent='− NGN 500';
+    showToast('🎉 Welcome code applied — NGN 500 off!');
+  } else {
+    showToast('❌ Invalid promo code. Try ZULA10 or WELCOME.');
+  }
+}
+function placeGuestOrder(){
+  showToast('🔒 Processing payment…');
+  setTimeout(function(){
+    showPage('orders');
+    showToast('✅ Order placed! Check your email for confirmation.');
+  }, 1400);
+}
+
+// ── SAVE FOR LATER ──────────────────────────────────
+function saveForLater(itemId, icon, name, seller, price) {
+  var item = document.getElementById(itemId);
+  if (item) item.style.display = 'none';
+  var sec = document.getElementById('saved-for-later-section');
+  if (sec) sec.style.display = 'block';
+  var list = document.getElementById('saved-items-list');
+  if (!list) return;
+  var uid = 'saved-' + Date.now();
+  list.insertAdjacentHTML('beforeend',
+    '<div id="'+uid+'" class="cart-line" style="padding:10px 0;opacity:.8;">'+
+    '<div class="cart-thumb" style="font-size:24px;">'+icon+'</div>'+
+    '<div class="cart-info"><div class="cart-name">'+name+'</div><div class="cart-seller">'+seller+'</div>'+
+    '<div style="margin-top:8px;display:flex;gap:8px;">'+
+    '<button class="btn btn-primary btn-sm" onclick="moveToCart(\''+uid+'\')">Move to cart</button>'+
+    '<button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:transparent;" onclick="document.getElementById(\''+uid+'\').remove();showToast(\'🗑 Removed from saved\')">Remove</button>'+
+    '</div></div><div class="cart-price">'+price+'</div></div>'
+  );
+  showToast('🔖 Saved for later — ' + name);
+}
+function moveToCart(uid) {
+  var el = document.getElementById(uid);
+  if (el) el.remove();
+  showToast('🛒 Moved back to cart!');
+}
+
+// ── SELLER TOOLS ──────────────────────────────────
+function openSellerTool(tool) {
+  document.getElementById('seller-tool-panel').style.display = 'block';
+  ['coupon','flash','bundle','subscription','vacation'].forEach(function(t){
+    var el = document.getElementById('stool-'+t);
+    if (el) el.style.display = t === tool ? 'block' : 'none';
+  });
+  document.getElementById('seller-tool-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  // start flash countdown demo
+  if (tool === 'flash') startFlashCountdown();
+}
+function closeSellerTool() {
+  document.getElementById('seller-tool-panel').style.display = 'none';
+}
+function createCoupon() {
+  var code = document.getElementById('coupon-code-input');
+  if (code && !code.value.trim()) { showToast('⚠️ Please enter a coupon code.'); return; }
+  document.getElementById('coupon-created').style.display = 'block';
+  showToast('✅ Coupon ' + (code ? code.value.toUpperCase() : '') + ' created!');
+}
+function activateVacation() {
+  showToast('☀️ Vacation mode activated! Buyers will see your return date and can join your waitlist.');
+  document.getElementById('vacation-btn').style.borderColor = 'var(--gold)';
+  document.getElementById('vacation-btn').style.color = 'var(--gold)';
+  document.getElementById('vacation-btn').textContent = '☀️ Vacation mode: ON';
+  closeSellerTool();
+}
+var flashInterval;
+function startFlashCountdown() {
+  if (flashInterval) clearInterval(flashInterval);
+  var secs = 167253; // ~46h demo
+  flashInterval = setInterval(function(){
+    secs--;
+    if (secs < 0) { clearInterval(flashInterval); return; }
+    var h = Math.floor(secs/3600);
+    var m = Math.floor((secs%3600)/60);
+    var s = secs%60;
+    var el = document.getElementById('flash-countdown');
+    if (el) el.textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }, 1000);
+}
+
+// ── BNPL + DEPOSIT MODALS ──────────────────────────────────
+function openBNPL() {
+  document.getElementById('bnpl-modal').classList.add('open');
+}
+function closeBNPL() {
+  document.getElementById('bnpl-modal').classList.remove('open');
+}
+function openDeposit() {
+  document.getElementById('deposit-modal').classList.add('open');
+}
+function closeDeposit() {
+  document.getElementById('deposit-modal').classList.remove('open');
+}
+
+// ── WAITLIST ──────────────────────────────────
+function joinWaitlist() {
+  var email = document.getElementById('waitlist-email');
+  if (!email || !email.value.includes('@')) { showToast('⚠️ Enter a valid email address.'); return; }
+  showToast('🔔 Added to waitlist! We\'ll email you at ' + email.value + ' when it\'s back.');
+  email.closest('div').innerHTML = '<div style="color:var(--green);font-size:13px;font-weight:600;">✓ You\'re on the waitlist! We\'ll notify you at '+email.value+'</div>';
+}
+function toggleWaitlistDemo() {
+  var box = document.getElementById('waitlist-box');
+  if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+</script>
+
+</body>
+</html>
