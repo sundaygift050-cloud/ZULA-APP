@@ -776,16 +776,21 @@ p{color:var(--text2);margin:0 0 1em;}
         <h2 id="profile-name">Loading…</h2>
         <p id="profile-email" style="margin:0;"></p>
         <p id="profile-joined" style="font-size:12px;color:var(--text3);margin:2px 0 8px;"></p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
           <span class="tag tag-green" id="profile-buyer-badge">✅ Verified buyer</span>
           <span class="tag tag-gold" id="profile-seller-badge" style="display:none;">🛍 Verified seller</span>
         </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('profile-v2')">🪪 Full profile</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
+        <p id="profile-bio" style="font-size:13.5px;color:var(--text2);margin:0 0 10px;">No bio yet.</p>
+        <div style="display:flex;gap:18px;">
+          <div style="cursor:pointer;" onclick="showFollowModal('followers')">
+            <span style="font-weight:700;color:var(--text);" id="profile-followers-count">0</span>
+            <span style="font-size:12px;color:var(--text3);"> followers</span>
+          </div>
+          <div style="cursor:pointer;" onclick="showFollowModal('following')">
+            <span style="font-weight:700;color:var(--text);" id="profile-following-count">0</span>
+            <span style="font-size:12px;color:var(--text3);"> following</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -856,47 +861,11 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- Seller analytics tabs -->
-      <div class="analytics-tabs" style="margin-bottom:16px;">
-        <button class="active" onclick="sellerAnalyticsTab('revenue',this)">💰 Revenue</button>
-        <button onclick="sellerAnalyticsTab('traffic',this)">👁 Traffic</button>
-        <button onclick="sellerAnalyticsTab('conversion',this)">📈 Conversion</button>
-        <button onclick="sellerAnalyticsTab('affiliates',this)">🔗 Affiliates</button>
-      </div>
-
-      <!-- Revenue tab -->
-      <div id="sdat-revenue" class="sdash-tab">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
-          <div id="sdash-product-revenue">
-            <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Traffic tab -->
-      <div id="sdat-traffic" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product views &amp; clicks</h3>
-          <div id="sdash-traffic-data">
-            <div style="color:var(--text3);font-size:13px;">Traffic data will appear here as buyers view your listings.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Conversion tab -->
-      <div id="sdat-conversion" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Conversion rate</h3>
-          <div style="color:var(--text3);font-size:13px;">Conversion tracking (views → purchases) will appear here once you have sales.</div>
-        </div>
-      </div>
-
-      <!-- Affiliates tab -->
-      <div id="sdat-affiliates" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Affiliates promoting your products</h3>
-          <div style="color:var(--text3);font-size:13px;">When affiliates share your products and drive sales, they appear here.</div>
+      <!-- Revenue — my products -->
+      <div class="dash-card">
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
+        <div id="sdash-product-revenue">
+          <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
         </div>
       </div>
 
@@ -2250,6 +2219,7 @@ window.loadProfilePage = async function() {
   if (el('profile-joined')) el('profile-joined').textContent = u.joinedAt
     ? 'Member since ' + new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
     : '';
+  if (el('profile-bio'))    el('profile-bio').textContent    = u.bio || 'No bio yet.';
   if (el('settings-name'))  el('settings-name').value  = u.fullName || '';
   if (el('settings-phone')) el('settings-phone').value = u.phone || '';
   if (el('settings-bio'))   el('settings-bio').value   = u.bio || '';
@@ -2261,6 +2231,12 @@ window.loadProfilePage = async function() {
     let count = 0;
     snap.forEach(d => { if (d.data().sellerId === user.uid) count++; });
     if (el('pstat-listings')) el('pstat-listings').textContent = count;
+  } catch(e) {}
+  try {
+    const usnap = await window._fns.getDoc(window._fns.doc(db, 'users', user.uid));
+    const ud = usnap.exists() ? usnap.data() : {};
+    if (el('profile-followers-count')) el('profile-followers-count').textContent = ud.followersCount || 0;
+    if (el('profile-following-count')) el('profile-following-count').textContent = ud.followingCount || 0;
   } catch(e) {}
   loadMyListings();
 };
@@ -2902,14 +2878,6 @@ function profileTab(name) {
     if (tc)  tc.classList.toggle('active', t === name);
   });
   if (name === 'seller') loadSellerDashboard();
-}
-
-function sellerAnalyticsTab(name, btn) {
-  document.querySelectorAll('.sdash-tab').forEach(t => t.style.display = 'none');
-  const sec = document.getElementById('sdat-' + name);
-  if (sec) sec.style.display = 'block';
-  document.querySelectorAll('.analytics-tabs button').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
 }
 
 window.requestPayout = function() {
