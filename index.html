@@ -1161,7 +1161,7 @@ p{color:var(--text2);margin:0 0 1em;}
 </div>
 
 <!-- ================================================================
-     PAGE: PROFILE V2 (enhanced with location, language, badges)
+     PAGE: PROFILE V2 (real data — location, language, badges, follows)
      ================================================================ -->
 <div class="page" id="page-profile-v2">
   <header class="hdr">
@@ -1189,15 +1189,24 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
         <div style="flex:1;min-width:180px;">
           <div style="font-size:21px;font-weight:700;margin-bottom:3px;" id="pv2-name">Loading…</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="pv2-email"></div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-            <span style="font-size:13px;color:var(--text2);" id="pv2-location">🇳🇬 Lagos, Nigeria</span>
-            <span class="location-badge">📍 Verified</span>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:6px;" id="pv2-email"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <span style="font-size:13px;color:var(--text2);" id="pv2-location">📍 —</span>
+          </div>
+          <!-- Follow stats -->
+          <div style="display:flex;gap:18px;margin-bottom:10px;">
+            <div style="cursor:pointer;" onclick="showFollowModal('followers')">
+              <span style="font-weight:700;color:var(--text);" id="pv2-followers-count">0</span>
+              <span style="font-size:12px;color:var(--text3);"> followers</span>
+            </div>
+            <div style="cursor:pointer;" onclick="showFollowModal('following')">
+              <span style="font-weight:700;color:var(--text);" id="pv2-following-count">0</span>
+              <span style="font-size:12px;color:var(--text3);"> following</span>
+            </div>
           </div>
           <div style="display:flex;gap:7px;flex-wrap:wrap;">
             <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
             <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
-            <span class="tag tag-gold">⭐ Gold Affiliate</span>
             <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;background:rgba(56,152,236,.1);border:1px solid rgba(56,152,236,.2);color:#5ba8f5;">🌐 English</span>
           </div>
         </div>
@@ -1206,6 +1215,7 @@ p{color:var(--text2);margin:0 0 1em;}
           <button class="btn btn-ghost btn-sm" onclick="showPage('locationverif')">📍 Location</button>
           <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Language</button>
           <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 2FA</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
         </div>
       </div>
     </div>
@@ -1216,25 +1226,23 @@ p{color:var(--text2);margin:0 0 1em;}
       <button class="btn btn-sm" id="pv2-tab-wishlist" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('wishlist',this)">Wishlist</button>
       <button class="btn btn-sm" id="pv2-tab-reviews" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('reviews',this)">Reviews</button>
     </div>
-    <!-- QUICK STATS -->
+    <!-- QUICK STATS — real from Firebase -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">12</div><div style="font-size:11px;color:var(--text3);">Orders</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">8</div><div style="font-size:11px;color:var(--text3);">Downloads</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">3</div><div style="font-size:11px;color:var(--text3);">Courses</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);">₦67K</div><div style="font-size:11px;color:var(--text3);">Aff. earned</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-orders">—</div><div style="font-size:11px;color:var(--text3);">Orders</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-listings">—</div><div style="font-size:11px;color:var(--text3);">Listings</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-followers">0</div><div style="font-size:11px;color:var(--text3);">Followers</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pv2-stat-revenue">NGN 0</div><div style="font-size:11px;color:var(--text3);">Revenue</div></div>
     </div>
-    <!-- RECENT ORDERS -->
-    <div class="dash-card">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Recent orders</h3>
-      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">👜</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">Woven Tote Bag</div><div style="font-size:11.5px;color:var(--text3);">Jun 21 · NGN 18,500</div></div><span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(245,200,66,.15);color:var(--gold);">in transit</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">📚</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">6-Figure Blueprint</div><div style="font-size:11.5px;color:var(--text3);">Jun 18 · NGN 4,500</div></div><span style="font-size:12px;color:var(--green);">✓ Downloaded</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">👗</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">Ankara Wrap Dress</div><div style="font-size:11.5px;color:var(--text3);">Jun 14 · NGN 15,000</div></div><span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(56,152,236,.15);color:#5ba8f5;">completed</span></div>
+    <!-- MY LISTINGS PREVIEW -->
+    <div class="dash-card" id="pv2-listings-card">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My listings</h3>
+      <div id="pv2-listings-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
   </div>
 </div>
 
 <!-- ================================================================
-     PAGE: OWNER / MY PROFILE (public-facing view of own profile)
+     PAGE: OWNER / MY PROFILE (public-facing view — real data + follow)
      ================================================================ -->
 <div class="page" id="page-myprofile">
   <header class="hdr">
@@ -1258,42 +1266,51 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
-            <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="owner-name">Ada Okafor</div>
-            <div style="font-size:13px;color:var(--text3);margin-bottom:10px;">🇳🇬 Lagos, Nigeria · Member since Jan 2024</div>
-            <div style="display:flex;gap:7px;flex-wrap:wrap;">
-              <span class="tag tag-green">✅ Verified seller</span>
-              <span class="tag tag-gold">⭐ Gold Affiliate</span>
-              <span class="tag tag-green">📍 Location verified</span>
+            <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="owner-name">Loading…</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="owner-meta">—</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;" id="owner-badges">
+              <span class="tag tag-green">✅ Verified buyer</span>
             </div>
           </div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost btn-sm" onclick="showPage('messages')">✉️ Message</button>
+            <button class="btn btn-ghost btn-sm" onclick="openMsgWithSelf()">✉️ Message</button>
             <button class="btn btn-primary btn-sm" onclick="showPage('marketplace')">View listings</button>
           </div>
         </div>
         <div class="pub-stats-row">
-          <div class="pub-stat"><div class="pub-stat-val">47</div><div class="pub-stat-lbl">Products</div></div>
-          <div class="pub-stat"><div class="pub-stat-val">312</div><div class="pub-stat-lbl">Sales</div></div>
-          <div class="pub-stat"><div class="pub-stat-val">4.9</div><div class="pub-stat-lbl">Rating</div></div>
-          <div class="pub-stat"><div class="pub-stat-val">98%</div><div class="pub-stat-lbl">Positive</div></div>
+          <div class="pub-stat"><div class="pub-stat-val" id="owner-listings-count">—</div><div class="pub-stat-lbl">Listings</div></div>
+          <div class="pub-stat"><div class="pub-stat-val" id="owner-followers-count">0</div><div class="pub-stat-lbl">Followers</div></div>
+          <div class="pub-stat"><div class="pub-stat-val" id="owner-following-count">0</div><div class="pub-stat-lbl">Following</div></div>
+          <div class="pub-stat"><div class="pub-stat-val" id="owner-joined">—</div><div class="pub-stat-lbl">Member since</div></div>
         </div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;" id="owner-bio">Nigerian creative entrepreneur — fashion, digital products, and business tools. Ships within 2 days, worldwide.</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;" id="owner-bio">—</div>
       </div>
     </div>
     <!-- SELLER'S LISTINGS -->
     <div class="dash-card">
       <h3 style="margin-bottom:16px;">Active listings</h3>
       <div class="pgrid" id="owner-listings-grid">
-        <div class="pcard"><div class="pcard-img">👜</div><div class="pcard-body"><div class="pcard-name">Woven Tote Bag</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 18,500</span><span class="pcard-type">Physical</span></div></div></div>
-        <div class="pcard"><div class="pcard-img">📚</div><div class="pcard-body"><div class="pcard-name">6-Figure Blueprint</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 4,500</span><span class="pcard-type">Digital</span></div></div></div>
-        <div class="pcard"><div class="pcard-img">👗</div><div class="pcard-body"><div class="pcard-name">Ankara Wrap Dress</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 15,000</span><span class="pcard-type">Physical</span></div></div></div>
+        <div style="color:var(--text3);font-size:13px;">Loading listings…</div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- FOLLOW/FOLLOWERS MODAL -->
+<div class="modal-bg" id="follow-modal">
+  <div class="modal-box" style="max-width:380px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h3 id="follow-modal-title" style="font-size:17px;margin:0;">Followers</h3>
+      <button onclick="document.getElementById('follow-modal').classList.remove('open')" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">×</button>
+    </div>
+    <div id="follow-modal-list" style="max-height:320px;overflow-y:auto;">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading…</div>
+    </div>
+  </div>
+</div>
+
 <!-- ================================================================
-     PAGE: MESSAGES (inbox overview)
+     PAGE: MESSAGES (inbox overview — real Firebase)
      ================================================================ -->
 <div class="page" id="page-messages">
   <header class="hdr">
@@ -1301,7 +1318,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('messaging')">Open full chat →</a>
+        <a onclick="showPage('messaging')">💬 Full chat</a>
         <div class="avatar-btn" id="nav-avatar-msgs" onclick="showPage('profile')">?</div>
       </nav>
     </div>
@@ -1311,43 +1328,29 @@ p{color:var(--text2);margin:0 0 1em;}
       <h1 style="font-size:22px;font-weight:700;">Messages</h1>
       <button class="btn btn-primary btn-sm" onclick="showPage('messaging')">💬 Open full chat</button>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
-      <div class="conv-item active" onclick="showPage('messaging')">
-        <div class="conv-avatar">KA</div>
-        <div style="flex:1;min-width:0;">
-          <div class="conv-meta"><span class="conv-name">Kemi Adeyemi</span><span class="conv-time">2m ago</span></div>
-          <div class="conv-preview">Hi, is the Ankara dress still available in size M?</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;" id="inbox-conv-list">
+      <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">Loading conversations…</div>
+    </div>
+    <!-- Start new conversation -->
+    <div style="margin-top:20px;">
+      <div class="dash-card">
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">✉️ New message</h3>
+        <div class="form-field" style="margin-bottom:10px;">
+          <label>Recipient's User ID or email</label>
+          <input type="text" id="new-msg-uid" placeholder="Paste user UID or email…">
         </div>
-        <div class="conv-unread">2</div>
-      </div>
-      <div class="conv-item" onclick="showPage('messaging')">
-        <div class="conv-avatar" style="background:#27c97a;">BO</div>
-        <div style="flex:1;min-width:0;">
-          <div class="conv-meta"><span class="conv-name">Biodun Ojo</span><span class="conv-time">1h ago</span></div>
-          <div class="conv-preview">Thanks for the quick delivery! 🙌</div>
+        <div class="form-field" style="margin-bottom:10px;">
+          <label>Message</label>
+          <textarea id="new-msg-text" style="height:70px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Type your message…"></textarea>
         </div>
-      </div>
-      <div class="conv-item" onclick="showPage('messaging')">
-        <div class="conv-avatar" style="background:#f5c842;color:#1a1000;">TN</div>
-        <div style="flex:1;min-width:0;">
-          <div class="conv-meta"><span class="conv-name">Tunde Nwosu</span><span class="conv-time">Yesterday</span></div>
-          <div class="conv-preview">Can I get a bulk discount for 5 units?</div>
-        </div>
-        <div class="conv-unread">1</div>
-      </div>
-      <div class="conv-item" onclick="showPage('messaging')">
-        <div class="conv-avatar" style="background:#5ba8f5;color:#fff;">ZÚ</div>
-        <div style="flex:1;min-width:0;">
-          <div class="conv-meta"><span class="conv-name">ZÚLA Support</span><span class="conv-time">Jun 20</span></div>
-          <div class="conv-preview">Your verification is under review — expect a response…</div>
-        </div>
+        <button class="btn btn-primary btn-sm" onclick="startNewConversation()">Send →</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- ================================================================
-     PAGE: FULL MESSAGING (chat interface)
+     PAGE: FULL MESSAGING (chat interface — real Firebase)
      ================================================================ -->
 <div class="page" id="page-messaging">
   <header class="hdr">
@@ -1361,68 +1364,31 @@ p{color:var(--text2);margin:0 0 1em;}
   </header>
   <div class="wrap" style="padding-top:24px;padding-bottom:40px;">
     <div class="inbox-layout">
-      <!-- SIDEBAR -->
+      <!-- SIDEBAR — real conversations -->
       <div class="inbox-sidebar">
-        <div class="inbox-search"><input placeholder="Search conversations…" type="text"></div>
-        <div class="conv-item active">
-          <div class="conv-avatar">KA</div>
-          <div style="flex:1;min-width:0;">
-            <div class="conv-meta"><span class="conv-name">Kemi Adeyemi</span><span class="conv-time">2m</span></div>
-            <div class="conv-preview">Hi, is the Ankara dress still available?</div>
-          </div>
-          <div class="conv-unread">2</div>
-        </div>
-        <div class="conv-item">
-          <div class="conv-avatar" style="background:#27c97a;">BO</div>
-          <div style="flex:1;min-width:0;">
-            <div class="conv-meta"><span class="conv-name">Biodun Ojo</span><span class="conv-time">1h</span></div>
-            <div class="conv-preview">Thanks for the quick delivery! 🙌</div>
-          </div>
-        </div>
-        <div class="conv-item">
-          <div class="conv-avatar" style="background:#f5c842;color:#1a1000;">TN</div>
-          <div style="flex:1;min-width:0;">
-            <div class="conv-meta"><span class="conv-name">Tunde Nwosu</span><span class="conv-time">Yesterday</span></div>
-            <div class="conv-preview">Can I get a bulk discount?</div>
-          </div>
-          <div class="conv-unread">1</div>
-        </div>
-        <div class="conv-item">
-          <div class="conv-avatar" style="background:#5ba8f5;color:#fff;">ZÚ</div>
-          <div style="flex:1;min-width:0;">
-            <div class="conv-meta"><span class="conv-name">ZÚLA Support</span><span class="conv-time">Jun 20</span></div>
-            <div class="conv-preview">Your verification is under review…</div>
-          </div>
+        <div class="inbox-search"><input placeholder="Search conversations…" type="text" oninput="filterConvs(this.value)"></div>
+        <div id="conv-list-sidebar">
+          <div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">Loading…</div>
         </div>
       </div>
       <!-- CHAT AREA -->
       <div class="chat-area">
-        <div class="chat-header">
-          <div class="conv-avatar">KA</div>
+        <div class="chat-header" id="chat-header">
+          <div class="conv-avatar" id="chat-peer-avatar">?</div>
           <div>
-            <div style="font-size:14px;font-weight:600;">Kemi Adeyemi</div>
-            <div style="font-size:12px;color:var(--green);">● Online</div>
+            <div style="font-size:14px;font-weight:600;" id="chat-peer-name">Select a conversation</div>
+            <div style="font-size:12px;color:var(--text3);" id="chat-peer-sub">—</div>
+          </div>
+          <div style="margin-left:auto;">
+            <button class="btn btn-ghost btn-sm" id="chat-follow-btn" style="display:none;" onclick="toggleFollowFromChat()">Follow</button>
           </div>
         </div>
         <div class="chat-messages" id="chat-messages">
-          <div class="msg recv">
-            <div class="msg-bubble">Hi! Is the Ankara Wrap Dress still available in size M?</div>
-            <div class="msg-time">2:14 PM</div>
-          </div>
-          <div class="msg recv">
-            <div class="msg-bubble">Also, do you ship to Abuja?</div>
-            <div class="msg-time">2:14 PM</div>
-          </div>
-          <div class="msg sent">
-            <div class="msg-bubble">Yes! Size M is still in stock 🎉 And yes, we ship everywhere in Nigeria — Abuja delivery takes 2–3 days.</div>
-            <div class="msg-time">2:17 PM</div>
-          </div>
-          <div class="msg recv">
-            <div class="msg-bubble">Amazing! I'll place an order now. Thank you! 🙏</div>
-            <div class="msg-time">2:18 PM</div>
+          <div style="margin:auto;text-align:center;color:var(--text3);font-size:13px;padding:40px 20px;">
+            Select a conversation or start a new one from the inbox.
           </div>
         </div>
-        <div class="chat-input-area">
+        <div class="chat-input-area" id="chat-input-area" style="display:none;">
           <textarea id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
           <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" style="height:42px;">Send →</button>
         </div>
@@ -1843,7 +1809,7 @@ p{color:var(--text2);margin:0 0 1em;}
 </div>
 
 <!-- ================================================================
-     PAGE: VERIFICATION STATUS
+     PAGE: VERIFICATION STATUS (real data from Firebase)
      ================================================================ -->
 <div class="page" id="page-verifstatus">
   <header class="hdr">
@@ -1857,65 +1823,49 @@ p{color:var(--text2);margin:0 0 1em;}
   </header>
   <div class="dash-wrap" style="max-width:620px;">
     <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">✅ Verification Status</h1>
-    <p style="margin-bottom:24px;">Track the status of your identity and seller verification.</p>
+    <p style="margin-bottom:24px;">Track your identity and seller verification in real time.</p>
 
-    <!-- OVERALL STATUS BANNER -->
-    <div style="background:rgba(39,201,122,.08);border:1px solid rgba(39,201,122,.25);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-      <div style="font-size:36px;">🏅</div>
+    <!-- OVERALL STATUS BANNER (dynamic) -->
+    <div id="verif-status-banner" style="background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="font-size:36px;">⏳</div>
       <div>
-        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:3px;">Fully Verified</div>
-        <div style="font-size:13px;color:var(--text2);">Your account has passed all verification steps. You can sell, receive payouts, and use all ZÚLA features.</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:3px;" id="verif-status-title">Loading…</div>
+        <div style="font-size:13px;color:var(--text2);" id="verif-status-desc">Checking your verification status…</div>
       </div>
     </div>
 
     <!-- STEP LIST -->
     <div class="vstatus-step">
-      <div class="vstatus-icon done">✓</div>
+      <div class="vstatus-icon" id="vs-email-icon">📧</div>
       <div>
         <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Email verified</div>
-        <div style="font-size:13px;color:var(--text3);">Your email address is confirmed. Verified on Jan 12, 2024.</div>
+        <div style="font-size:13px;color:var(--text3);" id="vs-email-desc">Checking…</div>
       </div>
     </div>
     <div class="vstatus-step">
-      <div class="vstatus-icon done">✓</div>
+      <div class="vstatus-icon" id="vs-seller-icon">🛍</div>
       <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Government ID</div>
-        <div style="font-size:13px;color:var(--text3);">National ID card accepted. Verified on Jan 15, 2024.</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Seller verification</div>
+        <div style="font-size:13px;color:var(--text3);" id="vs-seller-desc">Checking…</div>
       </div>
     </div>
     <div class="vstatus-step">
-      <div class="vstatus-icon done">✓</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Business / Individual registration</div>
-        <div style="font-size:13px;color:var(--text3);">Proof of address accepted. Verified on Jan 15, 2024.</div>
-      </div>
-    </div>
-    <div class="vstatus-step">
-      <div class="vstatus-icon done">✓</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Product ownership proof</div>
-        <div style="font-size:13px;color:var(--text3);">Brand certificate accepted. Verified on Jan 15, 2024.</div>
-      </div>
-    </div>
-    <div class="vstatus-step">
-      <div class="vstatus-icon done">✓</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Location verified</div>
-        <div style="font-size:13px;color:var(--text3);">GPS + IP verified — Lagos, Nigeria.</div>
-      </div>
-    </div>
-
-    <!-- UNVERIFIED EXAMPLE (commented out — swap in if needed) -->
-    <!-- <div class="vstatus-step">
-      <div class="vstatus-icon pending">⏳</div>
+      <div class="vstatus-icon" id="vs-phone-icon">📱</div>
       <div>
         <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Phone number</div>
-        <div style="font-size:13px;color:var(--text3);">Not yet verified. <a onclick="showPage('twofa')" style="color:var(--accent);cursor:pointer;">Verify now →</a></div>
+        <div style="font-size:13px;color:var(--text3);" id="vs-phone-desc">Checking…</div>
       </div>
-    </div> -->
+    </div>
+    <div class="vstatus-step">
+      <div class="vstatus-icon" id="vs-location-icon">📍</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Location</div>
+        <div style="font-size:13px;color:var(--text3);" id="vs-location-desc">Checking…</div>
+      </div>
+    </div>
 
     <div style="margin-top:8px;">
-      <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Update verification documents →</button>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Submit / update verification documents →</button>
     </div>
   </div>
 </div>
@@ -1960,7 +1910,7 @@ p{color:var(--text2);margin:0 0 1em;}
 </div>
 
 <!-- ================================================================
-     FIREBASE + APP LOGIC
+     FIREBASE + APP LOGIC (upgraded: real messaging, follows, verif)
      ================================================================ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1968,7 +1918,8 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
          sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
          updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
-         getDocs, query, orderBy, serverTimestamp }
+         getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
+         updateDoc, arrayUnion, arrayRemove, increment, deleteDoc }
          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1989,9 +1940,10 @@ window._auth = auth;
 window._db   = db;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
-  doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp };
+  doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
+  where, onSnapshot, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc };
 
-// AUTH STATE LISTENER
+// ── AUTH STATE ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     if (!user.emailVerified) {
@@ -2000,7 +1952,6 @@ onAuthStateChanged(auth, async (user) => {
       showPage('verify-email');
       return;
     }
-    // Load profile
     try {
       const snap = await getDoc(doc(db, 'users', user.uid));
       window._currentUser = snap.exists() ? snap.data() : { email: user.email, firstName: '' };
@@ -2008,7 +1959,6 @@ onAuthStateChanged(auth, async (user) => {
       window._currentUser = { email: user.email, firstName: '' };
     }
     updateNavAvatar();
-    // Show admin link if admin email
     const adminLink = document.getElementById('admin-nav-link');
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
@@ -2028,6 +1978,7 @@ function updateNavAvatar() {
   });
 }
 
+// ── AUTH FUNCTIONS ──────────────────────────────────────────────────
 window.doLogin = function() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
@@ -2076,13 +2027,14 @@ window.doSignup = function() {
         sendEmailVerification(user),
         setDoc(doc(db, 'users', user.uid), {
           uid: user.uid, firstName, lastName, fullName, email,
-          joinedAt: serverTimestamp(), role: 'buyer', sellerVerified: false
+          joinedAt: serverTimestamp(), role: 'buyer', sellerVerified: false,
+          followersCount: 0, followingCount: 0
         })
       ]);
     })
     .then(() => {
       showToast('📧 Verification email sent! Check your inbox.');
-      document.getElementById('verify-email-addr').textContent = email;
+      document.getElementById('verify-email-addr').textContent = document.getElementById('su-email').value.trim();
       showPage('verify-email');
     })
     .catch(err => {
@@ -2131,6 +2083,7 @@ window.sendResetLink = function() {
     .catch(() => showToast('❌ No account found with that email.'));
 };
 
+// ── PRODUCTS ────────────────────────────────────────────────────────
 window.loadProducts = async function() {
   const grid  = document.getElementById('products-grid');
   const empty = document.getElementById('empty-state');
@@ -2145,7 +2098,7 @@ window.loadProducts = async function() {
     renderProducts(window._allProducts);
   } catch(e) {
     grid.innerHTML = '';
-    empty.style.display = 'block';
+    if (empty) empty.style.display = 'block';
   }
 };
 
@@ -2156,12 +2109,12 @@ function renderProducts(products) {
   if (!grid) return;
   if (products.length === 0) {
     grid.innerHTML = '';
-    empty.style.display = 'block';
-    count.textContent = '0 products';
+    if (empty) empty.style.display = 'block';
+    if (count) count.textContent = '0 products';
     return;
   }
-  empty.style.display = 'none';
-  count.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
+  if (empty) empty.style.display = 'none';
+  if (count) count.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
   grid.innerHTML = products.map(p => `
     <div class="pcard" onclick="viewProduct('${p.id}')">
       <div class="pcard-img">${p.emoji || '📦'}</div>
@@ -2188,7 +2141,7 @@ window.filterProducts = function(query) {
   renderProducts(filtered);
 };
 
-window.applyFilters = function() { /* extend later */ };
+window.applyFilters = function() { };
 
 window.viewProduct = function(id) {
   const p = (window._allProducts||[]).find(x => x.id === id);
@@ -2207,7 +2160,6 @@ window.viewProduct = function(id) {
 window.publishProduct = async function() {
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ You must be signed in.'); return; }
-  // Block unverified sellers
   const profile = window._currentUser || {};
   if (!profile.sellerVerified) {
     showToast('🚫 You must be verified to publish products.');
@@ -2298,18 +2250,14 @@ window.loadProfilePage = async function() {
   if (el('settings-name'))  el('settings-name').value  = u.fullName || '';
   if (el('settings-phone')) el('settings-phone').value = u.phone || '';
   if (el('settings-bio'))   el('settings-bio').value   = u.bio || '';
-  // Show seller badge if verified
   const sellerBadge = el('profile-seller-badge');
   if (sellerBadge) sellerBadge.style.display = u.sellerVerified ? 'inline-block' : 'none';
-  // Update pstat listings count
-  const fns = window._fns;
   try {
-    const q = fns.query(fns.collection(db, 'products'), fns.orderBy('createdAt','desc'));
-    const snap = await fns.getDocs(q);
+    const q = window._fns.query(window._fns.collection(db, 'products'), window._fns.orderBy('createdAt','desc'));
+    const snap = await window._fns.getDocs(q);
     let count = 0;
     snap.forEach(d => { if (d.data().sellerId === user.uid) count++; });
     if (el('pstat-listings')) el('pstat-listings').textContent = count;
-    if (el('sdash-revenue'))  el('sdash-revenue').textContent  = 'NGN 0';
   } catch(e) {}
   loadMyListings();
 };
@@ -2323,7 +2271,6 @@ window.saveSettings = async function() {
   try {
     await window._fns.setDoc(doc(db, 'users', user.uid), { fullName: name, phone, bio }, { merge: true });
     if (window._currentUser) { window._currentUser.fullName = name; window._currentUser.phone = phone; window._currentUser.bio = bio; }
-    // Update profile name display
     const nameEl = document.getElementById('profile-name');
     if (nameEl && name) nameEl.textContent = name;
     showToast('✅ Settings saved!');
@@ -2334,6 +2281,559 @@ window.submitVerification = function() {
   showToast('✅ Verification submitted! We\'ll review within 24–48 hours.');
   showPage('profile');
 };
+
+// ── REAL VERIFICATION STATUS ────────────────────────────────────────
+window.loadVerifStatus = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const u = window._currentUser || {};
+
+  const setStep = (iconId, descId, status, desc) => {
+    const icon = document.getElementById(iconId);
+    const descEl = document.getElementById(descId);
+    if (!icon || !descEl) return;
+    icon.className = 'vstatus-icon ' + (status === 'done' ? 'done' : status === 'pending' ? 'pending' : 'todo');
+    icon.textContent = status === 'done' ? '✓' : status === 'pending' ? '⏳' : '○';
+    descEl.textContent = desc;
+  };
+
+  // Email
+  setStep('vs-email-icon','vs-email-desc',
+    user.emailVerified ? 'done' : 'pending',
+    user.emailVerified ? 'Your email ' + user.email + ' is confirmed.' : 'Please verify your email address — check your inbox.');
+
+  // Seller verification
+  setStep('vs-seller-icon','vs-seller-desc',
+    u.sellerVerified ? 'done' : (u.verifSubmitted ? 'pending' : 'todo'),
+    u.sellerVerified ? 'Seller verified ✅ — you can list products.' :
+    u.verifSubmitted ? 'Under review — we\'ll respond within 24–48 hours.' :
+    'Not yet started. Submit your documents below.');
+
+  // Phone
+  setStep('vs-phone-icon','vs-phone-desc',
+    u.phone ? 'done' : 'todo',
+    u.phone ? 'Phone on file: ' + u.phone : 'Add your phone number in Settings.');
+
+  // Location
+  setStep('vs-location-icon','vs-location-desc',
+    u.location ? 'done' : 'todo',
+    u.location ? '📍 ' + u.location : 'Location not set. Use Settings → Location.');
+
+  // Update banner
+  const banner = document.getElementById('verif-status-banner');
+  const title  = document.getElementById('verif-status-title');
+  const desc   = document.getElementById('verif-status-desc');
+  if (u.sellerVerified && user.emailVerified) {
+    banner.style.background = 'rgba(39,201,122,.08)';
+    banner.style.borderColor = 'rgba(39,201,122,.25)';
+    banner.firstElementChild.textContent = '🏅';
+    title.textContent = 'Fully Verified';
+    title.style.color = 'var(--green)';
+    desc.textContent = 'You can sell, receive payouts, and use all ZÚLA features.';
+  } else if (user.emailVerified) {
+    banner.firstElementChild.textContent = '⚠️';
+    title.textContent = 'Email verified — seller verification pending';
+    title.style.color = 'var(--gold)';
+    desc.textContent = u.verifSubmitted ? 'Your documents are under review.' : 'Submit seller documents to start selling.';
+  } else {
+    banner.firstElementChild.textContent = '⏳';
+    title.textContent = 'Email not verified';
+    title.style.color = 'var(--text2)';
+    desc.textContent = 'Please verify your email to continue.';
+  }
+};
+
+// ── FOLLOW SYSTEM ───────────────────────────────────────────────────
+// follows/{followerId_followedId} = { followerId, followedId, createdAt }
+
+window.followUser = async function(targetUid, targetName) {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Sign in to follow users.'); return; }
+  if (user.uid === targetUid) { showToast('⚠️ You cannot follow yourself.'); return; }
+  const followId = user.uid + '_' + targetUid;
+  const followRef = doc(db, 'follows', followId);
+  try {
+    const existing = await getDoc(followRef);
+    if (existing.exists()) {
+      // Unfollow
+      await deleteDoc(followRef);
+      await updateDoc(doc(db, 'users', user.uid), { followingCount: increment(-1) });
+      await updateDoc(doc(db, 'users', targetUid), { followersCount: increment(-1) });
+      showToast('👋 Unfollowed ' + targetName);
+      return false;
+    } else {
+      // Follow
+      await setDoc(followRef, {
+        followerId: user.uid,
+        followerName: window._currentUser?.fullName || user.displayName || user.email,
+        followedId: targetUid,
+        followedName: targetName,
+        createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, 'users', user.uid), { followingCount: increment(1) });
+      await updateDoc(doc(db, 'users', targetUid), { followersCount: increment(1) });
+      showToast('✅ Now following ' + targetName);
+      return true;
+    }
+  } catch(e) { showToast('❌ Could not follow. Try again.'); }
+};
+
+window.isFollowing = async function(targetUid) {
+  const user = auth.currentUser;
+  if (!user) return false;
+  const followId = user.uid + '_' + targetUid;
+  try {
+    const snap = await getDoc(doc(db, 'follows', followId));
+    return snap.exists();
+  } catch(e) { return false; }
+};
+
+window.getFollowers = async function(uid) {
+  const q = query(collection(db, 'follows'), where('followedId', '==', uid));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
+};
+
+window.getFollowing = async function(uid) {
+  const q = query(collection(db, 'follows'), where('followerId', '==', uid));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
+};
+
+window.showFollowModal = async function(type) {
+  const user = auth.currentUser;
+  if (!user) return;
+  const modal = document.getElementById('follow-modal');
+  const title = document.getElementById('follow-modal-title');
+  const list  = document.getElementById('follow-modal-list');
+  if (!modal) return;
+  modal.classList.add('open');
+  title.textContent = type === 'followers' ? 'Followers' : 'Following';
+  list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading…</div>';
+  try {
+    const items = type === 'followers' ? await getFollowers(user.uid) : await getFollowing(user.uid);
+    if (items.length === 0) {
+      list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">None yet.</div>';
+      return;
+    }
+    list.innerHTML = items.map(f => {
+      const name = type === 'followers' ? f.followerName : f.followedName;
+      const uid  = type === 'followers' ? f.followerId   : f.followedId;
+      const initials = name ? name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) : '?';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div class="conv-avatar" style="width:36px;height:36px;font-size:12px;">${initials}</div>
+        <div style="flex:1;font-size:13.5px;font-weight:600;color:var(--text);">${name || uid}</div>
+        ${type==='following' ? `<button class="btn btn-ghost btn-sm" onclick="unfollowFromModal('${uid}','${name}',this)">Unfollow</button>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load.</div>';
+  }
+};
+
+window.unfollowFromModal = async function(targetUid, targetName, btn) {
+  btn.textContent = '…'; btn.disabled = true;
+  await followUser(targetUid, targetName);
+  btn.closest('div[style]').remove();
+};
+
+// Load follow counts onto profile pages
+window.loadFollowCounts = async function(uid) {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    const d = snap.exists() ? snap.data() : {};
+    const fc = d.followersCount || 0;
+    const fg = d.followingCount || 0;
+    ['pv2-followers-count','pv2-stat-followers'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = fc;
+    });
+    ['pv2-following-count'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = fg;
+    });
+    const ownerFc = document.getElementById('owner-followers-count');
+    const ownerFg = document.getElementById('owner-following-count');
+    if (ownerFc) ownerFc.textContent = fc;
+    if (ownerFg) ownerFg.textContent = fg;
+  } catch(e) {}
+};
+
+// ── REAL MESSAGING ──────────────────────────────────────────────────
+// conversations/{convId} = { participants:[uid1,uid2], lastMsg, lastMsgAt, ... }
+// conversations/{convId}/messages/{msgId} = { text, senderId, createdAt }
+
+function convId(uid1, uid2) {
+  return [uid1, uid2].sort().join('_');
+}
+
+let _unsubMessages = null; // real-time listener
+
+window.loadConversations = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const list = document.getElementById('inbox-conv-list');
+  const sidebar = document.getElementById('conv-list-sidebar');
+  if (!list && !sidebar) return;
+
+  try {
+    const q = query(collection(db, 'conversations'), where('participants','array-contains', user.uid), orderBy('lastMsgAt','desc'));
+    const snap = await getDocs(q);
+    const convs = [];
+    snap.forEach(d => convs.push({ id: d.id, ...d.data() }));
+
+    const renderConv = (c, container, activeId) => {
+      const otherId   = c.participants.find(p => p !== user.uid);
+      const otherName = c.participantNames?.[otherId] || 'User';
+      const initials  = otherName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '?';
+      const timeAgo   = c.lastMsgAt ? timeSince(c.lastMsgAt.toDate()) : '';
+      const isActive  = c.id === activeId ? ' active' : '';
+      return `<div class="conv-item${isActive}" onclick="openConversation('${c.id}','${otherId}','${otherName.replace(/'/g,'')}')">
+        <div class="conv-avatar">${initials}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="conv-meta"><span class="conv-name">${otherName}</span><span class="conv-time">${timeAgo}</span></div>
+          <div class="conv-preview">${c.lastMsg || ''}</div>
+        </div>
+        ${c.unread && c.unread[user.uid] ? `<div class="conv-unread">${c.unread[user.uid]}</div>` : ''}
+      </div>`;
+    };
+
+    if (list) {
+      if (convs.length === 0) {
+        list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet. Start one below!</div>';
+      } else {
+        list.innerHTML = convs.map(c => renderConv(c, list, null)).join('');
+      }
+    }
+    if (sidebar) {
+      if (convs.length === 0) {
+        sidebar.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet.</div>';
+      } else {
+        sidebar.innerHTML = convs.map(c => renderConv(c, sidebar, window._activeConvId)).join('');
+      }
+    }
+  } catch(e) {
+    console.error(e);
+    const msg = '<div style="padding:20px;color:var(--text3);font-size:13px;">Could not load conversations.</div>';
+    if (list) list.innerHTML = msg;
+    if (sidebar) sidebar.innerHTML = msg;
+  }
+};
+
+window._allConvs = [];
+window.filterConvs = function(val) {
+  const sidebar = document.getElementById('conv-list-sidebar');
+  if (!sidebar) return;
+  const items = sidebar.querySelectorAll('.conv-item');
+  items.forEach(el => {
+    const name = el.querySelector('.conv-name')?.textContent || '';
+    el.style.display = name.toLowerCase().includes(val.toLowerCase()) ? '' : 'none';
+  });
+};
+
+window.openConversation = async function(cid, peerId, peerName) {
+  window._activeConvId = cid;
+  window._activePeerId = peerId;
+  window._activePeerName = peerName;
+
+  const msgs    = document.getElementById('chat-messages');
+  const nameEl  = document.getElementById('chat-peer-name');
+  const subEl   = document.getElementById('chat-peer-sub');
+  const avEl    = document.getElementById('chat-peer-avatar');
+  const inputArea = document.getElementById('chat-input-area');
+  const followBtn = document.getElementById('chat-follow-btn');
+
+  if (nameEl) nameEl.textContent = peerName;
+  const initials = peerName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '?';
+  if (avEl) avEl.textContent = initials;
+  if (inputArea) inputArea.style.display = 'flex';
+  if (followBtn) {
+    followBtn.style.display = 'inline-flex';
+    const already = await isFollowing(peerId);
+    followBtn.textContent = already ? 'Unfollow' : 'Follow';
+    followBtn.dataset.uid = peerId;
+    followBtn.dataset.name = peerName;
+  }
+  if (subEl) subEl.textContent = '';
+
+  // Mark as read
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      const upd = {};
+      upd['unread.' + user.uid] = 0;
+      await updateDoc(doc(db, 'conversations', cid), upd);
+    } catch(e) {}
+  }
+
+  // Refresh sidebar
+  loadConversations();
+
+  // Unsubscribe previous listener
+  if (_unsubMessages) { _unsubMessages(); _unsubMessages = null; }
+
+  if (msgs) msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading messages…</div>';
+
+  // Real-time messages
+  try {
+    const msgsRef = collection(db, 'conversations', cid, 'messages');
+    const mq = query(msgsRef, orderBy('createdAt','asc'));
+    _unsubMessages = onSnapshot(mq, snap => {
+      if (!msgs) return;
+      if (snap.empty) {
+        msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px 20px;">No messages yet. Say hello! 👋</div>';
+        return;
+      }
+      const uid = auth.currentUser?.uid;
+      msgs.innerHTML = snap.docs.map(d => {
+        const m = d.data();
+        const isSent = m.senderId === uid;
+        const time = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
+        return `<div class="msg ${isSent ? 'sent' : 'recv'}">
+          <div class="msg-bubble">${escapeHtml(m.text)}</div>
+          <div class="msg-time">${time}</div>
+        </div>`;
+      }).join('');
+      msgs.scrollTop = msgs.scrollHeight;
+    });
+  } catch(e) {
+    if (msgs) msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Could not load messages.</div>';
+  }
+};
+
+window.sendChatMsg = async function() {
+  const input = document.getElementById('chat-input');
+  const user  = auth.currentUser;
+  if (!input || !input.value.trim() || !user || !window._activeConvId) return;
+  const text = input.value.trim();
+  input.value = '';
+
+  const cid = window._activeConvId;
+  const peerId = window._activePeerId;
+  try {
+    await addDoc(collection(db, 'conversations', cid, 'messages'), {
+      text, senderId: user.uid,
+      senderName: window._currentUser?.fullName || user.displayName || 'User',
+      createdAt: serverTimestamp()
+    });
+    const upd = { lastMsg: text, lastMsgAt: serverTimestamp() };
+    upd['unread.' + peerId] = increment(1);
+    await updateDoc(doc(db, 'conversations', cid), upd);
+  } catch(e) { showToast('❌ Could not send. Check connection.'); input.value = text; }
+};
+
+window.startNewConversation = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Sign in first.'); return; }
+  const uidOrEmail = (document.getElementById('new-msg-uid')?.value || '').trim();
+  const text       = (document.getElementById('new-msg-text')?.value || '').trim();
+  if (!uidOrEmail) { showToast('⚠️ Enter a recipient UID or email.'); return; }
+  if (!text)       { showToast('⚠️ Enter a message.'); return; }
+
+  let targetUid = uidOrEmail;
+  let targetName = 'User';
+
+  // Look up by email if it looks like one
+  if (uidOrEmail.includes('@')) {
+    try {
+      const usnap = await getDocs(query(collection(db, 'users'), where('email','==', uidOrEmail)));
+      if (usnap.empty) { showToast('❌ No user found with that email.'); return; }
+      const ud = usnap.docs[0].data();
+      targetUid  = usnap.docs[0].id;
+      targetName = ud.fullName || ud.firstName || uidOrEmail;
+    } catch(e) { showToast('❌ Could not look up user.'); return; }
+  } else {
+    try {
+      const usnap = await getDoc(doc(db, 'users', uidOrEmail));
+      if (!usnap.exists()) { showToast('❌ No user found with that UID.'); return; }
+      const ud = usnap.data();
+      targetName = ud.fullName || ud.firstName || uidOrEmail;
+    } catch(e) { showToast('❌ Could not look up user.'); return; }
+  }
+
+  if (targetUid === user.uid) { showToast('⚠️ You cannot message yourself.'); return; }
+
+  const cid = convId(user.uid, targetUid);
+  const convRef = doc(db, 'conversations', cid);
+  const myName = window._currentUser?.fullName || user.displayName || 'User';
+
+  try {
+    const existing = await getDoc(convRef);
+    if (!existing.exists()) {
+      const names = {};
+      names[user.uid]  = myName;
+      names[targetUid] = targetName;
+      await setDoc(convRef, {
+        participants: [user.uid, targetUid],
+        participantNames: names,
+        lastMsg: text,
+        lastMsgAt: serverTimestamp(),
+        unread: { [targetUid]: 1 }
+      });
+    } else {
+      const upd = { lastMsg: text, lastMsgAt: serverTimestamp() };
+      upd['unread.' + targetUid] = increment(1);
+      await updateDoc(convRef, upd);
+    }
+    await addDoc(collection(db, 'conversations', cid, 'messages'), {
+      text, senderId: user.uid, senderName: myName, createdAt: serverTimestamp()
+    });
+    if (document.getElementById('new-msg-uid')) document.getElementById('new-msg-uid').value = '';
+    if (document.getElementById('new-msg-text')) document.getElementById('new-msg-text').value = '';
+    showToast('✅ Message sent to ' + targetName);
+    showPage('messaging');
+    window._activeConvId = cid;
+    window._activePeerId = targetUid;
+    window._activePeerName = targetName;
+    setTimeout(() => openConversation(cid, targetUid, targetName), 400);
+  } catch(e) { console.error(e); showToast('❌ Could not send message.'); }
+};
+
+window.openMsgWithSelf = function() { showPage('messages'); };
+
+window.toggleFollowFromChat = async function() {
+  const btn = document.getElementById('chat-follow-btn');
+  if (!btn) return;
+  const uid  = btn.dataset.uid;
+  const name = btn.dataset.name;
+  const result = await followUser(uid, name);
+  btn.textContent = result ? 'Unfollow' : 'Follow';
+};
+
+// ── LOAD FULL PROFILE V2 (real data) ─────────────────────────────
+window.loadProfileV2 = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const profile = window._currentUser || {};
+  const el = id => document.getElementById(id);
+
+  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : user.email[0].toUpperCase();
+  const fullName = profile.fullName || profile.firstName || user.email.split('@')[0];
+  const joined   = profile.joinedAt
+    ? 'Member since ' + new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
+    : 'Recently joined';
+
+  if (el('pv2-avatar'))  el('pv2-avatar').textContent  = initials;
+  if (el('pv2-name'))    el('pv2-name').textContent     = fullName;
+  if (el('pv2-email'))   el('pv2-email').textContent    = user.email + ' · ' + joined;
+  if (el('pv2-location')) el('pv2-location').textContent = profile.location ? '📍 ' + profile.location : '📍 Location not set';
+  if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
+
+  if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
+
+  // Counts
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    const d = snap.data() || {};
+    if (el('pv2-followers-count')) el('pv2-followers-count').textContent = d.followersCount || 0;
+    if (el('pv2-following-count')) el('pv2-following-count').textContent = d.followingCount || 0;
+    if (el('pv2-stat-followers'))  el('pv2-stat-followers').textContent  = d.followersCount || 0;
+  } catch(e) {}
+
+  // Listings count
+  try {
+    const lq = query(collection(db, 'products'), where('sellerId','==', user.uid));
+    const lsnap = await getDocs(lq);
+    if (el('pv2-stat-listings')) el('pv2-stat-listings').textContent = lsnap.size;
+    // Also render them
+    const listEl = document.getElementById('pv2-listings-list');
+    if (listEl) {
+      if (lsnap.empty) {
+        listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first →</a></div>';
+      } else {
+        listEl.innerHTML = lsnap.docs.map(d => {
+          const p = d.data();
+          return `<div class="listing-row">
+            <div class="listing-thumb">${p.emoji||'📦'}</div>
+            <div class="listing-info">
+              <div class="listing-name">${p.name}</div>
+              <div class="listing-meta">NGN ${Number(p.price).toLocaleString()} · ${p.type}</div>
+            </div>
+            <span class="tag tag-green">Live</span>
+          </div>`;
+        }).join('');
+      }
+    }
+  } catch(e) {}
+
+  if (el('pv2-stat-orders'))  el('pv2-stat-orders').textContent  = '—';
+};
+
+// ── LOAD MY PUBLIC PROFILE (myprofile page) ───────────────────────
+window.loadMyProfile = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const profile = window._currentUser || {};
+  const el = id => document.getElementById(id);
+
+  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : user.email[0].toUpperCase();
+  const fullName = profile.fullName || profile.firstName || user.email.split('@')[0];
+
+  if (el('owner-avatar')) el('owner-avatar').textContent = initials;
+  if (el('owner-name'))   el('owner-name').textContent   = fullName;
+  if (el('nav-avatar-myprofile')) el('nav-avatar-myprofile').textContent = initials;
+
+  const joined = profile.joinedAt
+    ? new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
+    : '';
+  const loc = profile.location || '';
+  if (el('owner-meta')) el('owner-meta').textContent = (loc ? '📍 ' + loc + ' · ' : '') + (joined ? 'Member since ' + joined : '');
+  if (el('owner-bio'))  el('owner-bio').textContent  = profile.bio || 'No bio yet.';
+  if (el('owner-joined')) el('owner-joined').textContent = joined || '—';
+
+  // Badges
+  const badgesEl = el('owner-badges');
+  if (badgesEl) {
+    let badges = '<span class="tag tag-green">✅ Verified buyer</span>';
+    if (profile.sellerVerified) badges += ' <span class="tag tag-gold">🛍 Verified seller</span>';
+    if (profile.location) badges += ' <span class="tag tag-green">📍 Location verified</span>';
+    badgesEl.innerHTML = badges;
+  }
+
+  // Counts
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    const d = snap.data() || {};
+    if (el('owner-followers-count')) el('owner-followers-count').textContent = d.followersCount || 0;
+    if (el('owner-following-count')) el('owner-following-count').textContent = d.followingCount || 0;
+  } catch(e) {}
+
+  // My listings
+  try {
+    const lq = query(collection(db, 'products'), where('sellerId','==', user.uid));
+    const lsnap = await getDocs(lq);
+    if (el('owner-listings-count')) el('owner-listings-count').textContent = lsnap.size;
+    const grid = el('owner-listings-grid');
+    if (grid) {
+      if (lsnap.empty) {
+        grid.innerHTML = '<div style="color:var(--text3);font-size:13px;">No listings yet.</div>';
+      } else {
+        grid.innerHTML = lsnap.docs.map(d => {
+          const p = d.data();
+          return `<div class="pcard" onclick="viewProduct('${d.id}')">
+            <div class="pcard-img">${p.emoji||'📦'}</div>
+            <div class="pcard-body">
+              <div class="pcard-name">${p.name}</div>
+              <div class="pcard-seller">by ${p.sellerName||fullName}</div>
+              <div class="pcard-foot"><span class="pcard-price">NGN ${Number(p.price).toLocaleString()}</span><span class="pcard-type">${p.type||'Physical'}</span></div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+  } catch(e) {}
+};
+
+// ── HELPERS ─────────────────────────────────────────────────────────
+function timeSince(date) {
+  const secs = Math.floor((new Date() - date) / 1000);
+  if (secs < 60) return 'just now';
+  if (secs < 3600) return Math.floor(secs/60) + 'm ago';
+  if (secs < 86400) return Math.floor(secs/3600) + 'h ago';
+  return Math.floor(secs/86400) + 'd ago';
+}
+
+function escapeHtml(t) {
+  return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 </script>
 
@@ -2612,20 +3112,23 @@ const _origShowPage = window.showPage;
 window.showPage = function(name) {
   if (_origShowPage) _origShowPage(name);
   // Populate dynamic elements on navigate
-  if (name === 'profile-v2' || name === 'myprofile') {
+  if (name === 'profile-v2') {
+    if (typeof loadProfileV2 === 'function') loadProfileV2();
+  }
+  if (name === 'myprofile') {
+    if (typeof loadMyProfile === 'function') loadMyProfile();
+  }
+  if (name === 'verifstatus') {
+    if (typeof loadVerifStatus === 'function') loadVerifStatus();
+  }
+  if (name === 'messages' || name === 'messaging') {
+    if (typeof loadConversations === 'function') loadConversations();
     const user = window._auth && window._auth.currentUser;
     const profile = window._currentUser || {};
     const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const fullName = profile.fullName || profile.firstName || (user ? user.email.split('@')[0] : 'User');
     const el = id => document.getElementById(id);
-    if (el('pv2-avatar')) el('pv2-avatar').textContent = initials;
-    if (el('pv2-name'))   el('pv2-name').textContent   = fullName;
-    if (el('pv2-email'))  el('pv2-email').textContent  = user ? user.email + ' · Member since ' + (profile.joinedAt ? new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : 'recently') : '';
-    if (el('owner-avatar')) el('owner-avatar').textContent = initials;
-    if (el('owner-name'))   el('owner-name').textContent   = fullName;
-    if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
-    if (el('nav-avatar-myprofile')) el('nav-avatar-myprofile').textContent = initials;
-    if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
+    if (el('nav-avatar-msgs')) el('nav-avatar-msgs').textContent = initials;
+    if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
   }
   if (name === 'settings') {
     const user = window._auth && window._auth.currentUser;
@@ -2645,13 +3148,12 @@ window.showPage = function(name) {
     const el = id => document.getElementById(id);
     if (el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
   }
-  if (name === 'messages' || name === 'messaging') {
+  if (name === 'verifstatus' || name === 'verif') {
     const user = window._auth && window._auth.currentUser;
     const profile = window._currentUser || {};
     const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
     const el = id => document.getElementById(id);
-    if (el('nav-avatar-msgs')) el('nav-avatar-msgs').textContent = initials;
-    if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
+    if (el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
   }
 };
 
