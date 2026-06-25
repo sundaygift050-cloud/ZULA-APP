@@ -219,29 +219,30 @@ p{color:var(--text2);margin:0 0 1em;}
 }
 
 /* ADMIN */
-.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
-@media(max-width:760px){.admin-layout{grid-template-columns:1fr;}}
-.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:24px 0;}
-.admin-logo{font-family:var(--font-display);font-size:18px;font-weight:800;padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px;}
-.admin-logo span{color:var(--accent);}
-.admin-nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:.15s;}
-.admin-nav-item:hover{background:var(--surface);color:var(--text);}
-.admin-nav-item.active{background:rgba(124,92,252,.12);color:var(--accent);border-right:2px solid var(--accent);}
-.admin-main{padding:32px;}
-.admin-main h1{font-size:22px;font-weight:700;margin-bottom:24px;}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;}
-.stat-card .sc-num{font-size:28px;font-weight:700;font-family:var(--font-display);}
-.stat-card .sc-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
-.admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
-.admin-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--border);}
-.admin-table td{padding:12px;border-bottom:1px solid var(--border);color:var(--text2);}
-.admin-table tr:last-child td{border-bottom:none;}
-.admin-table td:first-child{color:var(--text);font-weight:500;}
+.admin-shell{display:flex;min-height:100vh;}
+.dash-side{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;}
+.dash-side .d-brand{padding:0 18px 20px;font-family:var(--font-display);font-size:15px;font-weight:700;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.dash-side .d-brand span{color:var(--accent);}
+.dash-nav a{display:flex;align-items:center;gap:8px;padding:10px 18px;font-size:13.5px;font-weight:500;color:var(--text2);border-left:3px solid transparent;cursor:pointer;transition:.15s;}
+.dash-nav a:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.dash-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(124,92,252,.07);}
+.dash-main{flex:1;padding:28px 32px;overflow-x:auto;}
+.dash-h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+.dash-sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;min-width:140px;}
+.stat-lbl{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.stat-val{font-family:var(--font-display);font-size:22px;font-weight:700;}
+.dtable{width:100%;border-collapse:collapse;font-size:13px;}
+.dtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:9px;border-bottom:1px solid var(--border);}
+.dtable td{padding:11px 9px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text2);}
+.dtable tr:last-child td{border-bottom:none;}
+.dtable td:first-child{color:var(--text);font-weight:500;}
+.dthumb{width:40px;height:40px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;}
 .admin-section{display:none;}
 .admin-section.active{display:block;}
-.admin-access-denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
-.admin-access-denied h2{font-size:22px;font-weight:700;margin-bottom:8px;}
+.admin-denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.admin-denied h2{font-size:22px;font-weight:700;margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -468,7 +469,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <a onclick="showPage('marketplace')">Browse</a>
         <a onclick="showPage('addproduct')">Sell</a>
         <a onclick="showPage('profile')">Profile</a>
-        <a onclick="openAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
+        <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
         <div class="avatar-btn" id="nav-avatar" onclick="showPage('profile')">?</div>
       </nav>
     </div>
@@ -777,8 +778,9 @@ p{color:var(--text2);margin:0 0 1em;}
      PAGE: ADMIN PANEL (sundaygift050 & okoroaugustine050 only)
      ================================================================ -->
 <div class="page" id="page-admin">
-  <!-- Access denied fallback (shown if not admin) -->
-  <div class="admin-access-denied" id="admin-denied" style="display:none;">
+
+  <!-- ACCESS DENIED (non-admins) -->
+  <div class="admin-denied" id="admin-denied" style="display:none;">
     <div>
       <div style="font-size:52px;margin-bottom:16px;">🚫</div>
       <h2>Access Denied</h2>
@@ -786,70 +788,108 @@ p{color:var(--text2);margin:0 0 1em;}
       <button class="btn btn-ghost" onclick="showPage('marketplace')">← Back to marketplace</button>
     </div>
   </div>
-  <!-- Real admin panel -->
-  <div class="admin-layout" id="admin-panel" style="display:none;">
-    <aside class="admin-sidebar">
-      <div class="admin-logo">ZÚ<span>LA</span> <span style="font-size:10px;color:var(--text3);font-family:var(--font-body);font-weight:400;">Admin</span></div>
-      <div class="admin-nav-item active" onclick="adminTab('overview')">📊 Overview</div>
-      <div class="admin-nav-item" onclick="adminTab('users')">👥 Users</div>
-      <div class="admin-nav-item" onclick="adminTab('products')">📦 Products</div>
-      <div class="admin-nav-item" onclick="adminTab('verification')">🛡 Verif. Queue</div>
-      <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
-      <div class="admin-nav-item" onclick="showPage('marketplace')" style="color:var(--text3);">← Marketplace</div>
-      <div class="admin-nav-item" onclick="zulaSignOut()" style="color:var(--red);">Sign out</div>
+
+  <!-- REAL ADMIN PANEL -->
+  <div class="admin-shell" id="admin-panel" style="display:none;">
+    <aside class="dash-side">
+      <div class="d-brand">ZÚ<span>LA</span> Admin</div>
+      <nav class="dash-nav">
+        <a class="active" id="anav-overview"    onclick="adminTab('overview')">📊 Overview</a>
+        <a id="anav-products"   onclick="adminTab('products')">📦 Products</a>
+        <a id="anav-users"      onclick="adminTab('users')">👥 Users</a>
+        <a id="anav-orders"     onclick="adminTab('orders')">🛍 Orders</a>
+        <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
+        <a id="anav-settings"   onclick="adminTab('settings')">⚙️ Settings</a>
+        <a style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;" onclick="showPage('marketplace')">← Marketplace</a>
+        <a style="color:var(--red);" onclick="zulaSignOut()">Sign out</a>
+      </nav>
     </aside>
-    <main class="admin-main">
+
+    <main class="dash-main">
 
       <!-- OVERVIEW -->
-      <div class="admin-section active" id="admin-overview">
-        <h1>Dashboard</h1>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="sc-num" id="stat-users">—</div><div class="sc-lbl">Total users</div></div>
-          <div class="stat-card"><div class="sc-num" id="stat-products">—</div><div class="sc-lbl">Total products</div></div>
-          <div class="stat-card"><div class="sc-num" id="stat-sellers">—</div><div class="sc-lbl">Active sellers</div></div>
-          <div class="stat-card"><div class="sc-num" id="stat-pending">—</div><div class="sc-lbl">Pending verifications</div></div>
+      <div class="admin-section active" id="asec-overview">
+        <div class="dash-h1">Overview</div>
+        <div class="dash-sub">Live data from ZÚLA marketplace</div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-lbl">Total users</div><div class="stat-val" id="astat-users">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Total products</div><div class="stat-val" id="astat-products">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Active sellers</div><div class="stat-val" id="astat-sellers">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Pending verif.</div><div class="stat-val" id="astat-verif">0</div></div>
         </div>
         <div class="dash-card">
-          <h3>Recent products</h3>
-          <table class="admin-table">
-            <thead><tr><th>Product</th><th>Seller</th><th>Category</th><th>Price (NGN)</th><th>Type</th></tr></thead>
-            <tbody id="admin-recent-products"><tr><td colspan="5" style="color:var(--text3);">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- USERS -->
-      <div class="admin-section" id="admin-users">
-        <h1>All Users</h1>
-        <div class="dash-card">
-          <table class="admin-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
-            <tbody id="admin-users-table"><tr><td colspan="5" style="color:var(--text3);">Loading…</td></tr></tbody>
+          <div style="font-size:15px;font-weight:700;margin-bottom:14px;">Recent products</div>
+          <table class="dtable">
+            <thead><tr><th>Product</th><th>Seller</th><th>Category</th><th>Price</th><th>Type</th></tr></thead>
+            <tbody id="a-recent-products"><tr><td colspan="5" style="color:var(--text3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
 
       <!-- PRODUCTS -->
-      <div class="admin-section" id="admin-products">
-        <h1>All Products</h1>
+      <div class="admin-section" id="asec-products">
+        <div class="dash-h1">All Products</div>
+        <div class="dash-sub">Every product listed on the marketplace</div>
         <div class="dash-card">
-          <table class="admin-table">
-            <thead><tr><th>Product</th><th>Seller</th><th>Price</th><th>Category</th><th>Actions</th></tr></thead>
-            <tbody id="admin-products-table"><tr><td colspan="5" style="color:var(--text3);">Loading…</td></tr></tbody>
+          <table class="dtable">
+            <thead><tr><th>Product</th><th>Seller</th><th>Price (NGN)</th><th>Category</th><th>Type</th><th>Action</th></tr></thead>
+            <tbody id="a-products-table"><tr><td colspan="6" style="color:var(--text3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- VERIFICATION QUEUE -->
-      <div class="admin-section" id="admin-verification">
-        <h1>Verification Queue</h1>
+      <!-- USERS -->
+      <div class="admin-section" id="asec-users">
+        <div class="dash-h1">All Users</div>
+        <div class="dash-sub">Everyone registered on ZÚLA</div>
         <div class="dash-card">
-          <div id="admin-verif-list">
-            <div class="empty-state" style="padding:40px 0;">
-              <div class="es-icon">🛡</div>
-              <h3>No pending verifications</h3>
-              <p>Seller verification requests will appear here.</p>
-            </div>
+          <table class="dtable">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+            <tbody id="a-users-table"><tr><td colspan="4" style="color:var(--text3);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="admin-section" id="asec-orders">
+        <div class="dash-h1">Orders</div>
+        <div class="dash-sub">All orders across every seller and product type</div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val">NGN 0</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="empty-state" style="padding:40px 0;">
+            <div class="es-icon">🛍</div>
+            <h3>No orders yet</h3>
+            <p>Orders will appear here when buyers start purchasing.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VERIFICATION QUEUE -->
+      <div class="admin-section" id="asec-verif">
+        <div class="dash-h1">Verification Queue</div>
+        <div class="dash-sub">Seller verification requests waiting for review</div>
+        <div class="dash-card">
+          <div class="empty-state" style="padding:40px 0;">
+            <div class="es-icon">🛡</div>
+            <h3>No pending verifications</h3>
+            <p>Seller verification requests will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="admin-section" id="asec-settings">
+        <div class="dash-h1">Platform Settings</div>
+        <div class="dash-sub">Global settings for ZÚLA</div>
+        <div class="dash-card">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Admin accounts</div>
+          <p style="font-size:13.5px;color:var(--text2);">The following emails have full admin access:</p>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;">sundaygift050@gmail.com</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;">okoroaugustine050@gmail.com</div>
           </div>
         </div>
       </div>
@@ -1215,7 +1255,6 @@ function showPage(name) {
     window.scrollTo(0, 0);
     if (name === 'marketplace') { if(typeof loadProducts==='function') loadProducts(); }
     if (name === 'profile')     { if(typeof loadProfilePage==='function') loadProfilePage(); }
-    if (name === 'admin')       { if(typeof openAdmin==='function') openAdmin(); }
   }
 }
 
@@ -1288,98 +1327,96 @@ function isAdmin() {
 }
 
 window.openAdmin = function() {
-  showPage('admin');
+  // Don't call showPage here — called directly from nav link
   if (!isAdmin()) {
     document.getElementById('admin-denied').style.display = 'flex';
     document.getElementById('admin-panel').style.display = 'none';
     return;
   }
   document.getElementById('admin-denied').style.display = 'none';
-  document.getElementById('admin-panel').style.display = 'grid';
+  document.getElementById('admin-panel').style.display = 'flex';
   adminTab('overview');
   loadAdminData();
 };
 
 window.adminTab = function(name) {
-  document.querySelectorAll('.admin-nav-item').forEach((el, i) => {
-    const tabs = ['overview','users','products','verification'];
-    el.classList.toggle('active', tabs[i] === name);
+  // Update nav links
+  ['overview','products','users','orders','verif','settings'].forEach(t => {
+    const el = document.getElementById('anav-' + t);
+    if (el) el.classList.toggle('active', t === name);
   });
+  // Show correct section
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  const sec = document.getElementById('admin-' + name);
+  const sec = document.getElementById('asec-' + name);
   if (sec) sec.classList.add('active');
 };
 
 window.loadAdminData = async function() {
   if (!isAdmin() || !window._db) return;
-  const db   = window._db;
-  const fns  = window._fns;
+  const db  = window._db;
+  const fns = window._fns;
   try {
-    // Load all users
     const usersSnap    = await fns.getDocs(fns.collection(db, 'users'));
     const productsSnap = await fns.getDocs(fns.query(fns.collection(db, 'products'), fns.orderBy('createdAt','desc')));
-    const users    = [];
+    const users = [];
     const products = [];
     usersSnap.forEach(d    => users.push({ id: d.id, ...d.data() }));
     productsSnap.forEach(d => products.push({ id: d.id, ...d.data() }));
-
     const sellerIds = [...new Set(products.map(p => p.sellerId))];
 
-    // Update stat cards
-    document.getElementById('stat-users').textContent    = users.length;
-    document.getElementById('stat-products').textContent = products.length;
-    document.getElementById('stat-sellers').textContent  = sellerIds.length;
-    document.getElementById('stat-pending').textContent  = '0';
+    // Stat cards
+    const s = id => document.getElementById(id);
+    if (s('astat-users'))    s('astat-users').textContent    = users.length;
+    if (s('astat-products')) s('astat-products').textContent = products.length;
+    if (s('astat-sellers'))  s('astat-sellers').textContent  = sellerIds.length;
 
-    // Recent products table
-    const rpTbody = document.getElementById('admin-recent-products');
-    if (rpTbody) {
-      rpTbody.innerHTML = products.length === 0
+    // Recent products (overview)
+    const rp = s('a-recent-products');
+    if (rp) {
+      rp.innerHTML = products.length === 0
         ? '<tr><td colspan="5" style="color:var(--text3);">No products yet.</td></tr>'
-        : products.slice(0, 10).map(p => `
-            <tr>
-              <td>${p.emoji||'📦'} ${p.name}</td>
-              <td>${p.sellerName||'—'}</td>
-              <td>${p.category||'—'}</td>
-              <td>NGN ${Number(p.price||0).toLocaleString()}</td>
-              <td><span class="tag tag-gold">${p.type||'Physical'}</span></td>
-            </tr>`).join('');
+        : products.slice(0,10).map(p => `
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}</div>${p.name}</div></td>
+            <td>${p.sellerName||'—'}</td>
+            <td>${p.category||'—'}</td>
+            <td>NGN ${Number(p.price||0).toLocaleString()}</td>
+            <td><span class="tag tag-gold">${p.type||'Physical'}</span></td>
+          </tr>`).join('');
     }
 
-    // All users table
-    const uTbody = document.getElementById('admin-users-table');
-    if (uTbody) {
-      uTbody.innerHTML = users.length === 0
-        ? '<tr><td colspan="5" style="color:var(--text3);">No users yet.</td></tr>'
-        : users.map(u => `
-            <tr>
-              <td>${u.fullName||u.firstName||'—'}</td>
-              <td>${u.email||'—'}</td>
-              <td><span class="tag ${u.sellerVerified ? 'tag-green' : 'tag-gold'}">${u.sellerVerified ? 'Seller' : 'Buyer'}</span></td>
-              <td>${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '—'}</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="showToast('User management coming soon')">Manage</button></td>
-            </tr>`).join('');
-    }
-
-    // All products table
-    const pTbody = document.getElementById('admin-products-table');
-    if (pTbody) {
-      pTbody.innerHTML = products.length === 0
-        ? '<tr><td colspan="5" style="color:var(--text3);">No products yet.</td></tr>'
+    // All products tab
+    const pt = s('a-products-table');
+    if (pt) {
+      pt.innerHTML = products.length === 0
+        ? '<tr><td colspan="6" style="color:var(--text3);">No products yet.</td></tr>'
         : products.map(p => `
-            <tr>
-              <td>${p.emoji||'📦'} ${p.name}</td>
-              <td>${p.sellerName||'—'}</td>
-              <td>NGN ${Number(p.price||0).toLocaleString()}</td>
-              <td>${p.category||'—'}</td>
-              <td>
-                <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);"
-                  onclick="adminDeleteProduct('${p.id}')">Remove</button>
-              </td>
-            </tr>`).join('');
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}</div>${p.name}</div></td>
+            <td>${p.sellerName||'—'}</td>
+            <td>NGN ${Number(p.price||0).toLocaleString()}</td>
+            <td>${p.category||'—'}</td>
+            <td><span class="tag tag-gold">${p.type||'Physical'}</span></td>
+            <td><button class="btn btn-sm btn-danger" onclick="adminDeleteProduct('${p.id}')">Remove</button></td>
+          </tr>`).join('');
+    }
+
+    // All users tab
+    const ut = s('a-users-table');
+    if (ut) {
+      ut.innerHTML = users.length === 0
+        ? '<tr><td colspan="4" style="color:var(--text3);">No users yet.</td></tr>'
+        : users.map(u => `
+          <tr>
+            <td>${u.fullName||u.firstName||'—'}</td>
+            <td style="font-size:12px;">${u.email||'—'}</td>
+            <td><span class="tag ${u.sellerVerified?'tag-green':'tag-gold'}">${u.sellerVerified?'Seller':'Buyer'}</span></td>
+            <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '—'}</td>
+          </tr>`).join('');
     }
   } catch(e) {
     showToast('❌ Could not load admin data. Check Firestore rules.');
+    console.error(e);
   }
 };
 
@@ -1395,6 +1432,15 @@ window.adminDeleteProduct = async function(id) {
     showToast('❌ Could not remove product.');
   }
 };
+
+
+function goAdmin() {
+  // Show admin page without triggering showPage loop
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-admin');
+  if (target) { target.classList.add('active'); window.scrollTo(0,0); }
+  if (typeof openAdmin === 'function') openAdmin();
+}
 
 window._selectedType = 'Physical';
 </script>
