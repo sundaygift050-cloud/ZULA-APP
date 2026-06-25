@@ -248,6 +248,122 @@ p{color:var(--text2);margin:0 0 1em;}
 .admin-section.active{display:block;}
 .admin-denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
 .admin-denied h2{font-size:22px;font-weight:700;margin-bottom:8px;}
+
+/* ── NOTIFICATIONS ── */
+.notif-item{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item.unread{background:rgba(124,92,252,.04);margin:0 -20px;padding:16px 20px;border-radius:var(--radius-xs);}
+.notif-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);}
+.notif-body{flex:1;}
+.notif-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.notif-desc{font-size:12.5px;color:var(--text2);line-height:1.5;}
+.notif-time{font-size:11px;color:var(--text3);margin-top:4px;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px;}
+.notif-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.nfpill{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;}
+.nfpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ── MESSAGES / INBOX ── */
+.inbox-layout{display:grid;grid-template-columns:300px 1fr;min-height:600px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+@media(max-width:760px){.inbox-layout{grid-template-columns:1fr;}}
+.inbox-sidebar{border-right:1px solid var(--border);background:var(--surface);}
+.inbox-search{padding:14px;border-bottom:1px solid var(--border);}
+.inbox-search input{width:100%;padding:9px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:13px;font-family:var(--font-body);}
+.conv-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.conv-item:hover,.conv-item.active{background:rgba(124,92,252,.06);}
+.conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+.conv-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.conv-preview{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.conv-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.conv-time{font-size:11px;color:var(--text3);}
+.conv-unread{background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 6px;min-width:18px;text-align:center;}
+.chat-area{display:flex;flex-direction:column;background:var(--bg);}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;}
+.chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:400px;}
+.msg{max-width:72%;display:flex;flex-direction:column;}
+.msg.sent{align-self:flex-end;align-items:flex-end;}
+.msg.recv{align-self:flex-start;align-items:flex-start;}
+.msg-bubble{padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;}
+.msg.sent .msg-bubble{background:var(--accent);color:#fff;border-radius:14px 14px 4px 14px;}
+.msg.recv .msg-bubble{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px 14px 14px 4px;}
+.msg-time{font-size:10.5px;color:var(--text3);margin-top:4px;}
+.chat-input-area{padding:16px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:10px;align-items:flex-end;}
+.chat-input-area textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;padding:10px 14px;resize:none;height:42px;max-height:120px;}
+
+/* ── SETTINGS PAGE ── */
+.settings-layout{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:28px 0 60px;}
+@media(max-width:700px){.settings-layout{grid-template-columns:1fr;}}
+.settings-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 0;height:fit-content;}
+.settings-nav a{display:flex;align-items:center;gap:9px;padding:10px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-left:3px solid transparent;transition:.15s;}
+.settings-nav a:hover{color:var(--text);}
+.settings-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(124,92,252,.07);}
+.settings-section{display:none;}
+.settings-section.active{display:block;}
+.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px 24px;margin-bottom:16px;}
+.settings-card h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+.settings-card .sc-sub{font-size:13px;color:var(--text3);margin-bottom:18px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-label{font-size:13.5px;font-weight:500;color:var(--text);}
+.toggle-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.toggle-switch{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:999px;transition:.2s;}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;}
+.toggle-switch input:checked+.toggle-track{background:var(--accent);}
+.toggle-switch input:checked~.toggle-thumb{left:23px;}
+
+/* ── 2FA ── */
+.twofa-method{display:flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;cursor:pointer;margin-bottom:10px;transition:.15s;}
+.twofa-method:hover,.twofa-method.selected{border-color:var(--accent);background:rgba(124,92,252,.05);}
+.twofa-method input[type=radio]{accent-color:var(--accent);}
+.twofa-icon{font-size:26px;width:42px;text-align:center;flex-shrink:0;}
+.twofa-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.twofa-desc{font-size:12.5px;color:var(--text3);}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin:20px 0;}
+.otp-inputs input{width:46px;height:52px;text-align:center;font-size:22px;font-weight:700;background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-display);}
+.otp-inputs input:focus{outline:none;border-color:var(--accent);}
+
+/* ── LOCATION PAGE ── */
+.map-preview{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;height:180px;margin-bottom:16px;}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:30px 30px;opacity:.4;}
+.map-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:rgba(124,92,252,.15);border:2px solid var(--accent);animation:mapPulse 2s infinite;}
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-80%);font-size:28px;}
+.map-label{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(13,13,15,.85);border:1px solid var(--border);border-radius:999px;padding:5px 14px;font-size:12px;color:var(--text);white-space:nowrap;}
+@keyframes mapPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1;}50%{transform:translate(-50%,-50%) scale(1.4);opacity:.5;}}
+.location-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(39,201,122,.12);color:var(--green);border:1px solid rgba(39,201,122,.25);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;}
+
+/* ── LANGUAGE ── */
+.lang-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-xs);cursor:pointer;border:1px solid transparent;transition:.15s;}
+.lang-option:hover{background:var(--surface2);border-color:var(--border);}
+.lang-option.selected{background:rgba(124,92,252,.08);border-color:var(--accent);}
+.lang-flag{font-size:22px;width:32px;text-align:center;}
+.lang-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.lang-native{font-size:12px;color:var(--text3);}
+.lang-check{margin-left:auto;color:var(--accent);font-size:16px;}
+
+/* ── VERIF STATUS ── */
+.vstatus-step{display:flex;gap:16px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;}
+.vstatus-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.vstatus-icon.done{background:rgba(39,201,122,.15);border:2px solid var(--green);}
+.vstatus-icon.pending{background:rgba(245,200,66,.12);border:2px solid var(--gold);}
+.vstatus-icon.todo{background:var(--bg3);border:2px solid var(--border);}
+
+/* ── OWNER / PUBLIC PROFILE ── */
+.pub-profile-cover{height:160px;background:linear-gradient(135deg,rgba(124,92,252,.25),rgba(91,63,219,.12));border-radius:var(--radius) var(--radius) 0 0;position:relative;}
+.pub-profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+.pub-profile-body{padding:20px 24px 24px;}
+.pub-avatar-wrap{position:relative;margin-top:-44px;margin-bottom:12px;}
+.pub-avatar{width:80px;height:80px;border-radius:50%;border:4px solid var(--surface);background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;}
+.pub-online{position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:var(--green);border:2px solid var(--surface);border-radius:50%;}
+.pub-stats-row{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:16px 0;}
+.pub-stat{flex:1;text-align:center;padding:14px 8px;border-right:1px solid var(--border);}
+.pub-stat:last-child{border-right:none;}
+.pub-stat-val{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);}
+.pub-stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* ── PROFILE V2 LANG BANNER ── */
+.lang-banner{background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:10px 16px;font-size:13px;color:var(--text2);margin-bottom:16px;}
 </style>
 </head>
 <body>
@@ -644,6 +760,9 @@ p{color:var(--text2);margin:0 0 1em;}
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="goAddProduct()">+ Add product</a>
+        <a onclick="showPage('messages')">✉️</a>
+        <a onclick="showPage('notifications')">🔔</a>
+        <a onclick="showPage('settings')">⚙️</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
       </nav>
     </div>
@@ -664,7 +783,9 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
-        <button class="btn btn-ghost btn-sm" onclick="profileTab('settings')">⚙️ Settings</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('profile-v2')">🪪 Full profile</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
       </div>
     </div>
 
@@ -1036,6 +1157,805 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
 
     </main>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: PROFILE V2 (enhanced with location, language, badges)
+     ================================================================ -->
+<div class="page" id="page-profile-v2">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('messages')">✉️ Messages</a>
+        <a onclick="showPage('notifications')">🔔</a>
+        <a onclick="showPage('settings')">⚙️</a>
+        <div class="avatar-btn" id="nav-avatar-v2" onclick="showPage('profile-v2')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:740px;">
+    <div class="lang-banner" id="lang-banner-v2">
+      🌐 ZÚLA is displayed in <strong id="v2-lang-name">English</strong> — <a onclick="showPage('language')" style="cursor:pointer;">Change</a>
+    </div>
+    <!-- PROFILE HEADER -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;">
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+        <div style="position:relative;">
+          <div class="profile-avatar" id="pv2-avatar" style="width:80px;height:80px;font-size:28px;">?</div>
+          <div style="position:absolute;bottom:2px;right:2px;width:18px;height:18px;background:var(--green);border:3px solid var(--surface);border-radius:50%;"></div>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <div style="font-size:21px;font-weight:700;margin-bottom:3px;" id="pv2-name">Loading…</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="pv2-email"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <span style="font-size:13px;color:var(--text2);" id="pv2-location">🇳🇬 Lagos, Nigeria</span>
+            <span class="location-badge">📍 Verified</span>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
+            <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
+            <span class="tag tag-gold">⭐ Gold Affiliate</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;background:rgba(56,152,236,.1);border:1px solid rgba(56,152,236,.2);color:#5ba8f5;">🌐 English</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('locationverif')">📍 Location</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Language</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 2FA</button>
+        </div>
+      </div>
+    </div>
+    <!-- PROFILE TABS -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px;overflow-x:auto;">
+      <button class="btn btn-sm" id="pv2-tab-orders" style="flex:1;min-width:80px;background:var(--accent);color:#fff;" onclick="switchPv2Tab('orders',this)">Orders</button>
+      <button class="btn btn-sm" id="pv2-tab-downloads" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('downloads',this)">Downloads</button>
+      <button class="btn btn-sm" id="pv2-tab-wishlist" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('wishlist',this)">Wishlist</button>
+      <button class="btn btn-sm" id="pv2-tab-reviews" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('reviews',this)">Reviews</button>
+    </div>
+    <!-- QUICK STATS -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">12</div><div style="font-size:11px;color:var(--text3);">Orders</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">8</div><div style="font-size:11px;color:var(--text3);">Downloads</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);">3</div><div style="font-size:11px;color:var(--text3);">Courses</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);">₦67K</div><div style="font-size:11px;color:var(--text3);">Aff. earned</div></div>
+    </div>
+    <!-- RECENT ORDERS -->
+    <div class="dash-card">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Recent orders</h3>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">👜</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">Woven Tote Bag</div><div style="font-size:11.5px;color:var(--text3);">Jun 21 · NGN 18,500</div></div><span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(245,200,66,.15);color:var(--gold);">in transit</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">📚</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">6-Figure Blueprint</div><div style="font-size:11.5px;color:var(--text3);">Jun 18 · NGN 4,500</div></div><span style="font-size:12px;color:var(--green);">✓ Downloaded</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><div style="width:40px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">👗</div><div style="flex:1;"><div style="color:var(--text);font-weight:500;font-size:13px;">Ankara Wrap Dress</div><div style="font-size:11.5px;color:var(--text3);">Jun 14 · NGN 15,000</div></div><span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(56,152,236,.15);color:#5ba8f5;">completed</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: OWNER / MY PROFILE (public-facing view of own profile)
+     ================================================================ -->
+<div class="page" id="page-myprofile">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('profile-v2')">My Account</a>
+        <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap" style="max-width:860px;padding-top:28px;padding-bottom:60px;">
+    <!-- PUBLIC PROFILE CARD -->
+    <div class="pub-profile-card">
+      <div class="pub-profile-cover"></div>
+      <div class="pub-profile-body">
+        <div class="pub-avatar-wrap">
+          <div class="pub-avatar" id="owner-avatar">?</div>
+          <div class="pub-online"></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="owner-name">Ada Okafor</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:10px;">🇳🇬 Lagos, Nigeria · Member since Jan 2024</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;">
+              <span class="tag tag-green">✅ Verified seller</span>
+              <span class="tag tag-gold">⭐ Gold Affiliate</span>
+              <span class="tag tag-green">📍 Location verified</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="showPage('messages')">✉️ Message</button>
+            <button class="btn btn-primary btn-sm" onclick="showPage('marketplace')">View listings</button>
+          </div>
+        </div>
+        <div class="pub-stats-row">
+          <div class="pub-stat"><div class="pub-stat-val">47</div><div class="pub-stat-lbl">Products</div></div>
+          <div class="pub-stat"><div class="pub-stat-val">312</div><div class="pub-stat-lbl">Sales</div></div>
+          <div class="pub-stat"><div class="pub-stat-val">4.9</div><div class="pub-stat-lbl">Rating</div></div>
+          <div class="pub-stat"><div class="pub-stat-val">98%</div><div class="pub-stat-lbl">Positive</div></div>
+        </div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;" id="owner-bio">Nigerian creative entrepreneur — fashion, digital products, and business tools. Ships within 2 days, worldwide.</div>
+      </div>
+    </div>
+    <!-- SELLER'S LISTINGS -->
+    <div class="dash-card">
+      <h3 style="margin-bottom:16px;">Active listings</h3>
+      <div class="pgrid" id="owner-listings-grid">
+        <div class="pcard"><div class="pcard-img">👜</div><div class="pcard-body"><div class="pcard-name">Woven Tote Bag</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 18,500</span><span class="pcard-type">Physical</span></div></div></div>
+        <div class="pcard"><div class="pcard-img">📚</div><div class="pcard-body"><div class="pcard-name">6-Figure Blueprint</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 4,500</span><span class="pcard-type">Digital</span></div></div></div>
+        <div class="pcard"><div class="pcard-img">👗</div><div class="pcard-body"><div class="pcard-name">Ankara Wrap Dress</div><div class="pcard-seller">by Ada Okafor</div><div class="pcard-foot"><span class="pcard-price">NGN 15,000</span><span class="pcard-type">Physical</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: MESSAGES (inbox overview)
+     ================================================================ -->
+<div class="page" id="page-messages">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('messaging')">Open full chat →</a>
+        <div class="avatar-btn" id="nav-avatar-msgs" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:700px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h1 style="font-size:22px;font-weight:700;">Messages</h1>
+      <button class="btn btn-primary btn-sm" onclick="showPage('messaging')">💬 Open full chat</button>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+      <div class="conv-item active" onclick="showPage('messaging')">
+        <div class="conv-avatar">KA</div>
+        <div style="flex:1;min-width:0;">
+          <div class="conv-meta"><span class="conv-name">Kemi Adeyemi</span><span class="conv-time">2m ago</span></div>
+          <div class="conv-preview">Hi, is the Ankara dress still available in size M?</div>
+        </div>
+        <div class="conv-unread">2</div>
+      </div>
+      <div class="conv-item" onclick="showPage('messaging')">
+        <div class="conv-avatar" style="background:#27c97a;">BO</div>
+        <div style="flex:1;min-width:0;">
+          <div class="conv-meta"><span class="conv-name">Biodun Ojo</span><span class="conv-time">1h ago</span></div>
+          <div class="conv-preview">Thanks for the quick delivery! 🙌</div>
+        </div>
+      </div>
+      <div class="conv-item" onclick="showPage('messaging')">
+        <div class="conv-avatar" style="background:#f5c842;color:#1a1000;">TN</div>
+        <div style="flex:1;min-width:0;">
+          <div class="conv-meta"><span class="conv-name">Tunde Nwosu</span><span class="conv-time">Yesterday</span></div>
+          <div class="conv-preview">Can I get a bulk discount for 5 units?</div>
+        </div>
+        <div class="conv-unread">1</div>
+      </div>
+      <div class="conv-item" onclick="showPage('messaging')">
+        <div class="conv-avatar" style="background:#5ba8f5;color:#fff;">ZÚ</div>
+        <div style="flex:1;min-width:0;">
+          <div class="conv-meta"><span class="conv-name">ZÚLA Support</span><span class="conv-time">Jun 20</span></div>
+          <div class="conv-preview">Your verification is under review — expect a response…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: FULL MESSAGING (chat interface)
+     ================================================================ -->
+<div class="page" id="page-messaging">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('messages')">← Inbox</a>
+        <div class="avatar-btn" id="nav-avatar-chat" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap" style="padding-top:24px;padding-bottom:40px;">
+    <div class="inbox-layout">
+      <!-- SIDEBAR -->
+      <div class="inbox-sidebar">
+        <div class="inbox-search"><input placeholder="Search conversations…" type="text"></div>
+        <div class="conv-item active">
+          <div class="conv-avatar">KA</div>
+          <div style="flex:1;min-width:0;">
+            <div class="conv-meta"><span class="conv-name">Kemi Adeyemi</span><span class="conv-time">2m</span></div>
+            <div class="conv-preview">Hi, is the Ankara dress still available?</div>
+          </div>
+          <div class="conv-unread">2</div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-avatar" style="background:#27c97a;">BO</div>
+          <div style="flex:1;min-width:0;">
+            <div class="conv-meta"><span class="conv-name">Biodun Ojo</span><span class="conv-time">1h</span></div>
+            <div class="conv-preview">Thanks for the quick delivery! 🙌</div>
+          </div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-avatar" style="background:#f5c842;color:#1a1000;">TN</div>
+          <div style="flex:1;min-width:0;">
+            <div class="conv-meta"><span class="conv-name">Tunde Nwosu</span><span class="conv-time">Yesterday</span></div>
+            <div class="conv-preview">Can I get a bulk discount?</div>
+          </div>
+          <div class="conv-unread">1</div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-avatar" style="background:#5ba8f5;color:#fff;">ZÚ</div>
+          <div style="flex:1;min-width:0;">
+            <div class="conv-meta"><span class="conv-name">ZÚLA Support</span><span class="conv-time">Jun 20</span></div>
+            <div class="conv-preview">Your verification is under review…</div>
+          </div>
+        </div>
+      </div>
+      <!-- CHAT AREA -->
+      <div class="chat-area">
+        <div class="chat-header">
+          <div class="conv-avatar">KA</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;">Kemi Adeyemi</div>
+            <div style="font-size:12px;color:var(--green);">● Online</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg recv">
+            <div class="msg-bubble">Hi! Is the Ankara Wrap Dress still available in size M?</div>
+            <div class="msg-time">2:14 PM</div>
+          </div>
+          <div class="msg recv">
+            <div class="msg-bubble">Also, do you ship to Abuja?</div>
+            <div class="msg-time">2:14 PM</div>
+          </div>
+          <div class="msg sent">
+            <div class="msg-bubble">Yes! Size M is still in stock 🎉 And yes, we ship everywhere in Nigeria — Abuja delivery takes 2–3 days.</div>
+            <div class="msg-time">2:17 PM</div>
+          </div>
+          <div class="msg recv">
+            <div class="msg-bubble">Amazing! I'll place an order now. Thank you! 🙏</div>
+            <div class="msg-time">2:18 PM</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
+          <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" style="height:42px;">Send →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: NOTIFICATIONS
+     ================================================================ -->
+<div class="page" id="page-notifications">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('profile')">Profile</a>
+        <div class="avatar-btn" id="nav-avatar-notif" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:700px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h1 style="font-size:22px;font-weight:700;">Notifications</h1>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('✓ All marked as read')">Mark all read</button>
+    </div>
+    <div class="notif-filter-bar">
+      <button class="nfpill active" onclick="filterNotifs('all',this)">All</button>
+      <button class="nfpill" onclick="filterNotifs('orders',this)">Orders</button>
+      <button class="nfpill" onclick="filterNotifs('messages',this)">Messages</button>
+      <button class="nfpill" onclick="filterNotifs('payments',this)">Payments</button>
+      <button class="nfpill" onclick="filterNotifs('system',this)">System</button>
+    </div>
+    <div class="dash-card" style="padding:0 20px;">
+      <div class="notif-item unread">
+        <div class="notif-icon">🛍</div>
+        <div class="notif-body">
+          <div class="notif-title">New order received!</div>
+          <div class="notif-desc">Kemi Adeyemi just ordered your Ankara Wrap Dress (Size M). Payment is held in escrow.</div>
+          <div class="notif-time">2 minutes ago</div>
+        </div>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon">✉️</div>
+        <div class="notif-body">
+          <div class="notif-title">New message from Tunde Nwosu</div>
+          <div class="notif-desc">"Can I get a bulk discount for 5 units of the Tote Bag?"</div>
+          <div class="notif-time">1 hour ago</div>
+        </div>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">💳</div>
+        <div class="notif-body">
+          <div class="notif-title">Payout of NGN 45,000 sent</div>
+          <div class="notif-desc">Your payout has been sent to GTBank •••• 7823. It should arrive within 24 hours.</div>
+          <div class="notif-time">Yesterday at 3:42 PM</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">⭐</div>
+        <div class="notif-body">
+          <div class="notif-title">New review on 6-Figure Blueprint</div>
+          <div class="notif-desc">Biodun gave you 5 stars: "Life-changing content, worth every naira!"</div>
+          <div class="notif-time">Jun 22 · 11:00 AM</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">🛡</div>
+        <div class="notif-body">
+          <div class="notif-title">Seller verification approved ✅</div>
+          <div class="notif-desc">Congratulations! You are now a verified seller on ZÚLA. Your products are now live.</div>
+          <div class="notif-time">Jun 20 · 9:15 AM</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">🔗</div>
+        <div class="notif-body">
+          <div class="notif-title">Affiliate commission earned</div>
+          <div class="notif-desc">You earned NGN 2,700 from an affiliate sale of "Grow Your Business" eBook.</div>
+          <div class="notif-time">Jun 19 · 4:55 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: SETTINGS (full page with sidebar nav)
+     ================================================================ -->
+<div class="page" id="page-settings">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('profile')">← Profile</a>
+        <div class="avatar-btn" id="nav-avatar-settings" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="settings-layout">
+      <!-- SETTINGS SIDEBAR NAV -->
+      <nav class="settings-nav">
+        <a class="active" onclick="settingsTab('account',this)">👤 Account</a>
+        <a onclick="settingsTab('notifications',this)">🔔 Notifications</a>
+        <a onclick="settingsTab('privacy',this)">🔒 Privacy</a>
+        <a onclick="settingsTab('security',this)">🛡 Security</a>
+        <a onclick="settingsTab('payout',this)">💳 Payout</a>
+        <a onclick="settingsTab('display',this)">🎨 Display</a>
+        <a onclick="settingsTab('danger',this)" style="color:var(--red);margin-top:auto;">⚠️ Danger zone</a>
+      </nav>
+      <!-- SETTINGS CONTENT -->
+      <div>
+        <!-- ACCOUNT -->
+        <div class="settings-section active" id="stab-account">
+          <div class="settings-card">
+            <h3>Account information</h3>
+            <div class="sc-sub">Update your name, phone and bio</div>
+            <div class="form-field"><label>Full name</label><input type="text" id="st-name" placeholder="Your full name"></div>
+            <div class="form-field"><label>Phone number</label><input type="tel" id="st-phone" placeholder="+234 800 000 0000"></div>
+            <div class="form-field"><label>Bio</label><textarea id="st-bio" style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Tell buyers about yourself…"></textarea></div>
+            <button class="btn btn-primary btn-sm" onclick="saveSettings();showToast('✅ Account updated!')">Save changes</button>
+          </div>
+          <div class="settings-card">
+            <h3>Email address</h3>
+            <div class="sc-sub">Your login email</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;font-size:14px;color:var(--text2);" id="st-email-display">loading…</div>
+              <span class="tag tag-green">✅ Verified</span>
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3>Quick links</h3>
+            <div class="sc-sub">Other settings you might need</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Language</button>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('locationverif')">📍 Location</button>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 2FA Setup</button>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
+            </div>
+          </div>
+        </div>
+        <!-- NOTIFICATIONS SETTINGS -->
+        <div class="settings-section" id="stab-notifications">
+          <div class="settings-card">
+            <h3>Notification preferences</h3>
+            <div class="sc-sub">Choose what you want to be notified about</div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Order updates</div><div class="toggle-sub">When your order status changes</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">New messages</div><div class="toggle-sub">When buyers or sellers message you</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Payout notifications</div><div class="toggle-sub">When funds are sent to your bank</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">New reviews</div><div class="toggle-sub">When someone reviews your product</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Marketing emails</div><div class="toggle-sub">Tips, features, and ZÚLA news</div></div>
+              <label class="toggle-switch"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+        <!-- PRIVACY -->
+        <div class="settings-section" id="stab-privacy">
+          <div class="settings-card">
+            <h3>Privacy settings</h3>
+            <div class="sc-sub">Control what others can see about you</div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Show online status</div><div class="toggle-sub">Buyers can see when you're active</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Show profile to public</div><div class="toggle-sub">Non-registered users can see your profile</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Show earnings to followers</div><div class="toggle-sub">Display affiliate earnings publicly</div></div>
+              <label class="toggle-switch"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+        <!-- SECURITY -->
+        <div class="settings-section" id="stab-security">
+          <div class="settings-card">
+            <h3>Password</h3>
+            <div class="sc-sub">Change your account password</div>
+            <div class="form-field"><label>Current password</label><input type="password" placeholder="Enter current password"></div>
+            <div class="form-field"><label>New password</label><input type="password" placeholder="Min. 8 characters"></div>
+            <div class="form-field"><label>Confirm new password</label><input type="password" placeholder="Repeat new password"></div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('✅ Password updated!')">Update password</button>
+          </div>
+          <div class="settings-card">
+            <h3>Two-factor authentication</h3>
+            <div class="sc-sub">Add an extra layer of security to your account</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 Set up 2FA →</button>
+          </div>
+        </div>
+        <!-- PAYOUT -->
+        <div class="settings-section" id="stab-payout">
+          <div class="settings-card">
+            <h3>Payout bank account</h3>
+            <div class="sc-sub">Where your seller earnings will be sent</div>
+            <div class="form-field"><label>Bank name</label><input type="text" placeholder="e.g. GTBank, Access Bank"></div>
+            <div class="form-field"><label>Account number</label><input type="text" placeholder="10-digit account number"></div>
+            <div class="form-field"><label>Account name</label><input type="text" placeholder="Exactly as it appears on account"></div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('✅ Payout details saved!')">Save bank details</button>
+          </div>
+        </div>
+        <!-- DISPLAY -->
+        <div class="settings-section" id="stab-display">
+          <div class="settings-card">
+            <h3>Display preferences</h3>
+            <div class="sc-sub">Customise how ZÚLA looks for you</div>
+            <div style="margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">Currency display</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm">NGN ₦</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Currency switched to USD')">USD $</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Currency switched to GBP')">GBP £</button>
+              </div>
+            </div>
+            <div style="margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">Language</div>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Change language</button>
+            </div>
+          </div>
+        </div>
+        <!-- DANGER ZONE -->
+        <div class="settings-section" id="stab-danger">
+          <div class="settings-card" style="border-color:rgba(240,82,82,.3);">
+            <h3 style="color:var(--red);">Danger zone</h3>
+            <div class="sc-sub">Irreversible actions — proceed with caution</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border-radius:var(--radius-xs);border:1px solid var(--border);">
+                <div><div style="font-size:13.5px;font-weight:600;">Sign out of all devices</div><div style="font-size:12px;color:var(--text3);">You'll need to log back in on every device</div></div>
+                <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);" onclick="showToast('👋 Signed out of all devices')">Sign out all</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border-radius:var(--radius-xs);border:1px solid var(--border);">
+                <div><div style="font-size:13.5px;font-weight:600;">Delete account</div><div style="font-size:12px;color:var(--text3);">Permanently removes your account and all data</div></div>
+                <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);" onclick="if(confirm('Are you absolutely sure? This cannot be undone.'))showToast('Account deletion request submitted')">Delete account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: LANGUAGE
+     ================================================================ -->
+<div class="page" id="page-language">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="history.back?history.back():showPage('settings')">← Back</a>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:600px;">
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">🌐 Language</h1>
+    <p style="margin-bottom:20px;">Choose your preferred language for the ZÚLA interface.</p>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-bottom:16px;">
+      <input type="text" placeholder="Search language…" style="width:100%;padding:9px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" oninput="filterLangs(this.value)" id="lang-search-input">
+    </div>
+    <div id="lang-list" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+      <div class="lang-option selected" onclick="selectLang(this,'English','🇬🇧')"><span class="lang-flag">🇬🇧</span><div><div class="lang-name">English</div><div class="lang-native">English</div></div><span class="lang-check">✓</span></div>
+      <div class="lang-option" onclick="selectLang(this,'Yoruba','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Yoruba</div><div class="lang-native">Yorùbá</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Igbo','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Igbo</div><div class="lang-native">Igbo</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Hausa','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Hausa</div><div class="lang-native">Hausa</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Pidgin','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Nigerian Pidgin</div><div class="lang-native">Naija</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'French','🇫🇷')"><span class="lang-flag">🇫🇷</span><div><div class="lang-name">French</div><div class="lang-native">Français</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Arabic','🇸🇦')"><span class="lang-flag">🇸🇦</span><div><div class="lang-name">Arabic</div><div class="lang-native">العربية</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Portuguese','🇵🇹')"><span class="lang-flag">🇵🇹</span><div><div class="lang-name">Portuguese</div><div class="lang-native">Português</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Swahili','🇰🇪')"><span class="lang-flag">🇰🇪</span><div><div class="lang-name">Swahili</div><div class="lang-native">Kiswahili</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Spanish','🇪🇸')"><span class="lang-flag">🇪🇸</span><div><div class="lang-name">Spanish</div><div class="lang-native">Español</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: 2FA SETUP
+     ================================================================ -->
+<div class="page" id="page-twofa">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('settings')">← Settings</a>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:520px;">
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">🔐 Two-Factor Authentication</h1>
+    <p style="margin-bottom:24px;">Add an extra layer of security to your ZÚLA account.</p>
+    <!-- 2FA STEP 1 -->
+    <div id="twofa-step1">
+      <div class="settings-card">
+        <h3>Choose your 2FA method</h3>
+        <div class="sc-sub">Select how you'd like to verify your identity</div>
+        <div class="twofa-method selected" id="2fa-sms" onclick="select2FA('sms')">
+          <input type="radio" name="2fa-method" checked>
+          <div class="twofa-icon">📱</div>
+          <div><div class="twofa-name">SMS / Text message</div><div class="twofa-desc">We'll send a 6-digit code to your phone number</div></div>
+        </div>
+        <div class="twofa-method" id="2fa-app" onclick="select2FA('app')">
+          <input type="radio" name="2fa-method">
+          <div class="twofa-icon">🔑</div>
+          <div><div class="twofa-name">Authenticator app</div><div class="twofa-desc">Use Google Authenticator or Authy</div></div>
+        </div>
+        <div class="twofa-method" id="2fa-email" onclick="select2FA('email')">
+          <input type="radio" name="2fa-method">
+          <div class="twofa-icon">📧</div>
+          <div><div class="twofa-name">Email code</div><div class="twofa-desc">Receive a code at your registered email</div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="start2FA()">Continue →</button>
+    </div>
+    <!-- 2FA STEP 2: Enter OTP -->
+    <div id="twofa-step2" style="display:none;">
+      <div class="settings-card" style="text-align:center;">
+        <div style="font-size:42px;margin-bottom:12px;">📱</div>
+        <h3>Enter the 6-digit code</h3>
+        <div class="sc-sub">We sent a code to +234 •••• •••• 7892</div>
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" oninput="otpNext(this,0)">
+          <input type="text" maxlength="1" oninput="otpNext(this,1)">
+          <input type="text" maxlength="1" oninput="otpNext(this,2)">
+          <input type="text" maxlength="1" oninput="otpNext(this,3)">
+          <input type="text" maxlength="1" oninput="otpNext(this,4)">
+          <input type="text" maxlength="1" oninput="otpNext(this,5)">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="verify2FA()" style="margin-bottom:12px;">Verify →</button>
+        <div style="font-size:13px;color:var(--text3);">Didn't receive it? <a onclick="showToast('📨 Code resent!')" style="cursor:pointer;">Resend code</a></div>
+      </div>
+    </div>
+    <!-- 2FA STEP 3: Success -->
+    <div id="twofa-step3" style="display:none;">
+      <div class="settings-card" style="text-align:center;">
+        <div style="font-size:52px;margin-bottom:16px;">✅</div>
+        <h3 style="color:var(--green);margin-bottom:8px;">2FA enabled!</h3>
+        <p>Your account is now protected with two-factor authentication. You'll be asked for a code each time you sign in from a new device.</p>
+        <button class="btn btn-primary btn-block" onclick="showPage('settings')">Back to settings →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: LOCATION VERIFICATION
+     ================================================================ -->
+<div class="page" id="page-locationverif">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('settings')">← Settings</a>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:560px;">
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">📍 Location</h1>
+    <p style="margin-bottom:24px;">Verifying your location builds buyer trust and enables accurate delivery estimates.</p>
+
+    <!-- CURRENT LOCATION -->
+    <div class="settings-card" style="margin-bottom:16px;">
+      <h3>Current location</h3>
+      <div class="sc-sub">Your verified delivery / seller location</div>
+      <div class="map-preview">
+        <div class="map-grid"></div>
+        <div class="map-pulse"></div>
+        <div class="map-pin">📍</div>
+        <div class="map-label" id="loc-map-label">📍 Lagos, Nigeria</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="font-size:17px;font-weight:700;" id="loc-city-display">Lagos, Nigeria</div>
+        <span class="location-badge">📍 GPS verified</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="detectGPSLocation()">🔄 Update with GPS</button>
+    </div>
+
+    <!-- MANUAL ENTRY -->
+    <div class="settings-card" id="update-location-card">
+      <h3>Set location manually</h3>
+      <div class="sc-sub">Enter your city and country</div>
+      <div class="form-field">
+        <label>Country</label>
+        <select id="loc-country" style="width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;">
+          <option value="Nigeria" selected>🇳🇬 Nigeria</option>
+          <option value="Ghana">🇬🇭 Ghana</option>
+          <option value="Kenya">🇰🇪 Kenya</option>
+          <option value="South Africa">🇿🇦 South Africa</option>
+          <option value="United Kingdom">🇬🇧 United Kingdom</option>
+          <option value="United States">🇺🇸 United States</option>
+          <option value="Canada">🇨🇦 Canada</option>
+          <option value="Other">🌍 Other</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>City</label>
+        <input type="text" id="loc-city-input" placeholder="e.g. Lagos" value="Lagos">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveManualLocation()">Save location</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: VERIFICATION STATUS
+     ================================================================ -->
+<div class="page" id="page-verifstatus">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('profile')">← Profile</a>
+        <div class="avatar-btn" id="nav-avatar-verif" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:620px;">
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">✅ Verification Status</h1>
+    <p style="margin-bottom:24px;">Track the status of your identity and seller verification.</p>
+
+    <!-- OVERALL STATUS BANNER -->
+    <div style="background:rgba(39,201,122,.08);border:1px solid rgba(39,201,122,.25);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="font-size:36px;">🏅</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:3px;">Fully Verified</div>
+        <div style="font-size:13px;color:var(--text2);">Your account has passed all verification steps. You can sell, receive payouts, and use all ZÚLA features.</div>
+      </div>
+    </div>
+
+    <!-- STEP LIST -->
+    <div class="vstatus-step">
+      <div class="vstatus-icon done">✓</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Email verified</div>
+        <div style="font-size:13px;color:var(--text3);">Your email address is confirmed. Verified on Jan 12, 2024.</div>
+      </div>
+    </div>
+    <div class="vstatus-step">
+      <div class="vstatus-icon done">✓</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Government ID</div>
+        <div style="font-size:13px;color:var(--text3);">National ID card accepted. Verified on Jan 15, 2024.</div>
+      </div>
+    </div>
+    <div class="vstatus-step">
+      <div class="vstatus-icon done">✓</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Business / Individual registration</div>
+        <div style="font-size:13px;color:var(--text3);">Proof of address accepted. Verified on Jan 15, 2024.</div>
+      </div>
+    </div>
+    <div class="vstatus-step">
+      <div class="vstatus-icon done">✓</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Product ownership proof</div>
+        <div style="font-size:13px;color:var(--text3);">Brand certificate accepted. Verified on Jan 15, 2024.</div>
+      </div>
+    </div>
+    <div class="vstatus-step">
+      <div class="vstatus-icon done">✓</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Location verified</div>
+        <div style="font-size:13px;color:var(--text3);">GPS + IP verified — Lagos, Nigeria.</div>
+      </div>
+    </div>
+
+    <!-- UNVERIFIED EXAMPLE (commented out — swap in if needed) -->
+    <!-- <div class="vstatus-step">
+      <div class="vstatus-icon pending">⏳</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Phone number</div>
+        <div style="font-size:13px;color:var(--text3);">Not yet verified. <a onclick="showPage('twofa')" style="color:var(--accent);cursor:pointer;">Verify now →</a></div>
+      </div>
+    </div> -->
+
+    <div style="margin-top:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Update verification documents →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GPS MODAL (shared) -->
+<div class="modal-bg" id="gps-modal" style="display:none;">
+  <div class="modal-box" style="text-align:center;">
+    <div id="gps-state-requesting">
+      <div style="font-size:52px;margin-bottom:16px;">📡</div>
+      <div style="font-size:19px;font-weight:700;margin-bottom:8px;">Detecting your location</div>
+      <div style="font-size:13.5px;color:var(--text2);margin-bottom:20px;">Please allow location access when your browser asks. We only store your country and city — never your exact address.</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:16px;">
+        <div style="width:10px;height:10px;background:var(--accent);border-radius:50%;"></div>
+        <div style="width:10px;height:10px;background:var(--accent);border-radius:50%;opacity:.5;"></div>
+        <div style="width:10px;height:10px;background:var(--accent);border-radius:50%;opacity:.25;"></div>
+      </div>
+      <div style="font-size:12.5px;color:var(--text3);">Checking GPS signal…</div>
+    </div>
+    <div id="gps-state-success" style="display:none;">
+      <div style="font-size:52px;margin-bottom:16px;">🎉</div>
+      <div style="font-size:19px;font-weight:700;color:var(--green);margin-bottom:8px;">Location verified!</div>
+      <div class="map-preview" style="height:140px;margin-bottom:16px;">
+        <div class="map-grid"></div>
+        <div class="map-pulse"></div>
+        <div class="map-pin">📍</div>
+        <div class="map-label" id="gps-detected-label">📍 Lagos, Nigeria</div>
+      </div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;" id="gps-detected-city">Lagos, Nigeria</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">GPS + IP verified · Accuracy: ~500m</div>
+      <button class="btn btn-primary btn-block" onclick="confirmGPSLocation()">Save verified location →</button>
+    </div>
+    <div id="gps-state-denied" style="display:none;">
+      <div style="font-size:52px;margin-bottom:16px;">🚫</div>
+      <div style="font-size:19px;font-weight:700;margin-bottom:8px;">Location access denied</div>
+      <div style="font-size:13.5px;color:var(--text2);margin-bottom:20px;">You blocked location access. You can enter your location manually instead.</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('gps-modal').style.display='none'">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="document.getElementById('gps-modal').style.display='none'">Enter manually →</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1684,6 +2604,192 @@ function goAdmin() {
 }
 
 window._selectedType = 'Physical';
+
+// ── PROFILE FEATURE JS ──────────────────────────────────────────
+
+// showPage already handles navigation; extend it to populate new pages
+const _origShowPage = window.showPage;
+window.showPage = function(name) {
+  if (_origShowPage) _origShowPage(name);
+  // Populate dynamic elements on navigate
+  if (name === 'profile-v2' || name === 'myprofile') {
+    const user = window._auth && window._auth.currentUser;
+    const profile = window._currentUser || {};
+    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
+    const fullName = profile.fullName || profile.firstName || (user ? user.email.split('@')[0] : 'User');
+    const el = id => document.getElementById(id);
+    if (el('pv2-avatar')) el('pv2-avatar').textContent = initials;
+    if (el('pv2-name'))   el('pv2-name').textContent   = fullName;
+    if (el('pv2-email'))  el('pv2-email').textContent  = user ? user.email + ' · Member since ' + (profile.joinedAt ? new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : 'recently') : '';
+    if (el('owner-avatar')) el('owner-avatar').textContent = initials;
+    if (el('owner-name'))   el('owner-name').textContent   = fullName;
+    if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
+    if (el('nav-avatar-myprofile')) el('nav-avatar-myprofile').textContent = initials;
+    if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
+  }
+  if (name === 'settings') {
+    const user = window._auth && window._auth.currentUser;
+    const profile = window._currentUser || {};
+    const el = id => document.getElementById(id);
+    if (el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
+    if (el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
+    if (el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
+    if (el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
+    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
+    if (el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
+  }
+  if (name === 'notifications') {
+    const user = window._auth && window._auth.currentUser;
+    const profile = window._currentUser || {};
+    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
+    const el = id => document.getElementById(id);
+    if (el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
+  }
+  if (name === 'messages' || name === 'messaging') {
+    const user = window._auth && window._auth.currentUser;
+    const profile = window._currentUser || {};
+    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
+    const el = id => document.getElementById(id);
+    if (el('nav-avatar-msgs')) el('nav-avatar-msgs').textContent = initials;
+    if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
+  }
+};
+
+// Profile v2 tabs
+window.switchPv2Tab = function(tab, btn) {
+  ['orders','downloads','wishlist','reviews'].forEach(t => {
+    const b = document.getElementById('pv2-tab-' + t);
+    if (b) { b.style.background = 'transparent'; b.style.color = 'var(--text2)'; }
+  });
+  if (btn) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; }
+};
+
+// Settings sidebar tabs
+window.settingsTab = function(name, el) {
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+  const sec = document.getElementById('stab-' + name);
+  if (sec) sec.classList.add('active');
+  if (el) el.classList.add('active');
+};
+
+// Notification filter pills
+window.filterNotifs = function(type, btn) {
+  document.querySelectorAll('.nfpill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+};
+
+// Chat send message
+window.sendChatMsg = function() {
+  const input = document.getElementById('chat-input');
+  if (!input || !input.value.trim()) return;
+  const msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'msg sent';
+  const now = new Date();
+  div.innerHTML = '<div class="msg-bubble">' + input.value + '</div><div class="msg-time">' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  input.value = '';
+};
+
+// Language selection
+var _selectedLang = 'English';
+window.selectLang = function(el, name, flag) {
+  document.querySelectorAll('.lang-option').forEach(o => { o.classList.remove('selected'); const c = o.querySelector('.lang-check'); if (c) c.remove(); });
+  el.classList.add('selected');
+  const check = document.createElement('span');
+  check.className = 'lang-check';
+  check.textContent = '✓';
+  el.appendChild(check);
+  _selectedLang = name;
+  // Update language badges everywhere
+  ['v2-lang-name','banner-lang-name'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = name; });
+  showToast('🌐 Language set to ' + name);
+};
+
+window.filterLangs = function(val) {
+  document.querySelectorAll('#lang-list .lang-option').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
+  });
+};
+
+// 2FA
+window.select2FA = function(method) {
+  document.querySelectorAll('.twofa-method').forEach(m => m.classList.remove('selected'));
+  const el = document.getElementById('2fa-' + method);
+  if (el) el.classList.add('selected');
+};
+
+window.start2FA = function() {
+  document.getElementById('twofa-step1').style.display = 'none';
+  document.getElementById('twofa-step2').style.display = 'block';
+  showToast('📨 Code sent!');
+};
+
+window.verify2FA = function() {
+  const inputs = document.querySelectorAll('.otp-inputs input');
+  const code = Array.from(inputs).map(i => i.value).join('');
+  if (code.length < 6) { showToast('⚠️ Enter the full 6-digit code'); return; }
+  document.getElementById('twofa-step2').style.display = 'none';
+  document.getElementById('twofa-step3').style.display = 'block';
+};
+
+window.otpNext = function(input, idx) {
+  if (input.value.length === 1) {
+    const next = document.querySelectorAll('.otp-inputs input')[idx + 1];
+    if (next) next.focus();
+  }
+};
+
+// Location
+window.detectGPSLocation = function() {
+  const modal = document.getElementById('gps-modal');
+  if (modal) { modal.style.display = 'flex'; }
+  document.getElementById('gps-state-requesting').style.display = 'block';
+  document.getElementById('gps-state-success').style.display   = 'none';
+  document.getElementById('gps-state-denied').style.display    = 'none';
+  if (!navigator.geolocation) {
+    document.getElementById('gps-state-requesting').style.display = 'none';
+    document.getElementById('gps-state-denied').style.display     = 'block';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      document.getElementById('gps-state-requesting').style.display = 'none';
+      document.getElementById('gps-state-success').style.display    = 'block';
+    },
+    function() {
+      document.getElementById('gps-state-requesting').style.display = 'none';
+      document.getElementById('gps-state-denied').style.display     = 'block';
+    }
+  );
+};
+
+window.confirmGPSLocation = function() {
+  const city = document.getElementById('gps-detected-city');
+  const loc  = city ? city.textContent : 'Your location';
+  const locDisplay = document.getElementById('loc-city-display');
+  const locLabel   = document.getElementById('loc-map-label');
+  if (locDisplay) locDisplay.textContent = loc;
+  if (locLabel)   locLabel.textContent   = '📍 ' + loc;
+  document.getElementById('gps-modal').style.display = 'none';
+  showToast('📍 Location saved: ' + loc);
+};
+
+window.saveManualLocation = function() {
+  const city    = document.getElementById('loc-city-input');
+  const country = document.getElementById('loc-country');
+  const locText = (city ? city.value : '') + ', ' + (country ? country.value : '');
+  const locDisplay = document.getElementById('loc-city-display');
+  const locLabel   = document.getElementById('loc-map-label');
+  if (locDisplay) locDisplay.textContent = locText;
+  if (locLabel)   locLabel.textContent   = '📍 ' + locText;
+  showToast('📍 Location saved: ' + locText);
+};
+
 </script>
 
 </body>
