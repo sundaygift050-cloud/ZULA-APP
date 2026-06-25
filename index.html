@@ -760,7 +760,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="goAddProduct()">+ Add product</a>
-        <a onclick="showPage('messages')">✉️</a>
+        <a onclick="showPage('messages')" id="nav-msg-link" style="position:relative;">✉️ <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="showPage('notifications')">🔔</a>
         <a onclick="showPage('settings')">⚙️</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
@@ -1336,8 +1336,8 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="dash-card">
         <h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">✉️ New message</h3>
         <div class="form-field" style="margin-bottom:10px;">
-          <label>Recipient's User ID or email</label>
-          <input type="text" id="new-msg-uid" placeholder="Paste user UID or email…">
+          <label>Recipient's email address</label>
+          <input type="text" id="new-msg-uid" placeholder="e.g. ada@gmail.com">
         </div>
         <div class="form-field" style="margin-bottom:10px;">
           <label>Message</label>
@@ -1959,6 +1959,7 @@ onAuthStateChanged(auth, async (user) => {
       window._currentUser = { email: user.email, firstName: '' };
     }
     updateNavAvatar();
+    if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     const adminLink = document.getElementById('admin-nav-link');
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
@@ -1972,7 +1973,9 @@ function updateNavAvatar() {
   const u = window._currentUser;
   if (!u) return;
   const initials = ((u.firstName||'')[0]||'') + ((u.lastName||'')[0]||'');
-  ['nav-avatar','nav-avatar-product','nav-avatar-add'].forEach(id => {
+  ['nav-avatar','nav-avatar-product','nav-avatar-add','nav-avatar-msgs',
+   'nav-avatar-chat','nav-avatar-settings','nav-avatar-notif',
+   'nav-avatar-verif','nav-avatar-v2','nav-avatar-myprofile'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = initials || '?';
   });
@@ -2510,6 +2513,12 @@ window.loadConversations = async function() {
         sidebar.innerHTML = convs.map(c => renderConv(c, sidebar, window._activeConvId)).join('');
       }
     }
+    const totalUnread = convs.reduce((acc, c) => acc + (c.unread && c.unread[user.uid] ? c.unread[user.uid] : 0), 0);
+    const badge = document.getElementById('nav-msg-badge');
+    if (badge) {
+      if (totalUnread > 0) { badge.textContent = totalUnread > 9 ? '9+' : totalUnread; badge.style.display = 'inline-block'; }
+      else { badge.style.display = 'none'; }
+    }
   } catch(e) {
     console.error(e);
     const msg = '<div style="padding:20px;color:var(--text3);font-size:13px;">Could not load conversations.</div>';
@@ -2625,7 +2634,7 @@ window.startNewConversation = async function() {
   if (!user) { showToast('⚠️ Sign in first.'); return; }
   const uidOrEmail = (document.getElementById('new-msg-uid')?.value || '').trim();
   const text       = (document.getElementById('new-msg-text')?.value || '').trim();
-  if (!uidOrEmail) { showToast('⚠️ Enter a recipient UID or email.'); return; }
+  if (!uidOrEmail) { showToast('⚠️ Enter the recipient\'s email address.'); return; }
   if (!text)       { showToast('⚠️ Enter a message.'); return; }
 
   let targetUid = uidOrEmail;
@@ -2687,7 +2696,7 @@ window.startNewConversation = async function() {
   } catch(e) { console.error(e); showToast('❌ Could not send message.'); }
 };
 
-window.openMsgWithSelf = function() { showPage('messages'); };
+window.openMsgWithSelf = function() { showPage('messaging'); };
 
 window.toggleFollowFromChat = async function() {
   const btn = document.getElementById('chat-follow-btn');
@@ -3181,20 +3190,7 @@ window.filterNotifs = function(type, btn) {
   if (btn) btn.classList.add('active');
 };
 
-// Chat send message
-window.sendChatMsg = function() {
-  const input = document.getElementById('chat-input');
-  if (!input || !input.value.trim()) return;
-  const msgs = document.getElementById('chat-messages');
-  if (!msgs) return;
-  const div = document.createElement('div');
-  div.className = 'msg sent';
-  const now = new Date();
-  div.innerHTML = '<div class="msg-bubble">' + input.value + '</div><div class="msg-time">' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + '</div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  input.value = '';
-};
+// sendChatMsg is defined in the Firebase module above — do not redefine here
 
 // Language selection
 var _selectedLang = 'English';
