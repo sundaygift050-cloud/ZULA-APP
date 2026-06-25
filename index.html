@@ -261,7 +261,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <a onclick="showPage('home')">Home</a>
         <a onclick="requireAuth('marketplace')">Browse</a>
         <a onclick="showPage('affiliate-info')">Affiliate</a>
-        <a onclick="requireAuth('addproduct')">Sell</a>
+        <a onclick="goAddProduct()">Sell</a>
         <a onclick="showPage('login')" class="btn btn-ghost btn-sm" style="padding:7px 16px;">Sign in</a>
         <a onclick="showPage('signup')" class="btn btn-primary btn-sm" style="padding:7px 16px;">Join free</a>
       </nav>
@@ -467,7 +467,7 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Browse</a>
-        <a onclick="showPage('addproduct')">Sell</a>
+        <a onclick="goAddProduct()">Sell</a>
         <a onclick="showPage('profile')">Profile</a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
         <div class="avatar-btn" id="nav-avatar" onclick="showPage('profile')">?</div>
@@ -503,7 +503,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="es-icon">🛍</div>
         <h3>No products yet</h3>
         <p>Be the first to list a product on ZÚLA. Verify your account and start selling.</p>
-        <button class="btn btn-primary" onclick="showPage('addproduct')">List a product →</button>
+        <button class="btn btn-primary" onclick="goAddProduct()">List a product →</button>
       </div>
     </main>
   </div>
@@ -638,7 +638,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('addproduct')">Add product</a>
+        <a onclick="goAddProduct()">Add product</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
       </nav>
     </div>
@@ -663,13 +663,13 @@ p{color:var(--text2);margin:0 0 1em;}
     </div>
     <div class="dash-tab-content active" id="tab-listings">
       <div class="dash-card">
-        <h3>My listings <button class="btn btn-primary btn-sm" onclick="showPage('addproduct')" style="float:right;">+ Add product</button></h3>
+        <h3>My listings <button class="btn btn-primary btn-sm" onclick="goAddProduct()" style="float:right;">+ Add product</button></h3>
         <div id="my-listings-list">
           <div class="empty-state" style="padding:40px 0;">
             <div class="es-icon">📦</div>
             <h3>No listings yet</h3>
             <p>List your first product and it will appear here and on the marketplace.</p>
-            <button class="btn btn-primary btn-sm" onclick="showPage('addproduct')">List a product</button>
+            <button class="btn btn-primary btn-sm" onclick="goAddProduct()">List a product</button>
           </div>
         </div>
       </div>
@@ -719,6 +719,11 @@ p{color:var(--text2);margin:0 0 1em;}
     </div>
   </header>
   <div class="verif-wrap">
+    <!-- shown when user tries to add product without verification -->
+    <div id="verif-required-banner" style="display:none;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.35);border-radius:var(--radius-xs);padding:14px 18px;margin-bottom:24px;display:none;">
+      <div style="font-size:14px;font-weight:600;color:var(--gold);margin-bottom:4px;">⚠️ Seller verification required</div>
+      <div style="font-size:13px;color:var(--text2);">You need to complete seller verification before you can list products. Complete the steps below and submit — we'll review within 24–48 hours.</div>
+    </div>
     <h1 style="font-size:24px;font-weight:700;margin-bottom:6px;">🛡 Become a Verified Seller</h1>
     <p style="margin-bottom:28px;">Complete all 3 steps to start selling on ZÚLA. Verification takes 24–48 hours.</p>
     <div class="verif-step">
@@ -1193,7 +1198,7 @@ window.loadMyListings = async function() {
       container.innerHTML = `<div class="empty-state" style="padding:40px 0;">
         <div class="es-icon">📦</div><h3>No listings yet</h3>
         <p>List your first product and it will appear here.</p>
-        <button class="btn btn-primary btn-sm" onclick="showPage('addproduct')">List a product</button></div>`;
+        <button class="btn btn-primary btn-sm" onclick="goAddProduct()">List a product</button></div>`;
       return;
     }
     container.innerHTML = mine.map(p => `
@@ -1260,6 +1265,7 @@ function showPage(name) {
 
 function requireAuth(page) {
   if (window._auth && window._auth.currentUser && window._auth.currentUser.emailVerified) {
+    if (page === 'sell') { goAddProduct(); return; }
     showPage(page);
   } else {
     showPage('login');
@@ -1433,6 +1439,21 @@ window.adminDeleteProduct = async function(id) {
   }
 };
 
+
+
+function goAddProduct() {
+  const user = window._auth && window._auth.currentUser;
+  if (!user) { showPage('login'); return; }
+  const profile = window._currentUser || {};
+  if (!profile.sellerVerified) {
+    // Not verified — go to verification page with banner
+    showPage('verification');
+    const banner = document.getElementById('verif-required-banner');
+    if (banner) banner.style.display = 'block';
+    return;
+  }
+  showPage('addproduct');
+}
 
 function goAdmin() {
   // Show admin page without triggering showPage loop
