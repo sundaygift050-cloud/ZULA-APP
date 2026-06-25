@@ -655,6 +655,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="pdetail-actions">
           <button class="btn btn-primary" onclick="showToast('🛒 Added to cart!')">Add to cart</button>
           <button class="btn btn-ghost" onclick="showToast('❤️ Saved to wishlist!')">Save</button>
+          <button class="btn btn-ghost" id="pd-msg-seller-btn" onclick="msgSeller()" style="display:none;">💬 Message seller</button>
         </div>
         <div style="margin-top:20px;padding:14px;background:var(--bg3);border-radius:var(--radius-xs);font-size:13px;color:var(--text2);">
           🔒 Payment held in escrow until you confirm receipt.
@@ -776,21 +777,16 @@ p{color:var(--text2);margin:0 0 1em;}
         <h2 id="profile-name">Loading…</h2>
         <p id="profile-email" style="margin:0;"></p>
         <p id="profile-joined" style="font-size:12px;color:var(--text3);margin:2px 0 8px;"></p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <span class="tag tag-green" id="profile-buyer-badge">✅ Verified buyer</span>
           <span class="tag tag-gold" id="profile-seller-badge" style="display:none;">🛍 Verified seller</span>
         </div>
-        <p id="profile-bio" style="font-size:13.5px;color:var(--text2);margin:0 0 10px;">No bio yet.</p>
-        <div style="display:flex;gap:18px;">
-          <div style="cursor:pointer;" onclick="showFollowModal('followers')">
-            <span style="font-weight:700;color:var(--text);" id="profile-followers-count">0</span>
-            <span style="font-size:12px;color:var(--text3);"> followers</span>
-          </div>
-          <div style="cursor:pointer;" onclick="showFollowModal('following')">
-            <span style="font-weight:700;color:var(--text);" id="profile-following-count">0</span>
-            <span style="font-size:12px;color:var(--text3);"> following</span>
-          </div>
-        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('profile-v2')">🪪 Full profile</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
       </div>
     </div>
 
@@ -861,11 +857,47 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- Revenue — my products -->
-      <div class="dash-card">
-        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
-        <div id="sdash-product-revenue">
-          <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
+      <!-- Seller analytics tabs -->
+      <div class="analytics-tabs" style="margin-bottom:16px;">
+        <button class="active" onclick="sellerAnalyticsTab('revenue',this)">💰 Revenue</button>
+        <button onclick="sellerAnalyticsTab('traffic',this)">👁 Traffic</button>
+        <button onclick="sellerAnalyticsTab('conversion',this)">📈 Conversion</button>
+        <button onclick="sellerAnalyticsTab('affiliates',this)">🔗 Affiliates</button>
+      </div>
+
+      <!-- Revenue tab -->
+      <div id="sdat-revenue" class="sdash-tab">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
+          <div id="sdash-product-revenue">
+            <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traffic tab -->
+      <div id="sdat-traffic" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product views &amp; clicks</h3>
+          <div id="sdash-traffic-data">
+            <div style="color:var(--text3);font-size:13px;">Traffic data will appear here as buyers view your listings.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion tab -->
+      <div id="sdat-conversion" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Conversion rate</h3>
+          <div style="color:var(--text3);font-size:13px;">Conversion tracking (views → purchases) will appear here once you have sales.</div>
+        </div>
+      </div>
+
+      <!-- Affiliates tab -->
+      <div id="sdat-affiliates" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Affiliates promoting your products</h3>
+          <div style="color:var(--text3);font-size:13px;">When affiliates share your products and drive sales, they appear here.</div>
         </div>
       </div>
 
@@ -1304,9 +1336,18 @@ p{color:var(--text2);margin:0 0 1em;}
     <div style="margin-top:20px;">
       <div class="dash-card">
         <h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">✉️ New message</h3>
-        <div class="form-field" style="margin-bottom:10px;">
-          <label>Recipient's email address</label>
-          <input type="text" id="new-msg-uid" placeholder="e.g. ada@gmail.com">
+        <div class="form-field" style="margin-bottom:10px;position:relative;">
+          <label>Search for a user</label>
+          <input type="text" id="new-msg-search" placeholder="Type a name…" oninput="searchUsersToMsg(this.value)" autocomplete="off">
+          <div id="user-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);z-index:99;max-height:200px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.3);"></div>
+        </div>
+        <div id="new-msg-selected-user" style="display:none;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-xs);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+          <div id="new-msg-sel-avatar" class="conv-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div id="new-msg-sel-name" style="font-size:13.5px;font-weight:600;color:var(--text);"></div>
+            <div id="new-msg-sel-email" style="font-size:11px;color:var(--text3);"></div>
+          </div>
+          <button onclick="clearMsgRecipient()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">×</button>
         </div>
         <div class="form-field" style="margin-bottom:10px;">
           <label>Message</label>
@@ -2118,6 +2159,7 @@ window.applyFilters = function() { };
 window.viewProduct = function(id) {
   const p = (window._allProducts||[]).find(x => x.id === id);
   if (!p) return;
+  window._currentProduct = p;
   document.getElementById('pd-img').textContent    = p.emoji || '📦';
   document.getElementById('pd-title').textContent  = p.name;
   document.getElementById('pd-seller').textContent = 'By ' + (p.sellerName || 'ZÚLA Seller');
@@ -2126,6 +2168,11 @@ window.viewProduct = function(id) {
   document.getElementById('pd-tags').innerHTML     =
     `<span class="tag tag-gold">${p.type||'Physical'}</span>` +
     (p.commission ? ` <span class="tag tag-green">Affiliate · ${p.commission}%</span>` : '');
+  const msgBtn = document.getElementById('pd-msg-seller-btn');
+  if (msgBtn) {
+    const user = window._auth && window._auth.currentUser;
+    msgBtn.style.display = (p.sellerId && (!user || p.sellerId !== user.uid)) ? 'inline-flex' : 'none';
+  }
   showPage('product');
 };
 
@@ -2219,7 +2266,6 @@ window.loadProfilePage = async function() {
   if (el('profile-joined')) el('profile-joined').textContent = u.joinedAt
     ? 'Member since ' + new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
     : '';
-  if (el('profile-bio'))    el('profile-bio').textContent    = u.bio || 'No bio yet.';
   if (el('settings-name'))  el('settings-name').value  = u.fullName || '';
   if (el('settings-phone')) el('settings-phone').value = u.phone || '';
   if (el('settings-bio'))   el('settings-bio').value   = u.bio || '';
@@ -2231,12 +2277,6 @@ window.loadProfilePage = async function() {
     let count = 0;
     snap.forEach(d => { if (d.data().sellerId === user.uid) count++; });
     if (el('pstat-listings')) el('pstat-listings').textContent = count;
-  } catch(e) {}
-  try {
-    const usnap = await window._fns.getDoc(window._fns.doc(db, 'users', user.uid));
-    const ud = usnap.exists() ? usnap.data() : {};
-    if (el('profile-followers-count')) el('profile-followers-count').textContent = ud.followersCount || 0;
-    if (el('profile-following-count')) el('profile-following-count').textContent = ud.followingCount || 0;
   } catch(e) {}
   loadMyListings();
 };
@@ -2608,37 +2648,19 @@ window.sendChatMsg = async function() {
 window.startNewConversation = async function() {
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ Sign in first.'); return; }
-  const uidOrEmail = (document.getElementById('new-msg-uid')?.value || '').trim();
+
+  // Get recipient from selected user (search result) or fallback hidden field
+  const targetUid  = window._newMsgTargetUid;
+  const targetName = window._newMsgTargetName || 'User';
   const text       = (document.getElementById('new-msg-text')?.value || '').trim();
-  if (!uidOrEmail) { showToast('⚠️ Enter the recipient\'s email address.'); return; }
-  if (!text)       { showToast('⚠️ Enter a message.'); return; }
 
-  let targetUid = uidOrEmail;
-  let targetName = 'User';
-
-  // Look up by email if it looks like one
-  if (uidOrEmail.includes('@')) {
-    try {
-      const usnap = await getDocs(query(collection(db, 'users'), where('email','==', uidOrEmail)));
-      if (usnap.empty) { showToast('❌ No user found with that email.'); return; }
-      const ud = usnap.docs[0].data();
-      targetUid  = usnap.docs[0].id;
-      targetName = ud.fullName || ud.firstName || uidOrEmail;
-    } catch(e) { showToast('❌ Could not look up user.'); return; }
-  } else {
-    try {
-      const usnap = await getDoc(doc(db, 'users', uidOrEmail));
-      if (!usnap.exists()) { showToast('❌ No user found with that UID.'); return; }
-      const ud = usnap.data();
-      targetName = ud.fullName || ud.firstName || uidOrEmail;
-    } catch(e) { showToast('❌ Could not look up user.'); return; }
-  }
-
+  if (!targetUid) { showToast('⚠️ Search and select a user first.'); return; }
+  if (!text)      { showToast('⚠️ Type a message first.'); return; }
   if (targetUid === user.uid) { showToast('⚠️ You cannot message yourself.'); return; }
 
-  const cid = convId(user.uid, targetUid);
+  const cid    = convId(user.uid, targetUid);
   const convRef = doc(db, 'conversations', cid);
-  const myName = window._currentUser?.fullName || user.displayName || 'User';
+  const myName  = window._currentUser?.fullName || user.displayName || 'User';
 
   try {
     const existing = await getDoc(convRef);
@@ -2661,15 +2683,111 @@ window.startNewConversation = async function() {
     await addDoc(collection(db, 'conversations', cid, 'messages'), {
       text, senderId: user.uid, senderName: myName, createdAt: serverTimestamp()
     });
-    if (document.getElementById('new-msg-uid')) document.getElementById('new-msg-uid').value = '';
-    if (document.getElementById('new-msg-text')) document.getElementById('new-msg-text').value = '';
-    showToast('✅ Message sent to ' + targetName);
+    // Clear inputs
+    if (document.getElementById('new-msg-text'))   document.getElementById('new-msg-text').value = '';
+    clearMsgRecipient();
+    showToast('✅ Message sent to ' + targetName + '!');
     showPage('messaging');
-    window._activeConvId = cid;
-    window._activePeerId = targetUid;
+    window._activeConvId   = cid;
+    window._activePeerId   = targetUid;
     window._activePeerName = targetName;
     setTimeout(() => openConversation(cid, targetUid, targetName), 400);
-  } catch(e) { console.error(e); showToast('❌ Could not send message.'); }
+  } catch(e) { console.error(e); showToast('❌ Could not send. Check your connection.'); }
+};
+
+// ── USER SEARCH FOR MESSAGING ───────────────────────────────────────
+window._newMsgTargetUid  = null;
+window._newMsgTargetName = null;
+
+window.searchUsersToMsg = async function(val) {
+  const resultsBox = document.getElementById('user-search-results');
+  if (!resultsBox) return;
+  if (!val || val.length < 2) { resultsBox.style.display = 'none'; return; }
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  try {
+    // Search by fullName prefix (case-sensitive Firestore approach)
+    const snap = await getDocs(collection(db, 'users'));
+    const results = [];
+    snap.forEach(d => {
+      if (d.id === currentUser.uid) return;
+      const data = d.data();
+      const name = (data.fullName || data.firstName || '').toLowerCase();
+      const email = (data.email || '').toLowerCase();
+      if (name.includes(val.toLowerCase()) || email.includes(val.toLowerCase())) {
+        results.push({ uid: d.id, ...data });
+      }
+    });
+
+    if (results.length === 0) {
+      resultsBox.innerHTML = '<div style="padding:12px 14px;font-size:13px;color:var(--text3);">No users found.</div>';
+      resultsBox.style.display = 'block';
+      return;
+    }
+
+    resultsBox.innerHTML = results.slice(0, 8).map(u => {
+      const name     = u.fullName || u.firstName || u.email || 'User';
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      return `<div onclick="selectMsgRecipient('${u.uid}','${name.replace(/'/g,'')}','${(u.email||'').replace(/'/g,'')}','${initials}')"
+        style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;"
+        onmouseover="this.style.background='rgba(124,92,252,.08)'" onmouseout="this.style.background=''">
+        <div class="conv-avatar" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">${initials}</div>
+        <div>
+          <div style="font-size:13.5px;font-weight:600;color:var(--text);">${name}</div>
+          <div style="font-size:11px;color:var(--text3);">${u.email || ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+    resultsBox.style.display = 'block';
+  } catch(e) { console.error(e); }
+};
+
+window.selectMsgRecipient = function(uid, name, email, initials) {
+  window._newMsgTargetUid  = uid;
+  window._newMsgTargetName = name;
+
+  const searchInput = document.getElementById('new-msg-search');
+  const resultsBox  = document.getElementById('user-search-results');
+  const selectedBox = document.getElementById('new-msg-selected-user');
+  const selAvatar   = document.getElementById('new-msg-sel-avatar');
+  const selName     = document.getElementById('new-msg-sel-name');
+  const selEmail    = document.getElementById('new-msg-sel-email');
+
+  if (searchInput) searchInput.value = '';
+  if (resultsBox)  resultsBox.style.display = 'none';
+  if (selAvatar)   selAvatar.textContent  = initials;
+  if (selName)     selName.textContent    = name;
+  if (selEmail)    selEmail.textContent   = email;
+  if (selectedBox) selectedBox.style.display = 'flex';
+};
+
+window.clearMsgRecipient = function() {
+  window._newMsgTargetUid  = null;
+  window._newMsgTargetName = null;
+  const selectedBox = document.getElementById('new-msg-selected-user');
+  if (selectedBox) selectedBox.style.display = 'none';
+  const searchInput = document.getElementById('new-msg-search');
+  if (searchInput) searchInput.value = '';
+};
+
+// ── MESSAGE SELLER FROM PRODUCT PAGE ───────────────────────────────
+window.msgSeller = async function() {
+  const user = auth.currentUser;
+  if (!user) { showPage('login'); return; }
+  const p = window._currentProduct;
+  if (!p || !p.sellerId) { showToast('⚠️ Seller info not available.'); return; }
+  if (p.sellerId === user.uid) { showToast('⚠️ This is your own listing.'); return; }
+
+  showPage('messaging');
+  setTimeout(() => {
+    const cid = convId(user.uid, p.sellerId);
+    openConversation(cid, p.sellerId, p.sellerName || 'Seller');
+    // Pre-create conv doc if needed so they can send
+    window._activeConvId   = cid;
+    window._activePeerId   = p.sellerId;
+    window._activePeerName = p.sellerName || 'Seller';
+  }, 400);
 };
 
 window.openMsgWithSelf = function() { showPage('messaging'); };
@@ -2878,6 +2996,14 @@ function profileTab(name) {
     if (tc)  tc.classList.toggle('active', t === name);
   });
   if (name === 'seller') loadSellerDashboard();
+}
+
+function sellerAnalyticsTab(name, btn) {
+  document.querySelectorAll('.sdash-tab').forEach(t => t.style.display = 'none');
+  const sec = document.getElementById('sdat-' + name);
+  if (sec) sec.style.display = 'block';
+  document.querySelectorAll('.analytics-tabs button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
 }
 
 window.requestPayout = function() {
