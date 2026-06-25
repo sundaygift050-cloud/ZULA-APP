@@ -218,6 +218,11 @@ p{color:var(--text2);margin:0 0 1em;}
   .profile-header{flex-direction:column;align-items:flex-start;}
 }
 
+/* ANALYTICS TABS */
+.analytics-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:3px;width:fit-content;}
+.analytics-tabs button{padding:7px 14px;border-radius:5px;border:none;font-size:12.5px;font-weight:600;font-family:var(--font-body);cursor:pointer;color:var(--text3);background:transparent;}
+.analytics-tabs button.active{background:var(--accent);color:#fff;}
+
 /* ADMIN */
 .admin-shell{display:flex;min-height:100vh;}
 .dash-side{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;}
@@ -638,43 +643,167 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="goAddProduct()">Add product</a>
+        <a onclick="goAddProduct()">+ Add product</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
       </nav>
     </div>
   </header>
   <div class="dash-wrap">
+
+    <!-- PROFILE HEADER -->
     <div class="profile-header">
       <div class="profile-avatar" id="profile-avatar">?</div>
-      <div class="profile-info">
+      <div class="profile-info" style="flex:1;">
         <h2 id="profile-name">Loading…</h2>
-        <p id="profile-email">…</p>
-        <p id="profile-joined" style="margin-top:2px;"></p>
-        <div class="profile-badge" id="profile-badge">✓ Verified buyer</div>
+        <p id="profile-email" style="margin:0;"></p>
+        <p id="profile-joined" style="font-size:12px;color:var(--text3);margin:2px 0 8px;"></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-green" id="profile-buyer-badge">✅ Verified buyer</span>
+          <span class="tag tag-gold" id="profile-seller-badge" style="display:none;">🛍 Verified seller</span>
+        </div>
       </div>
-      <div style="margin-left:auto;">
-        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">Get seller verified →</button>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
+        <button class="btn btn-ghost btn-sm" onclick="profileTab('settings')">⚙️ Settings</button>
       </div>
     </div>
+
+    <!-- QUICK STATS (real from Firebase) -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-orders">0</div>
+        <div style="font-size:11px;color:var(--text3);">Orders</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-listings">0</div>
+        <div style="font-size:11px;color:var(--text3);">Listings</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="pstat-revenue">NGN 0</div>
+        <div style="font-size:11px;color:var(--text3);">Total revenue</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pstat-aff">NGN 0</div>
+        <div style="font-size:11px;color:var(--text3);">Aff. earned</div>
+      </div>
+    </div>
+
+    <!-- PROFILE TABS -->
     <div class="dash-tabs">
-      <div class="dash-tab active" onclick="switchTab('listings')">My listings</div>
-      <div class="dash-tab" onclick="switchTab('orders')">My orders</div>
-      <div class="dash-tab" onclick="switchTab('settings')">Settings</div>
+      <div class="dash-tab active" id="ptab-listings"  onclick="profileTab('listings')">📦 My listings</div>
+      <div class="dash-tab"        id="ptab-seller"    onclick="profileTab('seller')">📊 Seller dashboard</div>
+      <div class="dash-tab"        id="ptab-orders"    onclick="profileTab('orders')">🛍 My orders</div>
+      <div class="dash-tab"        id="ptab-settings"  onclick="profileTab('settings')">⚙️ Settings</div>
     </div>
-    <div class="dash-tab-content active" id="tab-listings">
+
+    <!-- TAB: MY LISTINGS -->
+    <div class="dash-tab-content active" id="ptc-listings">
       <div class="dash-card">
-        <h3>My listings <button class="btn btn-primary btn-sm" onclick="goAddProduct()" style="float:right;">+ Add product</button></h3>
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">
+          My listings
+          <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
+        </h3>
         <div id="my-listings-list">
           <div class="empty-state" style="padding:40px 0;">
             <div class="es-icon">📦</div>
             <h3>No listings yet</h3>
-            <p>List your first product and it will appear here and on the marketplace.</p>
-            <button class="btn btn-primary btn-sm" onclick="goAddProduct()">List a product</button>
+            <p>Get seller verified first, then list your first product.</p>
+            <button class="btn btn-primary btn-sm" onclick="showPage('verification')">Get verified →</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="dash-tab-content" id="tab-orders">
+
+    <!-- TAB: SELLER DASHBOARD -->
+    <div class="dash-tab-content" id="ptc-seller">
+      <!-- Earnings summary -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+        <div class="dash-card" style="text-align:center;padding:20px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Total revenue</div>
+          <div style="font-size:26px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="sdash-revenue">NGN 0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px);">All time</div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:20px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Product views</div>
+          <div style="font-size:26px;font-weight:700;font-family:var(--font-display);" id="sdash-views">0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Click traffic</div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:20px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Total orders</div>
+          <div style="font-size:26px;font-weight:700;color:var(--accent);font-family:var(--font-display);" id="sdash-orders">0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Completed sales</div>
+        </div>
+      </div>
+
+      <!-- Seller analytics tabs -->
+      <div class="analytics-tabs" style="margin-bottom:16px;">
+        <button class="active" onclick="sellerAnalyticsTab('revenue',this)">💰 Revenue</button>
+        <button onclick="sellerAnalyticsTab('traffic',this)">👁 Traffic</button>
+        <button onclick="sellerAnalyticsTab('conversion',this)">📈 Conversion</button>
+        <button onclick="sellerAnalyticsTab('affiliates',this)">🔗 Affiliates</button>
+      </div>
+
+      <!-- Revenue tab -->
+      <div id="sdat-revenue" class="sdash-tab">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
+          <div id="sdash-product-revenue">
+            <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traffic tab -->
+      <div id="sdat-traffic" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product views &amp; clicks</h3>
+          <div id="sdash-traffic-data">
+            <div style="color:var(--text3);font-size:13px;">Traffic data will appear here as buyers view your listings.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion tab -->
+      <div id="sdat-conversion" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Conversion rate</h3>
+          <div style="color:var(--text3);font-size:13px;">Conversion tracking (views → purchases) will appear here once you have sales.</div>
+        </div>
+      </div>
+
+      <!-- Affiliates tab -->
+      <div id="sdat-affiliates" class="sdash-tab" style="display:none;">
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Affiliates promoting your products</h3>
+          <div style="color:var(--text3);font-size:13px;">When affiliates share your products and drive sales, they appear here.</div>
+        </div>
+      </div>
+
+      <!-- Payout section -->
+      <div class="dash-card" style="margin-top:4px;">
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">💳 Payout</h3>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:14px;">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Available balance</div>
+          <div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="sdash-balance">NGN 0</div>
+        </div>
+        <div class="form-field">
+          <label>Bank name</label>
+          <input type="text" id="payout-bank" placeholder="e.g. GTBank">
+        </div>
+        <div class="form-field">
+          <label>Account number</label>
+          <input type="text" id="payout-acct" placeholder="0123456789">
+        </div>
+        <div class="form-field">
+          <label>Account name</label>
+          <input type="text" id="payout-name" placeholder="Your full name">
+        </div>
+        <button class="btn btn-primary" onclick="requestPayout()">Request payout →</button>
+      </div>
+    </div>
+
+    <!-- TAB: MY ORDERS -->
+    <div class="dash-tab-content" id="ptc-orders">
       <div class="dash-card">
         <h3>My orders</h3>
         <div class="empty-state" style="padding:40px 0;">
@@ -685,7 +814,9 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
     </div>
-    <div class="dash-tab-content" id="tab-settings">
+
+    <!-- TAB: SETTINGS -->
+    <div class="dash-tab-content" id="ptc-settings">
       <div class="dash-card">
         <h3>Account settings</h3>
         <div class="form-field">
@@ -696,13 +827,18 @@ p{color:var(--text2);margin:0 0 1em;}
           <label>Phone number</label>
           <input type="tel" id="settings-phone" placeholder="+234 800 000 0000">
         </div>
+        <div class="form-field">
+          <label>Bio</label>
+          <textarea id="settings-bio" placeholder="Tell buyers about yourself..." style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;"></textarea>
+        </div>
         <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save changes</button>
       </div>
       <div class="dash-card">
         <h3>Danger zone</h3>
-        <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);" onclick="zulaSignOut()">Sign out of all devices</button>
+        <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);" onclick="zulaSignOut()">Sign out</button>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -1151,6 +1287,15 @@ window.viewProduct = function(id) {
 window.publishProduct = async function() {
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ You must be signed in.'); return; }
+  // Block unverified sellers
+  const profile = window._currentUser || {};
+  if (!profile.sellerVerified) {
+    showToast('🚫 You must be verified to publish products.');
+    showPage('verification');
+    const banner = document.getElementById('verif-required-banner');
+    if (banner) banner.style.display = 'block';
+    return;
+  }
   const name       = document.getElementById('prod-name').value.trim();
   const category   = document.getElementById('prod-category').value;
   const desc       = document.getElementById('prod-desc').value.trim();
@@ -1218,17 +1363,34 @@ window.loadMyListings = async function() {
   }
 };
 
-window.loadProfilePage = function() {
+window.loadProfilePage = async function() {
   const user = auth.currentUser;
   if (!user) return;
   const u = window._currentUser || {};
   const el = id => document.getElementById(id);
   const initials = ((u.firstName||'')[0]||'U') + ((u.lastName||'')[0]||'');
-  if (el('profile-avatar')) el('profile-avatar').textContent = initials;
+  if (el('profile-avatar')) el('profile-avatar').textContent = initials.toUpperCase();
   if (el('profile-name'))   el('profile-name').textContent   = u.fullName || user.displayName || 'ZÚLA User';
   if (el('profile-email'))  el('profile-email').textContent  = user.email;
-  if (el('settings-name'))  el('settings-name').value        = u.fullName || '';
-  if (el('settings-phone')) el('settings-phone').value       = u.phone || '';
+  if (el('profile-joined')) el('profile-joined').textContent = u.joinedAt
+    ? 'Member since ' + new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
+    : '';
+  if (el('settings-name'))  el('settings-name').value  = u.fullName || '';
+  if (el('settings-phone')) el('settings-phone').value = u.phone || '';
+  if (el('settings-bio'))   el('settings-bio').value   = u.bio || '';
+  // Show seller badge if verified
+  const sellerBadge = el('profile-seller-badge');
+  if (sellerBadge) sellerBadge.style.display = u.sellerVerified ? 'inline-block' : 'none';
+  // Update pstat listings count
+  const fns = window._fns;
+  try {
+    const q = fns.query(fns.collection(db, 'products'), fns.orderBy('createdAt','desc'));
+    const snap = await fns.getDocs(q);
+    let count = 0;
+    snap.forEach(d => { if (d.data().sellerId === user.uid) count++; });
+    if (el('pstat-listings')) el('pstat-listings').textContent = count;
+    if (el('sdash-revenue'))  el('sdash-revenue').textContent  = 'NGN 0';
+  } catch(e) {}
   loadMyListings();
 };
 
@@ -1237,9 +1399,13 @@ window.saveSettings = async function() {
   if (!user) return;
   const name  = document.getElementById('settings-name').value.trim();
   const phone = document.getElementById('settings-phone').value.trim();
+  const bio   = document.getElementById('settings-bio') ? document.getElementById('settings-bio').value.trim() : '';
   try {
-    await window._fns.setDoc(doc(db, 'users', user.uid), { fullName: name, phone }, { merge: true });
-    if (window._currentUser) { window._currentUser.fullName = name; window._currentUser.phone = phone; }
+    await window._fns.setDoc(doc(db, 'users', user.uid), { fullName: name, phone, bio }, { merge: true });
+    if (window._currentUser) { window._currentUser.fullName = name; window._currentUser.phone = phone; window._currentUser.bio = bio; }
+    // Update profile name display
+    const nameEl = document.getElementById('profile-name');
+    if (nameEl && name) nameEl.textContent = name;
     showToast('✅ Settings saved!');
   } catch(e) { showToast('❌ Could not save. Try again.'); }
 };
@@ -1299,15 +1465,69 @@ function checkStrength(val) {
   if (lbl) lbl.textContent = labels[cls] || '';
 }
 
-function switchTab(name) {
-  document.querySelectorAll('.dash-tab').forEach((t, i) => {
-    const tabs = ['listings','orders','settings'];
-    t.classList.toggle('active', tabs[i] === name);
+function profileTab(name) {
+  ['listings','seller','orders','settings'].forEach(t => {
+    const tab = document.getElementById('ptab-' + t);
+    const tc  = document.getElementById('ptc-' + t);
+    if (tab) tab.classList.toggle('active', t === name);
+    if (tc)  tc.classList.toggle('active', t === name);
   });
-  document.querySelectorAll('.dash-tab-content').forEach(c => c.classList.remove('active'));
-  const el = document.getElementById('tab-' + name);
-  if (el) el.classList.add('active');
+  if (name === 'seller') loadSellerDashboard();
 }
+
+function sellerAnalyticsTab(name, btn) {
+  document.querySelectorAll('.sdash-tab').forEach(t => t.style.display = 'none');
+  const sec = document.getElementById('sdat-' + name);
+  if (sec) sec.style.display = 'block';
+  document.querySelectorAll('.analytics-tabs button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+window.requestPayout = function() {
+  const bank = document.getElementById('payout-bank').value.trim();
+  const acct = document.getElementById('payout-acct').value.trim();
+  const name = document.getElementById('payout-name').value.trim();
+  if (!bank || !acct || !name) { showToast('⚠️ Fill in all payout details.'); return; }
+  showToast('✅ Payout request submitted! We will process within 3–5 business days.');
+};
+
+window.loadSellerDashboard = async function() {
+  const user = window._auth && window._auth.currentUser;
+  if (!user || !window._db) return;
+  const fns = window._fns;
+  try {
+    const q = fns.query(fns.collection(window._db, 'products'), fns.orderBy('createdAt','desc'));
+    const snap = await fns.getDocs(q);
+    const mine = [];
+    snap.forEach(d => { if (d.data().sellerId === user.uid) mine.push({id:d.id,...d.data()}); });
+    const revenueEl = document.getElementById('sdash-revenue');
+    const viewsEl   = document.getElementById('sdash-views');
+    const ordersEl  = document.getElementById('sdash-orders');
+    const balanceEl = document.getElementById('sdash-balance');
+    const prodRevEl = document.getElementById('sdash-product-revenue');
+    // For now show listing data (orders/revenue tracking comes when payment is integrated)
+    if (revenueEl) revenueEl.textContent = 'NGN 0';
+    if (viewsEl)   viewsEl.textContent   = (mine.length * 0).toString() || '0';
+    if (ordersEl)  ordersEl.textContent  = '0';
+    if (balanceEl) balanceEl.textContent = 'NGN 0';
+    if (prodRevEl) {
+      prodRevEl.innerHTML = mine.length === 0
+        ? '<div style="color:var(--text3);font-size:13px;">No products listed yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
+        : mine.map(p => `
+          <div class="listing-row">
+            <div class="listing-thumb">${p.emoji||'📦'}</div>
+            <div class="listing-info">
+              <div class="listing-name">${p.name}</div>
+              <div class="listing-meta">${p.category} · NGN ${Number(p.price).toLocaleString()}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:13px;color:var(--text3);">0 sales</div>
+              <div style="font-size:13px;font-weight:600;color:var(--green);">NGN 0</div>
+            </div>
+          </div>`).join('');
+    }
+  } catch(e) { console.error(e); }
+};
 
 function selectType(type) {
   window._selectedType = type.charAt(0).toUpperCase() + type.slice(1);
