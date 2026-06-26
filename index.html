@@ -990,36 +990,16 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="dash-card" style="margin-bottom:18px;">
       <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product details</h3>
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product name *</label>
-          <input id="ap-name" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="e.g. Handwoven Raffia Tote Bag">
-        </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Category *</label>
-          <select id="ap-category" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
-            <option>Fashion & Bags</option><option>Shoes</option><option>Beauty & Health</option>
-            <option>Electronics</option><option>Home & Living</option><option>Ebooks & Education</option>
-            <option>Music & Audio</option><option>Templates & Design</option><option>Software & Tools</option>
-            <option>Food & Drinks</option>
+        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product name *</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="e.g. Handwoven Raffia Tote Bag"></div>
+        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Category *</label>
+          <select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+            <option>Fashion & Bags</option><option>Shoes</option><option>Beauty & Health</option><option>Electronics</option><option>Home & Living</option><option>Ebooks & Education</option><option>Music & Audio</option><option>Templates & Design</option><option>Software & Tools</option><option>Food & Drinks</option>
           </select>
         </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Description *</label>
-          <textarea id="ap-desc" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;height:100px;resize:vertical;" placeholder="Describe your product — be specific about size, material, what's included…"></textarea>
-        </div>
+        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Description *</label><textarea style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;height:100px;resize:vertical;" placeholder="Describe your product — be specific about size, material, what's included…"></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Price (NGN) *</label>
-            <input id="ap-price" type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="0.00">
-          </div>
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Original / Compare price</label>
-            <input id="ap-original-price" type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="Strikethrough price">
-          </div>
-        </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product emoji (shown as image) *</label>
-          <input id="ap-emoji" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:18px;" placeholder="e.g. 👜 📱 📚 🎵">
+          <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Price (NGN) *</label><input type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="0.00"></div>
+          <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Original / Compare price</label><input type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="Strikethrough price"></div>
         </div>
       </div>
     </div>
@@ -1027,7 +1007,7 @@ p{color:var(--text2);margin:0 0 1em;}
     <!-- UPLOAD -->
     <div class="dash-card" style="margin-bottom:18px;" id="upload-section">
       <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;" id="upload-label">📸 Product images</h3>
-      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:32px;text-align:center;cursor:pointer;" onclick="showToast('📎 Image upload coming soon — use an emoji for now')">
+      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:32px;text-align:center;cursor:pointer;">
         <div style="font-size:32px;margin-bottom:8px;">⬆️</div>
         <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">Drag & drop or click to upload</div>
         <div style="font-size:12px;color:var(--text3);">JPG, PNG, GIF up to 10MB each · Up to 8 images</div>
@@ -1037,25 +1017,65 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
     </div>
 
+    <!-- COURSE CURRICULUM (shown only when course type selected) -->
+    <div class="dash-card" id="course-section" style="display:none;margin-bottom:18px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:4px;">🎓 Course curriculum</h3>
+      <p style="font-size:13px;margin-bottom:14px;">Add modules and lessons. Buyers see this before purchasing.</p>
+      <div id="course-modules-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%;" onclick="addCourseModule()">+ Add module</button>
+
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
+        <h4 style="font-size:13px;font-weight:600;margin-bottom:10px;">Course details</h4>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Skill level</label>
+            <select id="course-level" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+              <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Language</label>
+            <select id="course-lang" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+              <option>English</option><option>Yoruba</option><option>Igbo</option><option>Hausa</option><option>Pidgin</option><option>French</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">What students will learn (one per line)</label>
+            <textarea id="course-outcomes" rows="4" placeholder="e.g. How to start a business&#10;How to create a logo&#10;How to market on Instagram" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;resize:vertical;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Requirements / prerequisites</label>
+            <textarea id="course-requirements" rows="3" placeholder="e.g. A smartphone&#10;Basic internet connection" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;resize:vertical;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Certificate on completion?</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="course-cert" style="accent-color:var(--accent);width:16px;height:16px;">
+              <span style="font-size:13.5px;">Yes — issue a ZÚLA completion certificate</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- AFFILIATE SETTINGS -->
     <div class="dash-card" style="margin-bottom:18px;">
       <h3 style="font-size:14px;font-weight:600;margin-bottom:6px;">💰 Affiliate programme</h3>
       <p style="font-size:13px;margin-bottom:14px;">Allow affiliates to promote this product and earn a commission. Higher commission = more promotion.</p>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
-        <input id="ap-affiliate" type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+        <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
         <span style="font-size:13.5px;font-weight:500;">Enable affiliate marketing for this product</span>
       </label>
-      <div>
-        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Commission rate (%)</label>
+      <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Commission rate (%)</label>
         <div style="display:flex;align-items:center;gap:14px;">
-          <input id="ap-commission" type="range" min="5" max="40" value="15" style="flex:1;accent-color:var(--accent);" oninput="this.nextElementSibling.textContent=this.value+'%'">
+          <input type="range" min="5" max="40" value="15" style="flex:1;accent-color:var(--accent);" oninput="this.nextElementSibling.textContent=this.value+'%'">
           <span style="font-size:15px;font-weight:700;color:var(--accent);min-width:40px;">15%</span>
         </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-ghost" onclick="showToast('Draft saved!')">Save as draft</button>
+    <div style="display:flex;gap:12px;">
+      <button class="btn btn-ghost">Save as draft</button>
       <button class="btn btn-ghost" onclick="openListingPreview()">👁 Preview listing</button>
       <button class="btn btn-primary" onclick="submitProduct()">Publish listing →</button>
     </div>
@@ -1068,21 +1088,18 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="preview-banner">👁 This is how your listing will appear to buyers — nothing is published yet</div>
     <div class="pdetail-layout" style="padding:0;">
       <div>
-        <div class="gallery-main" style="font-size:64px;" id="preview-emoji">📦</div>
+        <div class="gallery-main" style="font-size:64px;">📦</div>
         <div class="gallery-thumbs">
-          <div class="active" id="preview-thumb">📦</div>
+          <div class="active">📦</div><div>🏷</div><div>📐</div>
         </div>
       </div>
       <div class="pdetail-meta">
-        <div style="display:flex;gap:8px;margin-bottom:12px;">
-          <span class="tag tag-purple" id="preview-type-tag">Physical item</span>
-          <span class="tag tag-gold">Affiliate · 15%</span>
-        </div>
-        <div class="pdetail-title" id="preview-name">Handwoven Raffia Tote Bag</div>
-        <div class="pdetail-seller">By <span id="preview-seller-name">Your Store Name</span> · Verified seller</div>
-        <div class="pdetail-price" id="preview-price">NGN 18,500</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;"><span class="tag tag-purple">Physical item</span><span class="tag tag-gold">Affiliate · 15%</span></div>
+        <div class="pdetail-title">Handwoven Raffia Tote Bag</div>
+        <div class="pdetail-seller">By Your Store Name · Verified seller</div>
+        <div class="pdetail-price">NGN 18,500</div>
         <div class="rating-row"><span style="font-size:13px;color:var(--text3);">No reviews yet — be the first sale!</span></div>
-        <p class="desc-text" id="preview-desc">Your product description will appear here.</p>
+        <p class="desc-text">Your product description will appear here. Be specific about size, material, and what's included.</p>
         <div class="pdetail-actions">
           <button class="btn btn-ghost" style="pointer-events:none;opacity:.6;">Add to cart</button>
           <button class="btn btn-primary" style="pointer-events:none;opacity:.6;">Buy now</button>
@@ -4007,17 +4024,74 @@ window._selectedProductType = 'physical';
 window.pickType = function(el, type) {
   window._selectedProductType = type;
   document.querySelectorAll('.prod-type-opt').forEach(opt => {
-    opt.style.background    = 'var(--surface)';
-    opt.style.borderColor   = 'var(--border)';
+    opt.style.background  = 'var(--surface)';
+    opt.style.borderColor = 'var(--border)';
   });
   el.style.background  = 'rgba(124,92,252,.12)';
   el.style.borderColor = 'var(--accent)';
-  // Show digital upload note for non-physical
+
+  // Show/hide digital upload note
   const note = document.getElementById('digital-upload-note');
   if (note) note.style.display = type === 'physical' ? 'none' : 'block';
+
+  // Upload label
   const label = document.getElementById('upload-label');
-  const labels = { physical:'📸 Product images', ebook:'📄 Ebook / PDF file', course:'🎓 Course files', template:'🎨 Template files', audio:'🎵 Audio files', software:'💻 Software / ZIP' };
+  const labels = { physical:'📸 Product images', ebook:'📄 Ebook / PDF file', course:'🎓 Course thumbnail / promo image', template:'🎨 Template files', audio:'🎵 Audio files', software:'💻 Software / ZIP' };
   if (label) label.textContent = labels[type] || '📸 Product images';
+
+  // Show course curriculum section only for course type
+  const courseSection = document.getElementById('course-section');
+  if (courseSection) courseSection.style.display = type === 'course' ? 'block' : 'none';
+
+  // If switching to course and no modules yet, add one to start
+  if (type === 'course') {
+    const list = document.getElementById('course-modules-list');
+    if (list && list.children.length === 0) addCourseModule();
+  }
+};
+
+// ── COURSE MODULE BUILDER ────────────────────────────────────────────
+let _moduleCount = 0;
+window.addCourseModule = function() {
+  _moduleCount++;
+  const idx = _moduleCount;
+  const list = document.getElementById('course-modules-list');
+  if (!list) return;
+  const div = document.createElement('div');
+  div.id = 'module-' + idx;
+  div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;';
+  div.innerHTML = \`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <input id="mod-title-\${idx}" placeholder="Module \${idx}: e.g. Introduction" value="Module \${idx}" 
+        style="background:transparent;border:none;color:var(--text);font-size:13.5px;font-weight:600;font-family:var(--font-body);flex:1;outline:none;">
+      <button onclick="document.getElementById('module-\${idx}').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0 0 0 8px;">×</button>
+    </div>
+    <div id="lessons-\${idx}" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+    <button class="btn btn-ghost btn-sm" onclick="addLesson(\${idx})" style="font-size:12px;">+ Add lesson</button>
+  \`;
+  list.appendChild(div);
+  addLesson(idx); // auto-add first lesson
+};
+
+let _lessonCount = 0;
+window.addLesson = function(moduleIdx) {
+  _lessonCount++;
+  const lIdx = _lessonCount;
+  const list = document.getElementById('lessons-' + moduleIdx);
+  if (!list) return;
+  const div = document.createElement('div');
+  div.id = 'lesson-' + lIdx;
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  div.innerHTML = \`
+    <span style="color:var(--text3);font-size:13px;">▸</span>
+    <input id="lesson-title-\${lIdx}" placeholder="Lesson title" 
+      style="flex:1;background:var(--surface);border:1px solid var(--border);padding:7px 10px;border-radius:var(--radius-xs);color:var(--text);font-size:13px;font-family:var(--font-body);">
+    <select style="background:var(--surface);border:1px solid var(--border);padding:7px 8px;border-radius:var(--radius-xs);color:var(--text3);font-size:12px;font-family:var(--font-body);">
+      <option>🎥 Video</option><option>📄 PDF</option><option>🔗 Link</option><option>📝 Text</option>
+    </select>
+    <button onclick="document.getElementById('lesson-\${lIdx}').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">×</button>
+  \`;
+  list.appendChild(div);
 };
 
 // ── ADD PRODUCT: preview modal ───────────────────────────────────────
