@@ -1326,26 +1326,32 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">1</span> Government ID + Selfie</h3>
       <p>Upload a government-issued photo ID (passport, driver's licence, national ID) and a selfie holding the ID.</p>
-      <div class="upload-box" onclick="showToast('📎 ID upload ready — connect storage to enable')">
+      <input type="file" id="upload-id-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'id','verif-id-preview','verif-id-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-id-file').click()" id="verif-id-box">
         <div class="ub-icon">🪪</div>
-        <div class="ub-text">Upload government ID</div>
+        <div class="ub-text" id="verif-id-status">Tap to upload government ID</div>
       </div>
+      <div id="verif-id-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">2</span> Business / Individual Registration</h3>
       <p>Sole traders upload proof of address. Registered businesses upload their certificate (CAC or equivalent).</p>
-      <div class="upload-box" onclick="showToast('📎 Registration doc upload ready')">
+      <input type="file" id="upload-reg-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'reg','verif-reg-preview','verif-reg-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-reg-file').click()" id="verif-reg-box">
         <div class="ub-icon">🏢</div>
-        <div class="ub-text">Upload registration document</div>
+        <div class="ub-text" id="verif-reg-status">Tap to upload registration document</div>
       </div>
+      <div id="verif-reg-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">3</span> Proof of Product Ownership</h3>
       <p>Prove you own or have rights to sell what you're listing — purchase invoice, brand certificate, or creator declaration.</p>
-      <div class="upload-box" onclick="showToast('📎 Ownership proof upload ready')">
+      <input type="file" id="upload-own-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'ownership','verif-own-preview','verif-own-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-own-file').click()" id="verif-own-box">
         <div class="ub-icon">✅</div>
-        <div class="ub-text">Upload ownership proof</div>
+        <div class="ub-text" id="verif-own-status">Tap to upload ownership proof</div>
       </div>
+      <div id="verif-own-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <button class="btn btn-primary btn-block" onclick="submitVerification()" style="margin-top:8px;">Submit for review →</button>
   </div>
@@ -1472,12 +1478,10 @@ p{color:var(--text2);margin:0 0 1em;}
       <!-- VERIFICATION QUEUE -->
       <div class="admin-section" id="asec-verif">
         <div class="dash-h1">Verification Queue</div>
-        <div class="dash-sub">Seller verification requests waiting for review</div>
+        <div class="dash-sub">All seller verification submissions — approve or revoke access</div>
         <div class="dash-card">
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="es-icon">🛡</div>
-            <h3>No pending verifications</h3>
-            <p>Seller verification requests will appear here.</p>
+          <div id="admin-verif-list">
+            <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
           </div>
         </div>
       </div>
@@ -2629,9 +2633,73 @@ window.saveSettings = async function() {
   } catch(e) { showToast('❌ Could not save. Try again.'); }
 };
 
-window.submitVerification = function() {
-  showToast('✅ Verification submitted! We\'ll review within 24–48 hours.');
-  showPage('profile');
+// ── VERIFICATION FILE UPLOADS (Cloudinary) ───────────────────────────
+const CLOUDINARY_CLOUD = 'dclahlchz';
+const CLOUDINARY_PRESET = 'zula_verif';
+const _verifFiles = {};
+
+window.handleVerifUpload = function(input, key, previewId, statusId) {
+  const file = input.files[0];
+  if (!file) return;
+  _verifFiles[key] = file;
+  const preview = document.getElementById(previewId);
+  const status  = document.getElementById(statusId);
+  if (status)  status.textContent = '✅ ' + file.name;
+  if (preview) { preview.style.display = 'block'; preview.textContent = file.name + ' ready — tap Submit to send.'; }
+};
+
+async function uploadToCloudinary(file, folder) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  formData.append('folder', folder);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`,
+    { method: 'POST', body: formData }
+  );
+  if (!res.ok) throw new Error('Cloudinary upload failed');
+  const data = await res.json();
+  return data.secure_url;
+}
+
+window.submitVerification = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('Please log in first.'); return; }
+  if (Object.keys(_verifFiles).length === 0) {
+    showToast('⚠️ Please upload at least one document first.');
+    return;
+  }
+
+  const btn = document.querySelector('#page-verification .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+
+  try {
+    const urls = {};
+    for (const [key, file] of Object.entries(_verifFiles)) {
+      showToast(`📤 Uploading ${key}…`);
+      urls[key] = await uploadToCloudinary(file, `zula_verifications/${user.uid}`);
+    }
+
+    // Save URLs to Firestore — admin must approve
+    await updateDoc(doc(db, 'users', user.uid), {
+      verifSubmitted: true,
+      verifDocs: urls,
+      verifSubmittedAt: serverTimestamp(),
+      sellerVerified: false
+    });
+
+    if (window._currentUser) {
+      window._currentUser.verifSubmitted = true;
+      window._currentUser.sellerVerified = false;
+    }
+    showToast('📋 Documents submitted! We will review and approve within 24–48 hours.');
+    showPage('profile');
+  } catch (e) {
+    console.error('Verif upload error:', e);
+    showToast('❌ Upload failed: ' + (e.message || e));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit for review →'; }
+  }
 };
 
 // ── REAL VERIFICATION STATUS ────────────────────────────────────────
@@ -2656,10 +2724,11 @@ window.loadVerifStatus = async function() {
 
   // Seller verification
   setStep('vs-seller-icon','vs-seller-desc',
-    u.sellerVerified ? 'done' : (u.verifSubmitted ? 'pending' : 'todo'),
+    u.sellerVerified ? 'done' : (u.verifRejected ? 'todo' : u.verifSubmitted ? 'pending' : 'todo'),
     u.sellerVerified ? 'Seller verified ✅ — you can list products.' :
-    u.verifSubmitted ? 'Under review — we\'ll respond within 24–48 hours.' :
-    'Not yet started. Submit your documents below.');
+    u.verifRejected ? '❌ Rejected: ' + (u.verifRejectedReason || 'See admin for details') + ' — please resubmit.' :
+    u.verifSubmitted ? '⏳ Documents under review — we\'ll respond within 24–48 hours.' :
+    'Not yet started. Submit your documents to become a seller.');
 
   // Phone
   setStep('vs-phone-icon','vs-phone-desc',
@@ -3556,6 +3625,8 @@ window.adminTab = function(name) {
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   const sec = document.getElementById('asec-' + name);
   if (sec) sec.classList.add('active');
+  // Load verif queue when tab is opened
+  if (name === 'verif') loadAdminVerifQueue();
 };
 
 window.loadAdminData = async function() {
@@ -3625,6 +3696,117 @@ window.loadAdminData = async function() {
     showToast('❌ Could not load admin data. Check Firestore rules.');
     console.error(e);
   }
+};
+
+// ── ADMIN VERIF QUEUE ───────────────────────────────────────────────
+window.loadAdminVerifQueue = async function() {
+  const db  = window._db;
+  const fns = window._fns;
+  const list = document.getElementById('admin-verif-list');
+  if (!list) return;
+  try {
+    const snap = await fns.getDocs(fns.query(
+      fns.collection(db, 'users'),
+      fns.where('verifSubmitted', '==', true)
+    ));
+    const users = [];
+    snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+
+    // Count pending for stat card
+    const pending = users.filter(u => !u.sellerVerified).length;
+    const statEl = document.getElementById('astat-verif');
+    if (statEl) statEl.textContent = pending;
+
+    if (users.length === 0) {
+      list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No verification submissions yet.</div>';
+      return;
+    }
+
+    list.innerHTML = users.map(u => {
+      const docs = u.verifDocs || {};
+      const docLinks = Object.entries(docs).map(([k,url]) =>
+        `<a href="${url}" target="_blank" style="display:inline-block;margin:3px 4px 3px 0;padding:4px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);font-size:12px;color:var(--accent);">📄 View ${k}</a>`
+      ).join('');
+      let statusBadge, actionBtns;
+      if (u.sellerVerified) {
+        statusBadge = '<span style="background:rgba(39,201,122,.15);color:var(--green);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">✅ Approved</span>';
+        actionBtns  = `<button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="adminRevokeVerif('${u.id}')">Revoke</button>`;
+      } else if (u.verifRejected) {
+        statusBadge = '<span style="background:rgba(240,82,82,.15);color:var(--red);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">❌ Rejected</span>';
+        actionBtns  = `<button class="btn btn-sm btn-primary" onclick="adminApproveVerif('${u.id}')">Approve</button>`;
+      } else {
+        statusBadge = '<span style="background:rgba(245,200,66,.15);color:var(--gold);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">⏳ Pending</span>';
+        actionBtns  = `
+          <button class="btn btn-sm btn-primary" onclick="adminApproveVerif('${u.id}')">✅ Approve</button>
+          <button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="adminRejectVerif('${u.id}')">❌ Reject</button>`;
+      }
+      const date = u.verifSubmittedAt ? new Date(u.verifSubmittedAt.seconds*1000).toLocaleDateString() : '—';
+      const rejectReason = u.verifRejectedReason ? `<div style="margin-top:8px;font-size:12px;color:var(--red);">Reason: ${u.verifRejectedReason}</div>` : '';
+      return `
+        <div style="border:1px solid var(--border);border-radius:var(--radius-xs);padding:16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:14px;font-weight:700;">${u.fullName||u.firstName||'Unknown'}</div>
+              <div style="font-size:12px;color:var(--text3);">${u.email||'—'} · Submitted ${date}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              ${statusBadge}
+              ${actionBtns}
+            </div>
+          </div>
+          <div style="margin-bottom:6px;">${docLinks || '<span style="font-size:12px;color:var(--text3);">No documents uploaded</span>'}</div>
+          ${rejectReason}
+        </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load verifications.</div>';
+    console.error(e);
+  }
+};
+
+window.adminApproveVerif = async function(userId) {
+  if (!isAdmin()) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: true,
+      sellerVerifiedAt: fns.serverTimestamp()
+    });
+    showToast('✅ Seller approved!');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not approve.'); console.error(e); }
+};
+
+window.adminRejectVerif = async function(userId) {
+  if (!isAdmin()) return;
+  const reason = prompt('Reason for rejection (the seller will see this):');
+  if (!reason) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: false,
+      verifRejected: true,
+      verifRejectedReason: reason,
+      verifRejectedAt: fns.serverTimestamp()
+    });
+    showToast('❌ Verification rejected.');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not reject.'); console.error(e); }
+};
+
+window.adminRevokeVerif = async function(userId) {
+  if (!isAdmin()) return;
+  if (!confirm('Revoke this seller\'s verification? They will no longer be able to list products.')) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: false,
+      verifRevoked: true,
+      verifRevokedAt: fns.serverTimestamp()
+    });
+    showToast('⛔ Seller verification revoked.');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not revoke.'); console.error(e); }
 };
 
 window.adminDeleteProduct = async function(id) {
