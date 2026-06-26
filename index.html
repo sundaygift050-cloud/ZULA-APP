@@ -4748,48 +4748,68 @@ window.submitProduct = async function() {
     showPage('verification');
     return;
   }
-  const name      = (document.getElementById('ap-name')?.value || '').trim();
-  const desc      = (document.getElementById('ap-desc')?.value || '').trim();
-  const priceRaw  = document.getElementById('ap-price')?.value || '';
-  const emoji     = (document.getElementById('ap-emoji')?.value || '📦').trim();
-  const category  = document.getElementById('ap-category')?.value || 'Fashion & Bags';
-  const commission= document.getElementById('ap-commission')?.value || '15';
-  const hasAff    = document.getElementById('ap-affiliate')?.checked ?? true;
 
-  if (!name)     { showToast('⚠️ Product name is required.'); return; }
-  if (!desc)     { showToast('⚠️ Description is required.'); return; }
+  // Read from the correct field IDs in the add-product form
+  const name      = (document.getElementById('ap-field-name')?.value || '').trim();
+  const desc      = (document.getElementById('ap-field-desc')?.value || '').trim();
+  const priceRaw  = document.getElementById('ap-field-price')?.value || '';
+  const originalPrice = document.getElementById('ap-field-original')?.value || '';
+  const category  = document.getElementById('ap-field-category')?.value || 'Fashion & Accessories';
+  const currency  = document.getElementById('ap-field-currency')?.value || 'NGN';
+
+  // Affiliate settings
+  const affToggle   = document.getElementById('ap-aff-toggle');
+  const hasAff      = affToggle ? affToggle.classList.contains('on') : true;
+  const affRangeEl  = document.querySelector('#ap-aff-settings input[type=range]');
+  const commission  = affRangeEl ? parseInt(affRangeEl.value) : 20;
+
+  // Product type from step 1 (set by apSelectType via _apType)
+  const productType = window._apType || 'physical';
+  const typeMap     = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital', coaching:'Service', vehicle:'Vehicle' };
+
+  // Visibility
+  const visEl = document.querySelector('.ap-vis-opt.selected');
+  const status = visEl ? (visEl.textContent.trim().toLowerCase().includes('draft') ? 'draft' : 'active') : 'active';
+
+  if (!name)   { showToast('⚠️ Product name is required.'); return; }
+  if (!desc)   { showToast('⚠️ Description is required.'); return; }
   if (!priceRaw || Number(priceRaw) <= 0) { showToast('⚠️ Enter a valid price.'); return; }
 
-  const typeMap = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital' };
+  // Disable publish button while saving
+  const publishBtn = document.querySelector('#ap-step-3 .btn-primary');
+  if (publishBtn) { publishBtn.textContent = 'Publishing…'; publishBtn.disabled = true; }
 
   try {
     const productData = {
       name,
       description: desc,
-      price: Number(priceRaw),
-      emoji,
+      price:        Number(priceRaw),
+      originalPrice: originalPrice ? Number(originalPrice) : null,
       category,
-      type: typeMap[window._selectedProductType] || 'Physical',
-      productType: window._selectedProductType,
-      commission: hasAff ? Number(commission) : 0,
+      currency,
+      type:         typeMap[productType] || 'Physical',
+      productType,
+      commission:   hasAff ? commission : 0,
       affiliateEnabled: hasAff,
-      sellerId:   user.uid,
-      sellerName: profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
-      createdAt: fns.serverTimestamp(),
-      status: 'active',
+      sellerId:     user.uid,
+      sellerName:   profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
+      createdAt:    fns.serverTimestamp(),
+      status,
     };
     await fns.addDoc(fns.collection(db, 'products'), productData);
-    showToast('✅ Product published successfully!');
-    // Clear form
-    ['ap-name','ap-desc','ap-price','ap-original-price','ap-emoji'].forEach(id => {
+    showToast('🎉 Product published! It\'s now live in the marketplace.');
+    // Reset form fields
+    ['ap-field-name','ap-field-desc','ap-field-price','ap-field-original'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    closeListingPreview();
-    setTimeout(() => showPage('seller-dashboard'), 600);
+    // Reset step back to 1 for next time
+    if (typeof apSetStep === 'function') apSetStep(1);
+    setTimeout(() => { showPage('seller-dashboard'); if (typeof sdTab === 'function') sdTab('products'); }, 800);
   } catch(e) {
     console.error(e);
     showToast('❌ Could not publish. Check your connection.');
+    if (publishBtn) { publishBtn.textContent = 'Publish now →'; publishBtn.disabled = false; }
   }
 };
 
