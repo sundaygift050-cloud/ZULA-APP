@@ -226,9 +226,176 @@ p{color:var(--text2);margin:0 0 1em;}
 .modal-box h3{font-size:18px;font-weight:700;margin-bottom:8px;}
 .modal-box p{font-size:14px;margin-bottom:20px;}
 
-@media(max-width:600px){
-  .auth-card{padding:24px;}
-  .profile-header{flex-direction:column;align-items:flex-start;}
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — works on phone AND laptop
+   ═══════════════════════════════════════════════════ */
+
+/* ── Base mobile-first tweaks (≤ 480px — small phones) ── */
+@media(max-width:480px){
+  :root{ --max:100%; }
+  body{ font-size:14px; }
+  .wrap{ padding:0 14px; }
+
+  /* Header */
+  .hdr-inner{ height:54px; gap:10px; }
+  .logo{ font-size:18px; }
+  .hdr-nav{ gap:10px; font-size:12px; }
+  .avatar-btn{ width:30px; height:30px; font-size:11px; }
+
+  /* Auth cards */
+  .auth-card{ padding:20px 16px; }
+  .auth-logo{ font-size:22px; }
+
+  /* Profile header */
+  .profile-header{ flex-direction:column; align-items:flex-start; padding:16px; gap:12px; }
+  .profile-avatar{ width:58px; height:58px; font-size:20px; }
+
+  /* Profile stats grid — 2 cols on phone */
+  .profile-header + div[style*="grid-template-columns:repeat(4"] {
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+
+  /* Seller dashboard stats — 2 cols */
+  #page-seller-dashboard .dash-wrap > div[style*="repeat(4,1fr)"] {
+    grid-template-columns: repeat(2,1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Seller dashboard stats font */
+  #page-seller-dashboard [style*="font-size:26px"] { font-size:20px !important; }
+
+  /* Profile tabs — scrollable */
+  .dash-tabs{ overflow-x:auto; white-space:nowrap; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+  .dash-tab{ padding:8px 12px; font-size:12.5px; }
+
+  /* Marketplace */
+  .mkt-layout{ gap:16px; padding:16px 0 40px; }
+  .filter-panel{ padding:14px; }
+  .pgrid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+  .pcard-img{ height:140px; font-size:28px; }
+  .pcard-body{ padding:10px 10px; }
+  .pcard-name{ font-size:12.5px; }
+  .pcard-price{ font-size:13px; }
+  .mkt-topbar h2{ font-size:16px; }
+
+  /* Product detail */
+  .pdetail-layout{ gap:20px; }
+  .pdetail-title{ font-size:20px; }
+  .pdetail-price{ font-size:22px; }
+  .pdetail-actions{ flex-direction:column; }
+  .pdetail-actions .btn{ width:100%; }
+
+  /* Dash wrap padding */
+  .dash-wrap{ padding:20px 14px 48px; }
+
+  /* Add product */
+  .orders-wrap{ padding:20px 14px 48px; }
+  #product-type-picker{ grid-template-columns:repeat(2,1fr) !important; gap:8px !important; }
+
+  /* Profile-v2 stats */
+  div[style*="repeat(4,1fr)"]{ grid-template-columns:repeat(2,1fr) !important; }
+
+  /* Buttons */
+  .btn{ padding:10px 16px; font-size:13px; }
+  .btn-sm{ padding:6px 11px; font-size:12px; }
+
+  /* Modal */
+  .modal-box{ padding:20px 16px; }
+  .bio-modal-box{ padding:20px 16px; }
+
+  /* Chat */
+  .chat-input-area{ padding:8px 10px; gap:6px; }
+  .chat-messages{ padding:12px 12px; }
+  .chat-header{ padding:10px 12px; }
+
+  /* Notification page */
+  .notif-item{ padding:10px 12px; gap:8px; }
+
+  /* Admin shell — stack on phone */
+  .admin-shell{ flex-direction:column; }
+  .admin-side{ width:100% !important; min-height:auto; }
+  .admin-main{ padding:16px !important; }
+
+  /* Page headings */
+  h1[style*="font-size:24px"]{ font-size:20px !important; }
+  h1[style*="font-size:22px"]{ font-size:19px !important; }
+
+  /* Toast — full width on phone */
+  .toast{ left:14px; right:14px; transform:translateX(0) translateY(20px); white-space:normal; text-align:center; }
+  .toast.show{ transform:translateX(0) translateY(0); }
+
+  /* User dropdown */
+  #user-dropdown{ right:10px !important; left:10px !important; }
+}
+
+/* ── Tablet (481–760px) ── */
+@media(min-width:481px) and (max-width:760px){
+  .wrap{ padding:0 18px; }
+  .hdr-inner{ height:58px; }
+  .profile-header{ flex-direction:column; align-items:flex-start; padding:18px; }
+  .profile-header + div[style*="repeat(4"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  #page-seller-dashboard .dash-wrap > div[style*="repeat(4,1fr)"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  .pgrid{ grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+  .pcard-img{ height:150px; }
+  .dash-wrap{ padding:24px 18px 50px; }
+  .orders-wrap{ padding:24px 18px 50px; }
+  #product-type-picker{ grid-template-columns:repeat(3,1fr) !important; }
+  .admin-shell{ flex-direction:column; }
+  .admin-side{ width:100% !important; }
+}
+
+/* ── Stats grids: 2 cols on mobile ── */
+@media(max-width:640px){
+  .sd-stats-grid{ grid-template-columns:repeat(2,1fr) !important; gap:10px !important; }
+  .pstat-grid{ grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* ── All mobile (≤ 760px shared) ── */
+@media(max-width:760px){
+  /* Hide filter panel sidebar on mobile marketplace — make it collapsible */
+  .filter-panel{ display:none; }
+  .filter-panel.mobile-open{ display:block; margin-bottom:16px; }
+  .mkt-layout{ grid-template-columns:1fr !important; }
+
+  /* Inbox: already handled by .inbox-layout rules */
+
+  /* Nav: hide text labels, show icon fallbacks on small screens */
+  .hdr-nav .hide-mobile{ display:none; }
+  .hdr-nav .show-mobile{ display:inline !important; }
+
+  /* Profile-v2 sidebar buttons stack */
+  div[style*="flex-direction:column;gap:7px"]{
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+  }
+
+  /* Seller dashboard stats text smaller */
+  #sd-stat-listings, #sd-stat-orders, #sd-stat-revenue, #sd-stat-aff{
+    font-size:20px !important;
+  }
+
+  /* Add product type picker 2-col */
+  #product-type-picker{
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+
+  /* Preview modal scroll */
+  .preview-modal{ padding:16px; }
+  .preview-modal-box{ padding:16px; }
+  .pdetail-layout{ grid-template-columns:1fr; gap:20px; }
+}
+
+/* ── Laptop / Desktop (≥ 1024px) — enhance layout ── */
+@media(min-width:1024px){
+  .pgrid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+  .hdr-inner{ height:68px; }
+  .logo{ font-size:24px; }
+  .hdr-nav{ gap:24px; font-size:14px; }
+  .dash-wrap{ padding:40px 32px 80px; }
 }
 
 /* ANALYTICS TABS */
@@ -678,8 +845,8 @@ p{color:var(--text2);margin:0 0 1em;}
         <input placeholder="Search products…" oninput="filterProducts(this.value)">
       </div>
       <nav class="hdr-nav">
-        <a onclick="showPage('seller-dashboard')" title="Seller dashboard">Seller</a>
-        <a onclick="showPage('profile')">Profile</a>
+        <a onclick="showPage('seller-dashboard')" title="Seller dashboard"><span class="hide-mobile">Seller</span><span style="display:none;" class="show-mobile">📊</span></a>
+        <a onclick="showPage('profile')"><span class="hide-mobile">Profile</span><span style="display:none;" class="show-mobile">👤</span></a>
         <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬 <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
         <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
@@ -724,7 +891,10 @@ p{color:var(--text2);margin:0 0 1em;}
     </aside>
     <main>
       <div class="mkt-topbar">
-        <h2>All products</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <h2>All products</h2>
+          <button class="btn btn-ghost btn-sm" id="filter-toggle-btn" onclick="toggleMobileFilter()" style="display:none;">⚙️ Filters</button>
+        </div>
         <div class="result-count" id="result-count"></div>
       </div>
       <div class="pgrid" id="products-grid"></div>
@@ -962,7 +1132,7 @@ p{color:var(--text2);margin:0 0 1em;}
     </div>
 
     <!-- QUICK STATS (real from Firebase) -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+    <div class="pstat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
         <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-orders">0</div>
         <div style="font-size:11px;color:var(--text3);">Orders</div>
@@ -3022,6 +3192,19 @@ window.selectMsgRecipient = function(uid, name, email, initials) {
   if (selectedBox) selectedBox.style.display = 'flex';
 };
 
+window.toggleMobileFilter = function() {
+  const fp = document.querySelector('.filter-panel');
+  if (fp) fp.classList.toggle('mobile-open');
+};
+
+// Show filter toggle only on mobile
+function _updateFilterToggleVisibility() {
+  const btn = document.getElementById('filter-toggle-btn');
+  if (btn) btn.style.display = window.innerWidth <= 760 ? 'inline-flex' : 'none';
+}
+window.addEventListener('resize', _updateFilterToggleVisibility);
+_updateFilterToggleVisibility();
+
 window.clearMsgRecipient = function() {
   window._newMsgTargetUid  = null;
   window._newMsgTargetName = null;
@@ -3914,7 +4097,7 @@ window.saveManualLocation = function() {
       <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
     </div>
     <!-- Stats row -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+    <div class="sd-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
         <div style="font-size:26px;font-weight:800;font-family:var(--font-display);" id="sd-stat-listings">—</div>
         <div style="font-size:12px;color:var(--text3);margin-top:2px;">Listings</div>
