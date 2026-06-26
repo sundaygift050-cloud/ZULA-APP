@@ -1216,27 +1216,19 @@ p{color:var(--text2);margin:0 0 1em;}
 
       <!-- COURSE -->
       <div class="ap-card ap-dynamic" id="ap-sec-course">
-        <div class="ap-card-hd">Course structure</div>
-        <div class="ap-card-sub">Organise your content into modules. Buyers see this before they purchase.</div>
+        <div class="ap-card-hd">Course lessons &amp; videos</div>
+        <div class="ap-card-sub">Add each lesson with its video link. Buyers watch inside the Zula app — no raw links shown, no YouTube/Vimeo/Drive branding visible.</div>
         <div class="ap-field-row" style="margin-bottom:16px;">
-          <div class="ap-field"><label>Total lessons</label><input type="number" placeholder="e.g. 42" min="1"></div>
-          <div class="ap-field"><label>Total hours of content</label><input type="number" step="0.5" placeholder="e.g. 8.5"></div>
+          <div class="ap-field"><label>Skill level</label><select id="ap-field-skill"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option></select></div>
+          <div class="ap-field"><label>Total hours of content</label><input type="number" id="ap-field-hours" step="0.5" placeholder="e.g. 8.5"></div>
         </div>
-        <div id="ap-modules-list" style="margin-bottom:12px;">
-          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Introduction & welcome</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">3 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
-          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Core concepts</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">8 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
+        <div style="background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:11px 14px;font-size:12.5px;color:#a990ff;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-size:16px;flex-shrink:0;">🔒</span>
+          <div><strong style="display:block;margin-bottom:2px;">Video links are private</strong>Buyers only access lessons after purchase. Links never show as raw URLs — all videos play inside Zula's built-in player.</div>
         </div>
-        <button class="ap-add-module-btn" onclick="apAddModule()">+ Add module</button>
-        <div class="ap-field-row" style="margin-top:16px;">
-          <div class="ap-field"><label>Skill level</label><select><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option></select></div>
-          <div class="ap-field"><label>Delivery method</label><select><option>Pre-recorded video</option><option>Live sessions</option><option>Live + recordings</option><option>Text-based / PDF</option></select></div>
-        </div>
-        <div class="ap-callout ap-callout-info" style="margin-top:8px;">
-          <span style="font-size:16px;">ℹ️</span>
-          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Preview lesson</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">You can mark one module as a free preview so buyers can try before they buy.</p></div>
-        </div>
+        <div id="ap-lessons-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
+        <button class="ap-add-module-btn" onclick="apAddLesson()" type="button">+ Add lesson</button>
       </div>
-
       <!-- EBOOK -->
       <div class="ap-card ap-dynamic" id="ap-sec-ebook">
         <div class="ap-card-hd">Ebook details</div>
@@ -4796,7 +4788,12 @@ window.submitProduct = async function() {
       createdAt:    fns.serverTimestamp(),
       status,
     };
-    await fns.addDoc(fns.collection(db, 'products'), productData);
+    // Attach lessons if this is a course
+    if (productType === 'course' && window._pendingLessons && window._pendingLessons.length > 0) {
+      productData.lessons = window._pendingLessons;
+      window._pendingLessons = [];
+    }
+    var docRef = await fns.addDoc(fns.collection(db, 'products'), productData);
     showToast('🎉 Product published! It\'s now live in the marketplace.');
     // Reset form fields
     ['ap-field-name','ap-field-desc','ap-field-price','ap-field-original'].forEach(id => {
@@ -5426,6 +5423,360 @@ window.saveManualLocation = function() {
     <button class="btn btn-primary btn-block" onclick="startNewConversation()">Send →</button>
   </div>
 </div>
+
+
+<!-- ================================================================
+     PAGE: COURSE PLAYER
+     ================================================================ -->
+<div class="page" id="page-course-player">
+  <div class="cp-shell">
+    <!-- SIDEBAR: lesson list -->
+    <div class="cp-sidebar" id="cp-sidebar">
+      <div class="cp-sidebar-hd">
+        <button class="cp-back-btn" onclick="showPage('marketplace')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2L4 7l5 5"/></svg>
+          Back
+        </button>
+        <div class="cp-course-title" id="cp-course-title">Course</div>
+        <div class="cp-progress-bar-wrap">
+          <div class="cp-progress-track"><div class="cp-progress-fill" id="cp-progress-fill" style="width:0%"></div></div>
+          <div class="cp-progress-label" id="cp-progress-label">0% complete</div>
+        </div>
+      </div>
+      <div class="cp-lesson-list" id="cp-lesson-list"></div>
+    </div>
+
+    <!-- MAIN: video player + notes -->
+    <div class="cp-main">
+      <div class="cp-video-wrap" id="cp-video-wrap">
+        <iframe id="cp-iframe" src="" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" style="width:100%;height:100%;border:none;border-radius:var(--radius-sm);"></iframe>
+        <div class="cp-video-placeholder" id="cp-video-placeholder">
+          <div style="font-size:48px;margin-bottom:16px;">▶️</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Select a lesson to begin</div>
+          <div style="font-size:13px;color:var(--text3);">Pick any lesson from the list on the left.</div>
+        </div>
+      </div>
+      <div class="cp-below">
+        <div class="cp-lesson-meta">
+          <div class="cp-lesson-name" id="cp-lesson-name">Welcome to the course</div>
+          <button class="cp-done-btn" id="cp-done-btn" onclick="cpMarkDone()">Mark as complete ✓</button>
+        </div>
+        <div class="cp-nav-row">
+          <button class="cp-nav-btn" id="cp-prev-btn" onclick="cpPrev()">← Previous</button>
+          <button class="cp-nav-btn cp-nav-next" id="cp-next-btn" onclick="cpNext()">Next lesson →</button>
+        </div>
+        <div class="cp-notes-section">
+          <div class="cp-notes-label">📝 My notes for this lesson</div>
+          <textarea class="cp-notes-input" id="cp-notes-input" placeholder="Type your notes here — they're saved automatically…" oninput="cpSaveNote()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     CONGRATS MODAL (shown after course purchase)
+     ================================================================ -->
+<div id="cp-congrats-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:440px;width:100%;padding:36px;text-align:center;">
+    <div style="font-size:56px;margin-bottom:16px;">🎉</div>
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;margin-bottom:8px;">You're enrolled!</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:6px;" id="cp-congrats-course-name"></div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:28px;">A congratulations email is on its way to your inbox. Let's start learning!</div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" onclick="cpDismissCongrats()">Start watching now →</button>
+    <button class="btn btn-ghost" style="width:100%;font-size:13px;" onclick="showPage('marketplace');cpCloseCongrats()">Browse more courses</button>
+  </div>
+</div>
+
+<style>
+/* ── COURSE PLAYER ── */
+.cp-shell{display:flex;height:calc(100vh - 0px);min-height:100vh;background:var(--bg);}
+.cp-sidebar{width:300px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.cp-sidebar-hd{padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.cp-back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text3);font-size:12.5px;font-family:var(--font-body);cursor:pointer;margin-bottom:12px;padding:0;}
+.cp-back-btn:hover{color:var(--text);}
+.cp-course-title{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.3;}
+.cp-progress-track{height:4px;background:var(--border);border-radius:2px;margin-bottom:5px;}
+.cp-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width .4s;}
+.cp-progress-label{font-size:11px;color:var(--text3);}
+.cp-lesson-list{overflow-y:auto;flex:1;padding:10px 0;}
+.cp-lesson-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .12s;border-left:3px solid transparent;}
+.cp-lesson-item:hover{background:rgba(255,255,255,.04);}
+.cp-lesson-item.active{background:rgba(124,92,252,.1);border-left-color:var(--accent);}
+.cp-lesson-item.done .cp-lesson-check{background:var(--green);border-color:var(--green);color:#fff;}
+.cp-lesson-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:transparent;transition:.2s;}
+.cp-lesson-num{font-size:11px;color:var(--text3);min-width:18px;}
+.cp-lesson-item-name{font-size:13px;color:var(--text2);flex:1;line-height:1.3;}
+.cp-lesson-item.active .cp-lesson-item-name{color:var(--text);font-weight:600;}
+.cp-main{flex:1;display:flex;flex-direction:column;overflow-y:auto;}
+.cp-video-wrap{position:relative;background:#000;aspect-ratio:16/9;width:100%;flex-shrink:0;}
+.cp-video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text2);}
+.cp-video-placeholder.hidden{display:none;}
+.cp-below{padding:24px 28px 48px;flex:1;}
+.cp-lesson-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
+.cp-lesson-name{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);}
+.cp-done-btn{flex-shrink:0;padding:8px 14px;border-radius:var(--radius-xs);border:2px solid var(--border2);background:transparent;color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;white-space:nowrap;}
+.cp-done-btn.done{border-color:var(--green);color:var(--green);background:rgba(39,201,122,.08);}
+.cp-nav-row{display:flex;gap:10px;margin-bottom:24px;}
+.cp-nav-btn{padding:9px 18px;border-radius:var(--radius-xs);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.cp-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cp-nav-next{background:var(--accent);color:#fff;border-color:var(--accent);}
+.cp-nav-next:hover{opacity:.88;color:#fff;}
+.cp-notes-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;}
+.cp-notes-label{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;}
+.cp-notes-input{width:100%;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:13.5px;min-height:100px;resize:vertical;outline:none;line-height:1.6;}
+
+/* Lesson builder row in add-product form */
+.ap-lesson-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;}
+.ap-lesson-row-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.ap-lesson-row-num{font-size:11px;font-weight:700;color:var(--accent);background:rgba(124,92,252,.15);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ap-lesson-row-title{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:500;outline:none;}
+.ap-lesson-row-rm{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 2px;}
+.ap-lesson-row-rm:hover{color:var(--red);}
+.ap-lesson-url-wrap{display:flex;align-items:center;gap:8px;}
+.ap-lesson-url-icon{font-size:14px;color:var(--text3);}
+.ap-lesson-url-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 12px;color:var(--text);font-family:var(--font-body);font-size:12.5px;}
+.ap-lesson-url-input:focus{outline:none;border-color:var(--accent);}
+.ap-lesson-url-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.badge-yt{background:rgba(255,0,0,.12);color:#ff6b6b;}
+.badge-vimeo{background:rgba(26,183,234,.12);color:#1ab7ea;}
+.badge-drive{background:rgba(39,201,122,.12);color:var(--green);}
+.badge-firebase{background:rgba(124,92,252,.12);color:var(--accent);}
+.badge-other{background:rgba(160,160,176,.12);color:var(--text3);}
+
+@media(max-width:700px){
+  .cp-shell{flex-direction:column;}
+  .cp-sidebar{width:100%;height:auto;max-height:40vh;}
+  .cp-video-wrap{aspect-ratio:16/9;}
+  .cp-below{padding:16px;}
+}
+</style>
+
+<script>
+// ── LESSON BUILDER (Add Product form) ──────────────────────────────
+var _apLessonSeq = 0;
+
+window.apAddLesson = function() {
+  _apLessonSeq++;
+  var seq = _apLessonSeq;
+  var list = document.getElementById('ap-lessons-list');
+  if (!list) return;
+
+  var row = document.createElement('div');
+  row.className = 'ap-lesson-row';
+  row.dataset.seq = seq;
+
+  row.innerHTML =
+    '<div class="ap-lesson-row-top">' +
+      '<div class="ap-lesson-row-num">' + seq + '</div>' +
+      '<input class="ap-lesson-row-title" placeholder="Lesson title e.g. Introduction" value="Lesson ' + seq + '">' +
+      '<button class="ap-lesson-row-rm" onclick="this.closest(\'.ap-lesson-row\').remove();apRenumberLessons()" type="button">×</button>' +
+    '</div>' +
+    '<div class="ap-lesson-url-wrap">' +
+      '<span class="ap-lesson-url-icon">🔗</span>' +
+      '<input class="ap-lesson-url-input" placeholder="Paste YouTube, Vimeo, Google Drive, or Firebase video link…" oninput="apDetectVideoSource(this)">' +
+      '<span class="ap-lesson-url-badge badge-other" style="display:none;"></span>' +
+    '</div>';
+
+  list.appendChild(row);
+};
+
+window.apRenumberLessons = function() {
+  document.querySelectorAll('#ap-lessons-list .ap-lesson-row').forEach(function(row, i) {
+    var num = row.querySelector('.ap-lesson-row-num');
+    if (num) num.textContent = i + 1;
+  });
+};
+
+window.apDetectVideoSource = function(input) {
+  var url = input.value.trim();
+  var badge = input.parentNode.querySelector('.ap-lesson-url-badge');
+  if (!badge) return;
+  if (!url) { badge.style.display = 'none'; return; }
+  badge.style.display = '';
+  if (/youtu\.be|youtube\.com/.test(url))       { badge.textContent = 'YouTube';       badge.className = 'ap-lesson-url-badge badge-yt'; }
+  else if (/vimeo\.com/.test(url))               { badge.textContent = 'Vimeo';         badge.className = 'ap-lesson-url-badge badge-vimeo'; }
+  else if (/drive\.google\.com/.test(url))       { badge.textContent = 'Google Drive';  badge.className = 'ap-lesson-url-badge badge-drive'; }
+  else if (/firebasestorage\.googleapis/.test(url)){ badge.textContent = 'Firebase'; badge.className = 'ap-lesson-url-badge badge-firebase'; }
+  else                                            { badge.textContent = 'Video';         badge.className = 'ap-lesson-url-badge badge-other'; }
+};
+
+// Collect lessons from add-product form
+window.apGetLessons = function() {
+  var lessons = [];
+  document.querySelectorAll('#ap-lessons-list .ap-lesson-row').forEach(function(row, i) {
+    var title = (row.querySelector('.ap-lesson-row-title')?.value || 'Lesson ' + (i+1)).trim();
+    var url   = (row.querySelector('.ap-lesson-url-input')?.value || '').trim();
+    lessons.push({ title: title, url: url, order: i });
+  });
+  return lessons;
+};
+
+// ── VIDEO URL CONVERTER ────────────────────────────────────────────
+// Converts any shareable link into an embeddable URL
+function cpToEmbedUrl(url) {
+  if (!url) return '';
+  // YouTube
+  var ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  if (ytMatch) return 'https://www.youtube.com/embed/' + ytMatch[1] + '?rel=0&modestbranding=1&showinfo=0';
+  // Vimeo
+  var vmMatch = url.match(/vimeo\.com\/(?:video\/)?([0-9]+)/);
+  if (vmMatch) return 'https://player.vimeo.com/video/' + vmMatch[1] + '?title=0&byline=0&portrait=0';
+  // Google Drive
+  var gdMatch = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+  if (gdMatch) return 'https://drive.google.com/file/d/' + gdMatch[1] + '/preview';
+  // Firebase Storage direct link — use as-is in iframe
+  if (/firebasestorage\.googleapis/.test(url)) return url;
+  // Fallback: treat as direct video src
+  return url;
+}
+
+// ── COURSE PLAYER STATE ───────────────────────────────────────────
+var _cpLessons = [];
+var _cpCurrentIdx = 0;
+var _cpDone = {};
+var _cpProductId = null;
+
+window.openCoursePlayer = function(productId, courseName, lessons) {
+  _cpProductId = productId;
+  _cpLessons = lessons || [];
+  _cpCurrentIdx = 0;
+  _cpDone = JSON.parse(localStorage.getItem('cp_done_' + productId) || '{}');
+
+  var titleEl = document.getElementById('cp-course-title');
+  if (titleEl) titleEl.textContent = courseName || 'Course';
+
+  cpRenderLessonList();
+  if (_cpLessons.length > 0) cpPlayLesson(0);
+  showPage('course-player');
+
+  // Show congrats modal if first time opening
+  var seenKey = 'cp_seen_' + productId;
+  if (!localStorage.getItem(seenKey)) {
+    localStorage.setItem(seenKey, '1');
+    var modal = document.getElementById('cp-congrats-modal');
+    var nameEl = document.getElementById('cp-congrats-course-name');
+    if (nameEl) nameEl.textContent = courseName || 'Course';
+    if (modal) modal.style.display = 'flex';
+  }
+};
+
+window.cpDismissCongrats = function() {
+  var modal = document.getElementById('cp-congrats-modal');
+  if (modal) modal.style.display = 'none';
+};
+window.cpCloseCongrats = cpDismissCongrats;
+
+function cpRenderLessonList() {
+  var list = document.getElementById('cp-lesson-list');
+  if (!list) return;
+  list.innerHTML = '';
+  _cpLessons.forEach(function(lesson, i) {
+    var item = document.createElement('div');
+    item.className = 'cp-lesson-item' + (_cpDone[i] ? ' done' : '') + (i === _cpCurrentIdx ? ' active' : '');
+    item.innerHTML =
+      '<div class="cp-lesson-check">' + (_cpDone[i] ? '✓' : '') + '</div>' +
+      '<div class="cp-lesson-num">' + (i+1) + '</div>' +
+      '<div class="cp-lesson-item-name">' + (lesson.title || 'Lesson ' + (i+1)) + '</div>';
+    item.onclick = (function(idx){ return function(){ cpPlayLesson(idx); }; })(i);
+    list.appendChild(item);
+  });
+}
+
+function cpPlayLesson(idx) {
+  if (idx < 0 || idx >= _cpLessons.length) return;
+  _cpCurrentIdx = idx;
+  var lesson = _cpLessons[idx];
+  var embedUrl = cpToEmbedUrl(lesson.url || '');
+
+  // Update iframe
+  var iframe = document.getElementById('cp-iframe');
+  var placeholder = document.getElementById('cp-video-placeholder');
+  if (iframe) iframe.src = embedUrl || '';
+  if (placeholder) placeholder.classList.toggle('hidden', !!embedUrl);
+
+  // Update lesson name
+  var nameEl = document.getElementById('cp-lesson-name');
+  if (nameEl) nameEl.textContent = lesson.title || 'Lesson ' + (idx+1);
+
+  // Update done button
+  var doneBtn = document.getElementById('cp-done-btn');
+  if (doneBtn) { doneBtn.classList.toggle('done', !!_cpDone[idx]); doneBtn.textContent = _cpDone[idx] ? '✓ Completed' : 'Mark as complete ✓'; }
+
+  // Nav buttons
+  var prev = document.getElementById('cp-prev-btn');
+  var next = document.getElementById('cp-next-btn');
+  if (prev) prev.style.opacity = idx === 0 ? '.3' : '';
+  if (next) next.textContent = idx === _cpLessons.length - 1 ? 'Finish course 🎓' : 'Next lesson →';
+
+  // Load saved note
+  var notes = document.getElementById('cp-notes-input');
+  if (notes) notes.value = localStorage.getItem('cp_note_' + _cpProductId + '_' + idx) || '';
+
+  // Re-render list to update active state
+  cpRenderLessonList();
+  cpUpdateProgress();
+}
+
+window.cpMarkDone = function() {
+  _cpDone[_cpCurrentIdx] = !_cpDone[_cpCurrentIdx];
+  localStorage.setItem('cp_done_' + _cpProductId, JSON.stringify(_cpDone));
+  var doneBtn = document.getElementById('cp-done-btn');
+  if (doneBtn) { doneBtn.classList.toggle('done', !!_cpDone[_cpCurrentIdx]); doneBtn.textContent = _cpDone[_cpCurrentIdx] ? '✓ Completed' : 'Mark as complete ✓'; }
+  cpRenderLessonList();
+  cpUpdateProgress();
+};
+
+window.cpPrev = function() { if (_cpCurrentIdx > 0) cpPlayLesson(_cpCurrentIdx - 1); };
+window.cpNext = function() {
+  if (_cpCurrentIdx < _cpLessons.length - 1) { cpPlayLesson(_cpCurrentIdx + 1); }
+  else { showToast('🎓 You've finished the course! Great work.'); }
+};
+
+window.cpSaveNote = function() {
+  var notes = document.getElementById('cp-notes-input');
+  if (notes) localStorage.setItem('cp_note_' + _cpProductId + '_' + _cpCurrentIdx, notes.value);
+};
+
+function cpUpdateProgress() {
+  var done = Object.values(_cpDone).filter(Boolean).length;
+  var total = _cpLessons.length;
+  var pct = total ? Math.round((done / total) * 100) : 0;
+  var fill = document.getElementById('cp-progress-fill');
+  var label = document.getElementById('cp-progress-label');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = pct + '% complete';
+}
+
+// ── WIRE submitProduct TO SAVE LESSONS TO FIREBASE ─────────────────
+// Patch submitProduct to also save lessons
+var _origSubmitProduct = window.submitProduct;
+window.submitProduct = async function() {
+  // Collect lessons first
+  var lessons = window.apGetLessons ? window.apGetLessons() : [];
+  // Temporarily patch addDoc to inject lessons into productData
+  window._pendingLessons = lessons;
+  await _origSubmitProduct();
+};
+
+// Override addDoc call to include lessons — we patch in submitProduct directly
+// (Already handled: submitProduct reads _pendingLessons via closure below)
+
+// ── OPEN COURSE PLAYER FROM PURCHASE / ORDER PAGE ──────────────────
+window.watchCourse = async function(productId) {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'products', productId));
+    if (!snap.exists()) { showToast('❌ Course not found.'); return; }
+    var data = snap.data();
+    var lessons = data.lessons || [];
+    openCoursePlayer(productId, data.name || 'Course', lessons);
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not load course.');
+  }
+};
+</script>
 
 </body>
 </html>
