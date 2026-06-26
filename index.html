@@ -622,6 +622,145 @@ p{color:var(--text2);margin:0 0 1em;}
 
 /* ── PROFILE V2 LANG BANNER ── */
 .lang-banner{background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:10px 16px;font-size:13px;color:var(--text2);margin-bottom:16px;}
+
+/* ── ADD PRODUCT PAGE ── */
+.ap-topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:58px;}
+.ap-topbar-back{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);}
+.ap-topbar-back:hover{color:var(--text);}
+.ap-progress-bar{height:3px;background:var(--border);position:relative;}
+.ap-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:0 2px 2px 0;transition:width .4s ease;}
+.ap-main{max-width:820px;margin:0 auto;padding:36px 24px 100px;}
+.ap-steps{display:flex;align-items:center;gap:0;margin-bottom:36px;}
+.ap-step{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--text3);}
+.ap-step.active{color:var(--text);}
+.ap-step.done{color:var(--green);}
+.ap-step-num{width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:transparent;}
+.ap-step.done .ap-step-num{background:var(--green);border-color:var(--green);color:#0d0d0f;}
+.ap-step.active .ap-step-num{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ap-step-line{flex:1;height:2px;background:var(--border);margin:0 10px;}
+.ap-step-line.done{background:var(--green);}
+.ap-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;}
+.ap-card-hd{font-size:15px;font-weight:700;margin-bottom:4px;}
+.ap-card-sub{font-size:12.5px;color:var(--text3);margin-bottom:20px;}
+.ap-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;}
+.ap-type-opt{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-sm);padding:18px 12px 14px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.ap-type-opt:hover{border-color:var(--border2);}
+.ap-type-opt.selected{border-color:var(--accent);background:rgba(124,92,252,.08);}
+.ap-type-opt .to-icon{font-size:28px;margin-bottom:8px;}
+.ap-type-opt .to-name{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ap-type-opt .to-sub{font-size:11px;color:var(--text3);line-height:1.4;}
+.ap-type-opt .to-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:10px;color:#fff;}
+.ap-type-opt.selected .to-check{display:flex;}
+.ap-digital-badge{display:inline-block;background:rgba(91,163,245,.12);color:#5ba8f5;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
+.ap-physical-badge{display:inline-block;background:rgba(39,201,122,.1);color:var(--green);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
+.ap-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.ap-field:last-child{margin-bottom:0;}
+.ap-field label{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.03em;}
+.ap-field label em{color:var(--accent);font-style:normal;margin-left:2px;}
+.ap-field input,.ap-field textarea,.ap-field select{background:var(--bg3);border:1px solid var(--border);padding:11px 14px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;transition:border-color .15s;width:100%;}
+.ap-field input:focus,.ap-field textarea:focus,.ap-field select:focus{outline:none;border-color:var(--accent);}
+.ap-field input::placeholder,.ap-field textarea::placeholder{color:var(--text3);}
+.ap-field textarea{resize:vertical;min-height:90px;}
+.ap-field select option{background:var(--bg2);}
+.ap-field-hint{font-size:11.5px;color:var(--text3);}
+.ap-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.ap-field-row{grid-template-columns:1fr;}}
+.ap-field-count{font-size:11px;color:var(--text3);text-align:right;}
+.ap-field-count.warn{color:var(--gold);}
+.ap-field-count.over{color:var(--red);}
+.ap-price-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;}
+@media(max-width:560px){.ap-price-row{grid-template-columns:1fr 1fr;}}
+.ap-pricing-toggle{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer;}
+.ap-toggle-switch{width:40px;height:22px;border-radius:999px;background:var(--border2);position:relative;flex-shrink:0;transition:background .2s;}
+.ap-toggle-switch.on{background:var(--accent);}
+.ap-toggle-switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.ap-toggle-switch.on::after{left:21px;}
+.ap-currency-select{background:var(--bg3);border:1px solid var(--border);padding:11px 10px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+.ap-free-toggle-btn{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-free-toggle-btn.active{border-color:var(--green);color:var(--green);background:rgba(39,201,122,.08);}
+.ap-upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px;}
+.ap-upload-zone:hover{border-color:var(--accent);background:rgba(124,92,252,.04);}
+.ap-upload-zone.has-file{border-color:var(--green);background:rgba(39,201,122,.04);}
+.ap-dynamic{display:none;}
+.ap-dynamic.visible{display:block;}
+.ap-module-item{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;margin-bottom:8px;}
+.ap-mod-drag{color:var(--text3);cursor:grab;font-size:14px;}
+.ap-mod-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:0 3px;}
+.ap-mod-remove:hover{color:var(--red);}
+.ap-add-module-btn{width:100%;background:transparent;border:2px dashed var(--border2);border-radius:var(--radius-xs);padding:11px;font-size:13px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-add-module-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ap-variant-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.ap-variant-row input{flex:1;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+.ap-variant-row input:focus{outline:none;border-color:var(--accent);}
+.ap-variant-rm{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;}
+.ap-variant-rm:hover{color:var(--red);}
+.ap-add-variant-btn{background:transparent;border:1px dashed var(--border2);border-radius:var(--radius-xs);padding:8px 14px;font-size:12.5px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-add-variant-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ap-aff-range{display:flex;align-items:center;gap:14px;}
+.ap-aff-range input[type=range]{flex:1;accent-color:var(--accent);}
+.ap-aff-val{font-size:17px;font-weight:700;color:var(--accent);min-width:48px;text-align:right;}
+.ap-aff-preview{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 16px;margin-top:14px;display:flex;gap:24px;flex-wrap:wrap;}
+.ap-aep-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.ap-aep-val{font-size:16px;font-weight:700;}
+.ap-vis-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
+.ap-vis-opt{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);padding:12px 10px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:.15s;}
+.ap-vis-opt:hover{border-color:var(--border2);color:var(--text);}
+.ap-vis-opt.selected{border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.07);}
+.ap-callout{border-radius:var(--radius-xs);padding:12px 14px;font-size:13px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+.ap-callout-info{background:rgba(91,163,245,.07);border:1px solid rgba(91,163,245,.2);color:#5ba8f5;}
+.ap-callout-gold{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);color:var(--gold);}
+.ap-callout-green{background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);color:var(--green);}
+.ap-uploaded-file{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;margin-top:8px;}
+.ap-uf-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 2px;}
+.ap-uf-remove:hover{color:var(--red);}
+
+/* ── SELLER DASHBOARD LAYOUT ── */
+.sd-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+@media(max-width:700px){.sd-layout{grid-template-columns:1fr;}}
+.sd-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
+@media(max-width:700px){.sd-sidebar{display:none;}}
+.sd-sidebar-section{padding:0 16px;margin-bottom:24px;}
+.sd-sidebar-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:8px;}
+.sd-nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-xs);font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;border:none;background:none;font-family:var(--font-body);width:100%;text-align:left;}
+.sd-nav-item:hover{background:var(--surface);color:var(--text);}
+.sd-nav-item.active{background:rgba(124,92,252,.12);color:var(--accent);font-weight:600;}
+.sd-nav-item .sd-nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.sd-nav-item .sd-nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sd-nav-item .sd-nav-badge.gold{background:var(--gold);color:#000;}
+.sd-nav-divider{height:1px;background:var(--border);margin:8px 16px;}
+.sd-content{padding:32px 28px;max-width:860px;}
+@media(max-width:700px){.sd-content{padding:20px 16px;}}
+.sd-section{display:none;}
+.sd-section.active{display:block;}
+.sd-page-hd{font-size:22px;font-weight:800;margin-bottom:4px;}
+.sd-page-sub{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.sd-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+@media(max-width:600px){.sd-stat-grid{grid-template-columns:repeat(2,1fr);}}
+.sd-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;}
+.sd-stat-val{font-size:24px;font-weight:800;font-family:var(--font-display);}
+.sd-stat-lbl{font-size:12px;color:var(--text3);margin-top:3px;}
+.sd-product-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.sd-product-row:last-child{border-bottom:none;}
+.sd-product-thumb{width:48px;height:48px;background:var(--bg3);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.sd-product-info{flex:1;min-width:0;}
+.sd-product-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sd-product-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.sd-product-price{font-size:14px;font-weight:700;color:var(--accent);min-width:80px;text-align:right;}
+.sd-product-actions{display:flex;gap:6px;flex-shrink:0;}
+.sd-btn-edit{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:6px 12px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sd-btn-edit:hover{border-color:var(--accent);color:var(--accent);}
+.sd-btn-del{background:transparent;border:1px solid transparent;border-radius:var(--radius-xs);padding:6px 10px;font-size:12px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sd-btn-del:hover{border-color:var(--red);color:var(--red);}
+.sd-payout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:16px;}
+.sd-payout-balance{font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--green);margin-bottom:4px;}
+.sd-payout-pending{font-size:13px;color:var(--text3);}
+.sd-bank-row{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:10px;}
+.sd-bank-icon{font-size:24px;width:40px;height:40px;background:var(--surface);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sd-mobile-nav{display:none;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;white-space:nowrap;}
+@media(max-width:700px){.sd-mobile-nav{display:flex;gap:4px;padding:8px 16px;}}
+.sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
+.sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
+
 </style>
 </head>
 <body>
@@ -947,171 +1086,429 @@ p{color:var(--text2);margin:0 0 1em;}
      PAGE: ADD PRODUCT
      ================================================================ -->
 <div class="page" id="page-addproduct">
-  <header class="hdr">
-    <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('seller-dashboard')">← Dashboard</a>
-        <div class="avatar-btn" id="nav-avatar-add" onclick="showPage('profile')">?</div>
-      </nav>
-    </div>
-  </header>
-  <div class="orders-wrap" style="max-width:720px;">
-    <button class="btn btn-ghost btn-sm" onclick="showPage('seller-dashboard')" style="margin-bottom:20px;">← Back to dashboard</button>
-    <h1 style="font-size:24px;font-weight:700;margin-bottom:6px;">List a new product</h1>
-    <p style="margin-bottom:24px;">Sell physical goods, digital downloads, ebooks, templates, beats, courses, or software.</p>
 
-    <!-- TYPE PICKER -->
-    <div class="dash-card" style="margin-bottom:18px;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">What are you selling?</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;" id="product-type-picker">
-        <div class="prod-type-opt active" onclick="pickType(this,'physical')" style="background:rgba(124,92,252,.12);border:2px solid var(--accent);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">📦</div><div style="font-size:12.5px;font-weight:600;">Physical item</div>
+  <!-- TOP NAV -->
+  <div class="ap-topbar">
+    <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span style="color:var(--accent);">LA</span></div>
+    <div style="width:1px;height:20px;background:var(--border);margin:0 8px;"></div>
+    <button class="ap-topbar-back" onclick="showPage('seller-dashboard')">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 2L4 7l5 5"/></svg>
+      Back to dashboard
+    </button>
+    <div style="margin-left:auto;font-size:14px;font-weight:600;color:var(--text3);">New listing</div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="ap-progress-bar"><div class="ap-progress-fill" id="ap-progress-fill" style="width:33%"></div></div>
+
+  <div class="ap-main">
+
+    <!-- STEP INDICATOR -->
+    <div class="ap-steps">
+      <div class="ap-step active" id="ap-step-ind-1"><div class="ap-step-num">1</div><span>Product type</span></div>
+      <div class="ap-step-line" id="ap-step-line-1"></div>
+      <div class="ap-step" id="ap-step-ind-2"><div class="ap-step-num">2</div><span>Details & pricing</span></div>
+      <div class="ap-step-line" id="ap-step-line-2"></div>
+      <div class="ap-step" id="ap-step-ind-3"><div class="ap-step-num">3</div><span>Publish</span></div>
+    </div>
+
+    <!-- STEP 1: TYPE PICKER -->
+    <div id="ap-step-1">
+      <div class="ap-card">
+        <div class="ap-card-hd">What are you selling?</div>
+        <div class="ap-card-sub">Each type unlocks the right fields. You can change this later.</div>
+        <div class="ap-type-grid">
+          <div class="ap-type-opt" data-type="course" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎓</div>
+            <div class="to-name">Online course</div><div class="to-sub">Video lessons, quizzes, certificates</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="ebook" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">📚</div>
+            <div class="to-name">Ebook / PDF</div><div class="to-sub">Downloadable guide, manual, or report</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="template" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎨</div>
+            <div class="to-name">Template</div><div class="to-sub">Notion, Figma, Canva, spreadsheet…</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="software" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">💻</div>
+            <div class="to-name">Software / App</div><div class="to-sub">License key, SaaS, plugin, script</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="audio" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎵</div>
+            <div class="to-name">Music / Audio</div><div class="to-sub">Beat, sound pack, podcast, royalty-free</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="coaching" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🧑‍💼</div>
+            <div class="to-name">Coaching / Service</div><div class="to-sub">1-on-1 sessions, consulting, mentorship</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="vehicle" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🚗</div>
+            <div class="to-name">Vehicle</div><div class="to-sub">Car, bike, truck — new or used</div>
+            <span class="ap-physical-badge">Physical</span>
+          </div>
+          <div class="ap-type-opt" data-type="physical" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">📦</div>
+            <div class="to-name">Physical item</div><div class="to-sub">Fashion, home goods, electronics…</div>
+            <span class="ap-physical-badge">Physical</span>
+          </div>
         </div>
-        <div class="prod-type-opt" onclick="pickType(this,'ebook')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">📚</div><div style="font-size:12.5px;font-weight:600;">Ebook / PDF</div>
-        </div>
-        <div class="prod-type-opt" onclick="pickType(this,'course')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">🎓</div><div style="font-size:12.5px;font-weight:600;">Online course</div>
-        </div>
-        <div class="prod-type-opt" onclick="pickType(this,'template')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">🎨</div><div style="font-size:12.5px;font-weight:600;">Template</div>
-        </div>
-        <div class="prod-type-opt" onclick="pickType(this,'audio')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">🎵</div><div style="font-size:12.5px;font-weight:600;">Music / Audio</div>
-        </div>
-        <div class="prod-type-opt" onclick="pickType(this,'software')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
-          <div style="font-size:24px;margin-bottom:6px;">💻</div><div style="font-size:12.5px;font-weight:600;">Software</div>
-        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-primary" onclick="apGoStep2()" id="ap-step1-next" disabled style="opacity:.4">Continue →</button>
       </div>
     </div>
 
-    <!-- DETAILS FORM -->
-    <div class="dash-card" style="margin-bottom:18px;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product details</h3>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product name *</label><input style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="e.g. Handwoven Raffia Tote Bag"></div>
-        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Category *</label>
-          <select style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
-            <option>Fashion & Bags</option><option>Shoes</option><option>Beauty & Health</option><option>Electronics</option><option>Home & Living</option><option>Ebooks & Education</option><option>Music & Audio</option><option>Templates & Design</option><option>Software & Tools</option><option>Food & Drinks</option>
-          </select>
+    <!-- STEP 2: DETAILS -->
+    <div id="ap-step-2" style="display:none;">
+
+      <!-- CORE INFO -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Product details</div>
+        <div class="ap-card-sub" id="ap-details-sub">Fill in the information buyers will see on your listing.</div>
+        <div class="ap-field">
+          <label>Product name <em>*</em></label>
+          <input type="text" id="ap-field-name" placeholder="e.g. The Complete Figma Masterclass" maxlength="120" oninput="apSyncPreview();apCountChars(this,'ap-name-count',120)">
+          <div style="display:flex;justify-content:space-between;"><span class="ap-field-hint">Be specific — buyers search by name</span><span class="ap-field-count" id="ap-name-count">0 / 120</span></div>
         </div>
-        <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Description *</label><textarea style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;height:100px;resize:vertical;" placeholder="Describe your product — be specific about size, material, what's included…"></textarea></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Price (NGN) *</label><input type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="0.00"></div>
-          <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Original / Compare price</label><input type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="Strikethrough price"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- UPLOAD -->
-    <div class="dash-card" style="margin-bottom:18px;" id="upload-section">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;" id="upload-label">📸 Product images</h3>
-      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:32px;text-align:center;cursor:pointer;">
-        <div style="font-size:32px;margin-bottom:8px;">⬆️</div>
-        <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">Drag & drop or click to upload</div>
-        <div style="font-size:12px;color:var(--text3);">JPG, PNG, GIF up to 10MB each · Up to 8 images</div>
-      </div>
-      <div id="digital-upload-note" style="display:none;margin-top:12px;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:12px 14px;font-size:13px;">
-        📎 Also upload your digital file (PDF, ZIP, MP3, etc.) — buyers receive it instantly after purchase.
-      </div>
-    </div>
-
-    <!-- COURSE CURRICULUM (shown only when course type selected) -->
-    <div class="dash-card" id="course-section" style="display:none;margin-bottom:18px;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:4px;">🎓 Course curriculum</h3>
-      <p style="font-size:13px;margin-bottom:14px;">Add modules and lessons. Buyers see this before purchasing.</p>
-      <div id="course-modules-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%;" onclick="addCourseModule()">+ Add module</button>
-
-      <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
-        <h4 style="font-size:13px;font-weight:600;margin-bottom:10px;">Course details</h4>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Skill level</label>
-            <select id="course-level" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
-              <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option>
+        <div class="ap-field-row">
+          <div class="ap-field">
+            <label>Category <em>*</em></label>
+            <select id="ap-field-category">
+              <option value="">Select a category</option>
+              <optgroup label="Digital">
+                <option>Courses & Education</option><option>Ebooks & Guides</option><option>Templates & Design</option>
+                <option>Software & Tools</option><option>Music & Audio</option><option>Coaching & Consulting</option>
+              </optgroup>
+              <optgroup label="Physical">
+                <option>Fashion & Accessories</option><option>Electronics</option><option>Home & Living</option>
+                <option>Vehicles</option><option>Food & Drink</option><option>Health & Beauty</option>
+              </optgroup>
             </select>
           </div>
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Language</label>
-            <select id="course-lang" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
-              <option>English</option><option>Yoruba</option><option>Igbo</option><option>Hausa</option><option>Pidgin</option><option>French</option>
+          <div class="ap-field" id="ap-field-lang-wrap" style="display:none;">
+            <label>Language</label>
+            <select id="ap-field-language">
+              <option>English</option><option>Yoruba</option><option>Igbo</option><option>Hausa</option><option>French</option><option>Pidgin</option>
             </select>
           </div>
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">What students will learn (one per line)</label>
-            <textarea id="course-outcomes" rows="4" placeholder="e.g. How to start a business&#10;How to create a logo&#10;How to market on Instagram" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;resize:vertical;"></textarea>
+        </div>
+        <div class="ap-field">
+          <label>Description <em>*</em></label>
+          <textarea id="ap-field-desc" placeholder="What does this product do? Who is it for? What will they get?" maxlength="2000" oninput="apSyncPreview();apCountChars(this,'ap-desc-count',2000)"></textarea>
+          <div style="display:flex;justify-content:space-between;"><span class="ap-field-hint">Tip: mention the outcome — not just the features</span><span class="ap-field-count" id="ap-desc-count">0 / 2000</span></div>
+        </div>
+        <div class="ap-field">
+          <label>What's included <em style="font-size:11px;background:rgba(124,92,252,.15);color:#a990ff;padding:1px 7px;border-radius:5px;">Bullet checklist</em></label>
+          <div id="ap-features-list" style="margin-bottom:8px;">
+            <div class="ap-variant-row"><input placeholder="e.g. 40+ video lessons" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
+            <div class="ap-variant-row"><input placeholder="e.g. Lifetime access" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
           </div>
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Requirements / prerequisites</label>
-            <textarea id="course-requirements" rows="3" placeholder="e.g. A smartphone&#10;Basic internet connection" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;resize:vertical;"></textarea>
+          <button class="ap-add-variant-btn" onclick="apAddFeature()">+ Add feature</button>
+        </div>
+      </div>
+
+      <!-- COURSE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-course">
+        <div class="ap-card-hd">Course structure</div>
+        <div class="ap-card-sub">Organise your content into modules. Buyers see this before they purchase.</div>
+        <div class="ap-field-row" style="margin-bottom:16px;">
+          <div class="ap-field"><label>Total lessons</label><input type="number" placeholder="e.g. 42" min="1"></div>
+          <div class="ap-field"><label>Total hours of content</label><input type="number" step="0.5" placeholder="e.g. 8.5"></div>
+        </div>
+        <div id="ap-modules-list" style="margin-bottom:12px;">
+          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Introduction & welcome</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">3 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
+          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Core concepts</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">8 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
+        </div>
+        <button class="ap-add-module-btn" onclick="apAddModule()">+ Add module</button>
+        <div class="ap-field-row" style="margin-top:16px;">
+          <div class="ap-field"><label>Skill level</label><select><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option></select></div>
+          <div class="ap-field"><label>Delivery method</label><select><option>Pre-recorded video</option><option>Live sessions</option><option>Live + recordings</option><option>Text-based / PDF</option></select></div>
+        </div>
+        <div class="ap-callout ap-callout-info" style="margin-top:8px;">
+          <span style="font-size:16px;">ℹ️</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Preview lesson</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">You can mark one module as a free preview so buyers can try before they buy.</p></div>
+        </div>
+      </div>
+
+      <!-- EBOOK -->
+      <div class="ap-card ap-dynamic" id="ap-sec-ebook">
+        <div class="ap-card-hd">Ebook details</div>
+        <div class="ap-card-sub">Buyers see these specs on the listing page.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Number of pages</label><input type="number" placeholder="e.g. 95" min="1"></div>
+          <div class="ap-field"><label>File format</label><select><option>PDF</option><option>ePub</option><option>MOBI</option><option>PDF + ePub</option></select></div>
+        </div>
+        <div class="ap-field">
+          <label>Table of contents</label>
+          <textarea placeholder="Chapter 1: Getting Started&#10;Chapter 2: Core Framework&#10;Chapter 3: Advanced Techniques" style="min-height:80px;font-size:13px;"></textarea>
+        </div>
+      </div>
+
+      <!-- TEMPLATE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-template">
+        <div class="ap-card-hd">Template details</div>
+        <div class="ap-card-sub">Help buyers understand exactly what they'll receive.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Compatible tools</label><select><option>Notion</option><option>Figma</option><option>Canva</option><option>Google Sheets</option><option>Microsoft Excel</option><option>Framer</option><option>Webflow</option><option>Other</option></select></div>
+          <div class="ap-field"><label>Number of templates in pack</label><input type="number" placeholder="e.g. 12" min="1"></div>
+        </div>
+        <div class="ap-field"><label>What's in the download?</label><input placeholder="e.g. 1 Notion file + 2 bonus PDF guides + video walkthrough"></div>
+      </div>
+
+      <!-- SOFTWARE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-software">
+        <div class="ap-card-hd">Software details</div>
+        <div class="ap-card-sub">Buyers need to know what they're running before they buy.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Licence type</label><select><option>Single-user licence</option><option>Multi-user (team)</option><option>SaaS subscription</option><option>One-time lifetime deal</option><option>Plugin / extension</option></select></div>
+          <div class="ap-field"><label>Compatible platform</label><select><option>Web / SaaS</option><option>Windows</option><option>macOS</option><option>Windows + macOS</option><option>Chrome extension</option><option>Mobile (iOS / Android)</option></select></div>
+        </div>
+        <div class="ap-field"><label>Version number</label><input placeholder="e.g. v2.4.1"></div>
+        <div class="ap-callout ap-callout-green">
+          <span style="font-size:16px;">🔑</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Licence keys delivered automatically</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">After purchase, buyers receive their key instantly via email and their order page.</p></div>
+        </div>
+      </div>
+
+      <!-- AUDIO -->
+      <div class="ap-card ap-dynamic" id="ap-sec-audio">
+        <div class="ap-card-hd">Audio details</div>
+        <div class="ap-card-sub">Let buyers know exactly what they're getting.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Audio type</label><select><option>Beat / Instrumental</option><option>Sound pack / Samples</option><option>Full track (royalty-free)</option><option>Podcast episode</option><option>Voice-over clip</option></select></div>
+          <div class="ap-field"><label>Licence</label><select><option>Non-exclusive use</option><option>Exclusive (single buyer)</option><option>Royalty-free unlimited</option><option>Personal use only</option></select></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>BPM (if applicable)</label><input type="number" placeholder="e.g. 140" min="1"></div>
+          <div class="ap-field"><label>Key (if applicable)</label><input placeholder="e.g. C minor"></div>
+        </div>
+      </div>
+
+      <!-- COACHING -->
+      <div class="ap-card ap-dynamic" id="ap-sec-coaching">
+        <div class="ap-card-hd">Session details</div>
+        <div class="ap-card-sub">Tell buyers how the engagement works.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Session type</label><select><option>1-on-1 call</option><option>Group workshop</option><option>Email / async</option><option>Ongoing retainer</option><option>Audit / review</option></select></div>
+          <div class="ap-field"><label>Session duration</label><select><option>30 minutes</option><option>45 minutes</option><option>60 minutes</option><option>90 minutes</option><option>2 hours</option><option>Custom</option></select></div>
+        </div>
+        <div class="ap-field"><label>Platform</label><select><option>Zoom</option><option>Google Meet</option><option>WhatsApp call</option><option>In person</option><option>Buyer's choice</option></select></div>
+        <div class="ap-callout ap-callout-gold">
+          <span style="font-size:16px;">📅</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Booking calendar</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">After publishing, connect your Calendly or Google Calendar so buyers book directly.</p></div>
+        </div>
+      </div>
+
+      <!-- VEHICLE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-vehicle">
+        <div class="ap-card-hd">Vehicle details</div>
+        <div class="ap-card-sub">Accurate specs build buyer confidence and reduce back-and-forth.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Make</label><input placeholder="e.g. Toyota"></div>
+          <div class="ap-field"><label>Model</label><input placeholder="e.g. Camry XLE"></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Year</label><input type="number" placeholder="e.g. 2021" min="1900" max="2030"></div>
+          <div class="ap-field"><label>Mileage (km)</label><input type="number" placeholder="e.g. 42000"></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Transmission</label><select><option>Automatic</option><option>Manual</option></select></div>
+          <div class="ap-field"><label>Fuel type</label><select><option>Petrol</option><option>Diesel</option><option>Electric</option><option>Hybrid</option><option>CNG</option></select></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Colour</label><input placeholder="e.g. Midnight Black"></div>
+          <div class="ap-field"><label>Condition</label><select><option>Foreign used (Tokunbo)</option><option>Nigerian used</option><option>Brand new</option><option>For parts</option></select></div>
+        </div>
+        <div class="ap-field"><label>Location of vehicle</label><input placeholder="e.g. Lagos Island, Lagos"></div>
+      </div>
+
+      <!-- PHYSICAL -->
+      <div class="ap-card ap-dynamic" id="ap-sec-physical">
+        <div class="ap-card-hd">Physical product details</div>
+        <div class="ap-card-sub">Size, material, condition — anything a buyer can't see through a photo.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Condition</label><select><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
+          <div class="ap-field"><label>Available stock</label><input type="number" placeholder="e.g. 10" min="1"></div>
+        </div>
+        <div class="ap-field">
+          <label>Sizes / Variants</label>
+          <div id="ap-variants-list" style="margin-bottom:8px;">
+            <div class="ap-variant-row"><input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
           </div>
-          <div>
-            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Certificate on completion?</label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-              <input type="checkbox" id="course-cert" style="accent-color:var(--accent);width:16px;height:16px;">
-              <span style="font-size:13.5px;">Yes — issue a ZÚLA completion certificate</span>
-            </label>
+          <button class="ap-add-variant-btn" onclick="apAddVariant()">+ Add size or variant</button>
+        </div>
+      </div>
+
+      <!-- MEDIA UPLOAD -->
+      <div class="ap-card">
+        <div class="ap-card-hd" id="ap-upload-card-title">📸 Cover image & media</div>
+        <div class="ap-card-sub" id="ap-upload-card-sub">Upload images or a short preview. First image is your cover photo.</div>
+        <div class="ap-upload-zone" id="ap-cover-upload" onclick="apFakeUpload('ap-cover-upload','ap-cover-file-list','🖼 cover-image.jpg','1.2 MB')">
+          <div style="font-size:30px;margin-bottom:8px;">🖼</div>
+          <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;">Drag & drop or click to upload</div>
+          <div style="font-size:11.5px;color:var(--text3);" id="ap-cover-upload-hint">JPG, PNG, GIF · Up to 8 images · 10 MB each</div>
+        </div>
+        <div id="ap-cover-file-list"></div>
+        <div id="ap-digital-file-section" style="display:none;margin-top:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📎 Your delivery file</div>
+          <div class="ap-callout ap-callout-green" style="margin-bottom:10px;">
+            <span style="font-size:16px;">⚡</span>
+            <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Instant delivery</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">This file is sent to the buyer the moment payment clears — automatically.</p></div>
           </div>
+          <div class="ap-upload-zone" id="ap-digital-upload" onclick="apFakeUpload('ap-digital-upload','ap-digital-file-list','📦 product-files.zip','48.6 MB')">
+            <div style="font-size:30px;margin-bottom:8px;">⬆️</div>
+            <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;" id="ap-digital-upload-title">Upload your product file</div>
+            <div style="font-size:11.5px;color:var(--text3);" id="ap-digital-upload-sub">PDF, ZIP, MP3, MP4, EPUB — up to 2 GB</div>
+          </div>
+          <div id="ap-digital-file-list"></div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Pricing</div>
+        <div class="ap-card-sub">You can run promotions any time after listing.</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="font-size:13px;font-weight:600;">Pricing model:</span>
+          <button class="ap-free-toggle-btn active" id="ap-btn-paid" onclick="apSetPriceMode('paid')" style="border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.08);">Paid</button>
+          <button class="ap-free-toggle-btn" id="ap-btn-free" onclick="apSetPriceMode('free')">Free</button>
+          <button class="ap-free-toggle-btn" id="ap-btn-pwyw" onclick="apSetPriceMode('pwyw')">Pay what you want</button>
+        </div>
+        <div id="ap-price-fields">
+          <div class="ap-price-row">
+            <div class="ap-field" style="margin-bottom:0;"><label>Price <em>*</em></label><input type="number" id="ap-field-price" placeholder="0.00" min="0" step="0.01" oninput="apSyncPreview();apUpdateAffPreview()"></div>
+            <div class="ap-field" style="margin-bottom:0;"><label>Compare-at price</label><input type="number" id="ap-field-original" placeholder="0.00" min="0" step="0.01" oninput="apSyncPreview()"></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:6px;">Currency</label>
+              <select class="ap-currency-select" id="ap-field-currency">
+                <option value="NGN">NGN ₦</option><option value="USD">USD $</option><option value="GHS">GHS ¢</option><option value="KES">KES KSh</option><option value="ZAR">ZAR R</option>
+              </select>
+            </div>
+          </div>
+          <div class="ap-field" id="ap-pwyw-min-wrap" style="display:none;margin-top:12px;">
+            <label>Minimum price</label><input type="number" placeholder="e.g. 500" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- AFFILIATE -->
+      <div class="ap-card">
+        <div class="ap-card-hd">💰 Affiliate programme</div>
+        <div class="ap-card-sub">Affiliates promote your product and earn a cut. More commission = more promotion.</div>
+        <div class="ap-pricing-toggle" onclick="apToggleAff()">
+          <div>
+            <div style="font-size:13px;font-weight:600;">Enable affiliate marketing for this product</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:1px;">Affiliates can share a tracked link and earn on every sale</div>
+          </div>
+          <div class="ap-toggle-switch on" id="ap-aff-toggle"></div>
+        </div>
+        <div id="ap-aff-settings">
+          <div class="ap-aff-range">
+            <span style="font-size:12.5px;color:var(--text3);">Commission</span>
+            <input type="range" min="5" max="50" value="20" oninput="this.nextElementSibling.textContent=this.value+'%';apUpdateAffPreview()">
+            <span class="ap-aff-val" id="ap-aff-val">20%</span>
+          </div>
+          <div class="ap-aff-preview">
+            <div><div class="ap-aep-label">Affiliate earns</div><div class="ap-aep-val" id="ap-aep-affiliate" style="color:var(--gold);">—</div></div>
+            <div><div class="ap-aep-label">You receive</div><div class="ap-aep-val" id="ap-aep-seller" style="color:var(--green);">—</div></div>
+            <div><div class="ap-aep-label">Platform fee</div><div class="ap-aep-val" id="ap-aep-platform" style="color:var(--text3);">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISIBILITY -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Visibility & scheduling</div>
+        <div class="ap-card-sub">Control when and how buyers can find this listing.</div>
+        <div class="ap-vis-opts">
+          <div class="ap-vis-opt selected" onclick="apSelectVis(this,'public')"><div style="font-size:18px;margin-bottom:4px;">🌍</div>Public</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'unlisted')"><div style="font-size:18px;margin-bottom:4px;">🔗</div>Link only</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'draft')"><div style="font-size:18px;margin-bottom:4px;">📝</div>Draft</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'scheduled')"><div style="font-size:18px;margin-bottom:4px;">⏰</div>Scheduled</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'members')"><div style="font-size:18px;margin-bottom:4px;">🔒</div>Members only</div>
+        </div>
+        <div id="ap-schedule-date-wrap" style="display:none;margin-bottom:16px;">
+          <div class="ap-field" style="max-width:280px;"><label>Go live at</label><input type="datetime-local"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" checked style="accent-color:var(--accent);width:15px;height:15px;">Allow reviews</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" checked style="accent-color:var(--accent);width:15px;height:15px;">Show sales count</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" style="accent-color:var(--accent);width:15px;height:15px;">Limited-time offer</label>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-bottom:80px;">
+        <button class="btn btn-ghost" onclick="apGoStep1()">← Back</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="showToast('💾 Draft saved')">Save draft</button>
+          <button class="btn btn-ghost" onclick="apOpenPreview()">👁 Preview</button>
+          <button class="btn btn-primary" onclick="apGoStep3()">Review & publish →</button>
         </div>
       </div>
     </div>
 
-    <!-- AFFILIATE SETTINGS -->
-    <div class="dash-card" style="margin-bottom:18px;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:6px;">💰 Affiliate programme</h3>
-      <p style="font-size:13px;margin-bottom:14px;">Allow affiliates to promote this product and earn a commission. Higher commission = more promotion.</p>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
-        <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
-        <span style="font-size:13.5px;font-weight:500;">Enable affiliate marketing for this product</span>
-      </label>
-      <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Commission rate (%)</label>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <input type="range" min="5" max="40" value="15" style="flex:1;accent-color:var(--accent);" oninput="this.nextElementSibling.textContent=this.value+'%'">
-          <span style="font-size:15px;font-weight:700;color:var(--accent);min-width:40px;">15%</span>
+    <!-- STEP 3: PUBLISH -->
+    <div id="ap-step-3" style="display:none;">
+      <div class="ap-card" style="text-align:center;padding:40px 32px;">
+        <div style="font-size:56px;margin-bottom:16px;">🚀</div>
+        <h2 style="font-size:22px;margin-bottom:8px;">You're ready to publish</h2>
+        <p style="max-width:420px;margin:0 auto 28px;">Your listing has been saved. Once published, buyers can find and purchase it immediately.</p>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;text-align:left;max-width:480px;margin:0 auto 28px;">
+          <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Listing summary</div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Name</span><span id="ap-summary-name" style="font-weight:600;text-align:right;max-width:200px;"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Type</span><span id="ap-summary-type" style="font-weight:600;"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Price</span><span id="ap-summary-price" style="font-weight:600;color:var(--accent);"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:var(--text3);">Affiliate</span><span id="ap-summary-aff" style="font-weight:600;color:var(--gold);"></span></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-ghost" onclick="apGoStep2()">← Edit listing</button>
+          <button class="btn btn-ghost" onclick="apOpenPreview()">👁 Preview again</button>
+          <button class="btn btn-primary" style="min-width:160px;" onclick="apPublish(event)">Publish now →</button>
         </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;">
-      <button class="btn btn-ghost">Save as draft</button>
-      <button class="btn btn-ghost" onclick="openListingPreview()">👁 Preview listing</button>
-      <button class="btn btn-primary" onclick="submitProduct()">Publish listing →</button>
-    </div>
   </div>
 </div>
 
-<!-- LISTING PREVIEW MODAL -->
-<div class="preview-modal" id="listing-preview-modal">
-  <div class="preview-modal-box">
-    <div class="preview-banner">👁 This is how your listing will appear to buyers — nothing is published yet</div>
-    <div class="pdetail-layout" style="padding:0;">
+<!-- ADD PRODUCT PREVIEW MODAL -->
+<div class="preview-modal" id="ap-preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);max-width:840px;width:100%;padding:24px;">
+    <div style="background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--accent);margin-bottom:20px;text-align:center;">👁 Preview — this is how buyers will see your listing</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;">
       <div>
-        <div class="gallery-main" style="font-size:64px;">📦</div>
-        <div class="gallery-thumbs">
-          <div class="active">📦</div><div>🏷</div><div>📐</div>
-        </div>
+        <div style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:72px;margin-bottom:10px;" id="ap-pv-icon">📦</div>
+        <div style="display:flex;gap:7px;"><div style="width:52px;height:52px;background:var(--bg3);border:2px solid var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;" id="ap-pv-t1">📦</div></div>
       </div>
-      <div class="pdetail-meta">
-        <div style="display:flex;gap:8px;margin-bottom:12px;"><span class="tag tag-purple">Physical item</span><span class="tag tag-gold">Affiliate · 15%</span></div>
-        <div class="pdetail-title">Handwoven Raffia Tote Bag</div>
-        <div class="pdetail-seller">By Your Store Name · Verified seller</div>
-        <div class="pdetail-price">NGN 18,500</div>
-        <div class="rating-row"><span style="font-size:13px;color:var(--text3);">No reviews yet — be the first sale!</span></div>
-        <p class="desc-text">Your product description will appear here. Be specific about size, material, and what's included.</p>
-        <div class="pdetail-actions">
-          <button class="btn btn-ghost" style="pointer-events:none;opacity:.6;">Add to cart</button>
-          <button class="btn btn-primary" style="pointer-events:none;opacity:.6;">Buy now</button>
+      <div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;" id="ap-pv-type-tag" class="tag tag-purple">Physical item</span>
+          <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,200,66,.15);color:var(--gold);" id="ap-pv-aff-tag">Affiliate · 20%</span>
+        </div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:6px;" id="ap-pv-title">Your product name</div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">By Your Store · <span style="color:var(--green);">✓ Verified seller</span></div>
+        <div style="font-size:28px;font-weight:800;color:var(--accent);margin-bottom:12px;" id="ap-pv-price">₦0</div>
+        <div style="font-size:13px;color:var(--text3);text-decoration:line-through;display:none;margin-bottom:12px;" id="ap-pv-original"></div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:16px;" id="ap-pv-desc">Your description will appear here.</div>
+        <div style="display:flex;gap:8px;">
+          <button style="flex:1;padding:12px;font-size:13.5px;font-weight:700;border-radius:var(--radius-xs);border:none;cursor:pointer;background:var(--accent);color:#fff;opacity:.75;pointer-events:none;">Buy now</button>
+          <button style="flex:1;padding:12px;font-size:13.5px;font-weight:700;border-radius:var(--radius-xs);background:var(--surface);border:1px solid var(--border2);color:var(--text);opacity:.75;pointer-events:none;">Add to cart</button>
         </div>
       </div>
     </div>
-    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn btn-ghost" onclick="closeListingPreview()">Close preview</button>
-      <button class="btn btn-primary" onclick="closeListingPreview();submitProduct()">Publish now →</button>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <button class="btn btn-ghost" onclick="apClosePreview()">Close</button>
+      <button class="btn btn-primary" onclick="apClosePreview();apGoStep3()">Looks good →</button>
     </div>
   </div>
 </div>
+
 
 <div class="page" id="page-profile">
   <header class="hdr">
@@ -3485,14 +3882,44 @@ function escapeHtml(t) {
 
 <script>
 function showPage(name) {
+  // Redirect aliases
+  if (name === 'messages') name = 'messaging';
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + name);
   if (target) {
     target.classList.add('active');
     window.scrollTo(0, 0);
-    if (name === 'marketplace') { if(typeof loadProducts==='function') loadProducts(); }
-    if (name === 'profile')          { if(typeof loadProfilePage==='function') loadProfilePage(); }
+  }
+
+  const user = window._auth && window._auth.currentUser;
+  const profile = window._currentUser || {};
+  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? (user.email||'?')[0].toUpperCase() : '?');
+  const el = id => document.getElementById(id);
+
+  // Page-specific loaders
+  if (name === 'marketplace')      { if(typeof loadProducts==='function') loadProducts(); }
+  if (name === 'profile')          { if(typeof loadProfilePage==='function') loadProfilePage(); }
   if (name === 'seller-dashboard') { if(typeof loadSellerDashboardPage==='function') loadSellerDashboardPage(); }
+  if (name === 'profile-v2')       { if(typeof loadProfileV2==='function') loadProfileV2(); }
+  if (name === 'myprofile')        { if(typeof loadMyProfile==='function') loadMyProfile(); }
+  if (name === 'verifstatus')      { if(typeof loadVerifStatus==='function') loadVerifStatus(); }
+  if (name === 'messaging') {
+    if(typeof loadConversations==='function') loadConversations();
+    if(el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
+  }
+  if (name === 'settings') {
+    if(el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
+    if(el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
+    if(el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
+    if(el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
+    if(el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
+  }
+  if (name === 'notifications') {
+    if(el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
+  }
+  if (name === 'verifstatus' || name === 'verif') {
+    if(el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
   }
 }
 
@@ -3876,61 +4303,7 @@ window._selectedType = 'Physical';
 
 // ── PROFILE FEATURE JS ──────────────────────────────────────────
 
-// showPage already handles navigation; extend it to populate new pages
-const _origShowPage = window.showPage;
-window.showPage = function(name) {
-  if (_origShowPage) _origShowPage(name);
-  // Populate dynamic elements on navigate
-  if (name === 'profile-v2') {
-    if (typeof loadProfileV2 === 'function') loadProfileV2();
-  }
-  if (name === 'myprofile') {
-    if (typeof loadMyProfile === 'function') loadMyProfile();
-  }
-  if (name === 'verifstatus') {
-    if (typeof loadVerifStatus === 'function') loadVerifStatus();
-  }
-  if (name === 'messages') {
-    // Always redirect to the real Instagram-style chat page
-    if (typeof _origShowPage === 'function') _origShowPage('messaging');
-    else { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); const t=document.getElementById('page-messaging'); if(t){t.classList.add('active');window.scrollTo(0,0);} }
-    if (typeof loadConversations === 'function') loadConversations();
-    return;
-  }
-  if (name === 'messaging') {
-    if (typeof loadConversations === 'function') loadConversations();
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
-  }
-  if (name === 'settings') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const el = id => document.getElementById(id);
-    if (el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
-    if (el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
-    if (el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
-    if (el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    if (el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
-  }
-  if (name === 'notifications') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
-  }
-  if (name === 'verifstatus' || name === 'verif') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
-  }
-};
+// showPage merged above — no override needed
 
 // Profile v2 tabs
 window.switchPv2Tab = function(tab, btn) {
@@ -4021,6 +4394,239 @@ window.saveEditBio = async function() {
 // ── SELLER DASHBOARD PAGE ─────────────────────────────────────────────
 // ── ADD PRODUCT: type picker ────────────────────────────────────────
 window._selectedProductType = 'physical';
+// ══ ADD PRODUCT PAGE JS ══════════════════════════════════════════════
+var _apType = null, _apPriceMode = 'paid', _apAffEnabled = true, _apVisMode = 'public';
+
+var _apTypeMeta = {
+  course:   {icon:'🎓', label:'Online course',       digital:true,  sections:['ap-sec-course'],   uploadHint:'MP4, MOV, ZIP — video content up to 5 GB'},
+  ebook:    {icon:'📚', label:'Ebook / PDF',          digital:true,  sections:['ap-sec-ebook'],    uploadHint:'PDF, ePub, MOBI — up to 500 MB'},
+  template: {icon:'🎨', label:'Template',             digital:true,  sections:['ap-sec-template'], uploadHint:'ZIP, Figma, .fig, Notion export — up to 500 MB'},
+  software: {icon:'💻', label:'Software / App',       digital:true,  sections:['ap-sec-software'], uploadHint:'EXE, DMG, ZIP — up to 2 GB'},
+  audio:    {icon:'🎵', label:'Music / Audio',        digital:true,  sections:['ap-sec-audio'],    uploadHint:'MP3, WAV, FLAC, ZIP — up to 1 GB'},
+  coaching: {icon:'🧑‍💼', label:'Coaching / Service',  digital:true,  sections:['ap-sec-coaching'], uploadHint:'Optional: slide deck or resource PDF'},
+  vehicle:  {icon:'🚗', label:'Vehicle',              digital:false, sections:['ap-sec-vehicle'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
+  physical: {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'], uploadHint:'JPG, PNG, GIF — up to 8 images, 10 MB each'},
+};
+
+window.apSelectType = function(el) {
+  document.querySelectorAll('.ap-type-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  _apType = el.dataset.type;
+  var btn = document.getElementById('ap-step1-next');
+  if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+};
+
+window.apGoStep2 = function() {
+  if (!_apType) { showToast('⚠️ Pick a product type first'); return; }
+  apSetStep(2);
+  apApplyType();
+  window.scrollTo(0,0);
+};
+window.apGoStep1 = function() { apSetStep(1); window.scrollTo(0,0); };
+window.apGoStep3 = function() {
+  var name = document.getElementById('ap-field-name');
+  if (!name || !name.value.trim()) { showToast('⚠️ Add a product name first'); return; }
+  apFillSummary();
+  apSetStep(3);
+  window.scrollTo(0,0);
+};
+
+window.apSetStep = function(n) {
+  [1,2,3].forEach(function(i){
+    var s = document.getElementById('ap-step-' + i);
+    if (s) s.style.display = (i === n) ? '' : 'none';
+    var ind = document.getElementById('ap-step-ind-' + i);
+    if (ind) { ind.classList.remove('active','done'); ind.classList.add(i < n ? 'done' : i === n ? 'active' : ''); }
+    if (i < 3) { var line = document.getElementById('ap-step-line-' + i); if (line) line.classList.toggle('done', i < n); }
+  });
+  var fill = document.getElementById('ap-progress-fill');
+  if (fill) fill.style.width = {1:'33%',2:'66%',3:'100%'}[n];
+};
+
+window.apApplyType = function() {
+  if (!_apType) return;
+  var m = _apTypeMeta[_apType];
+  document.querySelectorAll('.ap-dynamic').forEach(s => s.classList.remove('visible'));
+  m.sections.forEach(function(id){ var el = document.getElementById(id); if (el) el.classList.add('visible'); });
+  var dfs = document.getElementById('ap-digital-file-section');
+  if (dfs) dfs.style.display = m.digital ? '' : 'none';
+  var hint = document.getElementById('ap-digital-upload-sub');
+  if (hint && m.digital) hint.textContent = m.uploadHint;
+  var coverHint = document.getElementById('ap-cover-upload-hint');
+  if (coverHint) coverHint.textContent = m.digital ? 'JPG, PNG — cover image / thumbnail · 10 MB max' : m.uploadHint;
+  var title = document.getElementById('ap-upload-card-title');
+  if (title) title.textContent = m.digital ? '🖼 Cover image' : '📸 Product photos';
+  var sub = document.getElementById('ap-upload-card-sub');
+  if (sub) sub.textContent = m.digital ? 'Your cover is the first thing buyers see — make it count.' : 'Upload clear photos. First image is your cover.';
+  var langWrap = document.getElementById('ap-field-lang-wrap');
+  if (langWrap) langWrap.style.display = (_apType==='course'||_apType==='ebook') ? '' : 'none';
+  var pvIcon = document.getElementById('ap-pv-icon');
+  if (pvIcon) pvIcon.textContent = m.icon;
+  var pvT1 = document.getElementById('ap-pv-t1');
+  if (pvT1) pvT1.textContent = m.icon;
+  var pvTag = document.getElementById('ap-pv-type-tag');
+  if (pvTag) { pvTag.textContent = m.label; pvTag.className = 'tag ' + (m.digital ? 'tag-blue' : 'tag-green'); }
+};
+
+window.apSetPriceMode = function(mode) {
+  _apPriceMode = mode;
+  ['paid','free','pwyw'].forEach(function(m){ var b = document.getElementById('ap-btn-'+m); if(b) b.classList.toggle('active', m===mode); });
+  var pf = document.getElementById('ap-price-fields');
+  var pw = document.getElementById('ap-pwyw-min-wrap');
+  if (pf) { pf.style.opacity = mode==='free' ? '.4' : ''; pf.style.pointerEvents = mode==='free' ? 'none' : ''; }
+  if (pw) pw.style.display = mode==='pwyw' ? '' : 'none';
+  apSyncPreview();
+};
+
+window.apToggleAff = function() {
+  _apAffEnabled = !_apAffEnabled;
+  var t = document.getElementById('ap-aff-toggle');
+  if (t) t.classList.toggle('on', _apAffEnabled);
+  var s = document.getElementById('ap-aff-settings');
+  if (s) s.style.display = _apAffEnabled ? '' : 'none';
+  var tag = document.getElementById('ap-pv-aff-tag');
+  if (tag) tag.style.display = _apAffEnabled ? '' : 'none';
+};
+
+window.apSelectVis = function(el, mode) {
+  _apVisMode = mode;
+  document.querySelectorAll('.ap-vis-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  var sdw = document.getElementById('ap-schedule-date-wrap');
+  if (sdw) sdw.style.display = mode==='scheduled' ? '' : 'none';
+};
+
+window.apUpdateAffPreview = function() {
+  var priceEl = document.getElementById('ap-field-price');
+  var price = priceEl ? (parseFloat(priceEl.value) || 0) : 0;
+  var rangeEl = document.querySelector('#ap-aff-settings input[type=range]');
+  var affPct = rangeEl ? parseInt(rangeEl.value) : 20;
+  var curEl = document.getElementById('ap-field-currency');
+  var currency = curEl ? curEl.value : 'NGN';
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
+  var platFee = price * 0.05, affEarn = price * (affPct/100), sellerGet = price - affEarn - platFee;
+  var fmt = function(v){ return price > 0 ? sym + v.toLocaleString('en',{maximumFractionDigits:0}) : '—'; };
+  var e = id => document.getElementById(id);
+  if (e('ap-aep-affiliate')) e('ap-aep-affiliate').textContent = fmt(affEarn);
+  if (e('ap-aep-seller'))    e('ap-aep-seller').textContent    = fmt(sellerGet);
+  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (5%)' : '—';
+  var affTag = e('ap-pv-aff-tag');
+  if (affTag) affTag.textContent = 'Affiliate · ' + affPct + '%';
+};
+
+window.apSyncPreview = function() {
+  var nameEl = document.getElementById('ap-field-name');
+  var descEl = document.getElementById('ap-field-desc');
+  var priceEl = document.getElementById('ap-field-price');
+  var origEl = document.getElementById('ap-field-original');
+  var curEl = document.getElementById('ap-field-currency');
+  var name = nameEl ? nameEl.value.trim() : '';
+  var desc = descEl ? descEl.value.trim() : '';
+  var price = priceEl ? (parseFloat(priceEl.value) || 0) : 0;
+  var original = origEl ? (parseFloat(origEl.value) || 0) : 0;
+  var currency = curEl ? curEl.value : 'NGN';
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
+  var e = id => document.getElementById(id);
+  if (e('ap-pv-title')) e('ap-pv-title').textContent = name || 'Your product name';
+  if (e('ap-pv-desc'))  e('ap-pv-desc').textContent  = desc || 'Your description will appear here.';
+  if (e('ap-pv-price')) e('ap-pv-price').textContent = _apPriceMode==='free' ? 'Free' : sym + (price > 0 ? price.toLocaleString('en',{maximumFractionDigits:0}) : '0');
+  var pvOrig = e('ap-pv-original');
+  if (pvOrig) { pvOrig.style.display = (original > 0 && original > price) ? '' : 'none'; pvOrig.textContent = sym + original.toLocaleString('en',{maximumFractionDigits:0}); }
+  apUpdateAffPreview();
+};
+
+window.apCountChars = function(el, counterId, max) {
+  var len = el.value.length;
+  var c = document.getElementById(counterId);
+  if (!c) return;
+  c.textContent = len + ' / ' + max;
+  c.className = 'ap-field-count' + (len >= max ? ' over' : len > max * 0.9 ? ' warn' : '');
+};
+
+window.apAddFeature = function() {
+  var row = document.createElement('div');
+  row.className = 'ap-variant-row';
+  row.innerHTML = '<input placeholder="Add a feature or benefit" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button>';
+  var list = document.getElementById('ap-features-list');
+  if (list) list.appendChild(row);
+};
+window.apAddVariant = function() {
+  var row = document.createElement('div');
+  row.className = 'ap-variant-row';
+  row.innerHTML = '<input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button>';
+  var list = document.getElementById('ap-variants-list');
+  if (list) list.appendChild(row);
+};
+window.apRemoveVariant = function(btn) { btn.closest('.ap-variant-row').remove(); };
+
+window.apAddModule = function() {
+  var num = document.querySelectorAll('#ap-modules-list .ap-module-item').length + 1;
+  var item = document.createElement('div');
+  item.className = 'ap-module-item';
+  item.innerHTML = '<span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><input style="flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:500;outline:none;margin-left:8px;" value="Module ' + num + '" placeholder="Module title"><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">0 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button>';
+  var list = document.getElementById('ap-modules-list');
+  if (list) list.appendChild(item);
+};
+
+window.apFakeUpload = function(zoneId, listId, filename, size) {
+  var zone = document.getElementById(zoneId);
+  if (zone) zone.classList.add('has-file');
+  var list = document.getElementById(listId);
+  if (!list) return;
+  var item = document.createElement('div');
+  item.className = 'ap-uploaded-file';
+  item.innerHTML = '<span style="font-size:18px;">✅</span><span style="flex:1;font-weight:500;">' + filename + '</span><span style="font-size:11.5px;color:var(--text3);">' + size + '</span><button class="ap-uf-remove" onclick="apRemoveFile(this,'' + zoneId + '')">×</button>';
+  list.innerHTML = '';
+  list.appendChild(item);
+};
+window.apRemoveFile = function(btn, zoneId) {
+  btn.closest('.ap-uploaded-file').remove();
+  var zone = document.getElementById(zoneId);
+  if (zone) zone.classList.remove('has-file');
+};
+
+window.apFillSummary = function() {
+  var name = document.getElementById('ap-field-name');
+  var price = document.getElementById('ap-field-price');
+  var currency = document.getElementById('ap-field-currency');
+  var rangeEl = document.querySelector('#ap-aff-settings input[type=range]');
+  var m = _apTypeMeta[_apType] || {};
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(currency&&currency.value)||'NGN'] || '';
+  var priceVal = price ? (parseFloat(price.value) || 0) : 0;
+  var affPct = rangeEl ? parseInt(rangeEl.value) : 20;
+  var e = id => document.getElementById(id);
+  if (e('ap-summary-name'))  e('ap-summary-name').textContent  = (name && name.value.trim()) || '(untitled)';
+  if (e('ap-summary-type'))  e('ap-summary-type').textContent  = m.label || '—';
+  if (e('ap-summary-price')) e('ap-summary-price').textContent = _apPriceMode==='free' ? 'Free' : sym + priceVal.toLocaleString('en');
+  if (e('ap-summary-aff'))   e('ap-summary-aff').textContent   = _apAffEnabled ? 'Enabled · ' + affPct + '% commission' : 'Disabled';
+};
+
+window.apOpenPreview = function() {
+  apSyncPreview();
+  var modal = document.getElementById('ap-preview-modal');
+  if (modal) modal.style.display = 'flex';
+};
+window.apClosePreview = function() {
+  var modal = document.getElementById('ap-preview-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.apPublish = function(e) {
+  var btn = e && e.target ? e.target : document.querySelector('#ap-step-3 .btn-primary');
+  // delegate to the real submitProduct function
+  submitProduct();
+};
+
+window.goAddProduct = function() {
+  // Reset add product state
+  _apType = null; _apPriceMode = 'paid'; _apAffEnabled = true; _apVisMode = 'public';
+  document.querySelectorAll('.ap-type-opt').forEach(o => o.classList.remove('selected'));
+  var btn = document.getElementById('ap-step1-next');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.4'; }
+  apSetStep(1);
+  showPage('addproduct');
+};
+
 window.pickType = function(el, type) {
   window._selectedProductType = type;
   document.querySelectorAll('.prod-type-opt').forEach(opt => {
@@ -4173,41 +4779,173 @@ window.submitProduct = async function() {
   }
 };
 
+// ── SELLER DASHBOARD TAB SYSTEM ─────────────────────────────────────
+window.sdTab = function(name) {
+  // Update sidebar nav
+  document.querySelectorAll('.sd-nav-item').forEach(i => i.classList.remove('active'));
+  const navEl = document.getElementById('sdnav-' + name);
+  if (navEl) navEl.classList.add('active');
+  // Update mobile tabs
+  document.querySelectorAll('.sd-mobile-tab').forEach(t => t.classList.remove('active'));
+  // Show section
+  document.querySelectorAll('.sd-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('sd-sec-' + name);
+  if (sec) sec.classList.add('active');
+  // Lazy-load section data
+  if (name === 'products') sdLoadProducts();
+  if (name === 'verification') sdLoadVerification();
+  if (name === 'payout') sdLoadPayout();
+};
+
 window.loadSellerDashboardPage = async function() {
   const user = auth.currentUser;
   if (!user) return;
   const u = window._currentUser || {};
-  // Show verif prompt if not seller verified
-  const verifPrompt = document.getElementById('sd-verif-prompt');
-  if (verifPrompt) verifPrompt.style.display = u.sellerVerified ? 'none' : 'block';
-  // Stats
   const el = id => document.getElementById(id);
+  // Sidebar name + badge
+  if (el('sd-sidebar-name')) el('sd-sidebar-name').textContent = u.fullName || u.firstName || 'Seller';
+  if (el('sd-sidebar-badge')) el('sd-sidebar-badge').style.display = u.sellerVerified ? 'inline-block' : 'none';
+  // Verif prompt
+  if (el('sd-verif-prompt')) el('sd-verif-prompt').style.display = (!u.sellerVerified && !u.verifSubmitted) ? 'block' : 'none';
+  if (el('sdnav-verif-badge')) el('sdnav-verif-badge').style.display = (!u.sellerVerified && !u.verifSubmitted) ? 'inline-block' : 'none';
+  // Avatar
+  const initials = (u.fullName || u.firstName || '?')[0].toUpperCase();
+  if (el('nav-avatar-seller-dash')) el('nav-avatar-seller-dash').textContent = initials;
+  // Load stats + overview products
   try {
-    const pSnap = await getDocs(query(collection(db, 'products'), where('sellerId','==', user.uid)));
+    const fns = window._fns;
+    const pSnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid)));
     if (el('sd-stat-listings')) el('sd-stat-listings').textContent = pSnap.size;
-    let revenue = 0;
-    const listingsHtml = pSnap.empty
-      ? '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
-      : pSnap.docs.map(d => {
-          const p = d.data();
-          revenue += Number(p.price || 0);
-          return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);">
-            <div style="font-size:28px;">${p.emoji || '📦'}</div>
-            <div style="flex:1;">
-              <div style="font-weight:600;font-size:14px;">${p.name || '—'}</div>
-              <div style="font-size:12px;color:var(--text3);">NGN ${Number(p.price||0).toLocaleString()} · ${p.category||''}</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="showPage('add-product')">Edit</button>
-          </div>`;
-        }).join('');
-    if (el('sd-listings-list')) el('sd-listings-list').innerHTML = listingsHtml;
-    if (el('sd-stat-revenue'))  el('sd-stat-revenue').textContent  = 'NGN ' + revenue.toLocaleString();
-    if (el('sd-stat-orders'))   el('sd-stat-orders').textContent   = '0';
-    if (el('sd-stat-aff'))      el('sd-stat-aff').textContent      = 'NGN 0';
-    // Update avatar
-    const initials = (u.fullName || u.firstName || '?')[0].toUpperCase();
-    if (el('nav-avatar-seller-dash')) el('nav-avatar-seller-dash').textContent = initials;
+    if (el('sdnav-products-count')) { el('sdnav-products-count').textContent = pSnap.size; el('sdnav-products-count').style.display = pSnap.size > 0 ? 'inline-block' : 'none'; }
+    if (el('sd-stat-orders'))   el('sd-stat-orders').textContent = '0';
+    if (el('sd-stat-revenue'))  el('sd-stat-revenue').textContent = '₦0';
+    if (el('sd-stat-aff'))      el('sd-stat-aff').textContent = '₦0';
+    // Overview products (last 4)
+    const recent = pSnap.docs.slice(0, 4);
+    if (el('sd-overview-products')) {
+      el('sd-overview-products').innerHTML = recent.length === 0
+        ? '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
+        : recent.map(d => sdProductRow(d.id, d.data(), true)).join('');
+    }
   } catch(e) { console.error(e); }
+};
+
+function sdProductRow(id, p, compact) {
+  const typeIcons = {course:'🎓',ebook:'📚',template:'🎨',software:'💻',audio:'🎵',coaching:'🧑‍💼',vehicle:'🚗',physical:'📦'};
+  const icon = typeIcons[p.type] || p.emoji || '📦';
+  const price = Number(p.price||0).toLocaleString();
+  const status = p.status || 'active';
+  const statusColor = status === 'active' ? 'var(--green)' : 'var(--text3)';
+  return \`<div class="sd-product-row">
+    <div class="sd-product-thumb">\${icon}</div>
+    <div class="sd-product-info">
+      <div class="sd-product-name">\${p.name || '(Untitled)'}</div>
+      <div class="sd-product-meta">\${p.category || p.type || '—'} · <span style="color:\${statusColor};">\${status}</span></div>
+    </div>
+    <div class="sd-product-price">₦\${price}</div>
+    <div class="sd-product-actions">
+      <button class="sd-btn-edit" onclick="sdEditProduct('\${id}')">Edit</button>
+      <button class="sd-btn-del" onclick="sdDeleteProduct('\${id}',this)">🗑</button>
+    </div>
+  </div>\`;
+}
+
+window.sdLoadProducts = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const el = document.getElementById('sd-products-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>';
+  try {
+    const fns = window._fns;
+    const snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    el.innerHTML = snap.empty
+      ? '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No products yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
+      : snap.docs.map(d => sdProductRow(d.id, d.data(), false)).join('');
+  } catch(e) { el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load products.</div>'; }
+};
+
+window.sdFilterProducts = function(btn, filter) {
+  document.querySelectorAll('.sd-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // visual filter only for now
+  document.querySelectorAll('#sd-products-list .sd-product-row').forEach(row => {
+    row.style.display = (filter === 'all') ? '' : (row.dataset.status === filter ? '' : 'none');
+  });
+};
+
+window.sdEditProduct = function(id) {
+  showToast('✏️ Edit coming soon — product: ' + id.slice(0,6));
+};
+
+window.sdDeleteProduct = async function(id, btn) {
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  try {
+    const fns = window._fns;
+    await fns.deleteDoc(fns.doc(db, 'products', id));
+    btn.closest('.sd-product-row').remove();
+    showToast('🗑 Product deleted.');
+    sdLoadProducts();
+  } catch(e) { showToast('❌ Could not delete product.'); }
+};
+
+window.sdLoadVerification = function() {
+  const u = window._currentUser || {};
+  const el = document.getElementById('sd-verif-content');
+  if (!el) return;
+  if (u.sellerVerified) {
+    el.innerHTML = \`<div style="text-align:center;padding:32px;">
+      <div style="font-size:56px;margin-bottom:12px;">✅</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px;color:var(--green);">You are a Verified Seller</div>
+      <p>Your documents were approved. You can now list products and receive payouts.</p>
+    </div>\`;
+  } else if (u.verifRejected) {
+    el.innerHTML = \`<div style="background:rgba(240,82,82,.07);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-sm);padding:20px;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:700;color:var(--red);margin-bottom:6px;">❌ Verification rejected</div>
+      <div style="font-size:13px;color:var(--text2);">Reason: <strong>\${u.verifRejectedReason || 'See admin for details'}</strong></div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;">Please fix the issue and resubmit your documents below.</div>
+    </div>
+    <button class="btn btn-primary" onclick="showPage('verification')">Resubmit documents →</button>\`;
+  } else if (u.verifSubmitted) {
+    el.innerHTML = \`<div style="text-align:center;padding:32px;">
+      <div style="font-size:56px;margin-bottom:12px;">⏳</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px;color:var(--gold);">Under Review</div>
+      <p>Your documents are being reviewed. We will respond within 24–48 hours.</p>
+    </div>\`;
+  } else {
+    el.innerHTML = \`<div style="text-align:center;padding:32px;">
+      <div style="font-size:56px;margin-bottom:12px;">🛡</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Get Verified</div>
+      <p style="margin-bottom:24px;">Upload your documents to become a verified seller on ZÚLA. Verification takes 24–48 hours.</p>
+      <button class="btn btn-primary" onclick="showPage('verification')">Start verification →</button>
+    </div>\`;
+  }
+};
+
+window.sdLoadPayout = function() {
+  const u = window._currentUser || {};
+  // placeholder — real payout data would come from Firestore
+};
+
+window.sdAddBank = function() {
+  showToast('🏦 Bank account setup coming soon');
+};
+
+window.sdRequestPayout = function() {
+  showToast('💸 Payout request coming soon — add a bank account first');
+};
+
+window.sdSaveSettings = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const name = document.getElementById('sd-store-name').value.trim();
+  const bio  = document.getElementById('sd-store-bio').value.trim();
+  const wa   = document.getElementById('sd-whatsapp').value.trim();
+  try {
+    const fns = window._fns;
+    await fns.updateDoc(fns.doc(db, 'users', user.uid), { storeName: name, storeBio: bio, whatsapp: wa });
+    showToast('✅ Settings saved!');
+  } catch(e) { showToast('❌ Could not save settings.'); }
 };
 
 // Language selection
@@ -4339,59 +5077,316 @@ window.saveManualLocation = function() {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('messaging')">💬</a>
-        <a onclick="showPage('profile')">Profile</a>
         <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile')">?</div>
       </nav>
     </div>
   </header>
-  <div class="dash-wrap" style="max-width:960px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-      <div>
-        <h1 style="font-size:24px;font-weight:800;margin-bottom:4px;">Seller dashboard</h1>
-        <p style="margin:0;font-size:13px;color:var(--text3);">Manage your listings, sales and earnings</p>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
-    </div>
-    <!-- Stats row -->
-    <div class="sd-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
-        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);" id="sd-stat-listings">—</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Listings</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
-        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);" id="sd-stat-orders">—</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Orders</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
-        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);color:var(--green);" id="sd-stat-revenue">NGN 0</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Revenue</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
-        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);color:var(--gold);" id="sd-stat-aff">NGN 0</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Aff. earned</div>
-      </div>
-    </div>
-    <!-- My listings -->
-    <div class="dash-card">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        My listings
-        <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
-      </h3>
-      <div id="sd-listings-list">
-        <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
-      </div>
-    </div>
-    <!-- Seller verification prompt -->
-    <div id="sd-verif-prompt" style="display:none;margin-top:16px;">
-      <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px;">⚠️ Seller verification required</div>
-          <div style="font-size:13px;color:var(--text2);">Get verified to start listing products and earn on ZÚLA.</div>
-        </div>
-        <button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="showPage('verification')">Get verified →</button>
-      </div>
-    </div>
+
+  <!-- MOBILE TAB BAR -->
+  <div class="sd-mobile-nav">
+    <button class="sd-mobile-tab active" onclick="sdTab('overview')">📊 Overview</button>
+    <button class="sd-mobile-tab" onclick="sdTab('products')">📦 Products</button>
+    <button class="sd-mobile-tab" onclick="sdTab('orders')">🛍 Orders</button>
+    <button class="sd-mobile-tab" onclick="sdTab('payout')">💸 Payout</button>
+    <button class="sd-mobile-tab" onclick="sdTab('verification')">🛡 Verification</button>
+    <button class="sd-mobile-tab" onclick="sdTab('settings')">⚙️ Settings</button>
   </div>
+
+  <div class="sd-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sd-sidebar">
+      <div style="padding:0 20px 20px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Seller account</div>
+        <div style="font-size:15px;font-weight:700;" id="sd-sidebar-name">—</div>
+        <div id="sd-sidebar-badge" style="display:none;margin-top:6px;background:rgba(39,201,122,.12);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-block;">✅ Verified Seller</div>
+      </div>
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Main</div>
+        <button class="sd-nav-item active" id="sdnav-overview" onclick="sdTab('overview')">
+          <span class="sd-nav-icon">📊</span> Dashboard
+        </button>
+        <button class="sd-nav-item" id="sdnav-products" onclick="sdTab('products')">
+          <span class="sd-nav-icon">📦</span> My Products
+          <span class="sd-nav-badge" id="sdnav-products-count" style="display:none;">0</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-orders" onclick="sdTab('orders')">
+          <span class="sd-nav-icon">🛍</span> Orders
+          <span class="sd-nav-badge gold" id="sdnav-orders-badge" style="display:none;">New</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-analytics" onclick="sdTab('analytics')">
+          <span class="sd-nav-icon">📈</span> Analytics
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Money</div>
+        <button class="sd-nav-item" id="sdnav-payout" onclick="sdTab('payout')">
+          <span class="sd-nav-icon">💸</span> Payout
+        </button>
+        <button class="sd-nav-item" id="sdnav-affiliate" onclick="sdTab('affiliate')">
+          <span class="sd-nav-icon">🔗</span> Affiliate earnings
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Account</div>
+        <button class="sd-nav-item" id="sdnav-verification" onclick="sdTab('verification')">
+          <span class="sd-nav-icon">🛡</span> Verification
+          <span class="sd-nav-badge" id="sdnav-verif-badge" style="display:none;">!</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-settings" onclick="sdTab('settings')">
+          <span class="sd-nav-icon">⚙️</span> Settings
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <button class="sd-nav-item" style="background:var(--accent);color:#fff;border-radius:var(--radius-xs);justify-content:center;" onclick="goAddProduct()">
+          <span>+</span> Add product
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="sd-content">
+
+      <!-- ── OVERVIEW ── -->
+      <div class="sd-section active" id="sd-sec-overview">
+        <div class="sd-page-hd">Dashboard</div>
+        <div class="sd-page-sub">Welcome back — here's how your store is doing</div>
+        <div class="sd-stat-grid">
+          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-stat-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-aff">₦0</div><div class="sd-stat-lbl">Aff. earned</div></div>
+        </div>
+
+        <!-- Verification prompt -->
+        <div id="sd-verif-prompt" style="display:none;margin-bottom:20px;">
+          <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px;">⚠️ Seller verification required</div>
+              <div style="font-size:13px;color:var(--text2);">Get verified to start listing and earn on ZÚLA.</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="sdTab('verification')">Get verified →</button>
+          </div>
+        </div>
+
+        <!-- Recent products -->
+        <div class="dash-card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:15px;font-weight:700;">Recent listings</h3>
+            <button class="btn btn-ghost btn-sm" onclick="sdTab('products')">View all →</button>
+          </div>
+          <div id="sd-overview-products">
+            <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="goAddProduct()" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">➕</div>
+            <div style="font-size:13.5px;font-weight:700;">New listing</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Add a product to sell</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('payout')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">💸</div>
+            <div style="font-size:13.5px;font-weight:700;">Request payout</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Withdraw your earnings</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('analytics')" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">📈</div>
+            <div style="font-size:13.5px;font-weight:700;">View analytics</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Sales & traffic data</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="showPage('messaging')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">💬</div>
+            <div style="font-size:13.5px;font-weight:700;">Messages</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Chat with buyers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MY PRODUCTS ── -->
+      <div class="sd-section" id="sd-sec-products">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
+          <div class="sd-page-hd">My Products</div>
+          <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
+        </div>
+        <div class="sd-page-sub">Manage, edit, or remove your listings</div>
+
+        <!-- Filter bar -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="sdFilterProducts(this,'all')">All</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterProducts(this,'active')">Active</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterProducts(this,'draft')">Draft</button>
+        </div>
+
+        <div class="dash-card" style="padding:0 24px;">
+          <div id="sd-products-list" style="padding:8px 0;">
+            <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div class="sd-section" id="sd-sec-orders">
+        <div class="sd-page-hd">Orders</div>
+        <div class="sd-page-sub">Track purchases made on your listings</div>
+        <div class="dash-card">
+          <div id="sd-orders-list">
+            <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No orders yet — your sales will appear here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div class="sd-section" id="sd-sec-analytics">
+        <div class="sd-page-hd">Analytics</div>
+        <div class="sd-page-sub">Traffic, conversions and revenue over time</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--blue);">—</div><div class="sd-stat-lbl">Page views</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">—%</div><div class="sd-stat-lbl">Conversion rate</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">—</div><div class="sd-stat-lbl">Avg. order value</div></div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:40px;">
+          <div style="font-size:40px;margin-bottom:12px;">📈</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Analytics coming soon</div>
+          <p>Detailed charts and traffic data will appear here once you have sales.</p>
+        </div>
+      </div>
+
+      <!-- ── PAYOUT ── -->
+      <div class="sd-section" id="sd-sec-payout">
+        <div class="sd-page-hd">Payout</div>
+        <div class="sd-page-sub">Withdraw your earnings to your bank account</div>
+
+        <!-- Balance cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+          <div class="sd-payout-card">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Available balance</div>
+            <div class="sd-payout-balance" id="sd-payout-available">₦0.00</div>
+            <div class="sd-payout-pending">Pending: <span id="sd-payout-pending">₦0.00</span></div>
+            <button class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;" onclick="sdRequestPayout()">Request payout →</button>
+          </div>
+          <div class="sd-payout-card">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total paid out</div>
+            <div class="sd-payout-balance" style="color:var(--text);" id="sd-payout-total">₦0.00</div>
+            <div class="sd-payout-pending">All time earnings</div>
+            <div style="margin-top:14px;font-size:12px;color:var(--text3);">Payouts processed within 1–3 business days</div>
+          </div>
+        </div>
+
+        <!-- Bank account -->
+        <div class="dash-card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:15px;font-weight:700;">Bank account</h3>
+            <button class="btn btn-ghost btn-sm" onclick="sdAddBank()">+ Add bank</button>
+          </div>
+          <div id="sd-bank-list">
+            <div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center;">No bank account added yet. Add one to receive payouts.</div>
+          </div>
+        </div>
+
+        <!-- Payout history -->
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Payout history</h3>
+          <div id="sd-payout-history">
+            <div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center;">No payout history yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AFFILIATE EARNINGS ── -->
+      <div class="sd-section" id="sd-sec-affiliate">
+        <div class="sd-page-hd">Affiliate Earnings</div>
+        <div class="sd-page-sub">Commissions earned from promoting other sellers' products</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦0</div><div class="sd-stat-lbl">Total earned</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val">0</div><div class="sd-stat-lbl">Referrals</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val">0</div><div class="sd-stat-lbl">Clicks</div></div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:40px;">
+          <div style="font-size:40px;margin-bottom:12px;">🔗</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Start earning with affiliate links</div>
+          <p style="margin-bottom:20px;">Browse products on the marketplace and share your unique affiliate link to earn commission on every sale.</p>
+          <button class="btn btn-primary" onclick="showPage('marketplace')">Browse products →</button>
+        </div>
+      </div>
+
+      <!-- ── VERIFICATION ── -->
+      <div class="sd-section" id="sd-sec-verification">
+        <div class="sd-page-hd">Seller Verification</div>
+        <div class="sd-page-sub">Complete verification to list products and receive payouts</div>
+        <div id="sd-verif-content">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">Loading…</div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="sd-section" id="sd-sec-settings">
+        <div class="sd-page-hd">Seller Settings</div>
+        <div class="sd-page-sub">Manage your store profile and preferences</div>
+
+        <div class="dash-card" style="margin-bottom:16px;">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Store profile</h3>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>Store name</label>
+            <input type="text" id="sd-store-name" placeholder="Your store name" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);">
+          </div>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>Store bio</label>
+            <textarea id="sd-store-bio" rows="3" placeholder="Tell buyers about your store…" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);resize:vertical;"></textarea>
+          </div>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>WhatsApp number (for buyer enquiries)</label>
+            <input type="tel" id="sd-whatsapp" placeholder="+234 800 000 0000" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="sdSaveSettings()">Save changes</button>
+        </div>
+
+        <div class="dash-card" style="margin-bottom:16px;">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Notifications</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">New order notification</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">New message notification</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">Payout confirmation</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">Marketing & tips emails</span>
+              <input type="checkbox" style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">Danger zone</h3>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">These actions are permanent and cannot be undone.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="if(confirm('Deactivate your seller account? You can reactivate later.'))showToast('Account deactivated')">Deactivate seller account</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sd-content -->
+  </div><!-- /sd-layout -->
 </div>
 
 <!-- ── NEW MESSAGE MODAL ─────────────────────────────────────── -->
