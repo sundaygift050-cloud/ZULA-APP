@@ -1388,53 +1388,19 @@ p{color:var(--text2);margin:0 0 1em;}
   </div>
 </div>
 
-<!-- ================================================================
-     PAGE: MESSAGES (inbox overview — real Firebase)
-     ================================================================ -->
+<!-- page-messages: just a redirect shell to the real chat UI -->
 <div class="page" id="page-messages">
-  <header class="hdr">
-    <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('messaging')">💬 Full chat</a>
-        <div class="avatar-btn" id="nav-avatar-msgs" onclick="showPage('profile')">?</div>
-      </nav>
-    </div>
-  </header>
-  <div class="dash-wrap" style="max-width:700px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <h1 style="font-size:22px;font-weight:700;">Messages</h1>
-      <button class="btn btn-primary btn-sm" onclick="showPage('messaging')">💬 Open full chat</button>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;" id="inbox-conv-list">
-      <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">Loading conversations…</div>
-    </div>
-    <!-- Start new conversation -->
-    <div style="margin-top:20px;">
-      <div class="dash-card">
-        <h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">✉️ New message</h3>
-        <div class="form-field" style="margin-bottom:10px;position:relative;">
-          <label>Search for a user</label>
-          <input type="text" id="new-msg-search" placeholder="Type a name…" oninput="searchUsersToMsg(this.value)" autocomplete="off">
-          <div id="user-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);z-index:99;max-height:200px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.3);"></div>
-        </div>
-        <div id="new-msg-selected-user" style="display:none;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-xs);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
-          <div id="new-msg-sel-avatar" class="conv-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0;"></div>
-          <div style="flex:1;">
-            <div id="new-msg-sel-name" style="font-size:13.5px;font-weight:600;color:var(--text);"></div>
-            <div id="new-msg-sel-email" style="font-size:11px;color:var(--text3);"></div>
-          </div>
-          <button onclick="clearMsgRecipient()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">×</button>
-        </div>
-        <div class="form-field" style="margin-bottom:10px;">
-          <label>Message</label>
-          <textarea id="new-msg-text" style="height:70px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Type your message…"></textarea>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="startNewConversation()">Send →</button>
-      </div>
-    </div>
+  <!-- new-msg inputs kept here so startNewConversation() still works -->
+  <input type="hidden" id="new-msg-search">
+  <input type="hidden" id="new-msg-uid">
+  <div id="user-search-results" style="display:none;"></div>
+  <div id="new-msg-selected-user" style="display:none;">
+    <div id="new-msg-sel-avatar"></div>
+    <div id="new-msg-sel-name"></div>
+    <div id="new-msg-sel-email"></div>
   </div>
+  <input type="hidden" id="new-msg-text">
+  <div id="inbox-conv-list" style="display:none;"></div>
 </div>
 
 <!-- ================================================================
@@ -1457,7 +1423,7 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="inbox-sidebar">
       <div class="inbox-sidebar-header">
         <span class="inbox-sidebar-title">Chats</span>
-        <button onclick="showPage('messages')" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:var(--font-body);">+ New</button>
+        <button onclick="openNewMsgModal()" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);">+ New</button>
       </div>
       <div class="inbox-search">
         <input placeholder="🔍  Search" type="text" oninput="filterConvs(this.value)">
@@ -2602,10 +2568,17 @@ window.loadConversations = async function() {
   if (!list && !sidebar) return;
 
   try {
-    const q = query(collection(db, 'conversations'), where('participants','array-contains', user.uid), orderBy('lastMsgAt','desc'));
+    // No orderBy — avoids composite index requirement. Sort in JS.
+    const q = query(collection(db, 'conversations'), where('participants','array-contains', user.uid));
     const snap = await getDocs(q);
     const convs = [];
     snap.forEach(d => convs.push({ id: d.id, ...d.data() }));
+    // Sort by lastMsgAt descending (newest first) in JS — no Firestore index needed
+    convs.sort((a, b) => {
+      const ta = a.lastMsgAt ? a.lastMsgAt.toMillis() : 0;
+      const tb = b.lastMsgAt ? b.lastMsgAt.toMillis() : 0;
+      return tb - ta;
+    });
 
     const renderConv = (c, container, activeId) => {
       const otherId   = c.participants.find(p => p !== user.uid);
@@ -2883,6 +2856,7 @@ window.startNewConversation = async function() {
     // Clear inputs
     if (document.getElementById('new-msg-text'))   document.getElementById('new-msg-text').value = '';
     clearMsgRecipient();
+    closeNewMsgModal();
     showToast('✅ Message sent to ' + targetName + '!');
     showPage('messaging');
     window._activeConvId   = cid;
@@ -2966,6 +2940,20 @@ window.clearMsgRecipient = function() {
   if (selectedBox) selectedBox.style.display = 'none';
   const searchInput = document.getElementById('new-msg-search');
   if (searchInput) searchInput.value = '';
+};
+
+window.openNewMsgModal = function() {
+  clearMsgRecipient();
+  const t = document.getElementById('new-msg-text');
+  if (t) t.value = '';
+  const m = document.getElementById('new-msg-modal');
+  if (m) m.classList.add('open');
+  setTimeout(() => { const s = document.getElementById('new-msg-search'); if(s) s.focus(); }, 100);
+};
+
+window.closeNewMsgModal = function() {
+  const m = document.getElementById('new-msg-modal');
+  if (m) m.classList.remove('open');
 };
 
 // ── MESSAGE SELLER FROM PRODUCT PAGE ───────────────────────────────
@@ -3421,13 +3409,19 @@ window.showPage = function(name) {
   if (name === 'verifstatus') {
     if (typeof loadVerifStatus === 'function') loadVerifStatus();
   }
-  if (name === 'messages' || name === 'messaging') {
+  if (name === 'messages') {
+    // Always redirect to the real Instagram-style chat page
+    if (typeof _origShowPage === 'function') _origShowPage('messaging');
+    else { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); const t=document.getElementById('page-messaging'); if(t){t.classList.add('active');window.scrollTo(0,0);} }
+    if (typeof loadConversations === 'function') loadConversations();
+    return;
+  }
+  if (name === 'messaging') {
     if (typeof loadConversations === 'function') loadConversations();
     const user = window._auth && window._auth.currentUser;
     const profile = window._currentUser || {};
     const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
     const el = id => document.getElementById(id);
-    if (el('nav-avatar-msgs')) el('nav-avatar-msgs').textContent = initials;
     if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
   }
   if (name === 'settings') {
@@ -3580,6 +3574,34 @@ window.saveManualLocation = function() {
 };
 
 </script>
+
+<!-- ── NEW MESSAGE MODAL ─────────────────────────────────────── -->
+<div class="modal-bg" id="new-msg-modal" onclick="if(event.target===this)closeNewMsgModal()">
+  <div class="modal-box" style="max-width:420px;width:90%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h3 style="font-size:17px;margin:0;">✉️ New message</h3>
+      <button onclick="closeNewMsgModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:10px;position:relative;">
+      <label>Search for a user</label>
+      <input type="text" id="new-msg-search" placeholder="Type a name…" oninput="searchUsersToMsg(this.value)" autocomplete="off" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+      <div id="user-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);z-index:200;max-height:200px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.5);"></div>
+    </div>
+    <div id="new-msg-selected-user" style="display:none;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-xs);padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;">
+      <div id="new-msg-sel-avatar" class="conv-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div id="new-msg-sel-name" style="font-size:13.5px;font-weight:600;color:var(--text);"></div>
+        <div id="new-msg-sel-email" style="font-size:11px;color:var(--text3);"></div>
+      </div>
+      <button onclick="clearMsgRecipient()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:14px;">
+      <label>Message</label>
+      <textarea id="new-msg-text" style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Type your first message…"></textarea>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="startNewConversation()">Send →</button>
+  </div>
+</div>
 
 </body>
 </html>
