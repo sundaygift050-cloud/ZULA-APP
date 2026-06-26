@@ -4345,7 +4345,7 @@ window.toggleAdminDropdown = function(e) {
     const nameEl  = document.getElementById('dropdown-name');
     const emailEl = document.getElementById('dropdown-email');
     if (nameEl)  nameEl.textContent  = u.fullName || u.firstName || 'User';
-    if (emailEl) emailEl.textContent = u.email || (auth.currentUser?.email) || '';
+    if (emailEl) emailEl.textContent = u.email || (window._auth?.currentUser?.email) || '';
     // Show admin panel item for admins
     const ddAdmin = document.getElementById('dd-admin-item');
     if (ddAdmin) ddAdmin.style.display = isAdmin() ? 'block' : 'none';
@@ -4375,6 +4375,7 @@ window.closeEditBioModal = function() {
   if (m) m.classList.remove('open');
 };
 window.saveEditBio = async function() {
+  const auth = window._auth; const db = window._db; const fns = window._fns;
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ Not signed in.'); return; }
   const fullName = (document.getElementById('bio-name-input')?.value || '').trim();
@@ -4382,7 +4383,7 @@ window.saveEditBio = async function() {
   const location = (document.getElementById('bio-location-input')?.value || '').trim();
   if (!fullName) { showToast('⚠️ Name cannot be empty.'); return; }
   try {
-    await updateDoc(doc(db, 'users', user.uid), { fullName, bio, location });
+    await fns.updateDoc(fns.doc(db, 'users', user.uid), { fullName, bio, location });
     if (window._currentUser) { window._currentUser.fullName = fullName; window._currentUser.bio = bio; window._currentUser.location = location; }
     closeEditBioModal();
     showToast('✅ Profile updated!');
@@ -4738,6 +4739,7 @@ window.closeListingPreview = function() {
 
 // ── ADD PRODUCT: submit to Firebase ─────────────────────────────────
 window.submitProduct = async function() {
+  const auth = window._auth; const db = window._db; const fns = window._fns;
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ Please sign in first.'); return; }
   const profile = window._currentUser || {};
@@ -4773,10 +4775,10 @@ window.submitProduct = async function() {
       affiliateEnabled: hasAff,
       sellerId:   user.uid,
       sellerName: profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
-      createdAt: serverTimestamp(),
+      createdAt: fns.serverTimestamp(),
       status: 'active',
     };
-    await addDoc(collection(db, 'products'), productData);
+    await fns.addDoc(fns.collection(db, 'products'), productData);
     showToast('✅ Product published successfully!');
     // Clear form
     ['ap-name','ap-desc','ap-price','ap-original-price','ap-emoji'].forEach(id => {
@@ -4810,6 +4812,7 @@ window.sdTab = function(name) {
 };
 
 window.loadSellerDashboardPage = async function() {
+  const auth = window._auth;
   const user = auth.currentUser;
   if (!user) return;
   const u = window._currentUser || {};
@@ -4826,6 +4829,7 @@ window.loadSellerDashboardPage = async function() {
   // Load stats + overview products
   try {
     const fns = window._fns;
+    const db = window._db;
     const pSnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid)));
     if (el('sd-stat-listings')) el('sd-stat-listings').textContent = pSnap.size;
     if (el('sdnav-products-count')) { el('sdnav-products-count').textContent = pSnap.size; el('sdnav-products-count').style.display = pSnap.size > 0 ? 'inline-block' : 'none'; }
@@ -4863,6 +4867,7 @@ function sdProductRow(id, p, compact) {
 }
 
 window.sdLoadProducts = async function() {
+  const auth = window._auth;
   const user = auth.currentUser;
   if (!user) return;
   const el = document.getElementById('sd-products-list');
@@ -4870,11 +4875,12 @@ window.sdLoadProducts = async function() {
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…<\/div>';
   try {
     const fns = window._fns;
+    const db = window._db;
     const snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
     el.innerHTML = snap.empty
       ? '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No products yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
       : snap.docs.map(d => sdProductRow(d.id, d.data(), false)).join('');
-  } catch(e) { el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load products.<\/div>'; }
+  } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load products.<\/div>'; }
 };
 
 window.sdFilterProducts = function(btn, filter) {
@@ -4894,11 +4900,12 @@ window.sdDeleteProduct = async function(id, btn) {
   if (!confirm('Delete this product? This cannot be undone.')) return;
   try {
     const fns = window._fns;
+    const db = window._db;
     await fns.deleteDoc(fns.doc(db, 'products', id));
     btn.closest('.sd-product-row').remove();
     showToast('🗑 Product deleted.');
     sdLoadProducts();
-  } catch(e) { showToast('❌ Could not delete product.'); }
+  } catch(e) { console.error(e); showToast('❌ Could not delete product.'); }
 };
 
 // sdLoadVerification defined above
@@ -4917,6 +4924,7 @@ window.sdRequestPayout = function() {
 };
 
 window.sdSaveSettings = async function() {
+  const auth = window._auth;
   const user = auth.currentUser;
   if (!user) return;
   const name = document.getElementById('sd-store-name').value.trim();
@@ -4924,9 +4932,10 @@ window.sdSaveSettings = async function() {
   const wa   = document.getElementById('sd-whatsapp').value.trim();
   try {
     const fns = window._fns;
+    const db = window._db;
     await fns.updateDoc(fns.doc(db, 'users', user.uid), { storeName: name, storeBio: bio, whatsapp: wa });
     showToast('✅ Settings saved!');
-  } catch(e) { showToast('❌ Could not save settings.'); }
+  } catch(e) { console.error(e); showToast('❌ Could not save settings.'); }
 };
 
 // Language selection
