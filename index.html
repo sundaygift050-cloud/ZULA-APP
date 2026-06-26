@@ -34,6 +34,13 @@ p{color:var(--text2);margin:0 0 1em;}
 .btn-block{width:100%;}
 .btn-sm{padding:7px 13px;font-size:12.5px;}
 
+/* ── LISTING PREVIEW MODAL ── */
+.preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.preview-modal.open{display:flex;}
+.preview-modal-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);max-width:860px;width:100%;padding:24px;}
+.preview-banner{background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:10px 16px;font-size:13px;color:var(--accent);margin-bottom:20px;text-align:center;}
+.prod-type-opt.active{background:rgba(124,92,252,.12)!important;border-color:var(--accent)!important;}
+
 /* TOAST */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -51,6 +58,12 @@ p{color:var(--text2);margin:0 0 1em;}
 .hdr-search input::placeholder{color:var(--text3);}
 .hdr-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);}
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
+.dd-item{padding:10px 16px;font-size:13.5px;color:var(--text2);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:10px;}
+.dd-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+/* Edit Bio modal */
+.bio-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9000;align-items:center;justify-content:center;}
+.bio-modal-bg.open{display:flex;}
+.bio-modal-box{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:90%;max-width:440px;}
 
 /* AUTH PAGES */
 .auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg);}
@@ -213,9 +226,176 @@ p{color:var(--text2);margin:0 0 1em;}
 .modal-box h3{font-size:18px;font-weight:700;margin-bottom:8px;}
 .modal-box p{font-size:14px;margin-bottom:20px;}
 
-@media(max-width:600px){
-  .auth-card{padding:24px;}
-  .profile-header{flex-direction:column;align-items:flex-start;}
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — works on phone AND laptop
+   ═══════════════════════════════════════════════════ */
+
+/* ── Base mobile-first tweaks (≤ 480px — small phones) ── */
+@media(max-width:480px){
+  :root{ --max:100%; }
+  body{ font-size:14px; }
+  .wrap{ padding:0 14px; }
+
+  /* Header */
+  .hdr-inner{ height:54px; gap:10px; }
+  .logo{ font-size:18px; }
+  .hdr-nav{ gap:10px; font-size:12px; }
+  .avatar-btn{ width:30px; height:30px; font-size:11px; }
+
+  /* Auth cards */
+  .auth-card{ padding:20px 16px; }
+  .auth-logo{ font-size:22px; }
+
+  /* Profile header */
+  .profile-header{ flex-direction:column; align-items:flex-start; padding:16px; gap:12px; }
+  .profile-avatar{ width:58px; height:58px; font-size:20px; }
+
+  /* Profile stats grid — 2 cols on phone */
+  .profile-header + div[style*="grid-template-columns:repeat(4"] {
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+
+  /* Seller dashboard stats — 2 cols */
+  #page-seller-dashboard .dash-wrap > div[style*="repeat(4,1fr)"] {
+    grid-template-columns: repeat(2,1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Seller dashboard stats font */
+  #page-seller-dashboard [style*="font-size:26px"] { font-size:20px !important; }
+
+  /* Profile tabs — scrollable */
+  .dash-tabs{ overflow-x:auto; white-space:nowrap; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+  .dash-tab{ padding:8px 12px; font-size:12.5px; }
+
+  /* Marketplace */
+  .mkt-layout{ gap:16px; padding:16px 0 40px; }
+  .filter-panel{ padding:14px; }
+  .pgrid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+  .pcard-img{ height:140px; font-size:28px; }
+  .pcard-body{ padding:10px 10px; }
+  .pcard-name{ font-size:12.5px; }
+  .pcard-price{ font-size:13px; }
+  .mkt-topbar h2{ font-size:16px; }
+
+  /* Product detail */
+  .pdetail-layout{ gap:20px; }
+  .pdetail-title{ font-size:20px; }
+  .pdetail-price{ font-size:22px; }
+  .pdetail-actions{ flex-direction:column; }
+  .pdetail-actions .btn{ width:100%; }
+
+  /* Dash wrap padding */
+  .dash-wrap{ padding:20px 14px 48px; }
+
+  /* Add product */
+  .orders-wrap{ padding:20px 14px 48px; }
+  #product-type-picker{ grid-template-columns:repeat(2,1fr) !important; gap:8px !important; }
+
+  /* Profile-v2 stats */
+  div[style*="repeat(4,1fr)"]{ grid-template-columns:repeat(2,1fr) !important; }
+
+  /* Buttons */
+  .btn{ padding:10px 16px; font-size:13px; }
+  .btn-sm{ padding:6px 11px; font-size:12px; }
+
+  /* Modal */
+  .modal-box{ padding:20px 16px; }
+  .bio-modal-box{ padding:20px 16px; }
+
+  /* Chat */
+  .chat-input-area{ padding:8px 10px; gap:6px; }
+  .chat-messages{ padding:12px 12px; }
+  .chat-header{ padding:10px 12px; }
+
+  /* Notification page */
+  .notif-item{ padding:10px 12px; gap:8px; }
+
+  /* Admin shell — stack on phone */
+  .admin-shell{ flex-direction:column; }
+  .admin-side{ width:100% !important; min-height:auto; }
+  .admin-main{ padding:16px !important; }
+
+  /* Page headings */
+  h1[style*="font-size:24px"]{ font-size:20px !important; }
+  h1[style*="font-size:22px"]{ font-size:19px !important; }
+
+  /* Toast — full width on phone */
+  .toast{ left:14px; right:14px; transform:translateX(0) translateY(20px); white-space:normal; text-align:center; }
+  .toast.show{ transform:translateX(0) translateY(0); }
+
+  /* User dropdown */
+  #user-dropdown{ right:10px !important; left:10px !important; }
+}
+
+/* ── Tablet (481–760px) ── */
+@media(min-width:481px) and (max-width:760px){
+  .wrap{ padding:0 18px; }
+  .hdr-inner{ height:58px; }
+  .profile-header{ flex-direction:column; align-items:flex-start; padding:18px; }
+  .profile-header + div[style*="repeat(4"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  #page-seller-dashboard .dash-wrap > div[style*="repeat(4,1fr)"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  .pgrid{ grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+  .pcard-img{ height:150px; }
+  .dash-wrap{ padding:24px 18px 50px; }
+  .orders-wrap{ padding:24px 18px 50px; }
+  #product-type-picker{ grid-template-columns:repeat(3,1fr) !important; }
+  .admin-shell{ flex-direction:column; }
+  .admin-side{ width:100% !important; }
+}
+
+/* ── Stats grids: 2 cols on mobile ── */
+@media(max-width:640px){
+  .sd-stats-grid{ grid-template-columns:repeat(2,1fr) !important; gap:10px !important; }
+  .pstat-grid{ grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* ── All mobile (≤ 760px shared) ── */
+@media(max-width:760px){
+  /* Hide filter panel sidebar on mobile marketplace — make it collapsible */
+  .filter-panel{ display:none; }
+  .filter-panel.mobile-open{ display:block; margin-bottom:16px; }
+  .mkt-layout{ grid-template-columns:1fr !important; }
+
+  /* Inbox: already handled by .inbox-layout rules */
+
+  /* Nav: hide text labels, show icon fallbacks on small screens */
+  .hdr-nav .hide-mobile{ display:none; }
+  .hdr-nav .show-mobile{ display:inline !important; }
+
+  /* Profile-v2 sidebar buttons stack */
+  div[style*="flex-direction:column;gap:7px"]{
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+  }
+
+  /* Seller dashboard stats text smaller */
+  #sd-stat-listings, #sd-stat-orders, #sd-stat-revenue, #sd-stat-aff{
+    font-size:20px !important;
+  }
+
+  /* Add product type picker 2-col */
+  #product-type-picker{
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+
+  /* Preview modal scroll */
+  .preview-modal{ padding:16px; }
+  .preview-modal-box{ padding:16px; }
+  .pdetail-layout{ grid-template-columns:1fr; gap:20px; }
+}
+
+/* ── Laptop / Desktop (≥ 1024px) — enhance layout ── */
+@media(min-width:1024px){
+  .pgrid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+  .hdr-inner{ height:68px; }
+  .logo{ font-size:24px; }
+  .hdr-nav{ gap:24px; font-size:14px; }
+  .dash-wrap{ padding:40px 32px 80px; }
 }
 
 /* ANALYTICS TABS */
@@ -263,32 +443,110 @@ p{color:var(--text2);margin:0 0 1em;}
 .nfpill{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;}
 .nfpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 
-/* ── MESSAGES / INBOX ── */
-.inbox-layout{display:grid;grid-template-columns:300px 1fr;min-height:600px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-@media(max-width:760px){.inbox-layout{grid-template-columns:1fr;}}
-.inbox-sidebar{border-right:1px solid var(--border);background:var(--surface);}
-.inbox-search{padding:14px;border-bottom:1px solid var(--border);}
-.inbox-search input{width:100%;padding:9px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:13px;font-family:var(--font-body);}
-.conv-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
-.conv-item:hover,.conv-item.active{background:rgba(124,92,252,.06);}
-.conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-.conv-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
-.conv-preview{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.conv-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.conv-time{font-size:11px;color:var(--text3);}
-.conv-unread{background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 6px;min-width:18px;text-align:center;}
-.chat-area{display:flex;flex-direction:column;background:var(--bg);}
-.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;}
-.chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:400px;}
-.msg{max-width:72%;display:flex;flex-direction:column;}
+/* ── MESSAGES / INBOX — Instagram/Messenger style ── */
+
+/* Full-screen chat shell */
+#page-messaging { display:none; }
+#page-messaging.active { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+#page-messaging .hdr { flex-shrink:0; }
+
+.inbox-layout{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 64px);overflow:hidden;}
+@media(max-width:760px){
+  .inbox-layout{grid-template-columns:1fr;}
+  .inbox-sidebar{ display:block; }
+  .chat-area{ display:none; }
+  .inbox-layout.chat-open .inbox-sidebar{ display:none; }
+  .inbox-layout.chat-open .chat-area{ display:flex; }
+}
+
+/* SIDEBAR */
+.inbox-sidebar{border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;}
+.inbox-sidebar-header{padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.inbox-sidebar-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text);}
+.inbox-search{padding:0 14px 12px;flex-shrink:0;}
+.inbox-search input{width:100%;padding:9px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:13px;font-family:var(--font-body);}
+.inbox-search input::placeholder{color:var(--text3);}
+.conv-list-wrap{flex:1;overflow-y:auto;}
+.conv-list-wrap::-webkit-scrollbar{width:4px;}
+.conv-list-wrap::-webkit-scrollbar-track{background:transparent;}
+.conv-list-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* CONVERSATION ROWS */
+.conv-item{display:flex;gap:13px;padding:12px 18px;cursor:pointer;transition:background .12s;align-items:center;}
+.conv-item:hover{background:rgba(255,255,255,.04);}
+.conv-item.active{background:rgba(124,92,252,.10);}
+.conv-avatar-wrap{position:relative;flex-shrink:0;}
+.conv-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;}
+.conv-online-dot{position:absolute;bottom:2px;right:2px;width:13px;height:13px;background:var(--green);border:2px solid var(--bg2);border-radius:50%;}
+.conv-info{flex:1;min-width:0;}
+.conv-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.conv-name{font-size:14px;font-weight:600;color:var(--text);}
+.conv-time{font-size:11.5px;color:var(--text3);flex-shrink:0;}
+.conv-bottom-row{display:flex;align-items:center;justify-content:space-between;}
+.conv-preview{font-size:13px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
+.conv-preview.unread-preview{color:var(--text);font-weight:600;}
+.conv-unread{background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px;min-width:18px;text-align:center;flex-shrink:0;}
+
+/* CHAT AREA */
+.chat-area{display:flex;flex-direction:column;background:var(--bg);overflow:hidden;}
+
+/* Chat header — like Messenger top bar */
+.chat-header{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.chat-header-back{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:0 8px 0 0;}
+@media(max-width:760px){.chat-header-back{display:block;}}
+.chat-header-avatar{width:38px;height:38px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;cursor:pointer;}
+.chat-header-info{flex:1;cursor:pointer;}
+.chat-header-name{font-size:14.5px;font-weight:700;color:var(--text);}
+.chat-header-status{font-size:12px;color:var(--green);}
+.chat-header-actions{display:flex;gap:10px;}
+.chat-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:none;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.chat-icon-btn:hover{background:var(--surface2);}
+
+/* Messages area */
+.chat-messages{flex:1;padding:16px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+.chat-messages::-webkit-scrollbar{width:4px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* Date divider */
+.msg-date-divider{text-align:center;font-size:11.5px;color:var(--text3);margin:12px 0 8px;font-weight:500;}
+
+/* Profile intro card (shown at top of empty chat) */
+.chat-profile-intro{display:flex;flex-direction:column;align-items:center;padding:32px 20px 20px;gap:10px;}
+.chat-intro-avatar{width:80px;height:80px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin-bottom:4px;}
+.chat-intro-name{font-size:19px;font-weight:700;color:var(--text);}
+.chat-intro-sub{font-size:13px;color:var(--text3);}
+.chat-intro-view-btn{margin-top:6px;padding:8px 22px;border-radius:999px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;}
+.chat-intro-view-btn:hover{background:var(--surface2);}
+.chat-e2e-note{font-size:12px;color:var(--text3);text-align:center;padding:4px 24px;line-height:1.5;}
+
+/* Message bubbles */
+.msg{max-width:68%;display:flex;flex-direction:column;margin-bottom:2px;}
 .msg.sent{align-self:flex-end;align-items:flex-end;}
-.msg.recv{align-self:flex-start;align-items:flex-start;}
-.msg-bubble{padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;}
-.msg.sent .msg-bubble{background:var(--accent);color:#fff;border-radius:14px 14px 4px 14px;}
-.msg.recv .msg-bubble{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px 14px 14px 4px;}
-.msg-time{font-size:10.5px;color:var(--text3);margin-top:4px;}
-.chat-input-area{padding:16px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:10px;align-items:flex-end;}
-.chat-input-area textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;padding:10px 14px;resize:none;height:42px;max-height:120px;}
+.msg.recv{align-self:flex-start;align-items:flex-start;flex-direction:row;gap:8px;max-width:74%;}
+.msg-recv-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;align-self:flex-end;margin-bottom:2px;}
+.msg-recv-content{display:flex;flex-direction:column;gap:2px;}
+.msg-bubble{padding:10px 14px;border-radius:20px;font-size:14px;line-height:1.5;word-break:break-word;}
+.msg.sent .msg-bubble{background:var(--accent);color:#fff;border-radius:20px 20px 4px 20px;}
+.msg.recv .msg-recv-content .msg-bubble{background:var(--surface2);color:var(--text);border-radius:20px 20px 20px 4px;}
+.msg-time{font-size:10.5px;color:var(--text3);margin-top:3px;padding:0 4px;}
+.msg-status{font-size:10.5px;color:rgba(255,255,255,.65);margin-top:3px;padding:0 4px;}
+
+/* Consecutive messages — reduce spacing */
+.msg+.msg.sent,
+.msg+.msg.recv { margin-bottom:1px; }
+
+/* Input bar — Messenger style */
+.chat-input-area{padding:12px 14px;border-top:1px solid var(--border);background:var(--bg2);display:flex;gap:10px;align-items:flex-end;flex-shrink:0;}
+.chat-input-wrap{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:22px;display:flex;align-items:flex-end;padding:6px 14px;gap:8px;}
+.chat-input-area textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-body);font-size:14px;padding:4px 0;resize:none;height:26px;max-height:100px;line-height:1.4;}
+.chat-input-area textarea::placeholder{color:var(--text3);}
+.chat-send-btn{width:38px;height:38px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s;}
+.chat-send-btn:hover{opacity:.85;}
+.chat-action-btn{width:36px;height:36px;border-radius:50%;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;flex-shrink:0;}
+
+/* Empty / no-chat selected state */
+.chat-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:10px;font-size:14px;}
+.chat-empty-icon{font-size:52px;}
 
 /* ── SETTINGS PAGE ── */
 .settings-layout{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:28px 0 60px;}
@@ -364,6 +622,145 @@ p{color:var(--text2);margin:0 0 1em;}
 
 /* ── PROFILE V2 LANG BANNER ── */
 .lang-banner{background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:10px 16px;font-size:13px;color:var(--text2);margin-bottom:16px;}
+
+/* ── ADD PRODUCT PAGE ── */
+.ap-topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:58px;}
+.ap-topbar-back{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);}
+.ap-topbar-back:hover{color:var(--text);}
+.ap-progress-bar{height:3px;background:var(--border);position:relative;}
+.ap-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:0 2px 2px 0;transition:width .4s ease;}
+.ap-main{max-width:820px;margin:0 auto;padding:36px 24px 100px;}
+.ap-steps{display:flex;align-items:center;gap:0;margin-bottom:36px;}
+.ap-step{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--text3);}
+.ap-step.active{color:var(--text);}
+.ap-step.done{color:var(--green);}
+.ap-step-num{width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:transparent;}
+.ap-step.done .ap-step-num{background:var(--green);border-color:var(--green);color:#0d0d0f;}
+.ap-step.active .ap-step-num{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ap-step-line{flex:1;height:2px;background:var(--border);margin:0 10px;}
+.ap-step-line.done{background:var(--green);}
+.ap-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;}
+.ap-card-hd{font-size:15px;font-weight:700;margin-bottom:4px;}
+.ap-card-sub{font-size:12.5px;color:var(--text3);margin-bottom:20px;}
+.ap-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;}
+.ap-type-opt{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-sm);padding:18px 12px 14px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.ap-type-opt:hover{border-color:var(--border2);}
+.ap-type-opt.selected{border-color:var(--accent);background:rgba(124,92,252,.08);}
+.ap-type-opt .to-icon{font-size:28px;margin-bottom:8px;}
+.ap-type-opt .to-name{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ap-type-opt .to-sub{font-size:11px;color:var(--text3);line-height:1.4;}
+.ap-type-opt .to-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:10px;color:#fff;}
+.ap-type-opt.selected .to-check{display:flex;}
+.ap-digital-badge{display:inline-block;background:rgba(91,163,245,.12);color:#5ba8f5;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
+.ap-physical-badge{display:inline-block;background:rgba(39,201,122,.1);color:var(--green);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
+.ap-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.ap-field:last-child{margin-bottom:0;}
+.ap-field label{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.03em;}
+.ap-field label em{color:var(--accent);font-style:normal;margin-left:2px;}
+.ap-field input,.ap-field textarea,.ap-field select{background:var(--bg3);border:1px solid var(--border);padding:11px 14px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;transition:border-color .15s;width:100%;}
+.ap-field input:focus,.ap-field textarea:focus,.ap-field select:focus{outline:none;border-color:var(--accent);}
+.ap-field input::placeholder,.ap-field textarea::placeholder{color:var(--text3);}
+.ap-field textarea{resize:vertical;min-height:90px;}
+.ap-field select option{background:var(--bg2);}
+.ap-field-hint{font-size:11.5px;color:var(--text3);}
+.ap-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.ap-field-row{grid-template-columns:1fr;}}
+.ap-field-count{font-size:11px;color:var(--text3);text-align:right;}
+.ap-field-count.warn{color:var(--gold);}
+.ap-field-count.over{color:var(--red);}
+.ap-price-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;}
+@media(max-width:560px){.ap-price-row{grid-template-columns:1fr 1fr;}}
+.ap-pricing-toggle{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer;}
+.ap-toggle-switch{width:40px;height:22px;border-radius:999px;background:var(--border2);position:relative;flex-shrink:0;transition:background .2s;}
+.ap-toggle-switch.on{background:var(--accent);}
+.ap-toggle-switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.ap-toggle-switch.on::after{left:21px;}
+.ap-currency-select{background:var(--bg3);border:1px solid var(--border);padding:11px 10px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+.ap-free-toggle-btn{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-free-toggle-btn.active{border-color:var(--green);color:var(--green);background:rgba(39,201,122,.08);}
+.ap-upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px;}
+.ap-upload-zone:hover{border-color:var(--accent);background:rgba(124,92,252,.04);}
+.ap-upload-zone.has-file{border-color:var(--green);background:rgba(39,201,122,.04);}
+.ap-dynamic{display:none;}
+.ap-dynamic.visible{display:block;}
+.ap-module-item{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;margin-bottom:8px;}
+.ap-mod-drag{color:var(--text3);cursor:grab;font-size:14px;}
+.ap-mod-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:0 3px;}
+.ap-mod-remove:hover{color:var(--red);}
+.ap-add-module-btn{width:100%;background:transparent;border:2px dashed var(--border2);border-radius:var(--radius-xs);padding:11px;font-size:13px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-add-module-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ap-variant-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.ap-variant-row input{flex:1;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+.ap-variant-row input:focus{outline:none;border-color:var(--accent);}
+.ap-variant-rm{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;}
+.ap-variant-rm:hover{color:var(--red);}
+.ap-add-variant-btn{background:transparent;border:1px dashed var(--border2);border-radius:var(--radius-xs);padding:8px 14px;font-size:12.5px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.ap-add-variant-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ap-aff-range{display:flex;align-items:center;gap:14px;}
+.ap-aff-range input[type=range]{flex:1;accent-color:var(--accent);}
+.ap-aff-val{font-size:17px;font-weight:700;color:var(--accent);min-width:48px;text-align:right;}
+.ap-aff-preview{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 16px;margin-top:14px;display:flex;gap:24px;flex-wrap:wrap;}
+.ap-aep-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.ap-aep-val{font-size:16px;font-weight:700;}
+.ap-vis-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
+.ap-vis-opt{background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);padding:12px 10px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:.15s;}
+.ap-vis-opt:hover{border-color:var(--border2);color:var(--text);}
+.ap-vis-opt.selected{border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.07);}
+.ap-callout{border-radius:var(--radius-xs);padding:12px 14px;font-size:13px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+.ap-callout-info{background:rgba(91,163,245,.07);border:1px solid rgba(91,163,245,.2);color:#5ba8f5;}
+.ap-callout-gold{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);color:var(--gold);}
+.ap-callout-green{background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);color:var(--green);}
+.ap-uploaded-file{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;margin-top:8px;}
+.ap-uf-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 2px;}
+.ap-uf-remove:hover{color:var(--red);}
+
+/* ── SELLER DASHBOARD LAYOUT ── */
+.sd-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+@media(max-width:700px){.sd-layout{grid-template-columns:1fr;}}
+.sd-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
+@media(max-width:700px){.sd-sidebar{display:none;}}
+.sd-sidebar-section{padding:0 16px;margin-bottom:24px;}
+.sd-sidebar-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:8px;}
+.sd-nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-xs);font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;border:none;background:none;font-family:var(--font-body);width:100%;text-align:left;}
+.sd-nav-item:hover{background:var(--surface);color:var(--text);}
+.sd-nav-item.active{background:rgba(124,92,252,.12);color:var(--accent);font-weight:600;}
+.sd-nav-item .sd-nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.sd-nav-item .sd-nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sd-nav-item .sd-nav-badge.gold{background:var(--gold);color:#000;}
+.sd-nav-divider{height:1px;background:var(--border);margin:8px 16px;}
+.sd-content{padding:32px 28px;max-width:860px;}
+@media(max-width:700px){.sd-content{padding:20px 16px;}}
+.sd-section{display:none;}
+.sd-section.active{display:block;}
+.sd-page-hd{font-size:22px;font-weight:800;margin-bottom:4px;}
+.sd-page-sub{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.sd-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+@media(max-width:600px){.sd-stat-grid{grid-template-columns:repeat(2,1fr);}}
+.sd-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;}
+.sd-stat-val{font-size:24px;font-weight:800;font-family:var(--font-display);}
+.sd-stat-lbl{font-size:12px;color:var(--text3);margin-top:3px;}
+.sd-product-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.sd-product-row:last-child{border-bottom:none;}
+.sd-product-thumb{width:48px;height:48px;background:var(--bg3);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.sd-product-info{flex:1;min-width:0;}
+.sd-product-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sd-product-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.sd-product-price{font-size:14px;font-weight:700;color:var(--accent);min-width:80px;text-align:right;}
+.sd-product-actions{display:flex;gap:6px;flex-shrink:0;}
+.sd-btn-edit{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:6px 12px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sd-btn-edit:hover{border-color:var(--accent);color:var(--accent);}
+.sd-btn-del{background:transparent;border:1px solid transparent;border-radius:var(--radius-xs);padding:6px 10px;font-size:12px;color:var(--text3);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sd-btn-del:hover{border-color:var(--red);color:var(--red);}
+.sd-payout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:16px;}
+.sd-payout-balance{font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--green);margin-bottom:4px;}
+.sd-payout-pending{font-size:13px;color:var(--text3);}
+.sd-bank-row{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:10px;}
+.sd-bank-icon{font-size:24px;width:40px;height:40px;background:var(--surface);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sd-mobile-nav{display:none;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;white-space:nowrap;}
+@media(max-width:700px){.sd-mobile-nav{display:flex;gap:4px;padding:8px 16px;}}
+.sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
+.sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
+
 </style>
 </head>
 <body>
@@ -587,11 +984,28 @@ p{color:var(--text2);margin:0 0 1em;}
         <input placeholder="Search products…" oninput="filterProducts(this.value)">
       </div>
       <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Browse</a>
-        <a onclick="goAddProduct()">Sell</a>
-        <a onclick="showPage('profile')">Profile</a>
+        <a onclick="showPage('seller-dashboard')" title="Seller dashboard"><span class="hide-mobile">Seller</span><span style="display:none;" class="show-mobile">📊</span></a>
+        <a onclick="showPage('profile')"><span class="hide-mobile">Profile</span><span style="display:none;" class="show-mobile">👤</span></a>
+        <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬 <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
-        <div class="avatar-btn" id="nav-avatar" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
+        <!-- Admin/user dropdown -->
+        <div id="user-dropdown" style="display:none;position:absolute;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+            <div style="font-size:14px;font-weight:700;color:var(--text);" id="dropdown-name">—</div>
+            <div style="font-size:12px;color:var(--text3);" id="dropdown-email">—</div>
+          </div>
+          <div style="padding:6px 0;">
+            <div class="dd-item" onclick="showPage('settings');closeDropdown()">⚙️ Settings</div>
+            <div class="dd-item" onclick="showPage('locationverif');closeDropdown()">📍 Location</div>
+            <div class="dd-item" onclick="showPage('language');closeDropdown()">🌐 Language</div>
+            <div class="dd-item" onclick="showPage('twofa');closeDropdown()">🔐 2FA</div>
+            <div class="dd-item" id="dd-admin-item" style="display:none;" onclick="showPage('admin');closeDropdown()">🛡 Admin panel</div>
+          </div>
+          <div style="padding:6px 0;border-top:1px solid var(--border);">
+            <div class="dd-item" style="color:var(--red);" onclick="zulaSignOut();closeDropdown()">→ Sign out</div>
+          </div>
+        </div>
       </nav>
     </div>
   </header>
@@ -616,7 +1030,10 @@ p{color:var(--text2);margin:0 0 1em;}
     </aside>
     <main>
       <div class="mkt-topbar">
-        <h2>All products</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <h2>All products</h2>
+          <button class="btn btn-ghost btn-sm" id="filter-toggle-btn" onclick="toggleMobileFilter()" style="display:none;">⚙️ Filters</button>
+        </div>
         <div class="result-count" id="result-count"></div>
       </div>
       <div class="pgrid" id="products-grid"></div>
@@ -655,6 +1072,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="pdetail-actions">
           <button class="btn btn-primary" onclick="showToast('🛒 Added to cart!')">Add to cart</button>
           <button class="btn btn-ghost" onclick="showToast('❤️ Saved to wishlist!')">Save</button>
+          <button class="btn btn-ghost" id="pd-msg-seller-btn" onclick="msgSeller()" style="display:none;">💬 Message seller</button>
         </div>
         <div style="margin-top:20px;padding:14px;background:var(--bg3);border-radius:var(--radius-xs);font-size:13px;color:var(--text2);">
           🔒 Payment held in escrow until you confirm receipt.
@@ -668,99 +1086,437 @@ p{color:var(--text2);margin:0 0 1em;}
      PAGE: ADD PRODUCT
      ================================================================ -->
 <div class="page" id="page-addproduct">
-  <header class="hdr">
-    <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('profile')">Profile</a>
-        <div class="avatar-btn" id="nav-avatar-add" onclick="showPage('profile')">?</div>
-      </nav>
+
+  <!-- TOP NAV -->
+  <div class="ap-topbar">
+    <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span style="color:var(--accent);">LA</span></div>
+    <div style="width:1px;height:20px;background:var(--border);margin:0 8px;"></div>
+    <button class="ap-topbar-back" onclick="showPage('seller-dashboard')">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 2L4 7l5 5"/></svg>
+      Back to dashboard
+    </button>
+    <div style="margin-left:auto;font-size:14px;font-weight:600;color:var(--text3);">New listing</div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="ap-progress-bar"><div class="ap-progress-fill" id="ap-progress-fill" style="width:33%"></div></div>
+
+  <div class="ap-main">
+
+    <!-- STEP INDICATOR -->
+    <div class="ap-steps">
+      <div class="ap-step active" id="ap-step-ind-1"><div class="ap-step-num">1</div><span>Product type</span></div>
+      <div class="ap-step-line" id="ap-step-line-1"></div>
+      <div class="ap-step" id="ap-step-ind-2"><div class="ap-step-num">2</div><span>Details & pricing</span></div>
+      <div class="ap-step-line" id="ap-step-line-2"></div>
+      <div class="ap-step" id="ap-step-ind-3"><div class="ap-step-num">3</div><span>Publish</span></div>
     </div>
-  </header>
-  <div class="addprod-wrap">
-    <h1>List a product</h1>
-    <p style="margin-bottom:28px;">Your product will appear on the marketplace immediately after publishing.</p>
-    <div class="dash-card">
-      <h3>What are you selling?</h3>
-      <div class="type-grid">
-        <div class="type-opt selected" id="type-physical" onclick="selectType('physical')">
-          <div class="to-icon">📦</div>
-          <div class="to-name">Physical item</div>
+
+    <!-- STEP 1: TYPE PICKER -->
+    <div id="ap-step-1">
+      <div class="ap-card">
+        <div class="ap-card-hd">What are you selling?</div>
+        <div class="ap-card-sub">Each type unlocks the right fields. You can change this later.</div>
+        <div class="ap-type-grid">
+          <div class="ap-type-opt" data-type="course" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎓</div>
+            <div class="to-name">Online course</div><div class="to-sub">Video lessons, quizzes, certificates</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="ebook" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">📚</div>
+            <div class="to-name">Ebook / PDF</div><div class="to-sub">Downloadable guide, manual, or report</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="template" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎨</div>
+            <div class="to-name">Template</div><div class="to-sub">Notion, Figma, Canva, spreadsheet…</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="software" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">💻</div>
+            <div class="to-name">Software / App</div><div class="to-sub">License key, SaaS, plugin, script</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="audio" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🎵</div>
+            <div class="to-name">Music / Audio</div><div class="to-sub">Beat, sound pack, podcast, royalty-free</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="coaching" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🧑‍💼</div>
+            <div class="to-name">Coaching / Service</div><div class="to-sub">1-on-1 sessions, consulting, mentorship</div>
+            <span class="ap-digital-badge">Digital</span>
+          </div>
+          <div class="ap-type-opt" data-type="vehicle" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🚗</div>
+            <div class="to-name">Vehicle</div><div class="to-sub">Car, bike, truck — new or used</div>
+            <span class="ap-physical-badge">Physical</span>
+          </div>
+          <div class="ap-type-opt" data-type="physical" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">📦</div>
+            <div class="to-name">Physical item</div><div class="to-sub">Fashion, home goods, electronics…</div>
+            <span class="ap-physical-badge">Physical</span>
+          </div>
         </div>
-        <div class="type-opt" id="type-digital" onclick="selectType('digital')">
-          <div class="to-icon">📚</div>
-          <div class="to-name">Digital / Ebook</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-primary" onclick="apGoStep2()" id="ap-step1-next" disabled style="opacity:.4">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: DETAILS -->
+    <div id="ap-step-2" style="display:none;">
+
+      <!-- CORE INFO -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Product details</div>
+        <div class="ap-card-sub" id="ap-details-sub">Fill in the information buyers will see on your listing.</div>
+        <div class="ap-field">
+          <label>Product name <em>*</em></label>
+          <input type="text" id="ap-field-name" placeholder="e.g. The Complete Figma Masterclass" maxlength="120" oninput="apSyncPreview();apCountChars(this,'ap-name-count',120)">
+          <div style="display:flex;justify-content:space-between;"><span class="ap-field-hint">Be specific — buyers search by name</span><span class="ap-field-count" id="ap-name-count">0 / 120</span></div>
         </div>
-        <div class="type-opt" id="type-course" onclick="selectType('course')">
-          <div class="to-icon">🎓</div>
-          <div class="to-name">Online course</div>
+        <div class="ap-field-row">
+          <div class="ap-field">
+            <label>Category <em>*</em></label>
+            <select id="ap-field-category">
+              <option value="">Select a category</option>
+              <optgroup label="Digital">
+                <option>Courses & Education</option><option>Ebooks & Guides</option><option>Templates & Design</option>
+                <option>Software & Tools</option><option>Music & Audio</option><option>Coaching & Consulting</option>
+              </optgroup>
+              <optgroup label="Physical">
+                <option>Fashion & Accessories</option><option>Electronics</option><option>Home & Living</option>
+                <option>Vehicles</option><option>Food & Drink</option><option>Health & Beauty</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="ap-field" id="ap-field-lang-wrap" style="display:none;">
+            <label>Language</label>
+            <select id="ap-field-language">
+              <option>English</option><option>Yoruba</option><option>Igbo</option><option>Hausa</option><option>French</option><option>Pidgin</option>
+            </select>
+          </div>
+        </div>
+        <div class="ap-field">
+          <label>Description <em>*</em></label>
+          <textarea id="ap-field-desc" placeholder="What does this product do? Who is it for? What will they get?" maxlength="2000" oninput="apSyncPreview();apCountChars(this,'ap-desc-count',2000)"></textarea>
+          <div style="display:flex;justify-content:space-between;"><span class="ap-field-hint">Tip: mention the outcome — not just the features</span><span class="ap-field-count" id="ap-desc-count">0 / 2000</span></div>
+        </div>
+        <div class="ap-field">
+          <label>What's included <em style="font-size:11px;background:rgba(124,92,252,.15);color:#a990ff;padding:1px 7px;border-radius:5px;">Bullet checklist</em></label>
+          <div id="ap-features-list" style="margin-bottom:8px;">
+            <div class="ap-variant-row"><input placeholder="e.g. 40+ video lessons" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
+            <div class="ap-variant-row"><input placeholder="e.g. Lifetime access" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
+          </div>
+          <button class="ap-add-variant-btn" onclick="apAddFeature()">+ Add feature</button>
+        </div>
+      </div>
+
+      <!-- COURSE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-course">
+        <div class="ap-card-hd">Course structure</div>
+        <div class="ap-card-sub">Organise your content into modules. Buyers see this before they purchase.</div>
+        <div class="ap-field-row" style="margin-bottom:16px;">
+          <div class="ap-field"><label>Total lessons</label><input type="number" placeholder="e.g. 42" min="1"></div>
+          <div class="ap-field"><label>Total hours of content</label><input type="number" step="0.5" placeholder="e.g. 8.5"></div>
+        </div>
+        <div id="ap-modules-list" style="margin-bottom:12px;">
+          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Introduction & welcome</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">3 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
+          <div class="ap-module-item"><span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span><span style="flex:1;font-size:13px;font-weight:500;margin-left:8px;">Core concepts</span><span style="font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;">8 lessons</span><button class="ap-mod-remove" onclick="this.closest('.ap-module-item').remove()">×</button></div>
+        </div>
+        <button class="ap-add-module-btn" onclick="apAddModule()">+ Add module</button>
+        <div class="ap-field-row" style="margin-top:16px;">
+          <div class="ap-field"><label>Skill level</label><select><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All levels</option></select></div>
+          <div class="ap-field"><label>Delivery method</label><select><option>Pre-recorded video</option><option>Live sessions</option><option>Live + recordings</option><option>Text-based / PDF</option></select></div>
+        </div>
+        <div class="ap-callout ap-callout-info" style="margin-top:8px;">
+          <span style="font-size:16px;">ℹ️</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Preview lesson</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">You can mark one module as a free preview so buyers can try before they buy.</p></div>
+        </div>
+      </div>
+
+      <!-- EBOOK -->
+      <div class="ap-card ap-dynamic" id="ap-sec-ebook">
+        <div class="ap-card-hd">Ebook details</div>
+        <div class="ap-card-sub">Buyers see these specs on the listing page.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Number of pages</label><input type="number" placeholder="e.g. 95" min="1"></div>
+          <div class="ap-field"><label>File format</label><select><option>PDF</option><option>ePub</option><option>MOBI</option><option>PDF + ePub</option></select></div>
+        </div>
+        <div class="ap-field">
+          <label>Table of contents</label>
+          <textarea placeholder="Chapter 1: Getting Started&#10;Chapter 2: Core Framework&#10;Chapter 3: Advanced Techniques" style="min-height:80px;font-size:13px;"></textarea>
+        </div>
+      </div>
+
+      <!-- TEMPLATE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-template">
+        <div class="ap-card-hd">Template details</div>
+        <div class="ap-card-sub">Help buyers understand exactly what they'll receive.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Compatible tools</label><select><option>Notion</option><option>Figma</option><option>Canva</option><option>Google Sheets</option><option>Microsoft Excel</option><option>Framer</option><option>Webflow</option><option>Other</option></select></div>
+          <div class="ap-field"><label>Number of templates in pack</label><input type="number" placeholder="e.g. 12" min="1"></div>
+        </div>
+        <div class="ap-field"><label>What's in the download?</label><input placeholder="e.g. 1 Notion file + 2 bonus PDF guides + video walkthrough"></div>
+      </div>
+
+      <!-- SOFTWARE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-software">
+        <div class="ap-card-hd">Software details</div>
+        <div class="ap-card-sub">Buyers need to know what they're running before they buy.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Licence type</label><select><option>Single-user licence</option><option>Multi-user (team)</option><option>SaaS subscription</option><option>One-time lifetime deal</option><option>Plugin / extension</option></select></div>
+          <div class="ap-field"><label>Compatible platform</label><select><option>Web / SaaS</option><option>Windows</option><option>macOS</option><option>Windows + macOS</option><option>Chrome extension</option><option>Mobile (iOS / Android)</option></select></div>
+        </div>
+        <div class="ap-field"><label>Version number</label><input placeholder="e.g. v2.4.1"></div>
+        <div class="ap-callout ap-callout-green">
+          <span style="font-size:16px;">🔑</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Licence keys delivered automatically</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">After purchase, buyers receive their key instantly via email and their order page.</p></div>
+        </div>
+      </div>
+
+      <!-- AUDIO -->
+      <div class="ap-card ap-dynamic" id="ap-sec-audio">
+        <div class="ap-card-hd">Audio details</div>
+        <div class="ap-card-sub">Let buyers know exactly what they're getting.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Audio type</label><select><option>Beat / Instrumental</option><option>Sound pack / Samples</option><option>Full track (royalty-free)</option><option>Podcast episode</option><option>Voice-over clip</option></select></div>
+          <div class="ap-field"><label>Licence</label><select><option>Non-exclusive use</option><option>Exclusive (single buyer)</option><option>Royalty-free unlimited</option><option>Personal use only</option></select></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>BPM (if applicable)</label><input type="number" placeholder="e.g. 140" min="1"></div>
+          <div class="ap-field"><label>Key (if applicable)</label><input placeholder="e.g. C minor"></div>
+        </div>
+      </div>
+
+      <!-- COACHING -->
+      <div class="ap-card ap-dynamic" id="ap-sec-coaching">
+        <div class="ap-card-hd">Session details</div>
+        <div class="ap-card-sub">Tell buyers how the engagement works.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Session type</label><select><option>1-on-1 call</option><option>Group workshop</option><option>Email / async</option><option>Ongoing retainer</option><option>Audit / review</option></select></div>
+          <div class="ap-field"><label>Session duration</label><select><option>30 minutes</option><option>45 minutes</option><option>60 minutes</option><option>90 minutes</option><option>2 hours</option><option>Custom</option></select></div>
+        </div>
+        <div class="ap-field"><label>Platform</label><select><option>Zoom</option><option>Google Meet</option><option>WhatsApp call</option><option>In person</option><option>Buyer's choice</option></select></div>
+        <div class="ap-callout ap-callout-gold">
+          <span style="font-size:16px;">📅</span>
+          <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Booking calendar</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">After publishing, connect your Calendly or Google Calendar so buyers book directly.</p></div>
+        </div>
+      </div>
+
+      <!-- VEHICLE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-vehicle">
+        <div class="ap-card-hd">Vehicle details</div>
+        <div class="ap-card-sub">Accurate specs build buyer confidence and reduce back-and-forth.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Make</label><input placeholder="e.g. Toyota"></div>
+          <div class="ap-field"><label>Model</label><input placeholder="e.g. Camry XLE"></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Year</label><input type="number" placeholder="e.g. 2021" min="1900" max="2030"></div>
+          <div class="ap-field"><label>Mileage (km)</label><input type="number" placeholder="e.g. 42000"></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Transmission</label><select><option>Automatic</option><option>Manual</option></select></div>
+          <div class="ap-field"><label>Fuel type</label><select><option>Petrol</option><option>Diesel</option><option>Electric</option><option>Hybrid</option><option>CNG</option></select></div>
+        </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Colour</label><input placeholder="e.g. Midnight Black"></div>
+          <div class="ap-field"><label>Condition</label><select><option>Foreign used (Tokunbo)</option><option>Nigerian used</option><option>Brand new</option><option>For parts</option></select></div>
+        </div>
+        <div class="ap-field"><label>Location of vehicle</label><input placeholder="e.g. Lagos Island, Lagos"></div>
+      </div>
+
+      <!-- PHYSICAL -->
+      <div class="ap-card ap-dynamic" id="ap-sec-physical">
+        <div class="ap-card-hd">Physical product details</div>
+        <div class="ap-card-sub">Size, material, condition — anything a buyer can't see through a photo.</div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Condition</label><select><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
+          <div class="ap-field"><label>Available stock</label><input type="number" placeholder="e.g. 10" min="1"></div>
+        </div>
+        <div class="ap-field">
+          <label>Sizes / Variants</label>
+          <div id="ap-variants-list" style="margin-bottom:8px;">
+            <div class="ap-variant-row"><input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
+          </div>
+          <button class="ap-add-variant-btn" onclick="apAddVariant()">+ Add size or variant</button>
+        </div>
+      </div>
+
+      <!-- MEDIA UPLOAD -->
+      <div class="ap-card">
+        <div class="ap-card-hd" id="ap-upload-card-title">📸 Cover image & media</div>
+        <div class="ap-card-sub" id="ap-upload-card-sub">Upload images or a short preview. First image is your cover photo.</div>
+        <div class="ap-upload-zone" id="ap-cover-upload" onclick="apFakeUpload('ap-cover-upload','ap-cover-file-list','🖼 cover-image.jpg','1.2 MB')">
+          <div style="font-size:30px;margin-bottom:8px;">🖼</div>
+          <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;">Drag & drop or click to upload</div>
+          <div style="font-size:11.5px;color:var(--text3);" id="ap-cover-upload-hint">JPG, PNG, GIF · Up to 8 images · 10 MB each</div>
+        </div>
+        <div id="ap-cover-file-list"></div>
+        <div id="ap-digital-file-section" style="display:none;margin-top:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📎 Your delivery file</div>
+          <div class="ap-callout ap-callout-green" style="margin-bottom:10px;">
+            <span style="font-size:16px;">⚡</span>
+            <div><strong style="font-size:13px;font-weight:700;display:block;margin-bottom:2px;">Instant delivery</strong><p style="font-size:12.5px;color:inherit;opacity:.85;">This file is sent to the buyer the moment payment clears — automatically.</p></div>
+          </div>
+          <div class="ap-upload-zone" id="ap-digital-upload" onclick="apFakeUpload('ap-digital-upload','ap-digital-file-list','📦 product-files.zip','48.6 MB')">
+            <div style="font-size:30px;margin-bottom:8px;">⬆️</div>
+            <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;" id="ap-digital-upload-title">Upload your product file</div>
+            <div style="font-size:11.5px;color:var(--text3);" id="ap-digital-upload-sub">PDF, ZIP, MP3, MP4, EPUB — up to 2 GB</div>
+          </div>
+          <div id="ap-digital-file-list"></div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Pricing</div>
+        <div class="ap-card-sub">You can run promotions any time after listing.</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="font-size:13px;font-weight:600;">Pricing model:</span>
+          <button class="ap-free-toggle-btn active" id="ap-btn-paid" onclick="apSetPriceMode('paid')" style="border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.08);">Paid</button>
+          <button class="ap-free-toggle-btn" id="ap-btn-free" onclick="apSetPriceMode('free')">Free</button>
+          <button class="ap-free-toggle-btn" id="ap-btn-pwyw" onclick="apSetPriceMode('pwyw')">Pay what you want</button>
+        </div>
+        <div id="ap-price-fields">
+          <div class="ap-price-row">
+            <div class="ap-field" style="margin-bottom:0;"><label>Price <em>*</em></label><input type="number" id="ap-field-price" placeholder="0.00" min="0" step="0.01" oninput="apSyncPreview();apUpdateAffPreview()"></div>
+            <div class="ap-field" style="margin-bottom:0;"><label>Compare-at price</label><input type="number" id="ap-field-original" placeholder="0.00" min="0" step="0.01" oninput="apSyncPreview()"></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:6px;">Currency</label>
+              <select class="ap-currency-select" id="ap-field-currency">
+                <option value="NGN">NGN ₦</option><option value="USD">USD $</option><option value="GHS">GHS ¢</option><option value="KES">KES KSh</option><option value="ZAR">ZAR R</option>
+              </select>
+            </div>
+          </div>
+          <div class="ap-field" id="ap-pwyw-min-wrap" style="display:none;margin-top:12px;">
+            <label>Minimum price</label><input type="number" placeholder="e.g. 500" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- AFFILIATE -->
+      <div class="ap-card">
+        <div class="ap-card-hd">💰 Affiliate programme</div>
+        <div class="ap-card-sub">Affiliates promote your product and earn a cut. More commission = more promotion.</div>
+        <div class="ap-pricing-toggle" onclick="apToggleAff()">
+          <div>
+            <div style="font-size:13px;font-weight:600;">Enable affiliate marketing for this product</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:1px;">Affiliates can share a tracked link and earn on every sale</div>
+          </div>
+          <div class="ap-toggle-switch on" id="ap-aff-toggle"></div>
+        </div>
+        <div id="ap-aff-settings">
+          <div class="ap-aff-range">
+            <span style="font-size:12.5px;color:var(--text3);">Commission</span>
+            <input type="range" min="5" max="50" value="20" oninput="this.nextElementSibling.textContent=this.value+'%';apUpdateAffPreview()">
+            <span class="ap-aff-val" id="ap-aff-val">20%</span>
+          </div>
+          <div class="ap-aff-preview">
+            <div><div class="ap-aep-label">Affiliate earns</div><div class="ap-aep-val" id="ap-aep-affiliate" style="color:var(--gold);">—</div></div>
+            <div><div class="ap-aep-label">You receive</div><div class="ap-aep-val" id="ap-aep-seller" style="color:var(--green);">—</div></div>
+            <div><div class="ap-aep-label">Platform fee</div><div class="ap-aep-val" id="ap-aep-platform" style="color:var(--text3);">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISIBILITY -->
+      <div class="ap-card">
+        <div class="ap-card-hd">Visibility & scheduling</div>
+        <div class="ap-card-sub">Control when and how buyers can find this listing.</div>
+        <div class="ap-vis-opts">
+          <div class="ap-vis-opt selected" onclick="apSelectVis(this,'public')"><div style="font-size:18px;margin-bottom:4px;">🌍</div>Public</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'unlisted')"><div style="font-size:18px;margin-bottom:4px;">🔗</div>Link only</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'draft')"><div style="font-size:18px;margin-bottom:4px;">📝</div>Draft</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'scheduled')"><div style="font-size:18px;margin-bottom:4px;">⏰</div>Scheduled</div>
+          <div class="ap-vis-opt" onclick="apSelectVis(this,'members')"><div style="font-size:18px;margin-bottom:4px;">🔒</div>Members only</div>
+        </div>
+        <div id="ap-schedule-date-wrap" style="display:none;margin-bottom:16px;">
+          <div class="ap-field" style="max-width:280px;"><label>Go live at</label><input type="datetime-local"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" checked style="accent-color:var(--accent);width:15px;height:15px;">Allow reviews</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" checked style="accent-color:var(--accent);width:15px;height:15px;">Show sales count</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:500;"><input type="checkbox" style="accent-color:var(--accent);width:15px;height:15px;">Limited-time offer</label>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-bottom:80px;">
+        <button class="btn btn-ghost" onclick="apGoStep1()">← Back</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="showToast('💾 Draft saved')">Save draft</button>
+          <button class="btn btn-ghost" onclick="apOpenPreview()">👁 Preview</button>
+          <button class="btn btn-primary" onclick="apGoStep3()">Review & publish →</button>
         </div>
       </div>
     </div>
-    <div class="dash-card">
-      <h3>Product details</h3>
-      <div class="form-field">
-        <label>Product name *</label>
-        <input type="text" id="prod-name" placeholder="e.g. Handwoven Raffia Tote Bag">
-      </div>
-      <div class="form-field">
-        <label>Category *</label>
-        <select id="prod-category">
-          <option value="">Select a category</option>
-          <option>Fashion</option>
-          <option>Electronics</option>
-          <option>Beauty & Health</option>
-          <option>Ebooks & Education</option>
-          <option>Courses</option>
-          <option>Home & Living</option>
-          <option>Music & Audio</option>
-          <option>Templates & Design</option>
-          <option>Software & Tools</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Description *</label>
-        <textarea id="prod-desc" placeholder="Describe your product — materials, size, what's included, etc."></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-field">
-          <label>Price (NGN) *</label>
-          <input type="number" id="prod-price" placeholder="e.g. 18500">
+
+    <!-- STEP 3: PUBLISH -->
+    <div id="ap-step-3" style="display:none;">
+      <div class="ap-card" style="text-align:center;padding:40px 32px;">
+        <div style="font-size:56px;margin-bottom:16px;">🚀</div>
+        <h2 style="font-size:22px;margin-bottom:8px;">You're ready to publish</h2>
+        <p style="max-width:420px;margin:0 auto 28px;">Your listing has been saved. Once published, buyers can find and purchase it immediately.</p>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;text-align:left;max-width:480px;margin:0 auto 28px;">
+          <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Listing summary</div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Name</span><span id="ap-summary-name" style="font-weight:600;text-align:right;max-width:200px;"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Type</span><span id="ap-summary-type" style="font-weight:600;"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">Price</span><span id="ap-summary-price" style="font-weight:600;color:var(--accent);"></span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:var(--text3);">Affiliate</span><span id="ap-summary-aff" style="font-weight:600;color:var(--gold);"></span></div>
         </div>
-        <div class="form-field">
-          <label>Affiliate commission %</label>
-          <input type="number" id="prod-commission" placeholder="e.g. 10" min="0" max="50">
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-ghost" onclick="apGoStep2()">← Edit listing</button>
+          <button class="btn btn-ghost" onclick="apOpenPreview()">👁 Preview again</button>
+          <button class="btn btn-primary" style="min-width:160px;" onclick="apPublish(event)">Publish now →</button>
         </div>
       </div>
     </div>
-    <div class="dash-card">
-      <h3>Product image</h3>
-      <div class="upload-box" onclick="document.getElementById('img-upload').click()">
-        <div class="ub-icon" id="upload-preview">📸</div>
-        <div class="ub-text">Click to upload an image (JPG, PNG · max 5MB)</div>
-        <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="previewImage(this)">
+
+  </div>
+</div>
+
+<!-- ADD PRODUCT PREVIEW MODAL -->
+<div class="preview-modal" id="ap-preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);max-width:840px;width:100%;padding:24px;">
+    <div style="background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--accent);margin-bottom:20px;text-align:center;">👁 Preview — this is how buyers will see your listing</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;">
+      <div>
+        <div style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:72px;margin-bottom:10px;" id="ap-pv-icon">📦</div>
+        <div style="display:flex;gap:7px;"><div style="width:52px;height:52px;background:var(--bg3);border:2px solid var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;" id="ap-pv-t1">📦</div></div>
+      </div>
+      <div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;" id="ap-pv-type-tag" class="tag tag-purple">Physical item</span>
+          <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,200,66,.15);color:var(--gold);" id="ap-pv-aff-tag">Affiliate · 20%</span>
+        </div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:6px;" id="ap-pv-title">Your product name</div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">By Your Store · <span style="color:var(--green);">✓ Verified seller</span></div>
+        <div style="font-size:28px;font-weight:800;color:var(--accent);margin-bottom:12px;" id="ap-pv-price">₦0</div>
+        <div style="font-size:13px;color:var(--text3);text-decoration:line-through;display:none;margin-bottom:12px;" id="ap-pv-original"></div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:16px;" id="ap-pv-desc">Your description will appear here.</div>
+        <div style="display:flex;gap:8px;">
+          <button style="flex:1;padding:12px;font-size:13.5px;font-weight:700;border-radius:var(--radius-xs);border:none;cursor:pointer;background:var(--accent);color:#fff;opacity:.75;pointer-events:none;">Buy now</button>
+          <button style="flex:1;padding:12px;font-size:13.5px;font-weight:700;border-radius:var(--radius-xs);background:var(--surface);border:1px solid var(--border2);color:var(--text);opacity:.75;pointer-events:none;">Add to cart</button>
+        </div>
       </div>
     </div>
-    <div style="display:flex;gap:12px;margin-top:8px;">
-      <button class="btn btn-ghost" onclick="showPage('marketplace')" style="flex:1;">Cancel</button>
-      <button class="btn btn-primary" onclick="publishProduct()" style="flex:1;">Publish listing →</button>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <button class="btn btn-ghost" onclick="apClosePreview()">Close</button>
+      <button class="btn btn-primary" onclick="apClosePreview();apGoStep3()">Looks good →</button>
     </div>
   </div>
 </div>
 
-<!-- ================================================================
-     PAGE: USER PROFILE / DASHBOARD
-     ================================================================ -->
+
 <div class="page" id="page-profile">
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="goAddProduct()">+ Add product</a>
-        <a onclick="showPage('messages')">✉️</a>
+        <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬</a>
         <a onclick="showPage('notifications')">🔔</a>
         <a onclick="showPage('settings')">⚙️</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
@@ -783,14 +1539,14 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('profile-v2')">🪪 Full profile</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
       </div>
     </div>
 
     <!-- QUICK STATS (real from Firebase) -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+    <div class="pstat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
         <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-orders">0</div>
         <div style="font-size:11px;color:var(--text3);">Orders</div>
@@ -812,9 +1568,7 @@ p{color:var(--text2);margin:0 0 1em;}
     <!-- PROFILE TABS -->
     <div class="dash-tabs">
       <div class="dash-tab active" id="ptab-listings"  onclick="profileTab('listings')">📦 My listings</div>
-      <div class="dash-tab"        id="ptab-seller"    onclick="profileTab('seller')">📊 Seller dashboard</div>
       <div class="dash-tab"        id="ptab-orders"    onclick="profileTab('orders')">🛍 My orders</div>
-      <div class="dash-tab"        id="ptab-settings"  onclick="profileTab('settings')">⚙️ Settings</div>
     </div>
 
     <!-- TAB: MY LISTINGS -->
@@ -986,26 +1740,32 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">1</span> Government ID + Selfie</h3>
       <p>Upload a government-issued photo ID (passport, driver's licence, national ID) and a selfie holding the ID.</p>
-      <div class="upload-box" onclick="showToast('📎 ID upload ready — connect storage to enable')">
+      <input type="file" id="upload-id-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'id','verif-id-preview','verif-id-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-id-file').click()" id="verif-id-box">
         <div class="ub-icon">🪪</div>
-        <div class="ub-text">Upload government ID</div>
+        <div class="ub-text" id="verif-id-status">Tap to upload government ID</div>
       </div>
+      <div id="verif-id-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">2</span> Business / Individual Registration</h3>
       <p>Sole traders upload proof of address. Registered businesses upload their certificate (CAC or equivalent).</p>
-      <div class="upload-box" onclick="showToast('📎 Registration doc upload ready')">
+      <input type="file" id="upload-reg-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'reg','verif-reg-preview','verif-reg-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-reg-file').click()" id="verif-reg-box">
         <div class="ub-icon">🏢</div>
-        <div class="ub-text">Upload registration document</div>
+        <div class="ub-text" id="verif-reg-status">Tap to upload registration document</div>
       </div>
+      <div id="verif-reg-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <div class="verif-step">
       <h3><span style="background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">3</span> Proof of Product Ownership</h3>
       <p>Prove you own or have rights to sell what you're listing — purchase invoice, brand certificate, or creator declaration.</p>
-      <div class="upload-box" onclick="showToast('📎 Ownership proof upload ready')">
+      <input type="file" id="upload-own-file" accept="image/*,application/pdf" style="display:none" onchange="handleVerifUpload(this,'ownership','verif-own-preview','verif-own-status')">
+      <div class="upload-box" onclick="document.getElementById('upload-own-file').click()" id="verif-own-box">
         <div class="ub-icon">✅</div>
-        <div class="ub-text">Upload ownership proof</div>
+        <div class="ub-text" id="verif-own-status">Tap to upload ownership proof</div>
       </div>
+      <div id="verif-own-preview" style="display:none;margin-top:10px;font-size:13px;color:var(--green);"></div>
     </div>
     <button class="btn btn-primary btn-block" onclick="submitVerification()" style="margin-top:8px;">Submit for review →</button>
   </div>
@@ -1132,12 +1892,10 @@ p{color:var(--text2);margin:0 0 1em;}
       <!-- VERIFICATION QUEUE -->
       <div class="admin-section" id="asec-verif">
         <div class="dash-h1">Verification Queue</div>
-        <div class="dash-sub">Seller verification requests waiting for review</div>
+        <div class="dash-sub">All seller verification submissions — approve or revoke access</div>
         <div class="dash-card">
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="es-icon">🛡</div>
-            <h3>No pending verifications</h3>
-            <p>Seller verification requests will appear here.</p>
+          <div id="admin-verif-list">
+            <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
           </div>
         </div>
       </div>
@@ -1211,11 +1969,8 @@ p{color:var(--text2);margin:0 0 1em;}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('locationverif')">📍 Location</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Language</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 2FA</button>
           <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
+          <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
         </div>
       </div>
     </div>
@@ -1309,93 +2064,98 @@ p{color:var(--text2);margin:0 0 1em;}
   </div>
 </div>
 
-<!-- ================================================================
-     PAGE: MESSAGES (inbox overview — real Firebase)
-     ================================================================ -->
+<!-- page-messages: just a redirect shell to the real chat UI -->
 <div class="page" id="page-messages">
+  <!-- new-msg inputs kept here so startNewConversation() still works -->
+  <input type="hidden" id="new-msg-search">
+  <input type="hidden" id="new-msg-uid">
+  <div id="user-search-results" style="display:none;"></div>
+  <div id="new-msg-selected-user" style="display:none;">
+    <div id="new-msg-sel-avatar"></div>
+    <div id="new-msg-sel-name"></div>
+    <div id="new-msg-sel-email"></div>
+  </div>
+  <input type="hidden" id="new-msg-text">
+  <div id="inbox-conv-list" style="display:none;"></div>
+</div>
+
+<!-- ================================================================
+     PAGE: FULL MESSAGING — Instagram/Messenger style
+     ================================================================ -->
+<div class="page" id="page-messaging">
+  <!-- Top nav bar -->
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('messaging')">💬 Full chat</a>
-        <div class="avatar-btn" id="nav-avatar-msgs" onclick="showPage('profile')">?</div>
-      </nav>
-    </div>
-  </header>
-  <div class="dash-wrap" style="max-width:700px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <h1 style="font-size:22px;font-weight:700;">Messages</h1>
-      <button class="btn btn-primary btn-sm" onclick="showPage('messaging')">💬 Open full chat</button>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;" id="inbox-conv-list">
-      <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">Loading conversations…</div>
-    </div>
-    <!-- Start new conversation -->
-    <div style="margin-top:20px;">
-      <div class="dash-card">
-        <h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">✉️ New message</h3>
-        <div class="form-field" style="margin-bottom:10px;">
-          <label>Recipient's User ID or email</label>
-          <input type="text" id="new-msg-uid" placeholder="Paste user UID or email…">
-        </div>
-        <div class="form-field" style="margin-bottom:10px;">
-          <label>Message</label>
-          <textarea id="new-msg-text" style="height:70px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Type your message…"></textarea>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="startNewConversation()">Send →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================================================================
-     PAGE: FULL MESSAGING (chat interface — real Firebase)
-     ================================================================ -->
-<div class="page" id="page-messaging">
-  <header class="hdr">
-    <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('messages')">← Inbox</a>
         <div class="avatar-btn" id="nav-avatar-chat" onclick="showPage('profile')">?</div>
       </nav>
     </div>
   </header>
-  <div class="wrap" style="padding-top:24px;padding-bottom:40px;">
-    <div class="inbox-layout">
-      <!-- SIDEBAR — real conversations -->
-      <div class="inbox-sidebar">
-        <div class="inbox-search"><input placeholder="Search conversations…" type="text" oninput="filterConvs(this.value)"></div>
-        <div id="conv-list-sidebar">
-          <div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">Loading…</div>
-        </div>
+
+  <div class="inbox-layout" id="inbox-layout">
+    <!-- ── LEFT SIDEBAR: conversation list ── -->
+    <div class="inbox-sidebar">
+      <div class="inbox-sidebar-header">
+        <span class="inbox-sidebar-title">Chats</span>
+        <button onclick="openNewMsgModal()" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);">+ New</button>
       </div>
-      <!-- CHAT AREA -->
-      <div class="chat-area">
-        <div class="chat-header" id="chat-header">
-          <div class="conv-avatar" id="chat-peer-avatar">?</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;" id="chat-peer-name">Select a conversation</div>
-            <div style="font-size:12px;color:var(--text3);" id="chat-peer-sub">—</div>
-          </div>
-          <div style="margin-left:auto;">
-            <button class="btn btn-ghost btn-sm" id="chat-follow-btn" style="display:none;" onclick="toggleFollowFromChat()">Follow</button>
-          </div>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div style="margin:auto;text-align:center;color:var(--text3);font-size:13px;padding:40px 20px;">
-            Select a conversation or start a new one from the inbox.
-          </div>
-        </div>
-        <div class="chat-input-area" id="chat-input-area" style="display:none;">
-          <textarea id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
-          <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" style="height:42px;">Send →</button>
-        </div>
+      <div class="inbox-search">
+        <input placeholder="🔍  Search" type="text" oninput="filterConvs(this.value)">
+      </div>
+      <div class="conv-list-wrap" id="conv-list-sidebar">
+        <div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">Loading…</div>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- ── RIGHT: chat area ── -->
+    <div class="chat-area" id="chat-area">
+
+      <!-- No chat selected -->
+      <div class="chat-empty-state" id="chat-empty-state">
+        <div class="chat-empty-icon">💬</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text2);">Your messages</div>
+        <div>Select a conversation or start a new one</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showPage('messages')">Send a message</button>
+      </div>
+
+      <!-- Active chat (hidden until a conv is selected) -->
+      <div id="chat-active-view" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+
+        <!-- Header -->
+        <div class="chat-header" id="chat-header">
+          <button class="chat-header-back" onclick="closeChatMobile()">‹</button>
+          <div class="chat-header-avatar" id="chat-peer-avatar" onclick="showChatProfile()">?</div>
+          <div class="chat-header-info" onclick="showChatProfile()">
+            <div class="chat-header-name" id="chat-peer-name">—</div>
+            <div class="chat-header-status" id="chat-peer-sub"></div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="chat-icon-btn" id="chat-follow-btn" style="display:none;font-size:13px;width:auto;padding:0 12px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);" onclick="toggleFollowFromChat()">Follow</button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chat-messages">
+          <!-- profile intro card injected here by openConversation() -->
+        </div>
+
+        <!-- Input bar -->
+        <div class="chat-input-area" id="chat-input-area">
+          <button class="chat-action-btn" title="Image">🖼</button>
+          <div class="chat-input-wrap">
+            <textarea id="chat-input" placeholder="Aa" rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"
+              oninput="this.style.height='26px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+          </div>
+          <button class="chat-send-btn" onclick="sendChatMsg()">➤</button>
+        </div>
+
+      </div><!-- /chat-active-view -->
+    </div><!-- /chat-area -->
+  </div><!-- /inbox-layout -->
+</div><!-- /page-messaging -->
 
 <!-- ================================================================
      PAGE: NOTIFICATIONS
@@ -1959,6 +2719,8 @@ onAuthStateChanged(auth, async (user) => {
       window._currentUser = { email: user.email, firstName: '' };
     }
     updateNavAvatar();
+    if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
+    setTimeout(_showAdminNavIfNeeded, 600);
     const adminLink = document.getElementById('admin-nav-link');
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
@@ -1972,7 +2734,9 @@ function updateNavAvatar() {
   const u = window._currentUser;
   if (!u) return;
   const initials = ((u.firstName||'')[0]||'') + ((u.lastName||'')[0]||'');
-  ['nav-avatar','nav-avatar-product','nav-avatar-add'].forEach(id => {
+  ['nav-avatar','nav-avatar-product','nav-avatar-add','nav-avatar-msgs',
+   'nav-avatar-chat','nav-avatar-settings','nav-avatar-notif',
+   'nav-avatar-verif','nav-avatar-v2','nav-avatar-myprofile'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = initials || '?';
   });
@@ -2146,6 +2910,7 @@ window.applyFilters = function() { };
 window.viewProduct = function(id) {
   const p = (window._allProducts||[]).find(x => x.id === id);
   if (!p) return;
+  window._currentProduct = p;
   document.getElementById('pd-img').textContent    = p.emoji || '📦';
   document.getElementById('pd-title').textContent  = p.name;
   document.getElementById('pd-seller').textContent = 'By ' + (p.sellerName || 'ZÚLA Seller');
@@ -2154,6 +2919,11 @@ window.viewProduct = function(id) {
   document.getElementById('pd-tags').innerHTML     =
     `<span class="tag tag-gold">${p.type||'Physical'}</span>` +
     (p.commission ? ` <span class="tag tag-green">Affiliate · ${p.commission}%</span>` : '');
+  const msgBtn = document.getElementById('pd-msg-seller-btn');
+  if (msgBtn) {
+    const user = window._auth && window._auth.currentUser;
+    msgBtn.style.display = (p.sellerId && (!user || p.sellerId !== user.uid)) ? 'inline-flex' : 'none';
+  }
   showPage('product');
 };
 
@@ -2277,9 +3047,73 @@ window.saveSettings = async function() {
   } catch(e) { showToast('❌ Could not save. Try again.'); }
 };
 
-window.submitVerification = function() {
-  showToast('✅ Verification submitted! We\'ll review within 24–48 hours.');
-  showPage('profile');
+// ── VERIFICATION FILE UPLOADS (Cloudinary) ───────────────────────────
+const CLOUDINARY_CLOUD = 'dclahlchz';
+const CLOUDINARY_PRESET = 'zula_verif';
+const _verifFiles = {};
+
+window.handleVerifUpload = function(input, key, previewId, statusId) {
+  const file = input.files[0];
+  if (!file) return;
+  _verifFiles[key] = file;
+  const preview = document.getElementById(previewId);
+  const status  = document.getElementById(statusId);
+  if (status)  status.textContent = '✅ ' + file.name;
+  if (preview) { preview.style.display = 'block'; preview.textContent = file.name + ' ready — tap Submit to send.'; }
+};
+
+async function uploadToCloudinary(file, folder) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  formData.append('folder', folder);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`,
+    { method: 'POST', body: formData }
+  );
+  if (!res.ok) throw new Error('Cloudinary upload failed');
+  const data = await res.json();
+  return data.secure_url;
+}
+
+window.submitVerification = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('Please log in first.'); return; }
+  if (Object.keys(_verifFiles).length === 0) {
+    showToast('⚠️ Please upload at least one document first.');
+    return;
+  }
+
+  const btn = document.querySelector('#page-verification .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+
+  try {
+    const urls = {};
+    for (const [key, file] of Object.entries(_verifFiles)) {
+      showToast(`📤 Uploading ${key}…`);
+      urls[key] = await uploadToCloudinary(file, `zula_verifications/${user.uid}`);
+    }
+
+    // Save URLs to Firestore — admin must approve
+    await updateDoc(doc(db, 'users', user.uid), {
+      verifSubmitted: true,
+      verifDocs: urls,
+      verifSubmittedAt: serverTimestamp(),
+      sellerVerified: false
+    });
+
+    if (window._currentUser) {
+      window._currentUser.verifSubmitted = true;
+      window._currentUser.sellerVerified = false;
+    }
+    showToast('📋 Documents submitted! We will review and approve within 24–48 hours.');
+    showPage('profile');
+  } catch (e) {
+    console.error('Verif upload error:', e);
+    showToast('❌ Upload failed: ' + (e.message || e));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit for review →'; }
+  }
 };
 
 // ── REAL VERIFICATION STATUS ────────────────────────────────────────
@@ -2304,10 +3138,11 @@ window.loadVerifStatus = async function() {
 
   // Seller verification
   setStep('vs-seller-icon','vs-seller-desc',
-    u.sellerVerified ? 'done' : (u.verifSubmitted ? 'pending' : 'todo'),
+    u.sellerVerified ? 'done' : (u.verifRejected ? 'todo' : u.verifSubmitted ? 'pending' : 'todo'),
     u.sellerVerified ? 'Seller verified ✅ — you can list products.' :
-    u.verifSubmitted ? 'Under review — we\'ll respond within 24–48 hours.' :
-    'Not yet started. Submit your documents below.');
+    u.verifRejected ? '❌ Rejected: ' + (u.verifRejectedReason || 'See admin for details') + ' — please resubmit.' :
+    u.verifSubmitted ? '⏳ Documents under review — we\'ll respond within 24–48 hours.' :
+    'Not yet started. Submit your documents to become a seller.');
 
   // Phone
   setStep('vs-phone-icon','vs-phone-desc',
@@ -2475,10 +3310,17 @@ window.loadConversations = async function() {
   if (!list && !sidebar) return;
 
   try {
-    const q = query(collection(db, 'conversations'), where('participants','array-contains', user.uid), orderBy('lastMsgAt','desc'));
+    // No orderBy — avoids composite index requirement. Sort in JS.
+    const q = query(collection(db, 'conversations'), where('participants','array-contains', user.uid));
     const snap = await getDocs(q);
     const convs = [];
     snap.forEach(d => convs.push({ id: d.id, ...d.data() }));
+    // Sort by lastMsgAt descending (newest first) in JS — no Firestore index needed
+    convs.sort((a, b) => {
+      const ta = a.lastMsgAt ? a.lastMsgAt.toMillis() : 0;
+      const tb = b.lastMsgAt ? b.lastMsgAt.toMillis() : 0;
+      return tb - ta;
+    });
 
     const renderConv = (c, container, activeId) => {
       const otherId   = c.participants.find(p => p !== user.uid);
@@ -2486,13 +3328,23 @@ window.loadConversations = async function() {
       const initials  = otherName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '?';
       const timeAgo   = c.lastMsgAt ? timeSince(c.lastMsgAt.toDate()) : '';
       const isActive  = c.id === activeId ? ' active' : '';
+      const unread    = c.unread && c.unread[user.uid] ? c.unread[user.uid] : 0;
+      const preview   = (c.lastMsg || '').slice(0,40);
       return `<div class="conv-item${isActive}" onclick="openConversation('${c.id}','${otherId}','${otherName.replace(/'/g,'')}')">
-        <div class="conv-avatar">${initials}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="conv-meta"><span class="conv-name">${otherName}</span><span class="conv-time">${timeAgo}</span></div>
-          <div class="conv-preview">${c.lastMsg || ''}</div>
+        <div class="conv-avatar-wrap">
+          <div class="conv-avatar">${initials}</div>
+          <div class="conv-online-dot"></div>
         </div>
-        ${c.unread && c.unread[user.uid] ? `<div class="conv-unread">${c.unread[user.uid]}</div>` : ''}
+        <div class="conv-info">
+          <div class="conv-top-row">
+            <span class="conv-name">${otherName}</span>
+            <span class="conv-time">${timeAgo}</span>
+          </div>
+          <div class="conv-bottom-row">
+            <span class="conv-preview${unread ? ' unread-preview' : ''}">${preview}</span>
+            ${unread ? `<div class="conv-unread">${unread}</div>` : ''}
+          </div>
+        </div>
       </div>`;
     };
 
@@ -2509,6 +3361,12 @@ window.loadConversations = async function() {
       } else {
         sidebar.innerHTML = convs.map(c => renderConv(c, sidebar, window._activeConvId)).join('');
       }
+    }
+    const totalUnread = convs.reduce((acc, c) => acc + (c.unread && c.unread[user.uid] ? c.unread[user.uid] : 0), 0);
+    const badge = document.getElementById('nav-msg-badge');
+    if (badge) {
+      if (totalUnread > 0) { badge.textContent = totalUnread > 9 ? '9+' : totalUnread; badge.style.display = 'inline-block'; }
+      else { badge.style.display = 'none'; }
     }
   } catch(e) {
     console.error(e);
@@ -2530,29 +3388,38 @@ window.filterConvs = function(val) {
 };
 
 window.openConversation = async function(cid, peerId, peerName) {
-  window._activeConvId = cid;
-  window._activePeerId = peerId;
+  window._activeConvId   = cid;
+  window._activePeerId   = peerId;
   window._activePeerName = peerName;
 
-  const msgs    = document.getElementById('chat-messages');
-  const nameEl  = document.getElementById('chat-peer-name');
-  const subEl   = document.getElementById('chat-peer-sub');
-  const avEl    = document.getElementById('chat-peer-avatar');
-  const inputArea = document.getElementById('chat-input-area');
-  const followBtn = document.getElementById('chat-follow-btn');
+  const msgs       = document.getElementById('chat-messages');
+  const nameEl     = document.getElementById('chat-peer-name');
+  const subEl      = document.getElementById('chat-peer-sub');
+  const avEl       = document.getElementById('chat-peer-avatar');
+  const followBtn  = document.getElementById('chat-follow-btn');
+  const emptyState = document.getElementById('chat-empty-state');
+  const activeView = document.getElementById('chat-active-view');
+  const layout     = document.getElementById('inbox-layout');
 
-  if (nameEl) nameEl.textContent = peerName;
+  // Show the active chat panel
+  if (emptyState) emptyState.style.display = 'none';
+  if (activeView) activeView.style.display = 'flex';
+  if (layout)     layout.classList.add('chat-open');   // mobile: hide sidebar
+
+  // Header
   const initials = peerName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '?';
-  if (avEl) avEl.textContent = initials;
-  if (inputArea) inputArea.style.display = 'flex';
+  if (nameEl) nameEl.textContent = peerName;
+  if (avEl)   avEl.textContent   = initials;
+  if (subEl)  subEl.textContent  = 'Active now';
+
+  // Follow button
   if (followBtn) {
     followBtn.style.display = 'inline-flex';
     const already = await isFollowing(peerId);
-    followBtn.textContent = already ? 'Unfollow' : 'Follow';
-    followBtn.dataset.uid = peerId;
-    followBtn.dataset.name = peerName;
+    followBtn.textContent    = already ? 'Unfollow' : 'Follow';
+    followBtn.dataset.uid    = peerId;
+    followBtn.dataset.name   = peerName;
   }
-  if (subEl) subEl.textContent = '';
 
   // Mark as read
   const user = auth.currentUser;
@@ -2564,39 +3431,109 @@ window.openConversation = async function(cid, peerId, peerName) {
     } catch(e) {}
   }
 
-  // Refresh sidebar
-  loadConversations();
+  loadConversations(); // refresh sidebar unread counts
 
   // Unsubscribe previous listener
   if (_unsubMessages) { _unsubMessages(); _unsubMessages = null; }
 
-  if (msgs) msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading messages…</div>';
+  if (msgs) msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading…</div>';
 
-  // Real-time messages
+  // Real-time messages listener
   try {
     const msgsRef = collection(db, 'conversations', cid, 'messages');
     const mq = query(msgsRef, orderBy('createdAt','asc'));
     _unsubMessages = onSnapshot(mq, snap => {
       if (!msgs) return;
+      const uid = auth.currentUser?.uid;
+
+      // Profile intro card (always shown at top like Messenger)
+      const introHtml = `
+        <div class="chat-profile-intro">
+          <div class="chat-intro-avatar">${initials}</div>
+          <div class="chat-intro-name">${escapeHtml(peerName)}</div>
+          <div class="chat-intro-sub">ZÚLA member</div>
+          <button class="chat-intro-view-btn" onclick="viewPeerProfile('${peerId}')">View profile</button>
+        </div>
+        <div class="chat-e2e-note">🔒 Messages are private. Only people in this chat can read them.</div>`;
+
       if (snap.empty) {
-        msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px 20px;">No messages yet. Say hello! 👋</div>';
+        msgs.innerHTML = introHtml + `<div class="msg-date-divider">Start the conversation</div>`;
         return;
       }
-      const uid = auth.currentUser?.uid;
-      msgs.innerHTML = snap.docs.map(d => {
+
+      // Group messages by date
+      let lastDate = '';
+      const bubbles = snap.docs.map(d => {
         const m = d.data();
         const isSent = m.senderId === uid;
-        const time = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
-        return `<div class="msg ${isSent ? 'sent' : 'recv'}">
-          <div class="msg-bubble">${escapeHtml(m.text)}</div>
-          <div class="msg-time">${time}</div>
-        </div>`;
+        const ts = m.createdAt ? m.createdAt.toDate() : new Date();
+        const dateStr = ts.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}).toUpperCase();
+        const timeStr = ts.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+        let divider = '';
+        if (dateStr !== lastDate) { lastDate = dateStr; divider = `<div class="msg-date-divider">${dateStr}</div>`; }
+
+        if (isSent) {
+          return `${divider}<div class="msg sent">
+            <div class="msg-bubble">${escapeHtml(m.text)}</div>
+            <div class="msg-status">${timeStr} · Sent</div>
+          </div>`;
+        } else {
+          return `${divider}<div class="msg recv">
+            <div class="msg-recv-avatar">${initials}</div>
+            <div class="msg-recv-content">
+              <div class="msg-bubble">${escapeHtml(m.text)}</div>
+              <div class="msg-time">${timeStr}</div>
+            </div>
+          </div>`;
+        }
       }).join('');
+
+      msgs.innerHTML = introHtml + bubbles;
       msgs.scrollTop = msgs.scrollHeight;
     });
   } catch(e) {
     if (msgs) msgs.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Could not load messages.</div>';
   }
+};
+
+// Close chat on mobile — go back to sidebar
+window.closeChatMobile = function() {
+  const layout = document.getElementById('inbox-layout');
+  if (layout) layout.classList.remove('chat-open');
+};
+
+// View the peer's public profile from chat header
+window.viewPeerProfile = async function(uid) {
+  if (!uid) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    const u = snap.exists() ? snap.data() : {};
+    const fullName = u.fullName || u.firstName || 'ZÚLA User';
+    const initials = fullName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+
+    // Populate the myprofile / owner page fields and show it
+    const el = id => document.getElementById(id);
+    if (el('owner-avatar')) el('owner-avatar').textContent = initials;
+    if (el('owner-name'))   el('owner-name').textContent   = fullName;
+    const joined = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '';
+    if (el('owner-meta'))  el('owner-meta').textContent  = (u.location ? '📍 '+u.location+' · ' : '') + (joined ? 'Member since '+joined : '');
+    if (el('owner-bio'))   el('owner-bio').textContent   = u.bio || 'No bio yet.';
+    if (el('owner-joined')) el('owner-joined').textContent = joined || '—';
+    if (el('owner-followers-count')) el('owner-followers-count').textContent = u.followersCount || 0;
+    if (el('owner-following-count')) el('owner-following-count').textContent = u.followingCount || 0;
+
+    // Message button goes straight back to this chat
+    const msgBtn = document.querySelector('[onclick="openMsgWithSelf()"]');
+    if (msgBtn) msgBtn.setAttribute('onclick', `showPage('messaging')`);
+
+    showPage('myprofile');
+  } catch(e) { showToast('Could not load profile.'); }
+};
+
+// Called from chat header avatar click
+window.showChatProfile = function() {
+  const uid = window._activePeerId;
+  if (uid) viewPeerProfile(uid);
 };
 
 window.sendChatMsg = async function() {
@@ -2623,37 +3560,19 @@ window.sendChatMsg = async function() {
 window.startNewConversation = async function() {
   const user = auth.currentUser;
   if (!user) { showToast('⚠️ Sign in first.'); return; }
-  const uidOrEmail = (document.getElementById('new-msg-uid')?.value || '').trim();
+
+  // Get recipient from selected user (search result) or fallback hidden field
+  const targetUid  = window._newMsgTargetUid;
+  const targetName = window._newMsgTargetName || 'User';
   const text       = (document.getElementById('new-msg-text')?.value || '').trim();
-  if (!uidOrEmail) { showToast('⚠️ Enter a recipient UID or email.'); return; }
-  if (!text)       { showToast('⚠️ Enter a message.'); return; }
 
-  let targetUid = uidOrEmail;
-  let targetName = 'User';
-
-  // Look up by email if it looks like one
-  if (uidOrEmail.includes('@')) {
-    try {
-      const usnap = await getDocs(query(collection(db, 'users'), where('email','==', uidOrEmail)));
-      if (usnap.empty) { showToast('❌ No user found with that email.'); return; }
-      const ud = usnap.docs[0].data();
-      targetUid  = usnap.docs[0].id;
-      targetName = ud.fullName || ud.firstName || uidOrEmail;
-    } catch(e) { showToast('❌ Could not look up user.'); return; }
-  } else {
-    try {
-      const usnap = await getDoc(doc(db, 'users', uidOrEmail));
-      if (!usnap.exists()) { showToast('❌ No user found with that UID.'); return; }
-      const ud = usnap.data();
-      targetName = ud.fullName || ud.firstName || uidOrEmail;
-    } catch(e) { showToast('❌ Could not look up user.'); return; }
-  }
-
+  if (!targetUid) { showToast('⚠️ Search and select a user first.'); return; }
+  if (!text)      { showToast('⚠️ Type a message first.'); return; }
   if (targetUid === user.uid) { showToast('⚠️ You cannot message yourself.'); return; }
 
-  const cid = convId(user.uid, targetUid);
+  const cid    = convId(user.uid, targetUid);
   const convRef = doc(db, 'conversations', cid);
-  const myName = window._currentUser?.fullName || user.displayName || 'User';
+  const myName  = window._currentUser?.fullName || user.displayName || 'User';
 
   try {
     const existing = await getDoc(convRef);
@@ -2676,18 +3595,142 @@ window.startNewConversation = async function() {
     await addDoc(collection(db, 'conversations', cid, 'messages'), {
       text, senderId: user.uid, senderName: myName, createdAt: serverTimestamp()
     });
-    if (document.getElementById('new-msg-uid')) document.getElementById('new-msg-uid').value = '';
-    if (document.getElementById('new-msg-text')) document.getElementById('new-msg-text').value = '';
-    showToast('✅ Message sent to ' + targetName);
+    // Clear inputs
+    if (document.getElementById('new-msg-text'))   document.getElementById('new-msg-text').value = '';
+    clearMsgRecipient();
+    closeNewMsgModal();
+    showToast('✅ Message sent to ' + targetName + '!');
     showPage('messaging');
-    window._activeConvId = cid;
-    window._activePeerId = targetUid;
+    window._activeConvId   = cid;
+    window._activePeerId   = targetUid;
     window._activePeerName = targetName;
     setTimeout(() => openConversation(cid, targetUid, targetName), 400);
-  } catch(e) { console.error(e); showToast('❌ Could not send message.'); }
+  } catch(e) { console.error(e); showToast('❌ Could not send. Check your connection.'); }
 };
 
-window.openMsgWithSelf = function() { showPage('messages'); };
+// ── USER SEARCH FOR MESSAGING ───────────────────────────────────────
+window._newMsgTargetUid  = null;
+window._newMsgTargetName = null;
+
+window.searchUsersToMsg = async function(val) {
+  const resultsBox = document.getElementById('user-search-results');
+  if (!resultsBox) return;
+  if (!val || val.length < 2) { resultsBox.style.display = 'none'; return; }
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  try {
+    // Search by fullName prefix (case-sensitive Firestore approach)
+    const snap = await getDocs(collection(db, 'users'));
+    const results = [];
+    snap.forEach(d => {
+      if (d.id === currentUser.uid) return;
+      const data = d.data();
+      const name = (data.fullName || data.firstName || '').toLowerCase();
+      const email = (data.email || '').toLowerCase();
+      if (name.includes(val.toLowerCase()) || email.includes(val.toLowerCase())) {
+        results.push({ uid: d.id, ...data });
+      }
+    });
+
+    if (results.length === 0) {
+      resultsBox.innerHTML = '<div style="padding:12px 14px;font-size:13px;color:var(--text3);">No users found.</div>';
+      resultsBox.style.display = 'block';
+      return;
+    }
+
+    resultsBox.innerHTML = results.slice(0, 8).map(u => {
+      const name     = u.fullName || u.firstName || u.email || 'User';
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      return `<div onclick="selectMsgRecipient('${u.uid}','${name.replace(/'/g,'')}','${(u.email||'').replace(/'/g,'')}','${initials}')"
+        style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;"
+        onmouseover="this.style.background='rgba(124,92,252,.08)'" onmouseout="this.style.background=''">
+        <div class="conv-avatar" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">${initials}</div>
+        <div>
+          <div style="font-size:13.5px;font-weight:600;color:var(--text);">${name}</div>
+          <div style="font-size:11px;color:var(--text3);">${u.email || ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+    resultsBox.style.display = 'block';
+  } catch(e) { console.error(e); }
+};
+
+window.selectMsgRecipient = function(uid, name, email, initials) {
+  window._newMsgTargetUid  = uid;
+  window._newMsgTargetName = name;
+
+  const searchInput = document.getElementById('new-msg-search');
+  const resultsBox  = document.getElementById('user-search-results');
+  const selectedBox = document.getElementById('new-msg-selected-user');
+  const selAvatar   = document.getElementById('new-msg-sel-avatar');
+  const selName     = document.getElementById('new-msg-sel-name');
+  const selEmail    = document.getElementById('new-msg-sel-email');
+
+  if (searchInput) searchInput.value = '';
+  if (resultsBox)  resultsBox.style.display = 'none';
+  if (selAvatar)   selAvatar.textContent  = initials;
+  if (selName)     selName.textContent    = name;
+  if (selEmail)    selEmail.textContent   = email;
+  if (selectedBox) selectedBox.style.display = 'flex';
+};
+
+window.toggleMobileFilter = function() {
+  const fp = document.querySelector('.filter-panel');
+  if (fp) fp.classList.toggle('mobile-open');
+};
+
+// Show filter toggle only on mobile
+function _updateFilterToggleVisibility() {
+  const btn = document.getElementById('filter-toggle-btn');
+  if (btn) btn.style.display = window.innerWidth <= 760 ? 'inline-flex' : 'none';
+}
+window.addEventListener('resize', _updateFilterToggleVisibility);
+_updateFilterToggleVisibility();
+
+window.clearMsgRecipient = function() {
+  window._newMsgTargetUid  = null;
+  window._newMsgTargetName = null;
+  const selectedBox = document.getElementById('new-msg-selected-user');
+  if (selectedBox) selectedBox.style.display = 'none';
+  const searchInput = document.getElementById('new-msg-search');
+  if (searchInput) searchInput.value = '';
+};
+
+window.openNewMsgModal = function() {
+  clearMsgRecipient();
+  const t = document.getElementById('new-msg-text');
+  if (t) t.value = '';
+  const m = document.getElementById('new-msg-modal');
+  if (m) m.classList.add('open');
+  setTimeout(() => { const s = document.getElementById('new-msg-search'); if(s) s.focus(); }, 100);
+};
+
+window.closeNewMsgModal = function() {
+  const m = document.getElementById('new-msg-modal');
+  if (m) m.classList.remove('open');
+};
+
+// ── MESSAGE SELLER FROM PRODUCT PAGE ───────────────────────────────
+window.msgSeller = async function() {
+  const user = auth.currentUser;
+  if (!user) { showPage('login'); return; }
+  const p = window._currentProduct;
+  if (!p || !p.sellerId) { showToast('⚠️ Seller info not available.'); return; }
+  if (p.sellerId === user.uid) { showToast('⚠️ This is your own listing.'); return; }
+
+  showPage('messaging');
+  setTimeout(() => {
+    const cid = convId(user.uid, p.sellerId);
+    openConversation(cid, p.sellerId, p.sellerName || 'Seller');
+    // Pre-create conv doc if needed so they can send
+    window._activeConvId   = cid;
+    window._activePeerId   = p.sellerId;
+    window._activePeerName = p.sellerName || 'Seller';
+  }, 400);
+};
+
+window.openMsgWithSelf = function() { showPage('messaging'); };
 
 window.toggleFollowFromChat = async function() {
   const btn = document.getElementById('chat-follow-btn');
@@ -2832,20 +3875,52 @@ function timeSince(date) {
 }
 
 function escapeHtml(t) {
-  return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (!t) return '';
+  return t.replace(/&/g,'&amp;').replace(/[<]/g,'&lt;').replace(/[>]/g,'&gt;').replace(/["]/g,'&quot;');
 }
 
 </script>
 
 <script>
 function showPage(name) {
+  // Redirect aliases
+  if (name === 'messages') name = 'messaging';
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + name);
   if (target) {
     target.classList.add('active');
     window.scrollTo(0, 0);
-    if (name === 'marketplace') { if(typeof loadProducts==='function') loadProducts(); }
-    if (name === 'profile')     { if(typeof loadProfilePage==='function') loadProfilePage(); }
+  }
+
+  const user = window._auth && window._auth.currentUser;
+  const profile = window._currentUser || {};
+  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? (user.email||'?')[0].toUpperCase() : '?');
+  const el = id => document.getElementById(id);
+
+  // Page-specific loaders
+  if (name === 'marketplace')      { if(typeof loadProducts==='function') loadProducts(); }
+  if (name === 'profile')          { if(typeof loadProfilePage==='function') loadProfilePage(); }
+  if (name === 'seller-dashboard') { if(typeof loadSellerDashboardPage==='function') loadSellerDashboardPage(); }
+  if (name === 'profile-v2')       { if(typeof loadProfileV2==='function') loadProfileV2(); }
+  if (name === 'myprofile')        { if(typeof loadMyProfile==='function') loadMyProfile(); }
+  if (name === 'verifstatus')      { if(typeof loadVerifStatus==='function') loadVerifStatus(); }
+  if (name === 'messaging') {
+    if(typeof loadConversations==='function') loadConversations();
+    if(el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
+  }
+  if (name === 'settings') {
+    if(el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
+    if(el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
+    if(el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
+    if(el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
+    if(el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
+  }
+  if (name === 'notifications') {
+    if(el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
+  }
+  if (name === 'verifstatus' || name === 'verif') {
+    if(el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
   }
 }
 
@@ -2932,19 +4007,19 @@ window.loadSellerDashboard = async function() {
     if (balanceEl) balanceEl.textContent = 'NGN 0';
     if (prodRevEl) {
       prodRevEl.innerHTML = mine.length === 0
-        ? '<div style="color:var(--text3);font-size:13px;">No products listed yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
+        ? '<div style="color:var(--text3);font-size:13px;">No products listed yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
         : mine.map(p => `
           <div class="listing-row">
-            <div class="listing-thumb">${p.emoji||'📦'}</div>
+            <div class="listing-thumb">${p.emoji||'📦'}<\/div>
             <div class="listing-info">
-              <div class="listing-name">${p.name}</div>
-              <div class="listing-meta">${p.category} · NGN ${Number(p.price).toLocaleString()}</div>
-            </div>
+              <div class="listing-name">${p.name}<\/div>
+              <div class="listing-meta">${p.category} · NGN ${Number(p.price).toLocaleString()}<\/div>
+            <\/div>
             <div style="text-align:right;">
-              <div style="font-size:13px;color:var(--text3);">0 sales</div>
-              <div style="font-size:13px;font-weight:600;color:var(--green);">NGN 0</div>
-            </div>
-          </div>`).join('');
+              <div style="font-size:13px;color:var(--text3);">0 sales<\/div>
+              <div style="font-size:13px;font-weight:600;color:var(--green);">NGN 0<\/div>
+            <\/div>
+          <\/div>`).join('');
     }
   } catch(e) { console.error(e); }
 };
@@ -2995,6 +4070,8 @@ window.adminTab = function(name) {
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   const sec = document.getElementById('asec-' + name);
   if (sec) sec.classList.add('active');
+  // Load verif queue when tab is opened
+  if (name === 'verif') loadAdminVerifQueue();
 };
 
 window.loadAdminData = async function() {
@@ -3020,50 +4097,161 @@ window.loadAdminData = async function() {
     const rp = s('a-recent-products');
     if (rp) {
       rp.innerHTML = products.length === 0
-        ? '<tr><td colspan="5" style="color:var(--text3);">No products yet.</td></tr>'
+        ? '<tr><td colspan="5" style="color:var(--text3);">No products yet.<\/td><\/tr>'
         : products.slice(0,10).map(p => `
           <tr>
-            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}</div>${p.name}</div></td>
-            <td>${p.sellerName||'—'}</td>
-            <td>${p.category||'—'}</td>
-            <td>NGN ${Number(p.price||0).toLocaleString()}</td>
-            <td><span class="tag tag-gold">${p.type||'Physical'}</span></td>
-          </tr>`).join('');
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
+            <td>${p.sellerName||'—'}<\/td>
+            <td>${p.category||'—'}<\/td>
+            <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
+            <td><span class="tag tag-gold">${p.type||'Physical'}<\/span><\/td>
+          <\/tr>`).join('');
     }
 
     // All products tab
     const pt = s('a-products-table');
     if (pt) {
       pt.innerHTML = products.length === 0
-        ? '<tr><td colspan="6" style="color:var(--text3);">No products yet.</td></tr>'
+        ? '<tr><td colspan="6" style="color:var(--text3);">No products yet.<\/td><\/tr>'
         : products.map(p => `
           <tr>
-            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}</div>${p.name}</div></td>
-            <td>${p.sellerName||'—'}</td>
-            <td>NGN ${Number(p.price||0).toLocaleString()}</td>
-            <td>${p.category||'—'}</td>
-            <td><span class="tag tag-gold">${p.type||'Physical'}</span></td>
-            <td><button class="btn btn-sm btn-danger" onclick="adminDeleteProduct('${p.id}')">Remove</button></td>
-          </tr>`).join('');
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
+            <td>${p.sellerName||'—'}<\/td>
+            <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
+            <td>${p.category||'—'}<\/td>
+            <td><span class="tag tag-gold">${p.type||'Physical'}<\/span><\/td>
+            <td><button class="btn btn-sm btn-danger" onclick="adminDeleteProduct('${p.id}')">Remove<\/button><\/td>
+          <\/tr>`).join('');
     }
 
     // All users tab
     const ut = s('a-users-table');
     if (ut) {
       ut.innerHTML = users.length === 0
-        ? '<tr><td colspan="4" style="color:var(--text3);">No users yet.</td></tr>'
+        ? '<tr><td colspan="4" style="color:var(--text3);">No users yet.<\/td><\/tr>'
         : users.map(u => `
           <tr>
-            <td>${u.fullName||u.firstName||'—'}</td>
-            <td style="font-size:12px;">${u.email||'—'}</td>
-            <td><span class="tag ${u.sellerVerified?'tag-green':'tag-gold'}">${u.sellerVerified?'Seller':'Buyer'}</span></td>
-            <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '—'}</td>
-          </tr>`).join('');
+            <td>${u.fullName||u.firstName||'—'}<\/td>
+            <td style="font-size:12px;">${u.email||'—'}<\/td>
+            <td><span class="tag ${u.sellerVerified?'tag-green':'tag-gold'}">${u.sellerVerified?'Seller':'Buyer'}<\/span><\/td>
+            <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '—'}<\/td>
+          <\/tr>`).join('');
     }
   } catch(e) {
     showToast('❌ Could not load admin data. Check Firestore rules.');
     console.error(e);
   }
+};
+
+// ── ADMIN VERIF QUEUE ───────────────────────────────────────────────
+window.loadAdminVerifQueue = async function() {
+  const db  = window._db;
+  const fns = window._fns;
+  const list = document.getElementById('admin-verif-list');
+  if (!list) return;
+  try {
+    const snap = await fns.getDocs(fns.query(
+      fns.collection(db, 'users'),
+      fns.where('verifSubmitted', '==', true)
+    ));
+    const users = [];
+    snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+
+    // Count pending for stat card
+    const pending = users.filter(u => !u.sellerVerified).length;
+    const statEl = document.getElementById('astat-verif');
+    if (statEl) statEl.textContent = pending;
+
+    if (users.length === 0) {
+      list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No verification submissions yet.<\/div>';
+      return;
+    }
+
+    list.innerHTML = users.map(u => {
+      const docs = u.verifDocs || {};
+      const docLinks = Object.entries(docs).map(([k,url]) =>
+        `<a href="${url}" target="_blank" style="display:inline-block;margin:3px 4px 3px 0;padding:4px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-xs);font-size:12px;color:var(--accent);">📄 View ${k}<\/a>`
+      ).join('');
+      let statusBadge, actionBtns;
+      if (u.sellerVerified) {
+        statusBadge = '<span style="background:rgba(39,201,122,.15);color:var(--green);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">✅ Approved<\/span>';
+        actionBtns  = `<button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="adminRevokeVerif('${u.id}')">Revoke<\/button>`;
+      } else if (u.verifRejected) {
+        statusBadge = '<span style="background:rgba(240,82,82,.15);color:var(--red);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">❌ Rejected<\/span>';
+        actionBtns  = `<button class="btn btn-sm btn-primary" onclick="adminApproveVerif('${u.id}')">Approve<\/button>`;
+      } else {
+        statusBadge = '<span style="background:rgba(245,200,66,.15);color:var(--gold);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;">⏳ Pending<\/span>';
+        actionBtns  = `
+          <button class="btn btn-sm btn-primary" onclick="adminApproveVerif('${u.id}')">✅ Approve<\/button>
+          <button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="adminRejectVerif('${u.id}')">❌ Reject<\/button>`;
+      }
+      const date = u.verifSubmittedAt ? new Date(u.verifSubmittedAt.seconds*1000).toLocaleDateString() : '—';
+      const rejectReason = u.verifRejectedReason ? `<div style="margin-top:8px;font-size:12px;color:var(--red);">Reason: ${u.verifRejectedReason}<\/div>` : '';
+      return `
+        <div style="border:1px solid var(--border);border-radius:var(--radius-xs);padding:16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:14px;font-weight:700;">${u.fullName||u.firstName||'Unknown'}<\/div>
+              <div style="font-size:12px;color:var(--text3);">${u.email||'—'} · Submitted ${date}<\/div>
+            <\/div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              ${statusBadge}
+              ${actionBtns}
+            <\/div>
+          <\/div>
+          <div style="margin-bottom:6px;">${docLinks || '<span style="font-size:12px;color:var(--text3);">No documents uploaded<\/span>'}<\/div>
+          ${rejectReason}
+        <\/div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load verifications.<\/div>';
+    console.error(e);
+  }
+};
+
+window.adminApproveVerif = async function(userId) {
+  if (!isAdmin()) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: true,
+      sellerVerifiedAt: fns.serverTimestamp()
+    });
+    showToast('✅ Seller approved!');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not approve.'); console.error(e); }
+};
+
+window.adminRejectVerif = async function(userId) {
+  if (!isAdmin()) return;
+  const reason = prompt('Reason for rejection (the seller will see this):');
+  if (!reason) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: false,
+      verifRejected: true,
+      verifRejectedReason: reason,
+      verifRejectedAt: fns.serverTimestamp()
+    });
+    showToast('❌ Verification rejected.');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not reject.'); console.error(e); }
+};
+
+window.adminRevokeVerif = async function(userId) {
+  if (!isAdmin()) return;
+  if (!confirm('Revoke this seller\'s verification? They will no longer be able to list products.')) return;
+  try {
+    const fns = window._fns; const db = window._db;
+    await fns.updateDoc(fns.doc(db, 'users', userId), {
+      sellerVerified: false,
+      verifRevoked: true,
+      verifRevokedAt: fns.serverTimestamp()
+    });
+    showToast('⛔ Seller verification revoked.');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('❌ Could not revoke.'); console.error(e); }
 };
 
 window.adminDeleteProduct = async function(id) {
@@ -3103,59 +4291,20 @@ function goAdmin() {
   if (typeof openAdmin === 'function') openAdmin();
 }
 
+// Show admin nav items when user is admin
+function _showAdminNavIfNeeded() {
+  if (!isAdmin()) return;
+  const adminLink = document.getElementById('admin-nav-link');
+  const ddAdmin   = document.getElementById('dd-admin-item');
+  if (adminLink) adminLink.style.display = 'inline';
+  if (ddAdmin)   ddAdmin.style.display   = 'block';
+}
+
 window._selectedType = 'Physical';
 
 // ── PROFILE FEATURE JS ──────────────────────────────────────────
 
-// showPage already handles navigation; extend it to populate new pages
-const _origShowPage = window.showPage;
-window.showPage = function(name) {
-  if (_origShowPage) _origShowPage(name);
-  // Populate dynamic elements on navigate
-  if (name === 'profile-v2') {
-    if (typeof loadProfileV2 === 'function') loadProfileV2();
-  }
-  if (name === 'myprofile') {
-    if (typeof loadMyProfile === 'function') loadMyProfile();
-  }
-  if (name === 'verifstatus') {
-    if (typeof loadVerifStatus === 'function') loadVerifStatus();
-  }
-  if (name === 'messages' || name === 'messaging') {
-    if (typeof loadConversations === 'function') loadConversations();
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-msgs')) el('nav-avatar-msgs').textContent = initials;
-    if (el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
-  }
-  if (name === 'settings') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const el = id => document.getElementById(id);
-    if (el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
-    if (el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
-    if (el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
-    if (el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    if (el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
-  }
-  if (name === 'notifications') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
-  }
-  if (name === 'verifstatus' || name === 'verif') {
-    const user = window._auth && window._auth.currentUser;
-    const profile = window._currentUser || {};
-    const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? user.email[0].toUpperCase() : '?');
-    const el = id => document.getElementById(id);
-    if (el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
-  }
-};
+// showPage merged above — no override needed
 
 // Profile v2 tabs
 window.switchPv2Tab = function(tab, btn) {
@@ -3181,19 +4330,603 @@ window.filterNotifs = function(type, btn) {
   if (btn) btn.classList.add('active');
 };
 
-// Chat send message
-window.sendChatMsg = function() {
-  const input = document.getElementById('chat-input');
-  if (!input || !input.value.trim()) return;
-  const msgs = document.getElementById('chat-messages');
-  if (!msgs) return;
-  const div = document.createElement('div');
-  div.className = 'msg sent';
-  const now = new Date();
-  div.innerHTML = '<div class="msg-bubble">' + input.value + '</div><div class="msg-time">' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + '</div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  input.value = '';
+// sendChatMsg is defined in the Firebase module above — do not redefine here
+
+// ── USER DROPDOWN (avatar click) ──────────────────────────────────────
+window.toggleAdminDropdown = function(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display === 'block';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // Populate name/email
+    const u = window._currentUser || {};
+    const nameEl  = document.getElementById('dropdown-name');
+    const emailEl = document.getElementById('dropdown-email');
+    if (nameEl)  nameEl.textContent  = u.fullName || u.firstName || 'User';
+    if (emailEl) emailEl.textContent = u.email || (auth.currentUser?.email) || '';
+    // Show admin panel item for admins
+    const ddAdmin = document.getElementById('dd-admin-item');
+    if (ddAdmin) ddAdmin.style.display = isAdmin() ? 'block' : 'none';
+    // Close when clicking outside
+    setTimeout(() => document.addEventListener('click', closeDropdown, { once: true }), 50);
+  }
+};
+window.closeDropdown = function() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = 'none';
+};
+
+// ── EDIT BIO MODAL ────────────────────────────────────────────────────
+window.openEditBioModal = function() {
+  const u = window._currentUser || {};
+  const nameInput     = document.getElementById('bio-name-input');
+  const bioInput      = document.getElementById('bio-text-input');
+  const locationInput = document.getElementById('bio-location-input');
+  if (nameInput)     nameInput.value     = u.fullName || u.firstName || '';
+  if (bioInput)      bioInput.value      = u.bio || '';
+  if (locationInput) locationInput.value = u.location || '';
+  const m = document.getElementById('edit-bio-modal');
+  if (m) m.classList.add('open');
+};
+window.closeEditBioModal = function() {
+  const m = document.getElementById('edit-bio-modal');
+  if (m) m.classList.remove('open');
+};
+window.saveEditBio = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Not signed in.'); return; }
+  const fullName = (document.getElementById('bio-name-input')?.value || '').trim();
+  const bio      = (document.getElementById('bio-text-input')?.value || '').trim();
+  const location = (document.getElementById('bio-location-input')?.value || '').trim();
+  if (!fullName) { showToast('⚠️ Name cannot be empty.'); return; }
+  try {
+    await updateDoc(doc(db, 'users', user.uid), { fullName, bio, location });
+    if (window._currentUser) { window._currentUser.fullName = fullName; window._currentUser.bio = bio; window._currentUser.location = location; }
+    closeEditBioModal();
+    showToast('✅ Profile updated!');
+    // Refresh whichever profile page is visible
+    if (typeof loadProfilePage === 'function') loadProfilePage();
+    if (typeof loadProfileV2   === 'function') loadProfileV2();
+  } catch(e) { console.error(e); showToast('❌ Could not save. Try again.'); }
+};
+
+// ── SELLER DASHBOARD PAGE ─────────────────────────────────────────────
+// ── ADD PRODUCT: type picker ────────────────────────────────────────
+window._selectedProductType = 'physical';
+// ══ ADD PRODUCT PAGE JS ══════════════════════════════════════════════
+var _apType = null, _apPriceMode = 'paid', _apAffEnabled = true, _apVisMode = 'public';
+
+var _apTypeMeta = {
+  course:   {icon:'🎓', label:'Online course',       digital:true,  sections:['ap-sec-course'],   uploadHint:'MP4, MOV, ZIP — video content up to 5 GB'},
+  ebook:    {icon:'📚', label:'Ebook / PDF',          digital:true,  sections:['ap-sec-ebook'],    uploadHint:'PDF, ePub, MOBI — up to 500 MB'},
+  template: {icon:'🎨', label:'Template',             digital:true,  sections:['ap-sec-template'], uploadHint:'ZIP, Figma, .fig, Notion export — up to 500 MB'},
+  software: {icon:'💻', label:'Software / App',       digital:true,  sections:['ap-sec-software'], uploadHint:'EXE, DMG, ZIP — up to 2 GB'},
+  audio:    {icon:'🎵', label:'Music / Audio',        digital:true,  sections:['ap-sec-audio'],    uploadHint:'MP3, WAV, FLAC, ZIP — up to 1 GB'},
+  coaching: {icon:'🧑‍💼', label:'Coaching / Service',  digital:true,  sections:['ap-sec-coaching'], uploadHint:'Optional: slide deck or resource PDF'},
+  vehicle:  {icon:'🚗', label:'Vehicle',              digital:false, sections:['ap-sec-vehicle'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
+  physical: {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'], uploadHint:'JPG, PNG, GIF — up to 8 images, 10 MB each'},
+};
+
+window.apSelectType = function(el) {
+  document.querySelectorAll('.ap-type-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  _apType = el.dataset.type;
+  var btn = document.getElementById('ap-step1-next');
+  if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+};
+
+window.apGoStep2 = function() {
+  if (!_apType) { showToast('⚠️ Pick a product type first'); return; }
+  apSetStep(2);
+  apApplyType();
+  window.scrollTo(0,0);
+};
+window.apGoStep1 = function() { apSetStep(1); window.scrollTo(0,0); };
+window.apGoStep3 = function() {
+  var name = document.getElementById('ap-field-name');
+  if (!name || !name.value.trim()) { showToast('⚠️ Add a product name first'); return; }
+  apFillSummary();
+  apSetStep(3);
+  window.scrollTo(0,0);
+};
+
+window.apSetStep = function(n) {
+  [1,2,3].forEach(function(i){
+    var s = document.getElementById('ap-step-' + i);
+    if (s) s.style.display = (i === n) ? '' : 'none';
+    var ind = document.getElementById('ap-step-ind-' + i);
+    if (ind) { ind.classList.remove('active','done'); ind.classList.add(i < n ? 'done' : i === n ? 'active' : ''); }
+    if (i < 3) { var line = document.getElementById('ap-step-line-' + i); if (line) line.classList.toggle('done', i < n); }
+  });
+  var fill = document.getElementById('ap-progress-fill');
+  if (fill) fill.style.width = {1:'33%',2:'66%',3:'100%'}[n];
+};
+
+window.apApplyType = function() {
+  if (!_apType) return;
+  var m = _apTypeMeta[_apType];
+  document.querySelectorAll('.ap-dynamic').forEach(s => s.classList.remove('visible'));
+  m.sections.forEach(function(id){ var el = document.getElementById(id); if (el) el.classList.add('visible'); });
+  var dfs = document.getElementById('ap-digital-file-section');
+  if (dfs) dfs.style.display = m.digital ? '' : 'none';
+  var hint = document.getElementById('ap-digital-upload-sub');
+  if (hint && m.digital) hint.textContent = m.uploadHint;
+  var coverHint = document.getElementById('ap-cover-upload-hint');
+  if (coverHint) coverHint.textContent = m.digital ? 'JPG, PNG — cover image / thumbnail · 10 MB max' : m.uploadHint;
+  var title = document.getElementById('ap-upload-card-title');
+  if (title) title.textContent = m.digital ? '🖼 Cover image' : '📸 Product photos';
+  var sub = document.getElementById('ap-upload-card-sub');
+  if (sub) sub.textContent = m.digital ? 'Your cover is the first thing buyers see — make it count.' : 'Upload clear photos. First image is your cover.';
+  var langWrap = document.getElementById('ap-field-lang-wrap');
+  if (langWrap) langWrap.style.display = (_apType==='course'||_apType==='ebook') ? '' : 'none';
+  var pvIcon = document.getElementById('ap-pv-icon');
+  if (pvIcon) pvIcon.textContent = m.icon;
+  var pvT1 = document.getElementById('ap-pv-t1');
+  if (pvT1) pvT1.textContent = m.icon;
+  var pvTag = document.getElementById('ap-pv-type-tag');
+  if (pvTag) { pvTag.textContent = m.label; pvTag.className = 'tag ' + (m.digital ? 'tag-blue' : 'tag-green'); }
+};
+
+window.apSetPriceMode = function(mode) {
+  _apPriceMode = mode;
+  ['paid','free','pwyw'].forEach(function(m){ var b = document.getElementById('ap-btn-'+m); if(b) b.classList.toggle('active', m===mode); });
+  var pf = document.getElementById('ap-price-fields');
+  var pw = document.getElementById('ap-pwyw-min-wrap');
+  if (pf) { pf.style.opacity = mode==='free' ? '.4' : ''; pf.style.pointerEvents = mode==='free' ? 'none' : ''; }
+  if (pw) pw.style.display = mode==='pwyw' ? '' : 'none';
+  apSyncPreview();
+};
+
+window.apToggleAff = function() {
+  _apAffEnabled = !_apAffEnabled;
+  var t = document.getElementById('ap-aff-toggle');
+  if (t) t.classList.toggle('on', _apAffEnabled);
+  var s = document.getElementById('ap-aff-settings');
+  if (s) s.style.display = _apAffEnabled ? '' : 'none';
+  var tag = document.getElementById('ap-pv-aff-tag');
+  if (tag) tag.style.display = _apAffEnabled ? '' : 'none';
+};
+
+window.apSelectVis = function(el, mode) {
+  _apVisMode = mode;
+  document.querySelectorAll('.ap-vis-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  var sdw = document.getElementById('ap-schedule-date-wrap');
+  if (sdw) sdw.style.display = mode==='scheduled' ? '' : 'none';
+};
+
+window.apUpdateAffPreview = function() {
+  var priceEl = document.getElementById('ap-field-price');
+  var price = priceEl ? (parseFloat(priceEl.value) || 0) : 0;
+  var rangeEl = document.querySelector('#ap-aff-settings input[type=range]');
+  var affPct = rangeEl ? parseInt(rangeEl.value) : 20;
+  var curEl = document.getElementById('ap-field-currency');
+  var currency = curEl ? curEl.value : 'NGN';
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
+  var platFee = price * 0.05, affEarn = price * (affPct/100), sellerGet = price - affEarn - platFee;
+  var fmt = function(v){ return price > 0 ? sym + v.toLocaleString('en',{maximumFractionDigits:0}) : '—'; };
+  var e = id => document.getElementById(id);
+  if (e('ap-aep-affiliate')) e('ap-aep-affiliate').textContent = fmt(affEarn);
+  if (e('ap-aep-seller'))    e('ap-aep-seller').textContent    = fmt(sellerGet);
+  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (5%)' : '—';
+  var affTag = e('ap-pv-aff-tag');
+  if (affTag) affTag.textContent = 'Affiliate · ' + affPct + '%';
+};
+
+window.apSyncPreview = function() {
+  var nameEl = document.getElementById('ap-field-name');
+  var descEl = document.getElementById('ap-field-desc');
+  var priceEl = document.getElementById('ap-field-price');
+  var origEl = document.getElementById('ap-field-original');
+  var curEl = document.getElementById('ap-field-currency');
+  var name = nameEl ? nameEl.value.trim() : '';
+  var desc = descEl ? descEl.value.trim() : '';
+  var price = priceEl ? (parseFloat(priceEl.value) || 0) : 0;
+  var original = origEl ? (parseFloat(origEl.value) || 0) : 0;
+  var currency = curEl ? curEl.value : 'NGN';
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
+  var e = id => document.getElementById(id);
+  if (e('ap-pv-title')) e('ap-pv-title').textContent = name || 'Your product name';
+  if (e('ap-pv-desc'))  e('ap-pv-desc').textContent  = desc || 'Your description will appear here.';
+  if (e('ap-pv-price')) e('ap-pv-price').textContent = _apPriceMode==='free' ? 'Free' : sym + (price > 0 ? price.toLocaleString('en',{maximumFractionDigits:0}) : '0');
+  var pvOrig = e('ap-pv-original');
+  if (pvOrig) { pvOrig.style.display = (original > 0 && original > price) ? '' : 'none'; pvOrig.textContent = sym + original.toLocaleString('en',{maximumFractionDigits:0}); }
+  apUpdateAffPreview();
+};
+
+window.apCountChars = function(el, counterId, max) {
+  var len = el.value.length;
+  var c = document.getElementById(counterId);
+  if (!c) return;
+  c.textContent = len + ' / ' + max;
+  c.className = 'ap-field-count' + (len >= max ? ' over' : len > max * 0.9 ? ' warn' : '');
+};
+
+window.apAddFeature = function() {
+  var row = document.createElement('div');
+  row.className = 'ap-variant-row';
+  row.innerHTML = '<input placeholder="Add a feature or benefit" type="text"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×<\/button>';
+  var list = document.getElementById('ap-features-list');
+  if (list) list.appendChild(row);
+};
+window.apAddVariant = function() {
+  var row = document.createElement('div');
+  row.className = 'ap-variant-row';
+  row.innerHTML = '<input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×<\/button>';
+  var list = document.getElementById('ap-variants-list');
+  if (list) list.appendChild(row);
+};
+window.apRemoveVariant = function(btn) { btn.closest('.ap-variant-row').remove(); };
+
+window.apAddModule = function() {
+  var num = document.querySelectorAll('#ap-modules-list .ap-module-item').length + 1;
+  var item = document.createElement('div');
+  item.className = 'ap-module-item';
+  var inp = document.createElement('input');
+  inp.style.cssText = 'flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:500;outline:none;margin-left:8px;';
+  inp.value = 'Module ' + num;
+  inp.placeholder = 'Module title';
+  var rmBtn = document.createElement('button');
+  rmBtn.className = 'ap-mod-remove';
+  rmBtn.textContent = '×';
+  rmBtn.onclick = function(){ this.closest('.ap-module-item').remove(); };
+  item.innerHTML = '<span class="ap-mod-drag">⠿</span><span style="font-size:16px;">📹</span>';
+  item.appendChild(inp);
+  var lessons = document.createElement('span');
+  lessons.style.cssText = 'font-size:11.5px;color:var(--text3);min-width:70px;text-align:right;';
+  lessons.textContent = '0 lessons';
+  item.appendChild(lessons);
+  item.appendChild(rmBtn);
+  var list = document.getElementById('ap-modules-list');
+  if (list) list.appendChild(item);
+};
+
+window.apFakeUpload = function(zoneId, listId, filename, size) {
+  var zone = document.getElementById(zoneId);
+  if (zone) zone.classList.add('has-file');
+  var list = document.getElementById(listId);
+  if (!list) return;
+  var item = document.createElement('div');
+  item.className = 'ap-uploaded-file';
+  var icon = document.createElement('span');
+  icon.style.fontSize = '18px'; icon.textContent = '✅';
+  var nameEl = document.createElement('span');
+  nameEl.style.cssText = 'flex:1;font-weight:500;'; nameEl.textContent = filename;
+  var sizeEl = document.createElement('span');
+  sizeEl.style.cssText = 'font-size:11.5px;color:var(--text3);'; sizeEl.textContent = size;
+  var rmBtn = document.createElement('button');
+  rmBtn.className = 'ap-uf-remove'; rmBtn.textContent = '×';
+  rmBtn.onclick = function(){ apRemoveFile(this, zoneId); };
+  item.appendChild(icon); item.appendChild(nameEl); item.appendChild(sizeEl); item.appendChild(rmBtn);
+  list.innerHTML = '';
+  list.appendChild(item);
+};
+window.apRemoveFile = function(btn, zoneId) {
+  btn.closest('.ap-uploaded-file').remove();
+  var zone = document.getElementById(zoneId);
+  if (zone) zone.classList.remove('has-file');
+};
+
+window.apFillSummary = function() {
+  var name = document.getElementById('ap-field-name');
+  var price = document.getElementById('ap-field-price');
+  var currency = document.getElementById('ap-field-currency');
+  var rangeEl = document.querySelector('#ap-aff-settings input[type=range]');
+  var m = _apTypeMeta[_apType] || {};
+  var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(currency&&currency.value)||'NGN'] || '';
+  var priceVal = price ? (parseFloat(price.value) || 0) : 0;
+  var affPct = rangeEl ? parseInt(rangeEl.value) : 20;
+  var e = id => document.getElementById(id);
+  if (e('ap-summary-name'))  e('ap-summary-name').textContent  = (name && name.value.trim()) || '(untitled)';
+  if (e('ap-summary-type'))  e('ap-summary-type').textContent  = m.label || '—';
+  if (e('ap-summary-price')) e('ap-summary-price').textContent = _apPriceMode==='free' ? 'Free' : sym + priceVal.toLocaleString('en');
+  if (e('ap-summary-aff'))   e('ap-summary-aff').textContent   = _apAffEnabled ? 'Enabled · ' + affPct + '% commission' : 'Disabled';
+};
+
+window.apOpenPreview = function() {
+  apSyncPreview();
+  var modal = document.getElementById('ap-preview-modal');
+  if (modal) modal.style.display = 'flex';
+};
+window.apClosePreview = function() {
+  var modal = document.getElementById('ap-preview-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.apPublish = function(e) {
+  var btn = e && e.target ? e.target : document.querySelector('#ap-step-3 .btn-primary');
+  // delegate to the real submitProduct function
+  submitProduct();
+};
+
+window.goAddProduct = function() {
+  // Reset add product state
+  _apType = null; _apPriceMode = 'paid'; _apAffEnabled = true; _apVisMode = 'public';
+  document.querySelectorAll('.ap-type-opt').forEach(o => o.classList.remove('selected'));
+  var btn = document.getElementById('ap-step1-next');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.4'; }
+  apSetStep(1);
+  showPage('addproduct');
+};
+
+window.pickType = function(el, type) {
+  window._selectedProductType = type;
+  document.querySelectorAll('.prod-type-opt').forEach(opt => {
+    opt.style.background  = 'var(--surface)';
+    opt.style.borderColor = 'var(--border)';
+  });
+  el.style.background  = 'rgba(124,92,252,.12)';
+  el.style.borderColor = 'var(--accent)';
+
+  // Show/hide digital upload note
+  const note = document.getElementById('digital-upload-note');
+  if (note) note.style.display = type === 'physical' ? 'none' : 'block';
+
+  // Upload label
+  const label = document.getElementById('upload-label');
+  const labels = { physical:'📸 Product images', ebook:'📄 Ebook / PDF file', course:'🎓 Course thumbnail / promo image', template:'🎨 Template files', audio:'🎵 Audio files', software:'💻 Software / ZIP' };
+  if (label) label.textContent = labels[type] || '📸 Product images';
+
+  // Show course curriculum section only for course type
+  const courseSection = document.getElementById('course-section');
+  if (courseSection) courseSection.style.display = type === 'course' ? 'block' : 'none';
+
+  // If switching to course and no modules yet, add one to start
+  if (type === 'course') {
+    const list = document.getElementById('course-modules-list');
+    if (list && list.children.length === 0) addCourseModule();
+  }
+};
+
+// ── COURSE MODULE BUILDER ────────────────────────────────────────────
+let _moduleCount = 0;
+window.addCourseModule = function() {
+  _moduleCount++;
+  var idx = _moduleCount;
+  var list = document.getElementById('course-modules-list');
+  if (!list) return;
+  var div = document.createElement('div');
+  div.id = 'module-' + idx;
+  div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;margin-bottom:8px;';
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+  var inp = document.createElement('input');
+  inp.value = 'Module ' + idx;
+  inp.placeholder = 'Module title';
+  inp.style.cssText = 'background:transparent;border:none;color:var(--text);font-size:13.5px;font-weight:600;font-family:var(--font-body);flex:1;outline:none;';
+  var rmBtn = document.createElement('button');
+  rmBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0 0 0 8px;';
+  rmBtn.textContent = 'x';
+  rmBtn.onclick = (function(id){ return function(){ var el=document.getElementById('module-'+id); if(el) el.remove(); }; })(idx);
+  hdr.appendChild(inp); hdr.appendChild(rmBtn);
+  var lessonsDiv = document.createElement('div');
+  lessonsDiv.id = 'lessons-' + idx;
+  lessonsDiv.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-bottom:8px;';
+  var addBtn = document.createElement('button');
+  addBtn.className = 'btn btn-ghost btn-sm'; addBtn.style.fontSize = '12px'; addBtn.textContent = '+ Add lesson';
+  addBtn.onclick = (function(id){ return function(){ addLesson(id); }; })(idx);
+  div.appendChild(hdr); div.appendChild(lessonsDiv); div.appendChild(addBtn);
+  list.appendChild(div);
+  addLesson(idx);
+};
+
+// ── ADD PRODUCT: preview modal ───────────────────────────────────────
+window.openListingPreview = function() {
+  const name   = document.getElementById('ap-name')?.value   || 'Your product name';
+  const desc   = document.getElementById('ap-desc')?.value   || 'Your description.';
+  const price  = document.getElementById('ap-price')?.value  || '0';
+  const emoji  = document.getElementById('ap-emoji')?.value  || '📦';
+  const seller = window._currentUser?.fullName || 'Your Store';
+  const typeLabels = { physical:'Physical item', ebook:'Ebook / PDF', course:'Online course', template:'Template', audio:'Music / Audio', software:'Software' };
+  const el = id => document.getElementById(id);
+  if (el('preview-name'))        el('preview-name').textContent        = name;
+  if (el('preview-desc'))        el('preview-desc').textContent        = desc;
+  if (el('preview-price'))       el('preview-price').textContent       = 'NGN ' + Number(price).toLocaleString();
+  if (el('preview-emoji'))       el('preview-emoji').textContent       = emoji;
+  if (el('preview-thumb'))       el('preview-thumb').textContent       = emoji;
+  if (el('preview-seller-name')) el('preview-seller-name').textContent = seller;
+  if (el('preview-type-tag'))    el('preview-type-tag').textContent    = typeLabels[window._selectedProductType] || 'Physical item';
+  const modal = document.getElementById('listing-preview-modal');
+  if (modal) modal.classList.add('open');
+};
+window.closeListingPreview = function() {
+  const modal = document.getElementById('listing-preview-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+// ── ADD PRODUCT: submit to Firebase ─────────────────────────────────
+window.submitProduct = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Please sign in first.'); return; }
+  const profile = window._currentUser || {};
+  if (!profile.sellerVerified) {
+    showToast('⚠️ You need to be a verified seller first.');
+    showPage('verification');
+    return;
+  }
+  const name      = (document.getElementById('ap-name')?.value || '').trim();
+  const desc      = (document.getElementById('ap-desc')?.value || '').trim();
+  const priceRaw  = document.getElementById('ap-price')?.value || '';
+  const emoji     = (document.getElementById('ap-emoji')?.value || '📦').trim();
+  const category  = document.getElementById('ap-category')?.value || 'Fashion & Bags';
+  const commission= document.getElementById('ap-commission')?.value || '15';
+  const hasAff    = document.getElementById('ap-affiliate')?.checked ?? true;
+
+  if (!name)     { showToast('⚠️ Product name is required.'); return; }
+  if (!desc)     { showToast('⚠️ Description is required.'); return; }
+  if (!priceRaw || Number(priceRaw) <= 0) { showToast('⚠️ Enter a valid price.'); return; }
+
+  const typeMap = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital' };
+
+  try {
+    const productData = {
+      name,
+      description: desc,
+      price: Number(priceRaw),
+      emoji,
+      category,
+      type: typeMap[window._selectedProductType] || 'Physical',
+      productType: window._selectedProductType,
+      commission: hasAff ? Number(commission) : 0,
+      affiliateEnabled: hasAff,
+      sellerId:   user.uid,
+      sellerName: profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
+      createdAt: serverTimestamp(),
+      status: 'active',
+    };
+    await addDoc(collection(db, 'products'), productData);
+    showToast('✅ Product published successfully!');
+    // Clear form
+    ['ap-name','ap-desc','ap-price','ap-original-price','ap-emoji'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    closeListingPreview();
+    setTimeout(() => showPage('seller-dashboard'), 600);
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not publish. Check your connection.');
+  }
+};
+
+// ── SELLER DASHBOARD TAB SYSTEM ─────────────────────────────────────
+window.sdTab = function(name) {
+  // Update sidebar nav
+  document.querySelectorAll('.sd-nav-item').forEach(i => i.classList.remove('active'));
+  const navEl = document.getElementById('sdnav-' + name);
+  if (navEl) navEl.classList.add('active');
+  // Update mobile tabs
+  document.querySelectorAll('.sd-mobile-tab').forEach(t => t.classList.remove('active'));
+  // Show section
+  document.querySelectorAll('.sd-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('sd-sec-' + name);
+  if (sec) sec.classList.add('active');
+  // Lazy-load section data
+  if (name === 'products') sdLoadProducts();
+  if (name === 'verification') sdLoadVerification();
+  if (name === 'payout') sdLoadPayout();
+};
+
+window.loadSellerDashboardPage = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const u = window._currentUser || {};
+  const el = id => document.getElementById(id);
+  // Sidebar name + badge
+  if (el('sd-sidebar-name')) el('sd-sidebar-name').textContent = u.fullName || u.firstName || 'Seller';
+  if (el('sd-sidebar-badge')) el('sd-sidebar-badge').style.display = u.sellerVerified ? 'inline-block' : 'none';
+  // Verif prompt
+  if (el('sd-verif-prompt')) el('sd-verif-prompt').style.display = (!u.sellerVerified && !u.verifSubmitted) ? 'block' : 'none';
+  if (el('sdnav-verif-badge')) el('sdnav-verif-badge').style.display = (!u.sellerVerified && !u.verifSubmitted) ? 'inline-block' : 'none';
+  // Avatar
+  const initials = (u.fullName || u.firstName || '?')[0].toUpperCase();
+  if (el('nav-avatar-seller-dash')) el('nav-avatar-seller-dash').textContent = initials;
+  // Load stats + overview products
+  try {
+    const fns = window._fns;
+    const pSnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid)));
+    if (el('sd-stat-listings')) el('sd-stat-listings').textContent = pSnap.size;
+    if (el('sdnav-products-count')) { el('sdnav-products-count').textContent = pSnap.size; el('sdnav-products-count').style.display = pSnap.size > 0 ? 'inline-block' : 'none'; }
+    if (el('sd-stat-orders'))   el('sd-stat-orders').textContent = '0';
+    if (el('sd-stat-revenue'))  el('sd-stat-revenue').textContent = '₦0';
+    if (el('sd-stat-aff'))      el('sd-stat-aff').textContent = '₦0';
+    // Overview products (last 4)
+    const recent = pSnap.docs.slice(0, 4);
+    if (el('sd-overview-products')) {
+      el('sd-overview-products').innerHTML = recent.length === 0
+        ? '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
+        : recent.map(d => sdProductRow(d.id, d.data(), true)).join('');
+    }
+  } catch(e) { console.error(e); }
+};
+
+function sdProductRow(id, p, compact) {
+  const typeIcons = {course:'🎓',ebook:'📚',template:'🎨',software:'💻',audio:'🎵',coaching:'🧑‍💼',vehicle:'🚗',physical:'📦'};
+  const icon = typeIcons[p.type] || p.emoji || '📦';
+  const price = Number(p.price||0).toLocaleString();
+  const status = p.status || 'active';
+  const statusColor = status === 'active' ? 'var(--green)' : 'var(--text3)';
+  return '<div class="sd-product-row">' +
+    '<div class="sd-product-thumb">' + icon + '<\/div>' +
+    '<div class="sd-product-info">' +
+      '<div class="sd-product-name">' + (p.name || '(Untitled)') + '<\/div>' +
+      '<div class="sd-product-meta">' + (p.category || p.type || '—') + ' · <span style="color:' + statusColor + ';">' + status + '<\/span><\/div>' +
+    '<\/div>' +
+    '<div class="sd-product-price">\u20a6' + price + '<\/div>' +
+    '<div class="sd-product-actions">' +
+      '<button class="sd-btn-edit" onclick="sdEditProduct(\x27' + id + '\x27)">Edit<\/button>' +
+      '<button class="sd-btn-del" onclick="sdDeleteProduct(\x27' + id + '\x27,this)">\u{1F5D1}<\/button>' +
+    '<\/div>' +
+  '<\/div>';
+}
+
+window.sdLoadProducts = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const el = document.getElementById('sd-products-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…<\/div>';
+  try {
+    const fns = window._fns;
+    const snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    el.innerHTML = snap.empty
+      ? '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No products yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
+      : snap.docs.map(d => sdProductRow(d.id, d.data(), false)).join('');
+  } catch(e) { el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load products.<\/div>'; }
+};
+
+window.sdFilterProducts = function(btn, filter) {
+  document.querySelectorAll('.sd-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // visual filter only for now
+  document.querySelectorAll('#sd-products-list .sd-product-row').forEach(row => {
+    row.style.display = (filter === 'all') ? '' : (row.dataset.status === filter ? '' : 'none');
+  });
+};
+
+window.sdEditProduct = function(id) {
+  showToast('✏️ Edit coming soon — product: ' + id.slice(0,6));
+};
+
+window.sdDeleteProduct = async function(id, btn) {
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  try {
+    const fns = window._fns;
+    await fns.deleteDoc(fns.doc(db, 'products', id));
+    btn.closest('.sd-product-row').remove();
+    showToast('🗑 Product deleted.');
+    sdLoadProducts();
+  } catch(e) { showToast('❌ Could not delete product.'); }
+};
+
+// sdLoadVerification defined above
+
+window.sdLoadPayout = function() {
+  const u = window._currentUser || {};
+  // placeholder — real payout data would come from Firestore
+};
+
+window.sdAddBank = function() {
+  showToast('🏦 Bank account setup coming soon');
+};
+
+window.sdRequestPayout = function() {
+  showToast('💸 Payout request coming soon — add a bank account first');
+};
+
+window.sdSaveSettings = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const name = document.getElementById('sd-store-name').value.trim();
+  const bio  = document.getElementById('sd-store-bio').value.trim();
+  const wa   = document.getElementById('sd-whatsapp').value.trim();
+  try {
+    const fns = window._fns;
+    await fns.updateDoc(fns.doc(db, 'users', user.uid), { storeName: name, storeBio: bio, whatsapp: wa });
+    showToast('✅ Settings saved!');
+  } catch(e) { showToast('❌ Could not save settings.'); }
 };
 
 // Language selection
@@ -3294,4 +5027,376 @@ window.saveManualLocation = function() {
 
 </script>
 
+<!-- ── EDIT BIO MODAL ───────────────────────────────────────── -->
+<div class="bio-modal-bg" id="edit-bio-modal" onclick="if(event.target===this)closeEditBioModal()">
+  <div class="bio-modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h3 style="font-size:17px;margin:0;">✏️ Edit bio</h3>
+      <button onclick="closeEditBioModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:12px;">
+      <label>Display name</label>
+      <input type="text" id="bio-name-input" placeholder="Your name" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+    </div>
+    <div class="form-field" style="margin-bottom:12px;">
+      <label>Bio</label>
+      <textarea id="bio-text-input" rows="4" placeholder="Tell people about yourself…" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);resize:vertical;"></textarea>
+    </div>
+    <div class="form-field" style="margin-bottom:18px;">
+      <label>Location</label>
+      <input type="text" id="bio-location-input" placeholder="e.g. Lagos, Nigeria" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveEditBio()">Save changes</button>
+  </div>
+</div>
+
+<!-- ── SELLER DASHBOARD PAGE ─────────────────────────────────── -->
+<div class="page" id="page-seller-dashboard">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('messaging')">💬</a>
+        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MOBILE TAB BAR -->
+  <div class="sd-mobile-nav">
+    <button class="sd-mobile-tab active" onclick="sdTab('overview')">📊 Overview</button>
+    <button class="sd-mobile-tab" onclick="sdTab('products')">📦 Products</button>
+    <button class="sd-mobile-tab" onclick="sdTab('orders')">🛍 Orders</button>
+    <button class="sd-mobile-tab" onclick="sdTab('payout')">💸 Payout</button>
+    <button class="sd-mobile-tab" onclick="sdTab('verification')">🛡 Verification</button>
+    <button class="sd-mobile-tab" onclick="sdTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <div class="sd-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sd-sidebar">
+      <div style="padding:0 20px 20px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Seller account</div>
+        <div style="font-size:15px;font-weight:700;" id="sd-sidebar-name">—</div>
+        <div id="sd-sidebar-badge" style="display:none;margin-top:6px;background:rgba(39,201,122,.12);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-block;">✅ Verified Seller</div>
+      </div>
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Main</div>
+        <button class="sd-nav-item active" id="sdnav-overview" onclick="sdTab('overview')">
+          <span class="sd-nav-icon">📊</span> Dashboard
+        </button>
+        <button class="sd-nav-item" id="sdnav-products" onclick="sdTab('products')">
+          <span class="sd-nav-icon">📦</span> My Products
+          <span class="sd-nav-badge" id="sdnav-products-count" style="display:none;">0</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-orders" onclick="sdTab('orders')">
+          <span class="sd-nav-icon">🛍</span> Orders
+          <span class="sd-nav-badge gold" id="sdnav-orders-badge" style="display:none;">New</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-analytics" onclick="sdTab('analytics')">
+          <span class="sd-nav-icon">📈</span> Analytics
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Money</div>
+        <button class="sd-nav-item" id="sdnav-payout" onclick="sdTab('payout')">
+          <span class="sd-nav-icon">💸</span> Payout
+        </button>
+        <button class="sd-nav-item" id="sdnav-affiliate" onclick="sdTab('affiliate')">
+          <span class="sd-nav-icon">🔗</span> Affiliate earnings
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <div class="sd-sidebar-label">Account</div>
+        <button class="sd-nav-item" id="sdnav-verification" onclick="sdTab('verification')">
+          <span class="sd-nav-icon">🛡</span> Verification
+          <span class="sd-nav-badge" id="sdnav-verif-badge" style="display:none;">!</span>
+        </button>
+        <button class="sd-nav-item" id="sdnav-settings" onclick="sdTab('settings')">
+          <span class="sd-nav-icon">⚙️</span> Settings
+        </button>
+      </div>
+
+      <div class="sd-nav-divider"></div>
+
+      <div class="sd-sidebar-section">
+        <button class="sd-nav-item" style="background:var(--accent);color:#fff;border-radius:var(--radius-xs);justify-content:center;" onclick="goAddProduct()">
+          <span>+</span> Add product
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="sd-content">
+
+      <!-- ── OVERVIEW ── -->
+      <div class="sd-section active" id="sd-sec-overview">
+        <div class="sd-page-hd">Dashboard</div>
+        <div class="sd-page-sub">Welcome back — here's how your store is doing</div>
+        <div class="sd-stat-grid">
+          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-stat-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-aff">₦0</div><div class="sd-stat-lbl">Aff. earned</div></div>
+        </div>
+
+        <!-- Verification prompt -->
+        <div id="sd-verif-prompt" style="display:none;margin-bottom:20px;">
+          <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px;">⚠️ Seller verification required</div>
+              <div style="font-size:13px;color:var(--text2);">Get verified to start listing and earn on ZÚLA.</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="sdTab('verification')">Get verified →</button>
+          </div>
+        </div>
+
+        <!-- Recent products -->
+        <div class="dash-card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:15px;font-weight:700;">Recent listings</h3>
+            <button class="btn btn-ghost btn-sm" onclick="sdTab('products')">View all →</button>
+          </div>
+          <div id="sd-overview-products">
+            <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="goAddProduct()" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">➕</div>
+            <div style="font-size:13.5px;font-weight:700;">New listing</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Add a product to sell</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('payout')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">💸</div>
+            <div style="font-size:13.5px;font-weight:700;">Request payout</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Withdraw your earnings</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('analytics')" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">📈</div>
+            <div style="font-size:13.5px;font-weight:700;">View analytics</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Sales & traffic data</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="showPage('messaging')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:24px;margin-bottom:8px;">💬</div>
+            <div style="font-size:13.5px;font-weight:700;">Messages</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Chat with buyers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MY PRODUCTS ── -->
+      <div class="sd-section" id="sd-sec-products">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
+          <div class="sd-page-hd">My Products</div>
+          <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
+        </div>
+        <div class="sd-page-sub">Manage, edit, or remove your listings</div>
+
+        <!-- Filter bar -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="sdFilterProducts(this,'all')">All</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterProducts(this,'active')">Active</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterProducts(this,'draft')">Draft</button>
+        </div>
+
+        <div class="dash-card" style="padding:0 24px;">
+          <div id="sd-products-list" style="padding:8px 0;">
+            <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div class="sd-section" id="sd-sec-orders">
+        <div class="sd-page-hd">Orders</div>
+        <div class="sd-page-sub">Track purchases made on your listings</div>
+        <div class="dash-card">
+          <div id="sd-orders-list">
+            <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No orders yet — your sales will appear here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div class="sd-section" id="sd-sec-analytics">
+        <div class="sd-page-hd">Analytics</div>
+        <div class="sd-page-sub">Traffic, conversions and revenue over time</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--blue);">—</div><div class="sd-stat-lbl">Page views</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">—%</div><div class="sd-stat-lbl">Conversion rate</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">—</div><div class="sd-stat-lbl">Avg. order value</div></div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:40px;">
+          <div style="font-size:40px;margin-bottom:12px;">📈</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Analytics coming soon</div>
+          <p>Detailed charts and traffic data will appear here once you have sales.</p>
+        </div>
+      </div>
+
+      <!-- ── PAYOUT ── -->
+      <div class="sd-section" id="sd-sec-payout">
+        <div class="sd-page-hd">Payout</div>
+        <div class="sd-page-sub">Withdraw your earnings to your bank account</div>
+
+        <!-- Balance cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+          <div class="sd-payout-card">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Available balance</div>
+            <div class="sd-payout-balance" id="sd-payout-available">₦0.00</div>
+            <div class="sd-payout-pending">Pending: <span id="sd-payout-pending">₦0.00</span></div>
+            <button class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;" onclick="sdRequestPayout()">Request payout →</button>
+          </div>
+          <div class="sd-payout-card">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total paid out</div>
+            <div class="sd-payout-balance" style="color:var(--text);" id="sd-payout-total">₦0.00</div>
+            <div class="sd-payout-pending">All time earnings</div>
+            <div style="margin-top:14px;font-size:12px;color:var(--text3);">Payouts processed within 1–3 business days</div>
+          </div>
+        </div>
+
+        <!-- Bank account -->
+        <div class="dash-card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="font-size:15px;font-weight:700;">Bank account</h3>
+            <button class="btn btn-ghost btn-sm" onclick="sdAddBank()">+ Add bank</button>
+          </div>
+          <div id="sd-bank-list">
+            <div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center;">No bank account added yet. Add one to receive payouts.</div>
+          </div>
+        </div>
+
+        <!-- Payout history -->
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Payout history</h3>
+          <div id="sd-payout-history">
+            <div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center;">No payout history yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AFFILIATE EARNINGS ── -->
+      <div class="sd-section" id="sd-sec-affiliate">
+        <div class="sd-page-hd">Affiliate Earnings</div>
+        <div class="sd-page-sub">Commissions earned from promoting other sellers' products</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦0</div><div class="sd-stat-lbl">Total earned</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val">0</div><div class="sd-stat-lbl">Referrals</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val">0</div><div class="sd-stat-lbl">Clicks</div></div>
+        </div>
+        <div class="dash-card" style="text-align:center;padding:40px;">
+          <div style="font-size:40px;margin-bottom:12px;">🔗</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Start earning with affiliate links</div>
+          <p style="margin-bottom:20px;">Browse products on the marketplace and share your unique affiliate link to earn commission on every sale.</p>
+          <button class="btn btn-primary" onclick="showPage('marketplace')">Browse products →</button>
+        </div>
+      </div>
+
+      <!-- ── VERIFICATION ── -->
+      <div class="sd-section" id="sd-sec-verification">
+        <div class="sd-page-hd">Seller Verification</div>
+        <div class="sd-page-sub">Complete verification to list products and receive payouts</div>
+        <div id="sd-verif-content">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">Loading…</div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="sd-section" id="sd-sec-settings">
+        <div class="sd-page-hd">Seller Settings</div>
+        <div class="sd-page-sub">Manage your store profile and preferences</div>
+
+        <div class="dash-card" style="margin-bottom:16px;">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Store profile</h3>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>Store name</label>
+            <input type="text" id="sd-store-name" placeholder="Your store name" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);">
+          </div>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>Store bio</label>
+            <textarea id="sd-store-bio" rows="3" placeholder="Tell buyers about your store…" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);resize:vertical;"></textarea>
+          </div>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label>WhatsApp number (for buyer enquiries)</label>
+            <input type="tel" id="sd-whatsapp" placeholder="+234 800 000 0000" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="sdSaveSettings()">Save changes</button>
+        </div>
+
+        <div class="dash-card" style="margin-bottom:16px;">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Notifications</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">New order notification</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">New message notification</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">Payout confirmation</span>
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <span style="font-size:13.5px;">Marketing & tips emails</span>
+              <input type="checkbox" style="accent-color:var(--accent);width:16px;height:16px;">
+            </label>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">Danger zone</h3>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">These actions are permanent and cannot be undone.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="if(confirm('Deactivate your seller account? You can reactivate later.'))showToast('Account deactivated')">Deactivate seller account</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sd-content -->
+  </div><!-- /sd-layout -->
+</div>
+
+<!-- ── NEW MESSAGE MODAL ─────────────────────────────────────── -->
+<div class="modal-bg" id="new-msg-modal" onclick="if(event.target===this)closeNewMsgModal()">
+  <div class="modal-box" style="max-width:420px;width:90%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h3 style="font-size:17px;margin:0;">✉️ New message</h3>
+      <button onclick="closeNewMsgModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:10px;position:relative;">
+      <label>Search for a user</label>
+      <input type="text" id="new-msg-search" placeholder="Type a name…" oninput="searchUsersToMsg(this.value)" autocomplete="off" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+      <div id="user-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);z-index:200;max-height:200px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.5);"></div>
+    </div>
+    <div id="new-msg-selected-user" style="display:none;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.25);border-radius:var(--radius-xs);padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;">
+      <div id="new-msg-sel-avatar" class="conv-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div id="new-msg-sel-name" style="font-size:13.5px;font-weight:600;color:var(--text);"></div>
+        <div id="new-msg-sel-email" style="font-size:11px;color:var(--text3);"></div>
+      </div>
+      <button onclick="clearMsgRecipient()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:14px;">
+      <label>Message</label>
+      <textarea id="new-msg-text" style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Type your first message…"></textarea>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="startNewConversation()">Send →</button>
+  </div>
+</div>
+
 </body>
+</html>
