@@ -4438,7 +4438,7 @@ window.apSetStep = function(n) {
     var s = document.getElementById('ap-step-' + i);
     if (s) s.style.display = (i === n) ? '' : 'none';
     var ind = document.getElementById('ap-step-ind-' + i);
-    if (ind) { ind.classList.remove('active','done'); ind.classList.add(i < n ? 'done' : i === n ? 'active' : ''); }
+    if (ind) { ind.classList.remove('active','done'); if (i < n) ind.classList.add('done'); else if (i === n) ind.classList.add('active'); }
     if (i < 3) { var line = document.getElementById('ap-step-line-' + i); if (line) line.classList.toggle('done', i < n); }
   });
   var fill = document.getElementById('ap-progress-fill');
