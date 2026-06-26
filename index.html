@@ -1116,6 +1116,101 @@ p{color:var(--text2);margin:0 0 1em;}
 </div>
 
 <!-- ================================================================
+     ADMIN CSS ADDITIONS
+     ================================================================ -->
+<style>
+/* ── ADMIN EXTENDED STYLES ── */
+.tag-purple{background:rgba(124,92,252,.18);color:#a990ff;}
+.tag-blue{background:rgba(56,152,236,.15);color:#5ba8f5;}
+.btn-danger{background:transparent;border-color:var(--red);color:var(--red);}
+.btn-gold{background:var(--gold);color:#1a1000;font-weight:700;}
+.spill{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700;}
+.spill-escrow{background:rgba(245,200,66,.15);color:var(--gold);}
+.spill-confirmed{background:rgba(39,201,122,.15);color:var(--green);}
+.spill-payout{background:rgba(56,152,236,.15);color:#5ba8f5;}
+.spill-pending{background:rgba(240,82,82,.15);color:var(--red);}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.user-avatar-sm{width:36px;height:36px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.user-search-bar{display:flex;gap:10px;margin-bottom:20px;}
+.user-search-bar input{flex:1;background:var(--bg3);border:1px solid var(--border);padding:9px 14px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;}
+.verif-queue-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:12px;}
+.vq-docs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.vq-doc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.toggle-switch{width:42px;height:24px;background:var(--border2);border-radius:999px;position:relative;cursor:pointer;transition:.2s;flex-shrink:0;}
+.toggle-switch.on{background:var(--green);}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;}
+.toggle-switch.on::after{left:21px;}
+/* Ads manager */
+.ads-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px;}
+.ads-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.ads-kpi .ak-icon{font-size:20px;margin-bottom:6px;}
+.ads-kpi .ak-val{font-family:var(--font-display);font-size:21px;font-weight:700;}
+.ads-kpi .ak-lbl{font-size:11px;color:var(--text3);margin-top:3px;}
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:6px;}
+.slot-card{background:var(--bg3);border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:14px;text-align:center;position:relative;}
+.slot-card.filled{border-style:solid;border-color:var(--gold);background:rgba(245,200,66,.06);}
+.slot-card .slot-num{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.slot-card .slot-icon{font-size:26px;margin-bottom:4px;}
+.slot-card .slot-name{font-size:12px;font-weight:600;color:var(--text);}
+.slot-card .slot-seller{font-size:10.5px;color:var(--text3);margin-top:1px;}
+.slot-card .slot-empty-txt{font-size:11.5px;color:var(--text3);}
+.sponsor-badge{position:absolute;top:10px;left:10px;background:var(--gold);color:#1a1000;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em;z-index:2;}
+.ad-review-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.ad-review-row:last-child{border-bottom:none;}
+.ad-bid-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(124,92,252,.12);color:#a990ff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;}
+/* Engagement earnings */
+.eng-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px;}
+.eng-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.eng-kpi .ek-icon{font-size:20px;margin-bottom:6px;}
+.eng-kpi .ek-val{font-family:var(--font-display);font-size:22px;font-weight:700;}
+.eng-kpi .ek-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+.eng-kpi .ek-rev{font-size:12.5px;color:var(--green);font-weight:600;margin-top:6px;}
+.eng-rate-table{width:100%;border-collapse:collapse;font-size:13px;}
+.eng-rate-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);}
+.eng-rate-table td{padding:11px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+.eng-rate-table tr:last-child td{border-bottom:none;}
+.eng-rate-table .rate-val{color:var(--accent);font-weight:700;}
+.eng-toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:3px;gap:3px;margin-bottom:20px;width:fit-content;}
+.eng-toggle button{padding:7px 16px;border-radius:5px;border:none;font-size:12.5px;font-weight:600;font-family:var(--font-body);cursor:pointer;color:var(--text3);background:transparent;}
+.eng-toggle button.active{background:var(--accent);color:#fff;}
+.restrict-banner{background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--text2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.restrict-banner b{color:var(--red);}
+/* Moderation */
+.mod-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:12px;transition:.2s;}
+.mod-card.resolved{opacity:.45;pointer-events:none;border-color:var(--green);}
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.fpill{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;}
+.fpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+/* SEO */
+.seo-row{border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+.seo-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.seo-label{display:block;font-size:12px;color:var(--text3);margin-bottom:5px;margin-top:10px;}
+.seo-input{width:100%;background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+textarea.seo-input{resize:vertical;}
+/* Announcements */
+.ann-preview-banner{padding:12px 18px;border-radius:var(--radius-xs);font-size:13.5px;font-weight:600;margin-bottom:8px;}
+.ann-info{background:rgba(56,152,236,.12);border:1px solid rgba(56,152,236,.3);color:#5ba8f5;}
+.ann-warning{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:var(--gold);}
+.ann-success{background:rgba(39,201,122,.1);border:1px solid rgba(39,201,122,.3);color:var(--green);}
+.ann-urgent{background:rgba(240,82,82,.1);border:1px solid rgba(240,82,82,.3);color:var(--red);}
+/* Platform fees */
+.fee-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+.fee-row:last-child{border-bottom:none;}
+.fee-type{font-weight:600;color:var(--text);}
+.fee-pct{color:var(--accent);font-weight:700;}
+.fee-example{font-size:12px;color:var(--text3);}
+/* User detail */
+.user-detail-header{padding:24px 28px;background:linear-gradient(135deg,rgba(124,92,252,.18),rgba(91,63,219,.08));display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+.user-detail-avatar{width:64px;height:64px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;border:3px solid var(--bg);}
+.user-detail-info{flex:1;}
+.user-detail-info h2{font-size:19px;font-weight:700;margin-bottom:4px;}
+.user-detail-info p{font-size:13px;color:var(--text3);margin:0;}
+.enforcement-log-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.enforcement-log-row:last-child{border-bottom:none;}
+.enforce-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);}
+</style>
+
+<!-- ================================================================
      PAGE: ADMIN PANEL (sundaygift050 & okoroaugustine050 only)
      ================================================================ -->
 <div class="page" id="page-admin">
@@ -1140,6 +1235,13 @@ p{color:var(--text2);margin:0 0 1em;}
         <a id="anav-users"      onclick="adminTab('users')">👥 Users</a>
         <a id="anav-orders"     onclick="adminTab('orders')">🛍 Orders</a>
         <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
+        <a id="anav-affiliates" onclick="adminTab('affiliates')">🤝 Affiliates</a>
+        <a id="anav-adsmanager" onclick="adminTab('adsmanager')">📢 Ads Manager</a>
+        <a id="anav-engagement" onclick="adminTab('engagement')">💰 Engagement $</a>
+        <a id="anav-moderation" onclick="adminTab('moderation')">🚩 Moderation</a>
+        <a id="anav-announce"   onclick="adminTab('announce')">📣 Announcements</a>
+        <a id="anav-seo"        onclick="adminTab('seo')">🔍 SEO</a>
+        <a id="anav-fees"       onclick="adminTab('fees')">💎 Platform Fees</a>
         <a id="anav-settings"   onclick="adminTab('settings')">⚙️ Settings</a>
         <a style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;" onclick="showPage('marketplace')">← Marketplace</a>
         <a style="color:var(--red);" onclick="zulaSignOut()">Sign out</a>
@@ -1148,7 +1250,7 @@ p{color:var(--text2);margin:0 0 1em;}
 
     <main class="dash-main">
 
-      <!-- OVERVIEW -->
+      <!-- ── OVERVIEW ── -->
       <div class="admin-section active" id="asec-overview">
         <div class="dash-h1">Overview</div>
         <div class="dash-sub">Live data from ZÚLA marketplace</div>
@@ -1157,6 +1259,8 @@ p{color:var(--text2);margin:0 0 1em;}
           <div class="stat-card"><div class="stat-lbl">Total products</div><div class="stat-val" id="astat-products">—</div></div>
           <div class="stat-card"><div class="stat-lbl">Active sellers</div><div class="stat-val" id="astat-sellers">—</div></div>
           <div class="stat-card"><div class="stat-lbl">Pending verif.</div><div class="stat-val" id="astat-verif">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Held in escrow</div><div class="stat-val" id="admin-escrow">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">GMV today</div><div class="stat-val">NGN 0</div></div>
         </div>
         <div class="dash-card">
           <div style="font-size:15px;font-weight:700;margin-bottom:14px;">Recent products</div>
@@ -1167,7 +1271,7 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- PRODUCTS -->
+      <!-- ── PRODUCTS ── -->
       <div class="admin-section" id="asec-products">
         <div class="dash-h1">All Products</div>
         <div class="dash-sub">Every product listed on the marketplace</div>
@@ -1179,25 +1283,88 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- USERS -->
+      <!-- ── USERS ── -->
       <div class="admin-section" id="asec-users">
-        <div class="dash-h1">All Users</div>
-        <div class="dash-sub">Everyone registered on ZÚLA</div>
+        <div class="dash-h1">User Management</div>
+        <div class="dash-sub">Search, view, suspend, or ban users and sellers.</div>
+        <div class="user-search-bar">
+          <input placeholder="Search by name, email, or user ID…">
+          <select style="background:var(--bg3);border:1px solid var(--border);padding:9px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;">
+            <option>All users</option><option>Verified sellers</option><option>Pending verification</option><option>Buyers only</option><option>Suspended</option>
+          </select>
+          <button class="btn btn-ghost btn-sm">Export CSV</button>
+        </div>
         <div class="dash-card">
           <table class="dtable">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
-            <tbody id="a-users-table"><tr><td colspan="4" style="color:var(--text3);">Loading…</td></tr></tbody>
+            <thead><tr><th>User</th><th>Joined</th><th>Role</th><th>Status</th><th>Revenue</th><th>Actions</th></tr></thead>
+            <tbody id="a-users-table">
+              <tr><td colspan="6" style="color:var(--text3);">Loading…</td></tr>
+            </tbody>
           </table>
+        </div>
+        <!-- USER DETAIL CARD (hidden by default, shown when View is clicked) -->
+        <div id="admin-user-detail" style="display:none;margin-top:20px;">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('admin-user-detail').style.display='none'" style="margin-bottom:16px;">← Back to user list</button>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;">
+            <div class="user-detail-header">
+              <div class="user-detail-avatar" id="aud-avatar">AO</div>
+              <div class="user-detail-info">
+                <h2 id="aud-name">Ada Okafor <span style="font-size:13px;opacity:.7;">#USR-2024-00142</span></h2>
+                <p id="aud-email">ada@example.com · +234 802 555 1234 · Lagos, Nigeria</p>
+                <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                  <span class="tag tag-gold" style="font-size:11px;">Verified Seller</span>
+                  <span class="tag tag-purple" style="font-size:11px;">Gold Affiliate</span>
+                  <span class="tag tag-green" style="font-size:11px;">● Active</span>
+                  <span style="background:rgba(39,201,122,.25);color:#27c97a;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;">🔐 2FA On</span>
+                </div>
+              </div>
+              <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:12px;opacity:.7;margin-bottom:4px;">Total revenue</div>
+                <div style="font-size:22px;font-weight:800;" id="aud-revenue">NGN 73,500</div>
+                <div style="font-size:11px;opacity:.6;margin-top:2px;" id="aud-joined">Joined Jan 2024</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);">
+              <div style="padding:14px;text-align:center;border-right:1px solid var(--border);"><div style="font-size:18px;font-weight:700;">12</div><div style="font-size:11px;color:var(--text3);">Purchases</div></div>
+              <div style="padding:14px;text-align:center;border-right:1px solid var(--border);"><div style="font-size:18px;font-weight:700;">34</div><div style="font-size:11px;color:var(--text3);">Sales</div></div>
+              <div style="padding:14px;text-align:center;border-right:1px solid var(--border);"><div style="font-size:18px;font-weight:700;color:var(--gold);">14</div><div style="font-size:11px;color:var(--text3);">Affiliates ref'd</div></div>
+              <div style="padding:14px;text-align:center;border-right:1px solid var(--border);"><div style="font-size:18px;font-weight:700;color:var(--green);">0</div><div style="font-size:11px;color:var(--text3);">Disputes</div></div>
+              <div style="padding:14px;text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--green);">4.9★</div><div style="font-size:11px;color:var(--text3);">Seller rating</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+            <div>
+              <div class="dash-card" style="margin-bottom:16px;">
+                <h3 style="font-size:14px;font-weight:600;margin-bottom:16px;">⚠️ Account enforcement</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showToast('⏸ Suspend form opened — set duration and reason')">⏸ Suspend account temporarily</button>
+                  <button class="btn btn-ghost" style="justify-content:flex-start;color:var(--red);border-color:rgba(240,82,82,.3);" onclick="showToast('⛔ Permanent ban — confirmation required')">⛔ Permanently ban account</button>
+                  <button class="btn btn-ghost" style="justify-content:flex-start;color:#5ba8f5;" onclick="showToast('⚡ Warning sent via email and in-app notification')">⚡ Send formal warning</button>
+                  <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showToast('🔐 2FA reset email sent — user must re-enroll')">🔐 Force 2FA reset</button>
+                  <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showToast('📧 Password reset email sent')">🔑 Force password reset</button>
+                  <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showToast('✅ Seller manually verified — badge activated')">✅ Manually verify seller</button>
+                </div>
+              </div>
+            </div>
+            <div class="dash-card">
+              <h3 style="font-size:14px;font-weight:600;margin-bottom:16px;">📋 Action log (audit trail)</h3>
+              <div class="enforcement-log-row"><div class="enforce-icon">🔐</div><div><div style="font-weight:600;">2FA enabled by user</div><div style="color:var(--text3);font-size:12px;">Jun 15 · 09:14 AM · Authenticator app</div></div></div>
+              <div class="enforcement-log-row"><div class="enforce-icon">✅</div><div><div style="font-weight:600;">Seller verification approved</div><div style="color:var(--text3);font-size:12px;">Mar 2 · 11:30 AM · Admin: sundaygift050</div></div></div>
+              <div class="enforcement-log-row"><div class="enforce-icon">👤</div><div><div style="font-weight:600;">Account created</div><div style="color:var(--text3);font-size:12px;">Jan 8 · 3:45 PM · Email signup</div></div></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ORDERS -->
+      <!-- ── ORDERS ── -->
       <div class="admin-section" id="asec-orders">
         <div class="dash-h1">Orders</div>
         <div class="dash-sub">All orders across every seller and product type</div>
         <div class="stat-row">
           <div class="stat-card"><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">0</div></div>
-          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val" id="admin-escrow-orders">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Ready to pay out</div><div class="stat-val" id="admin-ready">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Affiliate pending</div><div class="stat-val">NGN 0</div></div>
         </div>
         <div class="dash-card">
           <div class="empty-state" style="padding:40px 0;">
@@ -1208,20 +1375,400 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- VERIFICATION QUEUE -->
+      <!-- ── VERIFICATION QUEUE ── -->
       <div class="admin-section" id="asec-verif">
         <div class="dash-h1">Verification Queue</div>
-        <div class="dash-sub">Seller verification requests waiting for review</div>
-        <div class="dash-card">
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="es-icon">🛡</div>
-            <h3>No pending verifications</h3>
-            <p>Seller verification requests will appear here.</p>
+        <div class="dash-sub">Review ID documents, business registrations, and ownership proofs. All docs stored encrypted.</div>
+        <div class="stat-row" style="margin-bottom:20px;">
+          <div class="stat-card"><div class="stat-lbl">Pending review</div><div class="stat-val" id="averif-pending" style="color:var(--gold);">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Approved today</div><div class="stat-val" style="color:var(--green);">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Rejected today</div><div class="stat-val" style="color:var(--red);">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Avg review time</div><div class="stat-val">—</div></div>
+        </div>
+        <!-- Live Firebase queue renders here -->
+        <div id="admin-verif-queue">
+          <div class="dash-card">
+            <div class="empty-state" style="padding:40px 0;">
+              <div class="es-icon">🛡</div>
+              <h3>No pending verifications</h3>
+              <p>Seller verification requests will appear here in real time.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Demo card shown when queue loads from Firebase with data -->
+        <div id="admin-verif-demo" style="display:none;">
+          <div class="verif-queue-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;"><div><div style="font-size:15px;font-weight:700;">Amina Yusuf</div><div style="font-size:12px;color:var(--text3);">amina.yusuf@gmail.com · Applied recently · 1 hour ago</div><div style="font-size:12.5px;color:var(--text2);margin-top:4px;">Individual · Fashion &amp; Bags</div></div><span class="tag tag-gold">⏳ Pending</span></div>
+            <div class="vq-docs"><div class="vq-doc" onclick="showToast('Opening: NIN_amina_yusuf.jpg')">🪪 NIN card</div><div class="vq-doc" onclick="showToast('Liveness check passed ✓')">🤳 Selfie (AI ✓)</div><div class="vq-doc" onclick="showToast('Opening: utility_bill_amina.pdf')">📄 Proof of address</div><div class="vq-doc" onclick="showToast('Opening: supplier_invoice.pdf')">📦 Supplier invoice</div></div>
+            <div style="font-size:12.5px;color:var(--text2);margin-bottom:14px;">Wants to sell: Handmade beaded jewellery and imported fabric bags.</div>
+            <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" onclick="showToast('✅ Amina Yusuf approved — seller badge activated')">✅ Approve</button><button class="btn btn-danger btn-sm" onclick="showToast('❌ Rejection form — request clearer supplier invoice')">❌ Reject with reason</button><button class="btn btn-ghost btn-sm" onclick="showToast('💬 Message sent to Amina')">💬 Request more info</button></div>
+          </div>
+          <div class="verif-queue-card" style="border-color:rgba(240,82,82,.3);">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;"><div><div style="font-size:15px;font-weight:700;">Emmanuel O. <span style="color:var(--red);font-size:12px;">⚠️ AI Flagged</span></div><div style="font-size:12px;color:var(--text3);">emman.o99@yahoo.com · Applied recently</div></div><span class="tag tag-red">⚠️ Flagged</span></div>
+            <div class="vq-docs"><div class="vq-doc" onclick="showToast('ID — AI flag: possible edited document')">🪪 ID (flagged ⚠️)</div><div class="vq-doc" onclick="showToast('Liveness: 62% confidence — borderline fail')">🤳 Selfie (⚠️ 62%)</div><div class="vq-doc" onclick="showToast('Invoice: low image quality')">📦 Invoice (low quality)</div></div>
+            <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:14px;">🤖 <strong style="color:var(--red);">AI flag:</strong> ID shows signs of digital editing (metadata inconsistency). Selfie liveness 62% (threshold: 75%). Manual review recommended.</div>
+            <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" onclick="showToast('✓ Manual override: Approved with note on file')">✅ Manually approve</button><button class="btn btn-danger btn-sm" onclick="showToast('❌ Emmanuel O. rejected — account flagged, IP logged')">❌ Reject &amp; flag</button><button class="btn btn-ghost btn-sm">💬 Request clearer docs</button></div>
           </div>
         </div>
       </div>
 
-      <!-- SETTINGS -->
+      <!-- ── AFFILIATE PAYOUTS ── -->
+      <div class="admin-section" id="asec-affiliates">
+        <div class="dash-h1">Affiliate Payouts</div>
+        <div class="dash-sub">Manage and release commission payments to affiliates.</div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-lbl">Total pending</div><div class="stat-val" style="color:var(--gold);">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Affiliates active</div><div class="stat-val" id="astat-affiliates">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Paid out this month</div><div class="stat-val">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Conversions (month)</div><div class="stat-val">0</div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="adminPayAllAff()">Pay all pending affiliates</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('📄 CSV exported')">Export CSV</button>
+          <select style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:13px;padding:7px 12px;border-radius:var(--radius-xs);">
+            <option>All affiliates</option><option>Gold tier</option><option>Silver tier</option><option>Bronze tier</option>
+          </select>
+        </div>
+        <div class="dash-card">
+          <table class="dtable" id="admin-aff-table">
+            <thead><tr><th>Affiliate</th><th>Tier</th><th>Conversions</th><th>Pending</th><th>Bank</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="a-aff-tbody">
+              <tr><td colspan="7" style="color:var(--text3);">No affiliate data yet — will populate from Firebase.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── ADS MANAGER ── -->
+      <div class="admin-section" id="asec-adsmanager">
+        <div class="dash-h1">Ads Manager</div>
+        <div class="dash-sub">Review, approve, and monitor sponsored product placements.</div>
+        <div class="ads-kpi-grid">
+          <div class="ads-kpi"><div class="ak-icon">📢</div><div class="ak-val" id="ads-pending-count">0</div><div class="ak-lbl">Pending review <span id="ads-pending-badge" style="background:var(--red);color:#fff;border-radius:999px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;">0</span></div></div>
+          <div class="ads-kpi"><div class="ak-icon">● </div><div class="ak-val" id="ads-active-count" style="color:var(--green);">0</div><div class="ak-lbl">Active ad slots</div></div>
+          <div class="ads-kpi"><div class="ak-icon">💰</div><div class="ak-val" style="color:var(--gold);">NGN 0</div><div class="ak-lbl">Ad revenue today</div></div>
+          <div class="ads-kpi"><div class="ak-icon">👁</div><div class="ak-val">0</div><div class="ak-lbl">Impressions today</div></div>
+        </div>
+
+        <!-- HOMEPAGE AD SLOTS -->
+        <div class="dash-card" style="margin-bottom:20px;">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">Homepage sponsored slots</h3>
+          <div class="slot-grid">
+            <div class="slot-card filled">
+              <div class="sponsor-badge">Sponsored</div>
+              <div class="slot-num">Slot 1</div>
+              <div class="slot-icon">👜</div>
+              <div class="slot-name">Woven Tote Bag</div>
+              <div class="slot-seller">Chioma's Closet</div>
+            </div>
+            <div class="slot-card">
+              <div class="slot-num">Slot 2</div>
+              <div class="slot-icon">➕</div>
+              <div class="slot-empty-txt">Available</div>
+            </div>
+            <div class="slot-card">
+              <div class="slot-num">Slot 3</div>
+              <div class="slot-icon">➕</div>
+              <div class="slot-empty-txt">Available</div>
+            </div>
+            <div class="slot-card">
+              <div class="slot-num">Slot 4</div>
+              <div class="slot-icon">➕</div>
+              <div class="slot-empty-txt">Available</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:8px;">Slots fill automatically from approved ads by highest bid. Drag to reorder.</div>
+        </div>
+
+        <!-- PENDING ADS -->
+        <div class="dash-card" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <h3 style="font-size:15px;font-weight:600;">Pending ad review</h3>
+            <span class="tag tag-gold" id="ads-pending-badge2">0 pending</span>
+          </div>
+          <div id="ads-pending-list">
+            <div id="ads-pending-empty" style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No ads pending review. New seller ad submissions will appear here.</div>
+          </div>
+        </div>
+
+        <!-- ACTIVE ADS TABLE -->
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">Active &amp; paused ads</h3>
+          <div style="overflow-x:auto;">
+            <table class="dtable">
+              <thead><tr><th>Product</th><th>Seller</th><th>Placement</th><th>Daily budget</th><th>Spent</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td colspan="7" style="color:var(--text3);text-align:center;padding:24px;">No active ads yet — approved ads will appear here.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ENGAGEMENT EARNINGS ── -->
+      <div class="admin-section" id="asec-engagement">
+        <div class="dash-h1">Engagement Revenue</div>
+        <div class="dash-sub">ZÚLA earns from platform-wide likes, comments, and views.</div>
+        <div class="restrict-banner">
+          <span style="font-size:20px;">🔒</span>
+          <span><b>Admin-only feature.</b> Engagement earnings go to ZÚLA platform treasury. Seller share is disabled — toggle on in Settings when ready.</span>
+        </div>
+        <div class="eng-toggle">
+          <button class="active" onclick="adminEngTab('today',this)">Today</button>
+          <button onclick="adminEngTab('week',this)">This week</button>
+          <button onclick="adminEngTab('month',this)">This month</button>
+        </div>
+        <div class="eng-kpi-grid">
+          <div class="eng-kpi"><div class="ek-icon">❤️</div><div class="ek-val" id="eng-likes">248K</div><div class="ek-lbl">Platform likes today</div><div class="ek-rev" id="eng-likes-rev">+$124.00 revenue</div></div>
+          <div class="eng-kpi"><div class="ek-icon">💬</div><div class="ek-val" id="eng-comments">41K</div><div class="ek-lbl">Comments today</div><div class="ek-rev" id="eng-comments-rev">+$82.00 revenue</div></div>
+          <div class="eng-kpi"><div class="ek-icon">👁</div><div class="ek-val" id="eng-views">3.8M</div><div class="ek-lbl">Product page views today</div><div class="ek-rev" id="eng-views-rev">+$190.00 revenue</div></div>
+          <div class="eng-kpi" style="border-color:var(--accent);background:rgba(124,92,252,.06);">
+            <div class="ek-icon">💰</div><div class="ek-val" style="color:var(--accent);" id="eng-total">$396.00</div>
+            <div class="ek-lbl">Total engagement revenue</div><div class="ek-rev" id="eng-trend">↑ 18% vs yesterday</div>
+          </div>
+        </div>
+        <div class="dash-card" style="margin-bottom:20px;">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">How engagement revenue is calculated</h3>
+          <table class="eng-rate-table">
+            <thead><tr><th>Action</th><th>Rate</th><th>Who earns</th><th>Today's volume</th><th>Today's revenue</th></tr></thead>
+            <tbody>
+              <tr><td>❤️ Like on a product / post</td><td class="rate-val">$0.0005 / like</td><td><span class="tag tag-purple">ZÚLA</span></td><td>248,000</td><td style="color:var(--green);font-weight:600;">$124.00</td></tr>
+              <tr><td>💬 Comment on a product</td><td class="rate-val">$0.002 / comment</td><td><span class="tag tag-purple">ZÚLA</span></td><td>41,000</td><td style="color:var(--green);font-weight:600;">$82.00</td></tr>
+              <tr><td>👁 Product page view</td><td class="rate-val">$0.00005 / view</td><td><span class="tag tag-purple">ZÚLA</span></td><td>3,800,000</td><td style="color:var(--green);font-weight:600;">$190.00</td></tr>
+              <tr><td>🔗 Affiliate click-through</td><td class="rate-val">$0.001 / click</td><td><span class="tag tag-purple">ZÚLA</span></td><td>18,200</td><td style="color:var(--green);font-weight:600;">$18.20</td></tr>
+              <tr><td>📤 Product share (external)</td><td class="rate-val">$0.003 / share</td><td><span class="tag tag-purple">ZÚLA</span></td><td>6,800</td><td style="color:var(--green);font-weight:600;">$20.40</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--text3);">
+            <span>Revenue derived from ad value benchmarks and platform data licensing agreements.</span>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('✓ Rates saved!')">Edit rates</button>
+          </div>
+        </div>
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">Live engagement activity</h3>
+          <div id="eng-feed" style="display:flex;flex-direction:column;gap:0;max-height:260px;overflow-y:auto;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);"><span style="font-size:16px;">❤️</span><span>@tolu_m liked <strong style="color:var(--text);">Woven Tote Bag</strong></span><span style="margin-left:auto;font-size:11px;color:var(--text3);">2s ago</span><span style="color:var(--green);font-size:11.5px;font-weight:600;">+$0.0005</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);"><span style="font-size:16px;">👁</span><span>Anonymous viewed <strong style="color:var(--text);">Excel Masterclass</strong></span><span style="margin-left:auto;font-size:11px;color:var(--text3);">4s ago</span><span style="color:var(--green);font-size:11.5px;font-weight:600;">+$0.00005</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);"><span style="font-size:16px;">💬</span><span>@ada_okafor commented on <strong style="color:var(--text);">Ankara Wrap Dress</strong></span><span style="margin-left:auto;font-size:11px;color:var(--text3);">7s ago</span><span style="color:var(--green);font-size:11.5px;font-weight:600;">+$0.002</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);"><span style="font-size:16px;">📤</span><span>@kemi_c shared <strong style="color:var(--text);">6-Figure Blueprint</strong> to WhatsApp</span><span style="margin-left:auto;font-size:11px;color:var(--text3);">12s ago</span><span style="color:var(--green);font-size:11.5px;font-weight:600;">+$0.003</span></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="adminAddEngEvent()">▶ Simulate new event</button>
+        </div>
+      </div>
+
+      <!-- ── MODERATION ── -->
+      <div class="admin-section" id="asec-moderation">
+        <div class="dash-h1">Content Moderation</div>
+        <div class="dash-sub">AI-flagged and user-reported listings requiring review.</div>
+        <div class="stat-row" style="margin-bottom:16px;">
+          <div class="stat-card"><div class="stat-lbl">Flagged today</div><div class="stat-val" style="color:var(--red);">5</div></div>
+          <div class="stat-card"><div class="stat-lbl">Resolved today</div><div class="stat-val" style="color:var(--green);">12</div></div>
+          <div class="stat-card"><div class="stat-lbl">AI auto-flags</div><div class="stat-val">3</div></div>
+          <div class="stat-card"><div class="stat-lbl">User reports</div><div class="stat-val">2</div></div>
+        </div>
+        <div class="filter-pills" style="margin-bottom:16px;">
+          <button class="fpill active" onclick="adminFilterMod('all',this)">All</button>
+          <button class="fpill" onclick="adminFilterMod('ai',this)">🤖 AI-flagged</button>
+          <button class="fpill" onclick="adminFilterMod('reported',this)">🚩 User-reported</button>
+          <button class="fpill" onclick="adminFilterMod('counterfeit',this)">⚠️ Counterfeit</button>
+        </div>
+
+        <div class="mod-card" data-modcat="ai">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+            <div style="display:flex;gap:12px;">
+              <div class="dthumb" style="width:48px;height:48px;font-size:22px;">📱</div>
+              <div><div style="font-size:15px;font-weight:700;">iPhone 15 Pro Max 256GB — Brand New</div><div style="font-size:12px;color:var(--text3);">Seller: TechDealz · Account: 3 days old · No prior sales</div></div>
+            </div>
+            <span class="tag tag-red">🤖 AI-flagged</span>
+          </div>
+          <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:12px;">🤖 <strong style="color:var(--red);">AI flag:</strong> Listed at <strong style="color:var(--text);">NGN 95,000</strong> — <strong style="color:var(--red);">87% below</strong> category median (NGN 750,000+). New seller account, no sales history. Matches advance-fee scam pattern.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-danger btn-sm" onclick="adminResolveMod(this,'⛔ Listing removed — seller account restricted pending review')">⛔ Remove &amp; restrict seller</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📩 Seller asked to verify item and provide proof of stock')">📩 Request proof of stock</button>
+            <button class="btn btn-ghost btn-sm" onclick="adminResolveMod(this,'✓ Reviewed — clearance sale, legitimate')">✓ Confirm legitimate</button>
+          </div>
+        </div>
+
+        <div class="mod-card" data-modcat="reported">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+            <div style="display:flex;gap:12px;">
+              <div class="dthumb" style="width:48px;height:48px;font-size:22px;">👜</div>
+              <div><div style="font-size:15px;font-weight:700;">"Designer" Tote Bag — Authentic</div><div style="font-size:12px;color:var(--text3);">Seller: QuickDeals NG · Reported by 4 users</div></div>
+            </div>
+            <span class="tag tag-gold">🚩 User-reported</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px;">Reports: "stock photos taken from brand's official site", "not authentic, sold as fake on arrival", "misleading authenticity claim".</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-danger btn-sm" onclick="adminResolveMod(this,'⛔ Listing removed — false authenticity claim confirmed')">⛔ Remove listing</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('⚡ Warning issued to QuickDeals NG')">⚡ Warn seller</button>
+            <button class="btn btn-ghost btn-sm" onclick="adminResolveMod(this,'✓ Reviewed — listing edited, claim removed')">✓ Dismiss (edited)</button>
+          </div>
+        </div>
+
+        <div class="mod-card" data-modcat="counterfeit" style="border-color:rgba(240,82,82,.4);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+            <div style="display:flex;gap:12px;">
+              <div class="dthumb" style="width:48px;height:48px;font-size:22px;">🔥</div>
+              <div><div style="font-size:15px;font-weight:700;">Replica Designer Perfume Set</div><div style="font-size:12px;color:var(--text3);">Seller: ScentHub247 · 🤖 Auto-detected keyword match</div></div>
+            </div>
+            <span class="tag tag-red">⚠️ Counterfeit / banned</span>
+          </div>
+          <div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:10px 12px;font-size:12.5px;color:var(--text2);margin-bottom:12px;">🤖 <strong style="color:var(--red);">AI flag:</strong> Listing contains "replica" / "inspired by" alongside a registered brand name — matches ToS §3 prohibition on counterfeit goods.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-danger btn-sm" onclick="adminResolveMod(this,'⛔ Listing removed — seller issued strike 1 of 3')">⛔ Remove &amp; strike seller</button>
+            <button class="btn btn-ghost btn-sm" onclick="adminResolveMod(this,'✓ Dismiss — generic dupe, not a brand counterfeit')">✓ Dismiss (not counterfeit)</button>
+          </div>
+        </div>
+
+        <div style="background:rgba(124,92,252,.05);border:1px solid rgba(124,92,252,.15);border-radius:var(--radius-sm);padding:16px 18px;margin-top:8px;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>🤖 <strong style="color:var(--text);">Auto-flagging:</strong> Listings priced 70%+ above or below category median, or matching banned-keyword patterns, are queued here automatically. Nothing is removed without review.</div>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('⚙️ Auto-flagging thresholds — coming soon')">Adjust thresholds</button>
+        </div>
+      </div>
+
+      <!-- ── ANNOUNCEMENTS ── -->
+      <div class="admin-section" id="asec-announce">
+        <div class="dash-h1">Platform Announcements</div>
+        <div class="dash-sub">Send a banner, push notification, or email to all users — or target a specific segment.</div>
+        <div class="stat-row" style="margin-bottom:20px;">
+          <div class="stat-card"><div class="stat-lbl">Total users</div><div class="stat-val" id="ann-total-users">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Active banner</div><div class="stat-val" id="ann-active-banner" style="color:var(--green);">0 live</div></div>
+          <div class="stat-card"><div class="stat-lbl">Last email sent</div><div class="stat-val">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Open rate (last)</div><div class="stat-val">—</div></div>
+        </div>
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">New announcement</h3>
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" id="ann-type-banner" onclick="adminSetAnnounceType('banner',this)">🟪 Site banner</button>
+            <button class="btn btn-ghost btn-sm" id="ann-type-email" onclick="adminSetAnnounceType('email',this)">✉️ Email</button>
+            <button class="btn btn-ghost btn-sm" id="ann-type-push" onclick="adminSetAnnounceType('push',this)">🔔 Push notification</button>
+          </div>
+          <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Audience</label>
+          <select id="ann-audience" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;">
+            <option>All users</option><option>Buyers only</option><option>Sellers only</option><option>Verified sellers only</option><option>Affiliates only</option><option>Inactive users (90+ days)</option>
+          </select>
+          <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Subject / headline</label>
+          <input id="ann-subject" placeholder="e.g. Scheduled maintenance — Sunday 2–4am WAT" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;">
+          <label style="font-size:12.5px;color:var(--text3);display:block;margin-bottom:6px;">Message</label>
+          <textarea id="ann-body" rows="4" placeholder="Write the announcement message…" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;margin-bottom:14px;resize:vertical;"></textarea>
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+            <label style="font-size:12.5px;color:var(--text3);">Banner style:</label>
+            <span class="tag tag-blue" style="cursor:pointer;" onclick="adminPickBannerStyle('info',this)">ℹ️ Info</span>
+            <span class="tag tag-gold" style="cursor:pointer;" onclick="adminPickBannerStyle('warning',this)">⚠️ Warning</span>
+            <span class="tag tag-green" style="cursor:pointer;" onclick="adminPickBannerStyle('success',this)">✅ Success</span>
+            <span class="tag tag-red" style="cursor:pointer;" onclick="adminPickBannerStyle('urgent',this)">🔴 Urgent</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--text3);margin-bottom:8px;">Preview</div>
+          <div id="ann-preview" class="ann-preview-banner ann-info">📣 Your announcement will appear here as users browse the site.</div>
+          <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="adminSendAnnouncement()">🚀 Send now</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('🕑 Announcement scheduled')">🕑 Schedule for later</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('💾 Draft saved')">💾 Save as draft</button>
+          </div>
+        </div>
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Recent announcements</h3>
+          <table class="dtable">
+            <thead><tr><th>Type</th><th>Subject</th><th>Audience</th><th>Sent</th><th>Performance</th></tr></thead>
+            <tbody id="ann-history-body">
+              <tr><td colspan="5" style="color:var(--text3);">No announcements sent yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SEO SETTINGS ── -->
+      <div class="admin-section" id="asec-seo">
+        <div class="dash-h1">SEO Settings</div>
+        <div class="dash-sub">Manage meta titles, descriptions, and search engine indexing across the platform.</div>
+        <div class="stat-row" style="margin-bottom:20px;">
+          <div class="stat-card"><div class="stat-lbl">Indexed pages</div><div class="stat-val">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Sitemap last generated</div><div class="stat-val" style="font-size:14px;">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Pages missing meta</div><div class="stat-val" style="color:var(--gold);">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Organic traffic (30d)</div><div class="stat-val" style="color:var(--green);">—</div></div>
+        </div>
+        <div class="dash-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h3 style="font-size:15px;font-weight:600;margin-bottom:4px;">XML Sitemap</h3>
+              <p style="font-size:12.5px;color:var(--text2);">Auto-regenerates daily at 6:00am WAT. Includes all live product, course, and store pages.</p>
+              <div style="margin-top:8px;font-size:12.5px;color:var(--text3);">📍 zula.ng/sitemap.xml</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="adminRegenerateSitemap()">🔄 Regenerate now</button>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('📋 https://zula.ng/sitemap.xml copied')">📋 Copy URL</button>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('📤 Submitted to Google Search Console &amp; Bing Webmaster Tools')">📤 Submit to search engines</button>
+            </div>
+          </div>
+          <div id="sitemap-status" style="font-size:12.5px;color:var(--green);margin-top:10px;">✓ Sitemap is up to date</div>
+        </div>
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:10px;">Robots &amp; indexing</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Allow search engines to index the marketplace</span><div class="toggle-switch on" onclick="this.classList.toggle('on');showToast(this.classList.contains('on')?'✓ Indexing enabled site-wide':'⚠️ Site hidden from search engines')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Index seller storefronts</span><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;"><span style="font-size:13.5px;">Index suspended / removed listings (noindex recommended)</span><div class="toggle-switch" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="dash-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+            <h3 style="font-size:15px;font-weight:600;">Page meta settings</h3>
+            <input placeholder="Search pages…" style="background:var(--bg3);border:1px solid var(--border);padding:8px 12px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;">
+          </div>
+          <div class="seo-row">
+            <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">🏠 Homepage</span><span class="tag tag-green" style="font-size:10px;">Good</span></div>
+            <label class="seo-label">Meta title <span id="seo-title-len-1" style="color:var(--text3);">(48/60)</span></label>
+            <input class="seo-input" id="seo-title-1" value="ZÚLA — Buy &amp; Sell Anything in Nigeria | Marketplace" oninput="adminUpdateSeoCount('seo-title-1','seo-title-len-1',60)">
+            <label class="seo-label">Meta description <span id="seo-desc-len-1" style="color:var(--text3);">(132/160)</span></label>
+            <textarea class="seo-input" id="seo-desc-1" rows="2" oninput="adminUpdateSeoCount('seo-desc-1','seo-desc-len-1',160)">Shop physical products, digital downloads, and online courses from verified Nigerian sellers. Escrow-protected payments, fast delivery nationwide.</textarea>
+          </div>
+          <div class="seo-row">
+            <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">🛍 Browse / Category pages</span><span class="tag tag-gold" style="font-size:10px;">Needs work</span></div>
+            <label class="seo-label">Meta title template <span id="seo-title-len-2" style="color:var(--text3);">(38/60)</span></label>
+            <input class="seo-input" id="seo-title-2" value="{category} Products in Nigeria | ZÚLA" oninput="adminUpdateSeoCount('seo-title-2','seo-title-len-2',60)">
+            <label class="seo-label">Meta description template <span id="seo-desc-len-2" style="color:var(--text3);">(98/160)</span></label>
+            <textarea class="seo-input" id="seo-desc-2" rows="2" oninput="adminUpdateSeoCount('seo-desc-2','seo-desc-len-2',160)">Browse {category} from trusted sellers across Nigeria. Compare prices, read reviews, buy with escrow protection.</textarea>
+          </div>
+          <div class="seo-row">
+            <div class="seo-row-head"><span style="font-weight:600;font-size:13.5px;">📦 Product / Listing pages</span><span class="tag tag-green" style="font-size:10px;">Good</span></div>
+            <label class="seo-label">Meta title template <span id="seo-title-len-3" style="color:var(--text3);">(44/60)</span></label>
+            <input class="seo-input" id="seo-title-3" value="{product_name} — {price} | {seller_name} on ZÚLA" oninput="adminUpdateSeoCount('seo-title-3','seo-title-len-3',60)">
+            <label class="seo-label">Meta description template <span id="seo-desc-len-3" style="color:var(--text3);">(110/160)</span></label>
+            <textarea class="seo-input" id="seo-desc-3" rows="2" oninput="adminUpdateSeoCount('seo-desc-3','seo-desc-len-3',160)">{product_name} from {seller_name}. {short_description} Buy securely with ZÚLA escrow protection.</textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:6px;" onclick="showToast('✅ All SEO meta changes saved')">💾 Save all changes</button>
+        </div>
+      </div>
+
+      <!-- ── PLATFORM FEES ── -->
+      <div class="admin-section" id="asec-fees">
+        <div class="dash-h1">Platform Fees</div>
+        <div class="dash-sub">ZÚLA's commission on every transaction.</div>
+        <div class="stat-row" style="margin-bottom:24px;">
+          <div class="stat-card"><div class="stat-lbl">Fee revenue today</div><div class="stat-val" style="color:var(--gold);">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Fee revenue this month</div><div class="stat-val">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Total GMV this month</div><div class="stat-val">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Avg effective fee rate</div><div class="stat-val">—</div></div>
+        </div>
+        <div class="dash-card" style="margin-bottom:20px;">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;">Fee rates by product type</h3>
+          <div class="fee-row"><span class="fee-type">📦 Physical products</span><span class="fee-pct" id="fee-physical">8%</span><span class="fee-example">e.g. NGN 10,000 sale → NGN 800 fee</span><button class="btn btn-ghost btn-sm" onclick="adminEditFee('physical')">Edit</button></div>
+          <div class="fee-row"><span class="fee-type">📚 Digital downloads / Ebooks</span><span class="fee-pct" id="fee-digital">10%</span><span class="fee-example">e.g. NGN 5,000 sale → NGN 500 fee</span><button class="btn btn-ghost btn-sm" onclick="adminEditFee('digital')">Edit</button></div>
+          <div class="fee-row"><span class="fee-type">🎓 Online courses</span><span class="fee-pct" id="fee-course">12%</span><span class="fee-example">e.g. NGN 25,000 sale → NGN 3,000 fee</span><button class="btn btn-ghost btn-sm" onclick="adminEditFee('course')">Edit</button></div>
+          <div class="fee-row"><span class="fee-type">🔗 Affiliate commission (platform cut)</span><span class="fee-pct" id="fee-aff">2%</span><span class="fee-example">e.g. NGN 10,000 affiliate order → NGN 200 to ZÚLA</span><button class="btn btn-ghost btn-sm" onclick="adminEditFee('affiliate')">Edit</button></div>
+          <div class="fee-row"><span class="fee-type">📢 Ad placement fee</span><span class="fee-pct" id="fee-ads">NGN 500/day min.</span><span class="fee-example">Bids above minimum win slots</span><button class="btn btn-ghost btn-sm" onclick="adminEditFee('ads')">Edit</button></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="showToast('✅ Fee rates saved and live on platform')">💾 Save all fee rates</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('📊 Fee revenue report exported')">Export fee report</button>
+          </div>
+        </div>
+        <div class="dash-card">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Fee exemptions</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;"><span>Exempt verified charity sellers</span><div class="toggle-switch" onclick="this.classList.toggle('on');showToast('✅ Charity exemption updated')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;"><span>First 30 days free for new sellers</span><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:13.5px;"><span>Waive fees on orders under NGN 500</span><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
       <div class="admin-section" id="asec-settings">
         <div class="dash-h1">Platform Settings</div>
         <div class="dash-sub">Global settings for ZÚLA</div>
@@ -1229,9 +1776,23 @@ p{color:var(--text2);margin:0 0 1em;}
           <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Admin accounts</div>
           <p style="font-size:13.5px;color:var(--text2);">The following emails have full admin access:</p>
           <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;">sundaygift050@gmail.com</div>
-            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;">okoroaugustine050@gmail.com</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
+              <span>sundaygift050@gmail.com</span>
+              <span class="tag tag-gold" style="font-size:10px;">Super Admin</span>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
+              <span>okoroaugustine050@gmail.com</span>
+              <span class="tag tag-gold" style="font-size:10px;">Super Admin</span>
+            </div>
           </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="showToast('📧 Invite link sent')">+ Invite admin</button>
+        </div>
+        <div class="dash-card">
+          <div style="font-size:15px;font-weight:700;margin-bottom:14px;">Platform toggles</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Marketplace open to new sellers</span><div class="toggle-switch on" onclick="this.classList.toggle('on');showToast('✅ Setting updated')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Allow affiliate signups</span><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;">Enable BNPL payments</span><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;"><span style="font-size:13.5px;">Maintenance mode</span><div class="toggle-switch" onclick="this.classList.toggle('on');showToast(this.classList.contains('on')?'⚠️ Site in maintenance mode — users see maintenance page':'✓ Maintenance mode off')"></div></div>
         </div>
       </div>
 
@@ -3274,12 +3835,10 @@ window.openAdmin = function() {
 };
 
 window.adminTab = function(name) {
-  // Update nav links
-  ['overview','products','users','orders','verif','settings'].forEach(t => {
+  ['overview','products','users','orders','verif','affiliates','adsmanager','engagement','moderation','announce','seo','fees','settings'].forEach(t => {
     const el = document.getElementById('anav-' + t);
     if (el) el.classList.toggle('active', t === name);
   });
-  // Show correct section
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   const sec = document.getElementById('asec-' + name);
   if (sec) sec.classList.add('active');
@@ -3364,6 +3923,272 @@ window.adminDeleteProduct = async function(id) {
     loadAdminData();
   } catch(e) {
     showToast('❌ Could not remove product.');
+  }
+};
+
+// ── ADMIN: USER TABLE WITH DETAIL ────────────────────────────────────
+window.adminShowUserDetail = function(userData) {
+  const detail = document.getElementById('admin-user-detail');
+  if (!detail) return;
+  const s = id => document.getElementById(id);
+  if (s('aud-avatar'))  s('aud-avatar').textContent  = (userData.firstName||'?').charAt(0).toUpperCase()+(userData.lastName||'?').charAt(0).toUpperCase();
+  if (s('aud-name'))    s('aud-name').innerHTML       = (userData.fullName||userData.firstName||'User') + ' <span style="font-size:13px;opacity:.7;">#'+userData.id.slice(0,12)+'</span>';
+  if (s('aud-email'))   s('aud-email').textContent    = (userData.email||'—') + ' · ' + (userData.city||'Location not set');
+  if (s('aud-revenue')) s('aud-revenue').textContent  = 'NGN ' + Number(userData.revenue||0).toLocaleString();
+  if (s('aud-joined'))  s('aud-joined').textContent   = 'Joined ' + (userData.joinedAt ? new Date(userData.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '—');
+  detail.style.display = 'block';
+  detail.scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+// ── ADMIN: AFFILIATE PAYOUTS ────────────────────────────────────────
+window.adminPayAllAff = function() {
+  document.querySelectorAll('#admin-aff-table .aff-pay-btn').forEach(btn => {
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('.aff-status');
+    if (statusCell) statusCell.innerHTML = '<span class="spill spill-payout">paid</span>';
+    btn.outerHTML = '<span style="font-size:12px;color:var(--text3);">—</span>';
+  });
+  showToast('✅ All affiliates paid out!');
+};
+
+window.adminPayAff = function(btn) {
+  const row = btn.closest('tr');
+  const statusCell = row.querySelector('.aff-status');
+  if (statusCell) statusCell.innerHTML = '<span class="spill spill-payout">paid</span>';
+  btn.outerHTML = '<span style="font-size:12px;color:var(--text3);">—</span>';
+  showToast('✅ Payout sent!');
+};
+
+// ── ADMIN: ADS MANAGER ─────────────────────────────────────────────
+window.adminApproveAd = function(id) {
+  const row = document.getElementById('ad-pending-' + id);
+  if (row) row.remove();
+  const pc = document.getElementById('ads-pending-count');
+  const pb = document.getElementById('ads-pending-badge');
+  const pb2 = document.getElementById('ads-pending-badge2');
+  const ac = document.getElementById('ads-active-count');
+  if (pc) pc.textContent = Math.max(0, parseInt(pc.textContent,10)-1);
+  if (pb) pb.textContent = Math.max(0, parseInt(pb.textContent,10)-1);
+  const newCount = Math.max(0, parseInt((pb?pb.textContent:'0'),10));
+  if (pb2) pb2.textContent = newCount + ' pending';
+  if (ac) ac.textContent = parseInt(ac.textContent,10)+1;
+  const list = document.getElementById('ads-pending-list');
+  if (list && !list.querySelector('.ad-review-row')) {
+    document.getElementById('ads-pending-empty').style.display = 'block';
+  }
+  showToast('✅ Ad approved — going live on homepage.');
+};
+
+window.adminRejectAd = function(id) {
+  const row = document.getElementById('ad-pending-' + id);
+  if (row) row.remove();
+  const pc = document.getElementById('ads-pending-count');
+  const pb = document.getElementById('ads-pending-badge');
+  if (pc) pc.textContent = Math.max(0, parseInt(pc.textContent,10)-1);
+  if (pb) pb.textContent = Math.max(0, parseInt(pb.textContent,10)-1);
+  showToast('🚫 Ad rejected — seller notified with reason.');
+};
+
+window.adminPauseAd = function(btn) {
+  var row = btn.closest('tr');
+  row.querySelector('.tag').className = 'tag tag-blue';
+  row.querySelector('.tag').textContent = '⏸ Paused';
+  btn.textContent = 'Resume';
+  btn.setAttribute('onclick', 'adminResumeAd(this)');
+  showToast('⏸ Ad paused — unspent budget preserved.');
+};
+
+window.adminResumeAd = function(btn) {
+  var row = btn.closest('tr');
+  row.querySelector('.tag').className = 'tag tag-green';
+  row.querySelector('.tag').textContent = '● Live';
+  btn.textContent = 'Pause';
+  btn.setAttribute('onclick', 'adminPauseAd(this)');
+  showToast('▶️ Ad resumed.');
+};
+
+// ── ADMIN: ENGAGEMENT EARNINGS ────────────────────────────────────
+const ADMIN_ENG_DATA = {
+  today:  {likes:'248K', likeRev:'+$124.00', comments:'41K', commentRev:'+$82.00', views:'3.8M', viewRev:'+$190.00', total:'$396.00', trend:'↑ 18% vs yesterday'},
+  week:   {likes:'1.7M', likeRev:'+$850.00', comments:'290K', commentRev:'+$580.00', views:'26M', viewRev:'+$1,300', total:'$2,730', trend:'↑ 11% vs last week'},
+  month:  {likes:'7.2M', likeRev:'+$3,600', comments:'1.1M', commentRev:'+$2,200', views:'104M', viewRev:'+$5,200', total:'$11,000', trend:'↑ 34% vs last month'},
+};
+window.adminEngTab = function(period, btn) {
+  document.querySelectorAll('.eng-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = ADMIN_ENG_DATA[period];
+  const s = id => document.getElementById(id);
+  if (s('eng-likes'))        s('eng-likes').textContent        = d.likes;
+  if (s('eng-likes-rev'))    s('eng-likes-rev').textContent    = d.likeRev + ' revenue';
+  if (s('eng-comments'))     s('eng-comments').textContent     = d.comments;
+  if (s('eng-comments-rev')) s('eng-comments-rev').textContent = d.commentRev + ' revenue';
+  if (s('eng-views'))        s('eng-views').textContent        = d.views;
+  if (s('eng-views-rev'))    s('eng-views-rev').textContent    = d.viewRev + ' revenue';
+  if (s('eng-total'))        s('eng-total').textContent        = d.total;
+  if (s('eng-trend'))        s('eng-trend').textContent        = d.trend;
+};
+
+const ADMIN_FEED_EVENTS = [
+  {icon:'❤️', text:'@sara_au liked <strong style="color:var(--text)">Natural Glow Set</strong>', rev:'+$0.0005'},
+  {icon:'💬', text:'@marco_it commented on <strong style="color:var(--text)">Afrobeats Sample Pack</strong>', rev:'+$0.002'},
+  {icon:'👁',  text:'Anonymous viewed <strong style="color:var(--text)">Python for Beginners</strong>', rev:'+$0.00005'},
+  {icon:'📤', text:'@priya_in shared <strong style="color:var(--text)">Brand Identity Canva Pack</strong>', rev:'+$0.003'},
+  {icon:'🔗', text:'@felix_de clicked affiliate link for <strong style="color:var(--text)">Woven Tote Bag</strong>', rev:'+$0.001'},
+  {icon:'❤️', text:'@nguyen_vn liked <strong style="color:var(--text)">Digital Marketing A–Z</strong>', rev:'+$0.0005'},
+];
+var _adminFeedIdx = 0;
+window.adminAddEngEvent = function() {
+  const e = ADMIN_FEED_EVENTS[_adminFeedIdx % ADMIN_FEED_EVENTS.length]; _adminFeedIdx++;
+  const feed = document.getElementById('eng-feed');
+  if (!feed) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);';
+  row.innerHTML = '<span style="font-size:16px">'+e.icon+'</span><span>'+e.text+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">just now</span><span style="color:var(--green);font-size:11.5px;font-weight:600">'+e.rev+'</span>';
+  feed.insertBefore(row, feed.firstChild);
+  if (feed.children.length > 10) feed.removeChild(feed.lastChild);
+};
+
+// ── ADMIN: MODERATION ─────────────────────────────────────────────
+window.adminFilterMod = function(cat, btn) {
+  document.querySelectorAll('#asec-moderation .fpill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#asec-moderation .mod-card').forEach(card => {
+    card.style.display = (cat === 'all' || card.dataset.modcat === cat) ? '' : 'none';
+  });
+};
+
+window.adminResolveMod = function(btn, msg) {
+  const card = btn.closest('.mod-card');
+  card.classList.add('resolved');
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  showToast(msg);
+};
+
+// ── ADMIN: ANNOUNCEMENTS ─────────────────────────────────────────
+window.adminSetAnnounceType = function(type, btn) {
+  ['banner','email','push'].forEach(t => {
+    const b = document.getElementById('ann-type-' + t);
+    if (b) { b.classList.remove('btn-primary'); b.classList.add('btn-ghost'); }
+  });
+  btn.classList.remove('btn-ghost');
+  btn.classList.add('btn-primary');
+};
+
+window.adminPickBannerStyle = function(style, el) {
+  document.querySelectorAll('#asec-announce .tag').forEach(t => t.style.outline = 'none');
+  el.style.outline = '2px solid var(--text)';
+  const preview = document.getElementById('ann-preview');
+  if (preview) preview.className = 'ann-preview-banner ann-' + style;
+};
+
+window.adminSendAnnouncement = function() {
+  const subject   = document.getElementById('ann-subject');
+  const audience  = document.getElementById('ann-audience');
+  const body      = document.getElementById('ann-body');
+  const history   = document.getElementById('ann-history-body');
+  if (!subject || !subject.value.trim()) { showToast('⚠️ Add a subject first'); return; }
+  const now = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  const aud = audience ? audience.value : 'All users';
+  if (history) {
+    const row = document.createElement('tr');
+    row.innerHTML = '<td><span class="tag tag-purple">🟪 Banner</span></td><td>'+subject.value+'</td><td>'+aud+'</td><td>'+now+'</td><td style="font-size:12px;">Just sent</td>';
+    history.insertBefore(row, history.firstChild);
+    if (history.firstChild && history.firstChild.textContent.includes('No announcements')) history.removeChild(history.lastChild);
+  }
+  const active = document.getElementById('ann-active-banner');
+  if (active) active.textContent = '1 live';
+  showToast('🚀 Announcement sent to ' + aud);
+  if (subject) subject.value = '';
+  if (body) body.value = '';
+};
+
+// ── ADMIN: SEO SETTINGS ─────────────────────────────────────────
+window.adminUpdateSeoCount = function(inputId, labelId, max) {
+  const val = document.getElementById(inputId);
+  const label = document.getElementById(labelId);
+  if (!val || !label) return;
+  label.textContent = '(' + val.value.length + '/' + max + ')';
+  label.style.color = val.value.length > max ? 'var(--red)' : (val.value.length === 0 ? 'var(--red)' : 'var(--text3)');
+};
+
+window.adminRegenerateSitemap = function() {
+  const status = document.getElementById('sitemap-status');
+  if (status) {
+    status.style.color = 'var(--gold)';
+    status.textContent = '⏳ Regenerating sitemap…';
+    setTimeout(() => {
+      status.style.color = 'var(--green)';
+      status.textContent = '✓ Sitemap regenerated just now';
+      showToast('✅ Sitemap regenerated and ready');
+    }, 1200);
+  }
+};
+
+// ── ADMIN: PLATFORM FEES ─────────────────────────────────────────
+window.adminEditFee = function(type) {
+  const feeMap = {'physical':'fee-physical','digital':'fee-digital','course':'fee-course','affiliate':'fee-aff','ads':'fee-ads'};
+  const el = document.getElementById(feeMap[type]);
+  if (!el) return;
+  const current = el.textContent;
+  const newVal = prompt('New fee rate for ' + type + ' (current: ' + current + '):', current);
+  if (newVal && newVal.trim()) {
+    el.textContent = newVal.trim();
+    showToast('✅ ' + type + ' fee updated to ' + newVal.trim());
+  }
+};
+
+// ── ADMIN: LOAD DATA — extend existing loadAdminData ─────────────
+const _origLoadAdminData = window.loadAdminData;
+window.loadAdminData = async function() {
+  // Call original first
+  if (_origLoadAdminData) await _origLoadAdminData();
+  // Then update extra stat cards
+  if (!window._db || !window._fns) return;
+  try {
+    const db = window._db;
+    const { getDocs, collection, query, where } = window._fns;
+    // Affiliate count
+    const verifSnap = await getDocs(query(collection(db, 'users'), where('sellerVerified','==',true)));
+    const s = id => document.getElementById(id);
+    if (s('astat-verif')) {
+      const verifSubmissions = await getDocs(query(collection(db, 'verifications'), where('status','==','pending')));
+      const count = verifSubmissions.size || 0;
+      s('astat-verif').textContent = count;
+      if (s('averif-pending')) s('averif-pending').textContent = count;
+      // Show demo queue if there are pending verif requests in Firebase
+      if (count > 0) {
+        const emptyCard = document.querySelector('#admin-verif-queue .dash-card');
+        if (emptyCard) emptyCard.style.display = 'none';
+        const demo = document.getElementById('admin-verif-demo');
+        if (demo) demo.style.display = 'block';
+      }
+    }
+    // Update user table with View button
+    const ut = s('a-users-table');
+    if (ut && !ut.innerHTML.includes('adminShowUserDetail')) {
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const users = [];
+      usersSnap.forEach(d => users.push({ id: d.id, ...d.data() }));
+      if (ut) {
+        ut.innerHTML = users.length === 0
+          ? '<tr><td colspan="6" style="color:var(--text3);">No users yet.</td></tr>'
+          : users.map(u => `
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar-sm">${(u.firstName||'?').charAt(0)+(u.lastName||'?').charAt(0)}</div><div><div>${u.fullName||u.firstName||'—'}</div><div style="font-size:11px;color:var(--text3);">${u.email||''}</div></div></div></td>
+              <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '—'}</td>
+              <td><span class="tag ${u.sellerVerified?'tag-purple':'tag-blue'}">${u.sellerVerified?'Verified Seller':'Buyer'}</span></td>
+              <td><span class="tag tag-green">Active</span></td>
+              <td>NGN 0</td>
+              <td><div class="row-actions"><button class="btn btn-ghost btn-sm" onclick="adminShowUserDetail(${JSON.stringify({id:u.id,firstName:u.firstName||'',lastName:u.lastName||'',fullName:u.fullName||'',email:u.email||'',city:u.city||'',sellerVerified:u.sellerVerified||false,joinedAt:u.joinedAt||null}).replace(/"/g,'&quot;')})">View</button><button class="btn btn-danger btn-sm" onclick="showToast('⚠️ Suspend ${(u.fullName||u.firstName||'user').replace(/'/g,'\\\'').replace(/"/g,'&quot;')}?')">Suspend</button></div></td>
+            </tr>`).join('');
+      }
+    }
+    // Update announcement total users count
+    const usersSnap2 = await getDocs(collection(db, 'users'));
+    if (s('ann-total-users')) s('ann-total-users').textContent = usersSnap2.size.toLocaleString();
+  } catch(e) {
+    // Silently handle — extra data is best-effort
+    console.warn('Extra admin data load:', e);
   }
 };
 
