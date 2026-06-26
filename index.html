@@ -34,6 +34,13 @@ p{color:var(--text2);margin:0 0 1em;}
 .btn-block{width:100%;}
 .btn-sm{padding:7px 13px;font-size:12.5px;}
 
+/* ── LISTING PREVIEW MODAL ── */
+.preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.preview-modal.open{display:flex;}
+.preview-modal-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);max-width:860px;width:100%;padding:24px;}
+.preview-banner{background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:10px 16px;font-size:13px;color:var(--accent);margin-bottom:20px;text-align:center;}
+.prod-type-opt.active{background:rgba(124,92,252,.12)!important;border-color:var(--accent)!important;}
+
 /* TOAST */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -51,6 +58,12 @@ p{color:var(--text2);margin:0 0 1em;}
 .hdr-search input::placeholder{color:var(--text3);}
 .hdr-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);}
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
+.dd-item{padding:10px 16px;font-size:13.5px;color:var(--text2);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:10px;}
+.dd-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+/* Edit Bio modal */
+.bio-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9000;align-items:center;justify-content:center;}
+.bio-modal-bg.open{display:flex;}
+.bio-modal-box{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:90%;max-width:440px;}
 
 /* AUTH PAGES */
 .auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg);}
@@ -665,11 +678,28 @@ p{color:var(--text2);margin:0 0 1em;}
         <input placeholder="Search products…" oninput="filterProducts(this.value)">
       </div>
       <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Browse</a>
-        <a onclick="goAddProduct()">Sell</a>
+        <a onclick="showPage('seller-dashboard')" title="Seller dashboard">Seller</a>
         <a onclick="showPage('profile')">Profile</a>
+        <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬 <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
-        <div class="avatar-btn" id="nav-avatar" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
+        <!-- Admin/user dropdown -->
+        <div id="user-dropdown" style="display:none;position:absolute;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+            <div style="font-size:14px;font-weight:700;color:var(--text);" id="dropdown-name">—</div>
+            <div style="font-size:12px;color:var(--text3);" id="dropdown-email">—</div>
+          </div>
+          <div style="padding:6px 0;">
+            <div class="dd-item" onclick="showPage('settings');closeDropdown()">⚙️ Settings</div>
+            <div class="dd-item" onclick="showPage('locationverif');closeDropdown()">📍 Location</div>
+            <div class="dd-item" onclick="showPage('language');closeDropdown()">🌐 Language</div>
+            <div class="dd-item" onclick="showPage('twofa');closeDropdown()">🔐 2FA</div>
+            <div class="dd-item" id="dd-admin-item" style="display:none;" onclick="showPage('admin');closeDropdown()">🛡 Admin panel</div>
+          </div>
+          <div style="padding:6px 0;border-top:1px solid var(--border);">
+            <div class="dd-item" style="color:var(--red);" onclick="zulaSignOut();closeDropdown()">→ Sign out</div>
+          </div>
+        </div>
       </nav>
     </div>
   </header>
@@ -751,95 +781,158 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('profile')">Profile</a>
+        <a onclick="showPage('seller-dashboard')">← Dashboard</a>
         <div class="avatar-btn" id="nav-avatar-add" onclick="showPage('profile')">?</div>
       </nav>
     </div>
   </header>
-  <div class="addprod-wrap">
-    <h1>List a product</h1>
-    <p style="margin-bottom:28px;">Your product will appear on the marketplace immediately after publishing.</p>
-    <div class="dash-card">
-      <h3>What are you selling?</h3>
-      <div class="type-grid">
-        <div class="type-opt selected" id="type-physical" onclick="selectType('physical')">
-          <div class="to-icon">📦</div>
-          <div class="to-name">Physical item</div>
+  <div class="orders-wrap" style="max-width:720px;">
+    <button class="btn btn-ghost btn-sm" onclick="showPage('seller-dashboard')" style="margin-bottom:20px;">← Back to dashboard</button>
+    <h1 style="font-size:24px;font-weight:700;margin-bottom:6px;">List a new product</h1>
+    <p style="margin-bottom:24px;">Sell physical goods, digital downloads, ebooks, templates, beats, courses, or software.</p>
+
+    <!-- TYPE PICKER -->
+    <div class="dash-card" style="margin-bottom:18px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">What are you selling?</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;" id="product-type-picker">
+        <div class="prod-type-opt active" onclick="pickType(this,'physical')" style="background:rgba(124,92,252,.12);border:2px solid var(--accent);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">📦</div><div style="font-size:12.5px;font-weight:600;">Physical item</div>
         </div>
-        <div class="type-opt" id="type-digital" onclick="selectType('digital')">
-          <div class="to-icon">📚</div>
-          <div class="to-name">Digital / Ebook</div>
+        <div class="prod-type-opt" onclick="pickType(this,'ebook')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">📚</div><div style="font-size:12.5px;font-weight:600;">Ebook / PDF</div>
         </div>
-        <div class="type-opt" id="type-course" onclick="selectType('course')">
-          <div class="to-icon">🎓</div>
-          <div class="to-name">Online course</div>
+        <div class="prod-type-opt" onclick="pickType(this,'course')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">🎓</div><div style="font-size:12.5px;font-weight:600;">Online course</div>
         </div>
-      </div>
-    </div>
-    <div class="dash-card">
-      <h3>Product details</h3>
-      <div class="form-field">
-        <label>Product name *</label>
-        <input type="text" id="prod-name" placeholder="e.g. Handwoven Raffia Tote Bag">
-      </div>
-      <div class="form-field">
-        <label>Category *</label>
-        <select id="prod-category">
-          <option value="">Select a category</option>
-          <option>Fashion</option>
-          <option>Electronics</option>
-          <option>Beauty & Health</option>
-          <option>Ebooks & Education</option>
-          <option>Courses</option>
-          <option>Home & Living</option>
-          <option>Music & Audio</option>
-          <option>Templates & Design</option>
-          <option>Software & Tools</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Description *</label>
-        <textarea id="prod-desc" placeholder="Describe your product — materials, size, what's included, etc."></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-field">
-          <label>Price (NGN) *</label>
-          <input type="number" id="prod-price" placeholder="e.g. 18500">
+        <div class="prod-type-opt" onclick="pickType(this,'template')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">🎨</div><div style="font-size:12.5px;font-weight:600;">Template</div>
         </div>
-        <div class="form-field">
-          <label>Affiliate commission %</label>
-          <input type="number" id="prod-commission" placeholder="e.g. 10" min="0" max="50">
+        <div class="prod-type-opt" onclick="pickType(this,'audio')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">🎵</div><div style="font-size:12.5px;font-weight:600;">Music / Audio</div>
+        </div>
+        <div class="prod-type-opt" onclick="pickType(this,'software')" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;cursor:pointer;transition:.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">💻</div><div style="font-size:12.5px;font-weight:600;">Software</div>
         </div>
       </div>
     </div>
-    <div class="dash-card">
-      <h3>Product image</h3>
-      <div class="upload-box" onclick="document.getElementById('img-upload').click()">
-        <div class="ub-icon" id="upload-preview">📸</div>
-        <div class="ub-text">Click to upload an image (JPG, PNG · max 5MB)</div>
-        <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="previewImage(this)">
+
+    <!-- DETAILS FORM -->
+    <div class="dash-card" style="margin-bottom:18px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product details</h3>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product name *</label>
+          <input id="ap-name" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="e.g. Handwoven Raffia Tote Bag">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Category *</label>
+          <select id="ap-category" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+            <option>Fashion & Bags</option><option>Shoes</option><option>Beauty & Health</option>
+            <option>Electronics</option><option>Home & Living</option><option>Ebooks & Education</option>
+            <option>Music & Audio</option><option>Templates & Design</option><option>Software & Tools</option>
+            <option>Food & Drinks</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Description *</label>
+          <textarea id="ap-desc" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;height:100px;resize:vertical;" placeholder="Describe your product — be specific about size, material, what's included…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Price (NGN) *</label>
+            <input id="ap-price" type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="0.00">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Original / Compare price</label>
+            <input id="ap-original-price" type="number" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13.5px;" placeholder="Strikethrough price">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Product emoji (shown as image) *</label>
+          <input id="ap-emoji" style="width:100%;background:var(--bg3);border:1px solid var(--border);padding:11px 13px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:18px;" placeholder="e.g. 👜 📱 📚 🎵">
+        </div>
       </div>
     </div>
-    <div style="display:flex;gap:12px;margin-top:8px;">
-      <button class="btn btn-ghost" onclick="showPage('marketplace')" style="flex:1;">Cancel</button>
-      <button class="btn btn-primary" onclick="publishProduct()" style="flex:1;">Publish listing →</button>
+
+    <!-- UPLOAD -->
+    <div class="dash-card" style="margin-bottom:18px;" id="upload-section">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;" id="upload-label">📸 Product images</h3>
+      <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:32px;text-align:center;cursor:pointer;" onclick="showToast('📎 Image upload coming soon — use an emoji for now')">
+        <div style="font-size:32px;margin-bottom:8px;">⬆️</div>
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">Drag & drop or click to upload</div>
+        <div style="font-size:12px;color:var(--text3);">JPG, PNG, GIF up to 10MB each · Up to 8 images</div>
+      </div>
+      <div id="digital-upload-note" style="display:none;margin-top:12px;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);padding:12px 14px;font-size:13px;">
+        📎 Also upload your digital file (PDF, ZIP, MP3, etc.) — buyers receive it instantly after purchase.
+      </div>
+    </div>
+
+    <!-- AFFILIATE SETTINGS -->
+    <div class="dash-card" style="margin-bottom:18px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:6px;">💰 Affiliate programme</h3>
+      <p style="font-size:13px;margin-bottom:14px;">Allow affiliates to promote this product and earn a commission. Higher commission = more promotion.</p>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
+        <input id="ap-affiliate" type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+        <span style="font-size:13.5px;font-weight:500;">Enable affiliate marketing for this product</span>
+      </label>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Commission rate (%)</label>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <input id="ap-commission" type="range" min="5" max="40" value="15" style="flex:1;accent-color:var(--accent);" oninput="this.nextElementSibling.textContent=this.value+'%'">
+          <span style="font-size:15px;font-weight:700;color:var(--accent);min-width:40px;">15%</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" onclick="showToast('Draft saved!')">Save as draft</button>
+      <button class="btn btn-ghost" onclick="openListingPreview()">👁 Preview listing</button>
+      <button class="btn btn-primary" onclick="submitProduct()">Publish listing →</button>
     </div>
   </div>
 </div>
 
-<!-- ================================================================
-     PAGE: USER PROFILE / DASHBOARD
-     ================================================================ -->
+<!-- LISTING PREVIEW MODAL -->
+<div class="preview-modal" id="listing-preview-modal">
+  <div class="preview-modal-box">
+    <div class="preview-banner">👁 This is how your listing will appear to buyers — nothing is published yet</div>
+    <div class="pdetail-layout" style="padding:0;">
+      <div>
+        <div class="gallery-main" style="font-size:64px;" id="preview-emoji">📦</div>
+        <div class="gallery-thumbs">
+          <div class="active" id="preview-thumb">📦</div>
+        </div>
+      </div>
+      <div class="pdetail-meta">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <span class="tag tag-purple" id="preview-type-tag">Physical item</span>
+          <span class="tag tag-gold">Affiliate · 15%</span>
+        </div>
+        <div class="pdetail-title" id="preview-name">Handwoven Raffia Tote Bag</div>
+        <div class="pdetail-seller">By <span id="preview-seller-name">Your Store Name</span> · Verified seller</div>
+        <div class="pdetail-price" id="preview-price">NGN 18,500</div>
+        <div class="rating-row"><span style="font-size:13px;color:var(--text3);">No reviews yet — be the first sale!</span></div>
+        <p class="desc-text" id="preview-desc">Your product description will appear here.</p>
+        <div class="pdetail-actions">
+          <button class="btn btn-ghost" style="pointer-events:none;opacity:.6;">Add to cart</button>
+          <button class="btn btn-primary" style="pointer-events:none;opacity:.6;">Buy now</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeListingPreview()">Close preview</button>
+      <button class="btn btn-primary" onclick="closeListingPreview();submitProduct()">Publish now →</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="page-profile">
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="goAddProduct()">+ Add product</a>
-        <a onclick="showPage('messages')" id="nav-msg-link" style="position:relative;">✉️ <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
+        <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬</a>
         <a onclick="showPage('notifications')">🔔</a>
         <a onclick="showPage('settings')">⚙️</a>
         <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
@@ -862,9 +955,9 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('profile-v2')">🪪 Full profile</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
       </div>
     </div>
 
@@ -891,9 +984,7 @@ p{color:var(--text2);margin:0 0 1em;}
     <!-- PROFILE TABS -->
     <div class="dash-tabs">
       <div class="dash-tab active" id="ptab-listings"  onclick="profileTab('listings')">📦 My listings</div>
-      <div class="dash-tab"        id="ptab-seller"    onclick="profileTab('seller')">📊 Seller dashboard</div>
       <div class="dash-tab"        id="ptab-orders"    onclick="profileTab('orders')">🛍 My orders</div>
-      <div class="dash-tab"        id="ptab-settings"  onclick="profileTab('settings')">⚙️ Settings</div>
     </div>
 
     <!-- TAB: MY LISTINGS -->
@@ -1290,11 +1381,8 @@ p{color:var(--text2);margin:0 0 1em;}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙️ Settings</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('locationverif')">📍 Location</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Language</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 2FA</button>
           <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
+          <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
         </div>
       </div>
     </div>
@@ -2044,6 +2132,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     updateNavAvatar();
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
+    setTimeout(_showAdminNavIfNeeded, 600);
     const adminLink = document.getElementById('admin-nav-link');
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
@@ -3133,7 +3222,8 @@ function showPage(name) {
     target.classList.add('active');
     window.scrollTo(0, 0);
     if (name === 'marketplace') { if(typeof loadProducts==='function') loadProducts(); }
-    if (name === 'profile')     { if(typeof loadProfilePage==='function') loadProfilePage(); }
+    if (name === 'profile')          { if(typeof loadProfilePage==='function') loadProfilePage(); }
+  if (name === 'seller-dashboard') { if(typeof loadSellerDashboardPage==='function') loadSellerDashboardPage(); }
   }
 }
 
@@ -3391,6 +3481,15 @@ function goAdmin() {
   if (typeof openAdmin === 'function') openAdmin();
 }
 
+// Show admin nav items when user is admin
+function _showAdminNavIfNeeded() {
+  if (!isAdmin()) return;
+  const adminLink = document.getElementById('admin-nav-link');
+  const ddAdmin   = document.getElementById('dd-admin-item');
+  if (adminLink) adminLink.style.display = 'inline';
+  if (ddAdmin)   ddAdmin.style.display   = 'block';
+}
+
 window._selectedType = 'Physical';
 
 // ── PROFILE FEATURE JS ──────────────────────────────────────────
@@ -3476,6 +3575,201 @@ window.filterNotifs = function(type, btn) {
 };
 
 // sendChatMsg is defined in the Firebase module above — do not redefine here
+
+// ── USER DROPDOWN (avatar click) ──────────────────────────────────────
+window.toggleAdminDropdown = function(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display === 'block';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // Populate name/email
+    const u = window._currentUser || {};
+    const nameEl  = document.getElementById('dropdown-name');
+    const emailEl = document.getElementById('dropdown-email');
+    if (nameEl)  nameEl.textContent  = u.fullName || u.firstName || 'User';
+    if (emailEl) emailEl.textContent = u.email || (auth.currentUser?.email) || '';
+    // Show admin panel item for admins
+    const ddAdmin = document.getElementById('dd-admin-item');
+    if (ddAdmin) ddAdmin.style.display = isAdmin() ? 'block' : 'none';
+    // Close when clicking outside
+    setTimeout(() => document.addEventListener('click', closeDropdown, { once: true }), 50);
+  }
+};
+window.closeDropdown = function() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = 'none';
+};
+
+// ── EDIT BIO MODAL ────────────────────────────────────────────────────
+window.openEditBioModal = function() {
+  const u = window._currentUser || {};
+  const nameInput     = document.getElementById('bio-name-input');
+  const bioInput      = document.getElementById('bio-text-input');
+  const locationInput = document.getElementById('bio-location-input');
+  if (nameInput)     nameInput.value     = u.fullName || u.firstName || '';
+  if (bioInput)      bioInput.value      = u.bio || '';
+  if (locationInput) locationInput.value = u.location || '';
+  const m = document.getElementById('edit-bio-modal');
+  if (m) m.classList.add('open');
+};
+window.closeEditBioModal = function() {
+  const m = document.getElementById('edit-bio-modal');
+  if (m) m.classList.remove('open');
+};
+window.saveEditBio = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Not signed in.'); return; }
+  const fullName = (document.getElementById('bio-name-input')?.value || '').trim();
+  const bio      = (document.getElementById('bio-text-input')?.value || '').trim();
+  const location = (document.getElementById('bio-location-input')?.value || '').trim();
+  if (!fullName) { showToast('⚠️ Name cannot be empty.'); return; }
+  try {
+    await updateDoc(doc(db, 'users', user.uid), { fullName, bio, location });
+    if (window._currentUser) { window._currentUser.fullName = fullName; window._currentUser.bio = bio; window._currentUser.location = location; }
+    closeEditBioModal();
+    showToast('✅ Profile updated!');
+    // Refresh whichever profile page is visible
+    if (typeof loadProfilePage === 'function') loadProfilePage();
+    if (typeof loadProfileV2   === 'function') loadProfileV2();
+  } catch(e) { console.error(e); showToast('❌ Could not save. Try again.'); }
+};
+
+// ── SELLER DASHBOARD PAGE ─────────────────────────────────────────────
+// ── ADD PRODUCT: type picker ────────────────────────────────────────
+window._selectedProductType = 'physical';
+window.pickType = function(el, type) {
+  window._selectedProductType = type;
+  document.querySelectorAll('.prod-type-opt').forEach(opt => {
+    opt.style.background    = 'var(--surface)';
+    opt.style.borderColor   = 'var(--border)';
+  });
+  el.style.background  = 'rgba(124,92,252,.12)';
+  el.style.borderColor = 'var(--accent)';
+  // Show digital upload note for non-physical
+  const note = document.getElementById('digital-upload-note');
+  if (note) note.style.display = type === 'physical' ? 'none' : 'block';
+  const label = document.getElementById('upload-label');
+  const labels = { physical:'📸 Product images', ebook:'📄 Ebook / PDF file', course:'🎓 Course files', template:'🎨 Template files', audio:'🎵 Audio files', software:'💻 Software / ZIP' };
+  if (label) label.textContent = labels[type] || '📸 Product images';
+};
+
+// ── ADD PRODUCT: preview modal ───────────────────────────────────────
+window.openListingPreview = function() {
+  const name   = document.getElementById('ap-name')?.value   || 'Your product name';
+  const desc   = document.getElementById('ap-desc')?.value   || 'Your description.';
+  const price  = document.getElementById('ap-price')?.value  || '0';
+  const emoji  = document.getElementById('ap-emoji')?.value  || '📦';
+  const seller = window._currentUser?.fullName || 'Your Store';
+  const typeLabels = { physical:'Physical item', ebook:'Ebook / PDF', course:'Online course', template:'Template', audio:'Music / Audio', software:'Software' };
+  const el = id => document.getElementById(id);
+  if (el('preview-name'))        el('preview-name').textContent        = name;
+  if (el('preview-desc'))        el('preview-desc').textContent        = desc;
+  if (el('preview-price'))       el('preview-price').textContent       = 'NGN ' + Number(price).toLocaleString();
+  if (el('preview-emoji'))       el('preview-emoji').textContent       = emoji;
+  if (el('preview-thumb'))       el('preview-thumb').textContent       = emoji;
+  if (el('preview-seller-name')) el('preview-seller-name').textContent = seller;
+  if (el('preview-type-tag'))    el('preview-type-tag').textContent    = typeLabels[window._selectedProductType] || 'Physical item';
+  const modal = document.getElementById('listing-preview-modal');
+  if (modal) modal.classList.add('open');
+};
+window.closeListingPreview = function() {
+  const modal = document.getElementById('listing-preview-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+// ── ADD PRODUCT: submit to Firebase ─────────────────────────────────
+window.submitProduct = async function() {
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠️ Please sign in first.'); return; }
+  const profile = window._currentUser || {};
+  if (!profile.sellerVerified) {
+    showToast('⚠️ You need to be a verified seller first.');
+    showPage('verification');
+    return;
+  }
+  const name      = (document.getElementById('ap-name')?.value || '').trim();
+  const desc      = (document.getElementById('ap-desc')?.value || '').trim();
+  const priceRaw  = document.getElementById('ap-price')?.value || '';
+  const emoji     = (document.getElementById('ap-emoji')?.value || '📦').trim();
+  const category  = document.getElementById('ap-category')?.value || 'Fashion & Bags';
+  const commission= document.getElementById('ap-commission')?.value || '15';
+  const hasAff    = document.getElementById('ap-affiliate')?.checked ?? true;
+
+  if (!name)     { showToast('⚠️ Product name is required.'); return; }
+  if (!desc)     { showToast('⚠️ Description is required.'); return; }
+  if (!priceRaw || Number(priceRaw) <= 0) { showToast('⚠️ Enter a valid price.'); return; }
+
+  const typeMap = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital' };
+
+  try {
+    const productData = {
+      name,
+      description: desc,
+      price: Number(priceRaw),
+      emoji,
+      category,
+      type: typeMap[window._selectedProductType] || 'Physical',
+      productType: window._selectedProductType,
+      commission: hasAff ? Number(commission) : 0,
+      affiliateEnabled: hasAff,
+      sellerId:   user.uid,
+      sellerName: profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
+      createdAt: serverTimestamp(),
+      status: 'active',
+    };
+    await addDoc(collection(db, 'products'), productData);
+    showToast('✅ Product published successfully!');
+    // Clear form
+    ['ap-name','ap-desc','ap-price','ap-original-price','ap-emoji'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    closeListingPreview();
+    setTimeout(() => showPage('seller-dashboard'), 600);
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not publish. Check your connection.');
+  }
+};
+
+window.loadSellerDashboardPage = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const u = window._currentUser || {};
+  // Show verif prompt if not seller verified
+  const verifPrompt = document.getElementById('sd-verif-prompt');
+  if (verifPrompt) verifPrompt.style.display = u.sellerVerified ? 'none' : 'block';
+  // Stats
+  const el = id => document.getElementById(id);
+  try {
+    const pSnap = await getDocs(query(collection(db, 'products'), where('sellerId','==', user.uid)));
+    if (el('sd-stat-listings')) el('sd-stat-listings').textContent = pSnap.size;
+    let revenue = 0;
+    const listingsHtml = pSnap.empty
+      ? '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →</a></div>'
+      : pSnap.docs.map(d => {
+          const p = d.data();
+          revenue += Number(p.price || 0);
+          return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);">
+            <div style="font-size:28px;">${p.emoji || '📦'}</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:14px;">${p.name || '—'}</div>
+              <div style="font-size:12px;color:var(--text3);">NGN ${Number(p.price||0).toLocaleString()} · ${p.category||''}</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('add-product')">Edit</button>
+          </div>`;
+        }).join('');
+    if (el('sd-listings-list')) el('sd-listings-list').innerHTML = listingsHtml;
+    if (el('sd-stat-revenue'))  el('sd-stat-revenue').textContent  = 'NGN ' + revenue.toLocaleString();
+    if (el('sd-stat-orders'))   el('sd-stat-orders').textContent   = '0';
+    if (el('sd-stat-aff'))      el('sd-stat-aff').textContent      = 'NGN 0';
+    // Update avatar
+    const initials = (u.fullName || u.firstName || '?')[0].toUpperCase();
+    if (el('nav-avatar-seller-dash')) el('nav-avatar-seller-dash').textContent = initials;
+  } catch(e) { console.error(e); }
+};
 
 // Language selection
 var _selectedLang = 'English';
@@ -3574,6 +3868,92 @@ window.saveManualLocation = function() {
 };
 
 </script>
+
+<!-- ── EDIT BIO MODAL ───────────────────────────────────────── -->
+<div class="bio-modal-bg" id="edit-bio-modal" onclick="if(event.target===this)closeEditBioModal()">
+  <div class="bio-modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h3 style="font-size:17px;margin:0;">✏️ Edit bio</h3>
+      <button onclick="closeEditBioModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
+    </div>
+    <div class="form-field" style="margin-bottom:12px;">
+      <label>Display name</label>
+      <input type="text" id="bio-name-input" placeholder="Your name" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+    </div>
+    <div class="form-field" style="margin-bottom:12px;">
+      <label>Bio</label>
+      <textarea id="bio-text-input" rows="4" placeholder="Tell people about yourself…" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);resize:vertical;"></textarea>
+    </div>
+    <div class="form-field" style="margin-bottom:18px;">
+      <label>Location</label>
+      <input type="text" id="bio-location-input" placeholder="e.g. Lagos, Nigeria" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveEditBio()">Save changes</button>
+  </div>
+</div>
+
+<!-- ── SELLER DASHBOARD PAGE ─────────────────────────────────── -->
+<div class="page" id="page-seller-dashboard">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('messaging')">💬</a>
+        <a onclick="showPage('profile')">Profile</a>
+        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:960px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;margin-bottom:4px;">Seller dashboard</h1>
+        <p style="margin:0;font-size:13px;color:var(--text3);">Manage your listings, sales and earnings</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
+    </div>
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);" id="sd-stat-listings">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Listings</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);" id="sd-stat-orders">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Orders</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);color:var(--green);" id="sd-stat-revenue">NGN 0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Revenue</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;font-family:var(--font-display);color:var(--gold);" id="sd-stat-aff">NGN 0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Aff. earned</div>
+      </div>
+    </div>
+    <!-- My listings -->
+    <div class="dash-card">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        My listings
+        <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
+      </h3>
+      <div id="sd-listings-list">
+        <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
+      </div>
+    </div>
+    <!-- Seller verification prompt -->
+    <div id="sd-verif-prompt" style="display:none;margin-top:16px;">
+      <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-sm);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px;">⚠️ Seller verification required</div>
+          <div style="font-size:13px;color:var(--text2);">Get verified to start listing products and earn on ZÚLA.</div>
+        </div>
+        <button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="showPage('verification')">Get verified →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── NEW MESSAGE MODAL ─────────────────────────────────────── -->
 <div class="modal-bg" id="new-msg-modal" onclick="if(event.target===this)closeNewMsgModal()">
