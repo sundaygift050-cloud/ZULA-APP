@@ -4993,44 +4993,7 @@ p{color:var(--text2);margin:0 0 1em;}
 
 
 .pbar { display: none !important; }
-
-.group-nav {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: #09090b;
-  border-bottom: 1px solid #2a2a2a;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 0 8px;
-}
-.group-nav::-webkit-scrollbar { display: none; }
-
-.gtab {
-  flex-shrink: 0;
-  background: transparent;
-  color: #888;
-  border: none;
-  border-bottom: 3px solid transparent;
-  padding: 13px 15px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: color 0.2s, border-color 0.2s;
-}
-.gtab.active {
-  color: #fff;
-  border-bottom: 3px solid var(--accent, #7c5cfc);
-}
-.page { display: none !important; }
-.page.active { display: block !important; }
+.group-nav { display: none !important; }
 
 </style>
 <div class="group-nav">
@@ -5057,18 +5020,18 @@ p{color:var(--text2);margin:0 0 1em;}
     <aside class="dash-side">
       <div class="d-brand">Seller hub</div>
       <nav class="dash-nav">
-        <a class="active">📦 My Products</a>
-        <a>📊 Sales &amp; Earnings</a>
-        <a onclick="openSellerTool('coupon');showPage('seller');">🏷 Coupons &amp; Promos</a>
-        <a onclick="openSellerTool('flash');showPage('seller');">⚡ Flash Sales</a>
-        <a onclick="openSellerTool('bundle');showPage('seller');">📦 Bundle Deals</a>
-        <a onclick="openSellerTool('subscription');showPage('seller');">🔄 Subscriptions</a>
-        <a onclick="openSellerTool('promote');showPage('seller');">📢 Promote &amp; Ads</a>
-        <a>💰 Affiliate settings</a>
-        <a>📤 Payouts</a>
-        <a>⭐ Reviews</a>
-        <a onclick="openSellerTool('vacation');showPage('seller');">☀️ Vacation mode</a>
-        <a>⚙️ Store settings</a>
+        <a class="active" onclick="showGPage('seller');sideActive(this)">📦 My Products</a>
+        <a onclick="showGPage('analytics');sideActive(this)">📊 Sales &amp; Earnings</a>
+        <a onclick="openSellerTool('coupon');sideActive(this)">🏷 Coupons &amp; Promos</a>
+        <a onclick="openSellerTool('flash');sideActive(this)">⚡ Flash Sales</a>
+        <a onclick="openSellerTool('bundle');sideActive(this)">📦 Bundle Deals</a>
+        <a onclick="openSellerTool('subscription');sideActive(this)">🔄 Subscriptions</a>
+        <a onclick="openSellerTool('promote');sideActive(this)">📢 Promote &amp; Ads</a>
+        <a onclick="showGPage('sellerprofile');sideActive(this)">💰 Affiliate settings</a>
+        <a onclick="showGPage('payout');sideActive(this)">📤 Payouts</a>
+        <a onclick="showGPage('sellerprofile');sideActive(this)">⭐ Reviews</a>
+        <a onclick="openSellerTool('vacation');sideActive(this)">☀️ Vacation mode</a>
+        <a onclick="showGPage('sellerprofile');sideActive(this)">⚙️ Store settings</a>
       </nav>
     </aside>
     <main class="dash-main">
@@ -6160,15 +6123,13 @@ p{color:var(--text2);margin:0 0 1em;}
 
 function showGPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
   var page = document.getElementById('page-' + id);
   if (page) page.classList.add('active');
-  document.querySelectorAll('.gtab').forEach(function(b) {
-    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
-      b.classList.add('active');
-    }
-  });
   window.scrollTo(0,0);
+}
+function sideActive(el) {
+  document.querySelectorAll('.dash-nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
 }
 function showPage(name) { showGPage(name); }
 
@@ -8003,14 +7964,8 @@ function toggleWaitlistDemo() {
 
 function showGPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
   var page = document.getElementById('page-' + id);
   if (page) page.classList.add('active');
-  document.querySelectorAll('.gtab').forEach(function(b) {
-    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
-      b.classList.add('active');
-    }
-  });
   window.scrollTo(0,0);
 }
 function showPage(name) { showGPage(name); }
