@@ -1158,6 +1158,11 @@ p{color:var(--text2);margin:0 0 1em;}
             <div class="to-name">Physical item</div><div class="to-sub">Fashion, home goods, electronics…</div>
             <span class="ap-physical-badge">Physical</span>
           </div>
+          <div class="ap-type-opt" data-type="realestate" onclick="apSelectType(this)">
+            <div class="to-check">✓</div><div class="to-icon">🏠</div>
+            <div class="to-name">Real Estate</div><div class="to-sub">Land, house, apartment, commercial property</div>
+            <span class="ap-physical-badge">Property</span>
+          </div>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-top:8px;">
@@ -1335,6 +1340,80 @@ p{color:var(--text2);margin:0 0 1em;}
             <div class="ap-variant-row"><input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
           </div>
           <button class="ap-add-variant-btn" onclick="apAddVariant()">+ Add size or variant</button>
+        </div>
+      </div>
+
+      <!-- REAL ESTATE -->
+      <div class="ap-card ap-dynamic" id="ap-sec-realestate">
+        <div class="ap-card-hd">🏠 Property details</div>
+        <div class="ap-card-sub">Give buyers everything they need to decide before booking a viewing.</div>
+
+        <div class="ap-field-row">
+          <div class="ap-field">
+            <label>Property type</label>
+            <select id="re-property-type">
+              <option>Detached house</option><option>Semi-detached house</option><option>Terraced house</option>
+              <option>Apartment / Flat</option><option>Duplex</option><option>Bungalow</option>
+              <option>Commercial building</option><option>Office space</option><option>Warehouse</option>
+              <option>Land (residential)</option><option>Land (commercial)</option>
+            </select>
+          </div>
+          <div class="ap-field">
+            <label>Listing type</label>
+            <select id="re-listing-type">
+              <option value="sale">For Sale</option>
+              <option value="rent">For Rent</option>
+              <option value="shortlet">Short Let</option>
+              <option value="lease">Lease</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Bedrooms</label><select id="re-bedrooms"><option>Studio</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>
+          <div class="ap-field"><label>Bathrooms</label><select id="re-bathrooms"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+        </div>
+
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Size (sqm)</label><input type="number" id="re-size" placeholder="e.g. 120"></div>
+          <div class="ap-field"><label>Condition</label><select id="re-condition"><option>Brand new</option><option>Newly renovated</option><option>Good condition</option><option>Needs renovation</option><option>Off-plan</option></select></div>
+        </div>
+
+        <div class="ap-field">
+          <label>Full address / location</label>
+          <input id="re-address" placeholder="e.g. 14B Admiralty Way, Lekki Phase 1, Lagos">
+        </div>
+
+        <div class="ap-field">
+          <label>Key features</label>
+          <div id="re-features-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+            <div class="ap-variant-row"><input placeholder="e.g. Swimming pool" type="text"><button class="ap-variant-rm" onclick="this.closest('.ap-variant-row').remove()">×</button></div>
+            <div class="ap-variant-row"><input placeholder="e.g. 24/7 security" type="text"><button class="ap-variant-rm" onclick="this.closest('.ap-variant-row').remove()">×</button></div>
+            <div class="ap-variant-row"><input placeholder="e.g. Boys quarters" type="text"><button class="ap-variant-rm" onclick="this.closest('.ap-variant-row').remove()">×</button></div>
+          </div>
+          <button class="ap-add-variant-btn" onclick="reAddFeature()" type="button">+ Add feature</button>
+        </div>
+
+        <!-- VIEWING SCHEDULE -->
+        <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+          <div style="font-size:14px;font-weight:700;font-family:var(--font-display);margin-bottom:4px;">📅 Viewing schedule</div>
+          <div style="font-size:12.5px;color:var(--text3);margin-bottom:14px;">Set the days and times buyers can book a viewing. You will confirm each request before it is finalised.</div>
+
+          <div id="re-schedule-slots" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+            <div class="re-slot-row">
+              <select class="re-slot-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+              <input type="time" class="re-slot-from" value="09:00">
+              <span style="font-size:12px;color:var(--text3);">to</span>
+              <input type="time" class="re-slot-to" value="17:00">
+              <button class="ap-variant-rm" onclick="this.closest('.re-slot-row').remove()" type="button">×</button>
+            </div>
+          </div>
+          <button class="ap-add-variant-btn" onclick="reAddSlot()" type="button">+ Add viewing slot</button>
+        </div>
+
+        <div style="background:rgba(240,82,82,.07);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:11px 14px;font-size:12.5px;color:var(--red);margin-top:16px;display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+          <div><strong style="display:block;margin-bottom:2px;">Payment must go through Zula</strong>If a buyer is interested after viewing, payment must be completed inside the app. Accepting payment outside the app will result in a permanent account ban.</div>
         </div>
       </div>
 
@@ -4403,7 +4482,8 @@ var _apTypeMeta = {
   audio:    {icon:'🎵', label:'Music / Audio',        digital:true,  sections:['ap-sec-audio'],    uploadHint:'MP3, WAV, FLAC, ZIP — up to 1 GB'},
   coaching: {icon:'🧑‍💼', label:'Coaching / Service',  digital:true,  sections:['ap-sec-coaching'], uploadHint:'Optional: slide deck or resource PDF'},
   vehicle:  {icon:'🚗', label:'Vehicle',              digital:false, sections:['ap-sec-vehicle'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
-  physical: {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'], uploadHint:'JPG, PNG, GIF — up to 8 images, 10 MB each'},
+  physical:   {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'],   uploadHint:'JPG, PNG, GIF — up to 8 images, 10 MB each'},
+  realestate: {icon:'🏠', label:'Real Estate',           digital:false, sections:['ap-sec-realestate'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
 };
 
 window.apSelectType = function(el) {
@@ -4761,7 +4841,7 @@ window.submitProduct = async function() {
 
   // Product type from step 1 (set by apSelectType via _apType)
   const productType = window._apType || 'physical';
-  const typeMap     = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital', coaching:'Service', vehicle:'Vehicle' };
+  const typeMap     = { physical:'Physical', ebook:'Digital', course:'Course', template:'Digital', audio:'Digital', software:'Digital', coaching:'Service', vehicle:'Vehicle', realestate:'Real Estate' };
 
   // Visibility
   const visEl = document.querySelector('.ap-vis-opt.selected');
@@ -4797,6 +4877,22 @@ window.submitProduct = async function() {
       productData.lessons = window._pendingLessons;
       window._pendingLessons = [];
     }
+    // Attach real estate fields
+    if (productType === 'realestate') {
+      productData.realestate = {
+        propertyType:  document.getElementById('re-property-type')?.value || '',
+        listingType:   document.getElementById('re-listing-type')?.value || 'sale',
+        bedrooms:      document.getElementById('re-bedrooms')?.value || '',
+        bathrooms:     document.getElementById('re-bathrooms')?.value || '',
+        size:          document.getElementById('re-size')?.value || '',
+        condition:     document.getElementById('re-condition')?.value || '',
+        address:       document.getElementById('re-address')?.value || '',
+        features:      window.reGetFeatures ? window.reGetFeatures() : [],
+        schedule:      window.reGetSchedule ? window.reGetSchedule() : [],
+      };
+      productData.photos = window._apPhotos ? window._apPhotos.map(function(p){ return p.dataUrl; }) : [];
+      productData.paymentPolicy = 'in_app_only';
+    }
     var docRef = await fns.addDoc(fns.collection(db, 'products'), productData);
     showToast('🎉 Product published! It\'s now live in the marketplace.');
     // Reset form fields
@@ -4828,6 +4924,7 @@ window.sdTab = function(name) {
   if (sec) sec.classList.add('active');
   // Lazy-load section data
   if (name === 'products') sdLoadProducts();
+  if (name === 'viewings') reLoadViewingRequests();
   if (name === 'verification') sdLoadVerification();
   if (name === 'payout') sdLoadPayout();
 };
@@ -4854,6 +4951,11 @@ window.loadSellerDashboardPage = async function() {
     const pSnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid)));
     if (el('sd-stat-listings')) el('sd-stat-listings').textContent = pSnap.size;
     if (el('sdnav-products-count')) { el('sdnav-products-count').textContent = pSnap.size; el('sdnav-products-count').style.display = pSnap.size > 0 ? 'inline-block' : 'none'; }
+    // Load pending viewings badge
+    try {
+      var vSnap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.where('sellerId','==',user.uid), fns.where('status','==','pending')));
+      if (el('sdnav-viewings-badge')) { el('sdnav-viewings-badge').textContent = vSnap.size; el('sdnav-viewings-badge').style.display = vSnap.size > 0 ? 'inline-block' : 'none'; }
+    } catch(e) {}
     if (el('sd-stat-orders'))   el('sd-stat-orders').textContent = '0';
     if (el('sd-stat-revenue'))  el('sd-stat-revenue').textContent = '₦0';
     if (el('sd-stat-aff'))      el('sd-stat-aff').textContent = '₦0';
@@ -5127,6 +5229,10 @@ window.saveManualLocation = function() {
           <span class="sd-nav-icon">🛍</span> Orders
           <span class="sd-nav-badge gold" id="sdnav-orders-badge" style="display:none;">New</span>
         </button>
+        <button class="sd-nav-item" id="sdnav-viewings" onclick="sdTab('viewings')">
+          <span class="sd-nav-icon">🏠</span> Viewings
+          <span class="sd-nav-badge" id="sdnav-viewings-badge" style="display:none;">New</span>
+        </button>
         <button class="sd-nav-item" id="sdnav-analytics" onclick="sdTab('analytics')">
           <span class="sd-nav-icon">📈</span> Analytics
         </button>
@@ -5257,6 +5363,24 @@ window.saveManualLocation = function() {
           <div id="sd-orders-list">
             <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No orders yet — your sales will appear here.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── VIEWINGS ── -->
+      <div class="sd-section" id="sd-sec-viewings">
+        <div class="sd-page-hd">🏠 Property Viewings</div>
+        <div class="sd-page-sub">Manage viewing requests from buyers interested in your properties</div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="reFilterViewings(this,'all')">All</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="reFilterViewings(this,'pending')">⏳ Pending</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="reFilterViewings(this,'confirmed')">✅ Confirmed</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="reFilterViewings(this,'payment_submitted')">💰 Payment received</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="reFilterViewings(this,'completed')">🎉 Completed</button>
+        </div>
+
+        <div id="re-viewings-list">
+          <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">Loading viewing requests…</div>
         </div>
       </div>
 
@@ -5556,6 +5680,22 @@ window.saveManualLocation = function() {
 .ap-photo-tile .ap-pt-num{position:absolute;top:4px;left:4px;background:rgba(13,13,15,.6);color:var(--text2);font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;}
 .ap-photo-tile .ap-pt-rm{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(13,13,15,.7);border:none;color:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1;}
 .ap-photo-tile .ap-pt-rm:hover{background:var(--red);}
+
+/* ── REAL ESTATE ── */
+.re-slot-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.re-slot-day{background:var(--bg3);border:1px solid var(--border);padding:8px 10px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;}
+.re-slot-from,.re-slot-to{background:var(--bg3);border:1px solid var(--border);padding:8px 10px;border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:13px;width:110px;}
+.re-slot-from:focus,.re-slot-to:focus,.re-slot-day:focus{outline:none;border-color:var(--accent);}
+
+/* Viewing request card */
+.re-view-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:12px;}
+.re-view-card-hd{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.re-view-status{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;}
+.re-status-pending{background:rgba(245,200,66,.15);color:var(--gold);}
+.re-status-confirmed{background:rgba(39,201,122,.15);color:var(--green);}
+.re-status-declined{background:rgba(240,82,82,.15);color:var(--red);}
+.re-status-done{background:rgba(124,92,252,.15);color:var(--accent);}
+
 @media(max-width:700px){
   .cp-shell{flex-direction:column;}
   .cp-sidebar{width:100%;height:auto;max-height:40vh;}
@@ -5565,6 +5705,273 @@ window.saveManualLocation = function() {
 </style>
 
 <script>
+
+
+// ── REAL ESTATE HELPERS ────────────────────────────────────────────
+window.reAddFeature = function() {
+  var list = document.getElementById('re-features-list');
+  if (!list) return;
+  var row = document.createElement('div');
+  row.className = 'ap-variant-row';
+  row.innerHTML = '<input placeholder="e.g. Parking space" type="text"><button class="ap-variant-rm" onclick="this.closest(\'.ap-variant-row\').remove()" type="button">×</button>';
+  list.appendChild(row);
+};
+
+window.reAddSlot = function() {
+  var list = document.getElementById('re-schedule-slots');
+  if (!list) return;
+  var row = document.createElement('div');
+  row.className = 're-slot-row';
+  row.innerHTML = '<select class="re-slot-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>' +
+    '<input type="time" class="re-slot-from" value="09:00">' +
+    '<span style="font-size:12px;color:var(--text3);">to</span>' +
+    '<input type="time" class="re-slot-to" value="17:00">' +
+    '<button class="ap-variant-rm" onclick="this.closest(\'.re-slot-row\').remove()" type="button">×</button>';
+  list.appendChild(row);
+};
+
+window.reGetSchedule = function() {
+  var slots = [];
+  document.querySelectorAll('.re-slot-row').forEach(function(row) {
+    var day  = row.querySelector('.re-slot-day')?.value || '';
+    var from = row.querySelector('.re-slot-from')?.value || '';
+    var to   = row.querySelector('.re-slot-to')?.value || '';
+    if (day) slots.push({ day, from, to });
+  });
+  return slots;
+};
+
+window.reGetFeatures = function() {
+  var feats = [];
+  document.querySelectorAll('#re-features-list .ap-variant-row input').forEach(function(inp) {
+    var v = inp.value.trim();
+    if (v) feats.push(v);
+  });
+  return feats;
+};
+
+// ── VIEWING REQUEST (buyer books a viewing slot) ───────────────────
+window.reRequestViewing = async function(productId, productName, sellerId, slots) {
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in to book a viewing.'); showPage('login'); return; }
+
+  // Show slot picker modal
+  var modal = document.getElementById('re-book-modal');
+  var slotsEl = document.getElementById('re-book-slots');
+  var titleEl = document.getElementById('re-book-title');
+  if (!modal) return;
+  if (titleEl) titleEl.textContent = 'Book a viewing — ' + productName;
+  if (slotsEl) {
+    slotsEl.innerHTML = '';
+    (slots || []).forEach(function(slot, i) {
+      var btn = document.createElement('button');
+      btn.className = 're-slot-pick-btn';
+      btn.textContent = slot.day + '  ' + slot.from + ' – ' + slot.to;
+      btn.onclick = function() {
+        document.querySelectorAll('.re-slot-pick-btn').forEach(function(b){ b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        window._reSelectedSlot = slot;
+      };
+      slotsEl.appendChild(btn);
+    });
+  }
+  window._reBookingProduct = { productId, productName, sellerId };
+  modal.style.display = 'flex';
+};
+
+window.reConfirmBooking = async function() {
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!user || !window._reBookingProduct || !window._reSelectedSlot) {
+    showToast('Please select a time slot.'); return;
+  }
+  var p = window._reBookingProduct;
+  var slot = window._reSelectedSlot;
+  var note = document.getElementById('re-book-note')?.value || '';
+  try {
+    await fns.addDoc(fns.collection(db, 'viewingRequests'), {
+      productId: p.productId,
+      productName: p.productName,
+      sellerId: p.sellerId,
+      buyerId: user.uid,
+      buyerName: (window._currentUser?.fullName || user.displayName || 'Buyer'),
+      buyerEmail: user.email,
+      slot: slot,
+      note: note,
+      status: 'pending',
+      createdAt: fns.serverTimestamp(),
+    });
+    document.getElementById('re-book-modal').style.display = 'none';
+    showToast('✅ Viewing request sent! The seller will confirm shortly.');
+    // Notify seller (write to notifications collection)
+    await fns.addDoc(fns.collection(db, 'notifications'), {
+      userId: p.sellerId,
+      type: 'viewing_request',
+      title: 'New viewing request',
+      body: (window._currentUser?.fullName || 'A buyer') + ' wants to view your property: ' + p.productName,
+      productId: p.productId,
+      read: false,
+      createdAt: fns.serverTimestamp(),
+    });
+  } catch(e) { console.error(e); showToast('Could not send request. Try again.'); }
+};
+
+window.reCloseBookModal = function() {
+  var m = document.getElementById('re-book-modal');
+  if (m) m.style.display = 'none';
+};
+
+// ── SELLER: CONFIRM OR DECLINE VIEWING ────────────────────────────
+window.reRespondViewing = async function(requestId, action, buyerId, productName) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  try {
+    await fns.updateDoc(fns.doc(db, 'viewingRequests', requestId), { status: action });
+    var msg = action === 'confirmed'
+      ? 'Viewing confirmed! The buyer has been notified.'
+      : 'Viewing declined.';
+    showToast(msg);
+    // Notify buyer
+    await fns.addDoc(fns.collection(db, 'notifications'), {
+      userId: buyerId,
+      type: action === 'confirmed' ? 'viewing_confirmed' : 'viewing_declined',
+      title: action === 'confirmed' ? 'Viewing confirmed!' : 'Viewing request declined',
+      body: action === 'confirmed'
+        ? 'Your viewing for ' + productName + ' has been confirmed. Check your schedule.'
+        : 'Unfortunately your viewing request for ' + productName + ' was not accepted.',
+      productId: null,
+      read: false,
+      createdAt: fns.serverTimestamp(),
+    });
+    reLoadViewingRequests();
+  } catch(e) { console.error(e); showToast('Could not update request.'); }
+};
+
+// ── BUYER: POST-VIEWING INTEREST ──────────────────────────────────
+window.reMarkInterest = async function(requestId, productId, productName, sellerId, interested) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    await fns.updateDoc(fns.doc(db, 'viewingRequests', requestId), {
+      status: 'done',
+      buyerInterested: interested,
+    });
+    if (interested) {
+      // Show payment modal
+      var modal = document.getElementById('re-payment-modal');
+      var titleEl = document.getElementById('re-pay-title');
+      if (titleEl) titleEl.textContent = productName;
+      window._rePayProduct = { productId, productName, sellerId, requestId };
+      if (modal) modal.style.display = 'flex';
+    } else {
+      showToast('Thanks for the feedback. We have notified the seller.');
+      // Notify seller
+      await fns.addDoc(fns.collection(db, 'notifications'), {
+        userId: sellerId,
+        type: 'viewing_not_interested',
+        title: 'Buyer not interested',
+        body: (window._currentUser?.fullName || 'The buyer') + ' viewed ' + productName + ' and is not proceeding.',
+        read: false,
+        createdAt: fns.serverTimestamp(),
+      });
+    }
+  } catch(e) { console.error(e); showToast('Could not save your response.'); }
+};
+
+// ── IN-APP PAYMENT FOR REAL ESTATE ───────────────────────────────
+window.reSubmitPayment = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var p = window._rePayProduct;
+  if (!user || !p) return;
+  var ref = document.getElementById('re-pay-ref')?.value.trim();
+  if (!ref) { showToast('Please enter your payment reference.'); return; }
+  try {
+    await fns.addDoc(fns.collection(db, 'payments'), {
+      productId: p.productId,
+      productName: p.productName,
+      buyerId: user.uid,
+      sellerId: p.sellerId,
+      requestId: p.requestId,
+      paymentRef: ref,
+      status: 'pending_verification',
+      createdAt: fns.serverTimestamp(),
+    });
+    await fns.updateDoc(fns.doc(db, 'viewingRequests', p.requestId), { status: 'payment_submitted' });
+    // Notify seller
+    await fns.addDoc(fns.collection(db, 'notifications'), {
+      userId: p.sellerId,
+      type: 'payment_received',
+      title: 'Payment submitted!',
+      body: (window._currentUser?.fullName || 'A buyer') + ' has submitted payment for ' + p.productName + '. Please verify.',
+      read: false,
+      createdAt: fns.serverTimestamp(),
+    });
+    document.getElementById('re-payment-modal').style.display = 'none';
+    showToast('Payment submitted! The seller will verify and confirm.');
+  } catch(e) { console.error(e); showToast('Could not submit payment. Try again.'); }
+};
+
+window.reClosePayModal = function() {
+  var m = document.getElementById('re-payment-modal');
+  if (m) m.style.display = 'none';
+};
+
+// Load viewing requests for seller dashboard
+window.reLoadViewingRequests = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('re-viewings-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db, 'viewingRequests'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No viewing requests yet.</div>'; return; }
+    el.innerHTML = '';
+    snap.docs.forEach(function(d) {
+      var r = d.data();
+      var statusClass = { pending:'re-status-pending', confirmed:'re-status-confirmed', declined:'re-status-declined', done:'re-status-done', payment_submitted:'re-status-confirmed' }[r.status] || 're-status-pending';
+      var statusLabel = { pending:'Pending', confirmed:'Confirmed', declined:'Declined', done:'Viewed', payment_submitted:'Payment received' }[r.status] || r.status;
+      var slotTxt = r.slot ? r.slot.day + ' ' + r.slot.from + '–' + r.slot.to : '—';
+      var card = document.createElement('div');
+      card.className = 're-view-card';
+      card.innerHTML =
+        '<div class="re-view-card-hd">' + (r.buyerName || 'Buyer') + '<span class="re-view-status ' + statusClass + '">' + statusLabel + '</span></div>' +
+        '<div style="font-size:12.5px;color:var(--text3);margin-bottom:8px;">' + (r.productName || '') + ' · ' + slotTxt + '</div>' +
+        (r.note ? '<div style="font-size:12.5px;color:var(--text2);margin-bottom:10px;font-style:italic;">"' + r.note + '"</div>' : '') +
+        (r.status === 'pending'
+          ? '<div style="display:flex;gap:8px;">' +
+              '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" data-action="confirm-viewing" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">✓ Confirm</button>' +
+              '<button class="btn btn-sm btn-ghost" data-action="decline-viewing" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">✗ Decline</button>' +
+            '</div>'
+          : '') +
+        (r.status === 'payment_submitted'
+          ? '<div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" data-action="verify-payment" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">Verify payment</button></div>'
+          : '');
+      el.appendChild(card);
+    });
+  } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;">Could not load requests.</div>'; }
+};
+
+window.reVerifyPayment = async function(requestId, buyerId, productName) {
+  var db = window._db, fns = window._fns;
+  if (!confirm('Confirm you have received payment for ' + productName + '?')) return;
+  try {
+    await fns.updateDoc(fns.doc(db, 'viewingRequests', requestId), { status: 'completed' });
+    await fns.addDoc(fns.collection(db, 'notifications'), {
+      userId: buyerId,
+      type: 'payment_verified',
+      title: 'Payment confirmed!',
+      body: 'Your payment for ' + productName + ' has been verified. Congratulations on your new property!',
+      read: false,
+      createdAt: fns.serverTimestamp(),
+    });
+    showToast('Payment verified! Buyer has been notified.');
+    reLoadViewingRequests();
+  } catch(e) { showToast('Could not verify.'); }
+};
 
 // ── MULTI-PHOTO UPLOAD ─────────────────────────────────────────────
 var _apPhotos = []; // [{dataUrl, name}]
@@ -5836,6 +6243,305 @@ window.watchCourse = async function(productId) {
     showToast('❌ Could not load course.');
   }
 };
+</script>
+
+
+<!-- ================================================================
+     REAL ESTATE: BOOK VIEWING MODAL
+     ================================================================ -->
+<div id="re-book-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9100;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div style="font-family:var(--font-display);font-size:17px;font-weight:800;" id="re-book-title">Book a Viewing</div>
+      <button onclick="reCloseBookModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:18px;">Pick an available slot below. The seller will confirm your appointment.</div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Available slots</div>
+    <div id="re-book-slots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
+
+    <div style="margin-bottom:18px;">
+      <label style="font-size:12.5px;font-weight:600;display:block;margin-bottom:6px;">Note to seller <span style="color:var(--text3);font-weight:400;">(optional)</span></label>
+      <textarea id="re-book-note" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;resize:vertical;min-height:70px;" placeholder="e.g. I am available any day except Wednesday…"></textarea>
+    </div>
+
+    <div style="background:rgba(240,82,82,.07);border:1px solid rgba(240,82,82,.18);border-radius:var(--radius-xs);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:18px;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">⚠️</span>
+      <div>If you decide to buy after viewing, <strong>payment must be made inside the Zula app</strong>. Paying the seller directly outside the app violates our policy.</div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;" onclick="reConfirmBooking()">Request viewing →</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     REAL ESTATE: POST-VIEWING INTEREST MODAL (buyer)
+     ================================================================ -->
+<div id="re-interest-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9100;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:420px;width:100%;padding:28px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:12px;">🏠</div>
+    <div style="font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:6px;">How was the viewing?</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:6px;" id="re-interest-name"></div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:24px;">Are you interested in purchasing or renting this property?</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn" style="flex:1;background:rgba(39,201,122,.12);color:var(--green);border:1.5px solid var(--green);font-weight:700;" onclick="reSubmitInterest(true)">Yes, I am interested!</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="reSubmitInterest(false)">No, not this time</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     REAL ESTATE: IN-APP PAYMENT MODAL (buyer)
+     ================================================================ -->
+<div id="re-payment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div style="font-family:var(--font-display);font-size:17px;font-weight:800;">💳 Make Payment</div>
+      <button onclick="reClosePayModal()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:4px;" id="re-pay-title"></div>
+
+    <div style="background:rgba(240,82,82,.07);border:1px solid rgba(240,82,82,.18);border-radius:var(--radius-xs);padding:12px 14px;font-size:12.5px;color:var(--red);margin:16px 0;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+      <div><strong style="display:block;margin-bottom:2px;">Pay only through Zula</strong>Paying the seller directly (cash, bank transfer, etc.) is a violation of our policy. The seller's account will be permanently banned if detected. Your funds are protected when you pay here.</div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Amount due</div>
+      <div id="re-pay-amount" style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--accent);margin-bottom:4px;">—</div>
+      <div id="re-pay-currency" style="font-size:12px;color:var(--text3);"></div>
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Transfer to Zula Escrow Account</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3);">Bank</span><span style="font-weight:600;">Zula Trust Bank</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3);">Account name</span><span style="font-weight:600;">Zula Escrow Ltd</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3);">Account number</span>
+          <span style="font-weight:700;font-family:monospace;display:flex;align-items:center;gap:6px;">0123456789
+            <button onclick="navigator.clipboard.writeText('0123456789');showToast('Copied!')" style="background:rgba(124,92,252,.15);border:none;color:var(--accent);border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;">Copy</button>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3);">Sort code</span><span style="font-weight:600;">00-00-00</span></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12.5px;font-weight:600;display:block;margin-bottom:6px;">Payment reference / transaction ID</label>
+      <input id="re-pay-ref" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="e.g. TRF2024061500012345">
+      <div style="font-size:11.5px;color:var(--text3);margin-top:5px;">After transferring, paste your bank reference here so the seller can verify.</div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" onclick="reSubmitPayment()">Submit payment proof →</button>
+    <div style="font-size:11.5px;color:var(--text3);text-align:center;">Funds are held securely in escrow until the seller confirms receipt.</div>
+  </div>
+</div>
+
+<style>
+/* Slot picker buttons */
+.re-slot-pick-btn{width:100%;padding:12px 16px;background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius-xs);color:var(--text2);font-family:var(--font-body);font-size:13.5px;font-weight:600;cursor:pointer;text-align:left;transition:.15s;}
+.re-slot-pick-btn:hover{border-color:var(--accent);color:var(--accent);}
+.re-slot-pick-btn.selected{border-color:var(--accent);background:rgba(124,92,252,.1);color:var(--accent);}
+/* Buyer viewings list */
+.re-buy-view-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+</style>
+
+<script>
+// ─── REAL ESTATE: COMPLETE FLOW ────────────────────────────────────
+
+// Filter viewings on seller dashboard
+window._reAllViewings = [];
+window.reFilterViewings = function(btn, status) {
+  document.querySelectorAll('.sd-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var list = document.getElementById('re-viewings-list');
+  if (!list) return;
+  var filtered = status === 'all' ? window._reAllViewings : window._reAllViewings.filter(function(v){ return v.status === status; });
+  reRenderViewingCards(filtered, list);
+};
+
+// Override reLoadViewingRequests to also store data for filtering
+var _origReLoad = window.reLoadViewingRequests;
+window.reLoadViewingRequests = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('re-viewings-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(
+      fns.collection(db,'viewingRequests'),
+      fns.where('sellerId','==',user.uid),
+      fns.orderBy('createdAt','desc')
+    ));
+    window._reAllViewings = snap.docs.map(function(d){ return Object.assign({ _id: d.id }, d.data()); });
+    reRenderViewingCards(window._reAllViewings, el);
+    // Update badge
+    var pending = window._reAllViewings.filter(function(v){ return v.status === 'pending'; }).length;
+    var badge = document.getElementById('sdnav-viewings-badge');
+    if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
+  } catch(e) {
+    console.error(e);
+    el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px;text-align:center;">Could not load viewing requests. Make sure the Firestore index for viewingRequests (sellerId ASC, createdAt DESC) is created.</div>';
+  }
+};
+
+window.reRenderViewingCards = function(viewings, container) {
+  if (!container) return;
+  if (!viewings || viewings.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:40px;text-align:center;"><div style="font-size:36px;margin-bottom:12px;">🏠</div>No viewing requests yet.<br>When buyers book viewings on your properties, they will appear here.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  viewings.forEach(function(r) {
+    var statusClass = { pending:'re-status-pending', confirmed:'re-status-confirmed', declined:'re-status-declined', done:'re-status-done', payment_submitted:'re-status-confirmed', completed:'re-status-confirmed' }[r.status] || 're-status-pending';
+    var statusLabel = { pending:'Pending', confirmed:'Confirmed', declined:'Declined', done:'Viewed', payment_submitted:'Payment received', completed:'Completed' }[r.status] || r.status;
+    var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '—';
+    var card = document.createElement('div');
+    card.className = 're-view-card';
+
+    var actionBtns = '';
+    if (r.status === 'pending') {
+      actionBtns = '<div style="display:flex;gap:8px;margin-top:12px;">' +
+        '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-weight:700;" data-action="confirm-viewing" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">\u2713 Confirm viewing</button>' +
+        '<button class="btn btn-sm btn-ghost" data-action="decline-viewing" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">\u2717 Decline</button>' +
+        '</div>';
+    } else if (r.status === 'payment_submitted') {
+      actionBtns = '<div style="margin-top:12px;padding:10px 14px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+        '<div><div style="font-size:12.5px;font-weight:700;color:var(--green);">💰 Payment submitted by buyer</div>' +
+        '<div style="font-size:12px;color:var(--text3);">Ref: ' + (r.paymentRef||'—') + '</div></div>' +
+        '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" data-action="verify-payment" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">Verify &amp; confirm</button>' +
+        '</div>';
+    } else if (r.status === 'completed') {
+      actionBtns = '<div style="margin-top:10px;padding:8px 12px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);font-size:12.5px;color:var(--green);font-weight:700;">🎉 Sale completed!</div>';
+    }
+
+    card.innerHTML =
+      '<div class="re-view-card-hd">' +
+        '<span style="font-size:16px;">👤</span> ' + (r.buyerName||'Buyer') +
+        '<span class="re-view-status ' + statusClass + '">' + statusLabel + '</span>' +
+      '</div>' +
+      '<div style="font-size:12.5px;color:var(--text2);margin:4px 0 2px;font-weight:600;">' + (r.productName||'Property') + '</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">📅 ' + slotTxt + ' &nbsp;|&nbsp; 📧 ' + (r.buyerEmail||'—') + '</div>' +
+      (r.note ? '<div style="font-size:12.5px;color:var(--text2);background:var(--bg3);padding:8px 12px;border-radius:var(--radius-xs);margin-bottom:6px;font-style:italic;">"' + r.note + '"</div>' : '') +
+      actionBtns;
+
+    container.appendChild(card);
+  });
+};
+
+// ─── BUYER: Show interest modal after viewing ──────────────────────
+window.reShowInterestModal = function(requestId, productName, sellerId) {
+  window._reInterestData = { requestId, productName, sellerId };
+  var nameEl = document.getElementById('re-interest-name');
+  if (nameEl) nameEl.textContent = productName;
+  var modal = document.getElementById('re-interest-modal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.reSubmitInterest = async function(interested) {
+  var modal = document.getElementById('re-interest-modal');
+  if (modal) modal.style.display = 'none';
+  var d = window._reInterestData;
+  if (!d) return;
+
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  try {
+    await fns.updateDoc(fns.doc(db, 'viewingRequests', d.requestId), {
+      status: 'done',
+      buyerInterested: interested,
+    });
+
+    if (interested) {
+      // Fetch product price and show payment modal
+      var snap = await fns.getDoc(fns.doc(db, 'products', window._reInterestProductId || ''));
+      var pData = snap.exists() ? snap.data() : {};
+      var amountEl = document.getElementById('re-pay-amount');
+      var currEl = document.getElementById('re-pay-currency');
+      var titleEl = document.getElementById('re-pay-title');
+      if (amountEl) amountEl.textContent = pData.currency ? pData.currency + ' ' + Number(pData.price||0).toLocaleString() : Number(pData.price||0).toLocaleString();
+      if (currEl) currEl.textContent = pData.currency || '';
+      if (titleEl) titleEl.textContent = d.productName;
+      window._rePayProduct = { productId: window._reInterestProductId, productName: d.productName, sellerId: d.sellerId, requestId: d.requestId };
+      var payModal = document.getElementById('re-payment-modal');
+      if (payModal) payModal.style.display = 'flex';
+    } else {
+      showToast('Thanks for your feedback. The seller has been notified.');
+      await fns.addDoc(fns.collection(db,'notifications'), {
+        userId: d.sellerId,
+        type: 'viewing_not_interested',
+        title: 'Buyer not interested',
+        body: ((window._currentUser&&window._currentUser.fullName)||'The buyer') + ' viewed ' + d.productName + ' and has decided not to proceed.',
+        read: false,
+        createdAt: fns.serverTimestamp(),
+      });
+    }
+  } catch(e) { console.error(e); showToast('Could not save your response.'); }
+};
+
+// ─── BUYER: My Viewings tab (in buyer profile / orders area) ────────
+window.reLoadBuyerViewings = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('re-buyer-viewings-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(
+      fns.collection(db,'viewingRequests'),
+      fns.where('buyerId','==',user.uid),
+      fns.orderBy('createdAt','desc')
+    ));
+    if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No viewings booked yet.</div>'; return; }
+    el.innerHTML = '';
+    snap.docs.forEach(function(d) {
+      var r = d.data();
+      var statusLabel = { pending:'Awaiting confirmation', confirmed:'Confirmed — visit the property!', declined:'Declined by seller', done:'Viewing done', payment_submitted:'Payment submitted — awaiting verification', completed:'Completed!' }[r.status] || r.status;
+      var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--green)', completed:'var(--green)' }[r.status] || 'var(--text3)';
+      var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '—';
+      var card = document.createElement('div');
+      card.className = 're-buy-view-card';
+
+      var actionBtns = '';
+      if (r.status === 'confirmed') {
+        actionBtns = '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-top:10px;" data-action="mark-viewing-done" data-rid="' + d.id + '" data-pid="' + r.productId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '" data-sid="' + r.sellerId + '">Mark viewing as done \u2192</button>';
+      }
+
+      card.innerHTML =
+        '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">' + (r.productName||'Property') + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">📅 ' + slotTxt + '</div>' +
+        '<div style="font-size:12.5px;font-weight:700;color:' + statusColor + ';margin-bottom:6px;">' + statusLabel + '</div>' +
+        actionBtns;
+
+      el.appendChild(card);
+    });
+  } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px;">Could not load viewings.</div>'; }
+};
+
+// ─── FIREBASE INDEXES NEEDED FOR VIEWINGS ─────────────────────────
+// Firestore composite indexes required:
+// Collection: viewingRequests
+//   sellerId ASC + createdAt DESC
+//   buyerId  ASC + createdAt DESC
+// Create them at: https://console.firebase.google.com
+
+// ── Data-attribute event delegation for viewing request buttons ──────
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  var rid    = btn.dataset.rid;
+  var bid    = btn.dataset.bid;
+  var pname  = btn.dataset.pname;
+  if (action === 'confirm-viewing') reRespondViewing(rid, 'confirmed', bid, pname);
+  if (action === 'decline-viewing') reRespondViewing(rid, 'declined',  bid, pname);
+  if (action === 'verify-payment')  reVerifyPayment(rid, bid, pname);
+  if (action === 'mark-viewing-done') {
+    window._reInterestProductId = btn.dataset.pid;
+    if(typeof reShowInterestModal==='function') reShowInterestModal(rid, btn.dataset.pname, btn.dataset.sid);
+  }
+});
 </script>
 
 </body>
