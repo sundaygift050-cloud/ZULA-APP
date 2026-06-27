@@ -2751,7 +2751,8 @@ p{color:var(--text2);margin:0 0 1em;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
          sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
-         updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+         updateProfile, browserLocalStoragePersistence, setPersistence }
+         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
          getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
          updateDoc, arrayUnion, arrayRemove, increment, deleteDoc }
@@ -2771,12 +2772,51 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
+// ── KEEP USER LOGGED IN across refreshes (localStorage persistence) ──
+setPersistence(auth, browserLocalStoragePersistence).catch(e => console.warn('Persistence:', e));
+
 window._auth = auth;
 window._db   = db;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
   doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
   where, onSnapshot, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc };
+
+// ── INACTIVITY AUTO-LOGOUT (10 minutes) ─────────────────────────────
+const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
+let _inactivityTimer = null;
+
+function resetInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  if (!auth.currentUser) return;
+  _inactivityTimer = setTimeout(async () => {
+    await signOut(auth);
+    localStorage.removeItem('zula_last_page');
+    showPage('home');
+    showToast('You were signed out after 10 minutes of inactivity.');
+  }, INACTIVITY_MS);
+}
+
+['click','keydown','mousemove','touchstart','scroll'].forEach(evt =>
+  document.addEventListener(evt, resetInactivityTimer, { passive: true })
+);
+
+// ── SAVE & RESTORE LAST PAGE across refreshes ────────────────────────
+const _protectedPages = ['marketplace','profile','seller-dashboard','messaging',
+  'settings','notifications','addproduct','verification','my-orders','admin'];
+
+const _origShowPage2 = window.showPage;
+window.showPage = function(name) {
+  if (typeof _origShowPage2 === 'function') _origShowPage2(name);
+  else {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const t = document.getElementById('page-' + name);
+    if (t) { t.classList.add('active'); window.scrollTo(0,0); }
+  }
+  if (_protectedPages.some(p => name.startsWith(p))) {
+    localStorage.setItem('zula_last_page', name);
+  }
+};
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
@@ -2800,8 +2840,18 @@ onAuthStateChanged(auth, async (user) => {
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
     }
+    // ── Restore last page after refresh ──
+    const lastPage = localStorage.getItem('zula_last_page');
+    if (lastPage) {
+      setTimeout(() => showPage(lastPage), 300);
+    } else {
+      setTimeout(() => showPage('marketplace'), 300);
+    }
+    // Start inactivity timer
+    resetInactivityTimer();
   } else {
     window._currentUser = null;
+    clearTimeout(_inactivityTimer);
   }
 });
 
@@ -2887,8 +2937,10 @@ window.doSignup = function() {
 };
 
 window.zulaSignOut = function() {
+  clearTimeout(_inactivityTimer);
   signOut(auth).then(() => {
     window._currentUser = null;
+    localStorage.removeItem('zula_last_page');
     showToast('👋 Signed out.');
     showPage('home');
   });
