@@ -777,9 +777,9 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('home')">Home</a>
-        <a onclick="requireAuth('marketplace')">Browse</a>
+        <a onclick="showPage('marketplace')">Browse</a>
         <a onclick="showPage('affiliate-info')">Affiliate</a>
-        <a onclick="goAddProduct()">Sell</a>
+        <a onclick="requireAuth('sell')">Sell</a>
         <a onclick="showPage('login')" class="btn btn-ghost btn-sm" style="padding:7px 16px;">Sign in</a>
         <a onclick="showPage('signup')" class="btn btn-primary btn-sm" style="padding:7px 16px;">Join free</a>
       </nav>
@@ -793,7 +793,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <h1>Buy anything.<br>Sell everything.<br><em>Earn on every share.</em></h1>
       <p class="lede">Physical goods, digital downloads, online courses — all in one place, in your currency. Real sellers, real products, escrow-protected payments.</p>
       <div class="hero-cta">
-        <button class="btn btn-primary" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
+        <button class="btn btn-primary" style="font-size:15px;padding:14px 28px;" onclick="showPage('marketplace')">Start shopping →</button>
         <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-info')">Become an affiliate</button>
       </div>
       <div class="hero-stats">
@@ -2777,6 +2777,7 @@ setPersistence(auth, browserLocalStoragePersistence).catch(e => console.warn('Pe
 
 window._auth = auth;
 window._db   = db;
+window._firebaseReady = true;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
   doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
@@ -2805,16 +2806,12 @@ function resetInactivityTimer() {
 const _protectedPages = ['marketplace','profile','seller-dashboard','messaging',
   'settings','notifications','addproduct','verification','my-orders','admin'];
 
-const _origShowPage2 = window.showPage;
+// Patch showPage to also save last page (non-destructive)
+const _spOrig = window.showPage;
 window.showPage = function(name) {
-  if (typeof _origShowPage2 === 'function') _origShowPage2(name);
-  else {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const t = document.getElementById('page-' + name);
-    if (t) { t.classList.add('active'); window.scrollTo(0,0); }
-  }
+  if (typeof _spOrig === 'function') _spOrig(name);
   if (_protectedPages.some(p => name.startsWith(p))) {
-    localStorage.setItem('zula_last_page', name);
+    try { localStorage.setItem('zula_last_page', name); } catch(e){}
   }
 };
 
@@ -2869,13 +2866,24 @@ function updateNavAvatar() {
 
 // ── AUTH FUNCTIONS ──────────────────────────────────────────────────
 window.doLogin = function() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
-  if (!email) { document.getElementById('login-email-err').classList.add('show'); return; }
-  if (!pass)  { document.getElementById('login-pass-err').classList.add('show'); return; }
+  const email = (document.getElementById('login-email')||{}).value||'';
+  const pass  = (document.getElementById('login-pass')||{}).value||'';
+  const emailErr = document.getElementById('login-email-err');
+  const passErr  = document.getElementById('login-pass-err');
+  if (emailErr) emailErr.classList.remove('show');
+  if (passErr)  passErr.classList.remove('show');
+  if (!email.trim()) { if(emailErr) emailErr.classList.add('show'); return; }
+  if (!pass)         { if(passErr)  passErr.classList.add('show');  return; }
   const btn = document.getElementById('login-btn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  signInWithEmailAndPassword(auth, email, pass)
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+  const fns = window._fns;
+  const auth = window._auth;
+  if (!fns || !auth) {
+    if(btn){btn.disabled=false;btn.textContent='Sign in \u2192';}
+    showToast('\u23f3 Still connecting, please tap Sign in again in a moment.');
+    return;
+  }
+  fns.signInWithEmailAndPassword(auth, email.trim(), pass)
     .then(r => {
       if (!r.user.emailVerified) {
         document.getElementById('verify-email-addr').textContent = r.user.email;
