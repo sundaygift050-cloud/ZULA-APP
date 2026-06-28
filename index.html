@@ -127,6 +127,19 @@ p{color:var(--text2);margin:0 0 1em;}
 @media(max-width:860px){.mkt-layout{grid-template-columns:1fr;}}
 .filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;height:fit-content;}
 .filter-panel h3{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+.fp-preset{background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;transition:.15s;font-family:var(--font-body);}
+.fp-preset:hover{border-color:var(--accent);color:var(--accent);}
+.fp-preset.active{background:rgba(124,92,252,.12);border-color:var(--accent);color:var(--accent);}
+/* Theme picker */
+.theme-opt{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:.15s;font-family:var(--font-body);}
+.theme-opt:hover{border-color:var(--border2);}
+.theme-opt.active{border-color:var(--accent);background:rgba(124,92,252,.08);}
+.theme-swatch{width:48px;height:32px;border-radius:6px;border:1px solid var(--border);}
+.theme-opt-label{font-size:12.5px;font-weight:600;color:var(--text2);}
+.theme-opt.active .theme-opt-label{color:var(--accent);}
+/* Password strength bars */
+.sec-str-bar{flex:1;height:4px;border-radius:2px;background:var(--border);transition:.2s;}
+
 .filter-group{margin-bottom:20px;}
 .filter-group h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);}
 .fcheck{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:7px;cursor:pointer;}
@@ -991,6 +1004,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <a onclick="showPage('seller-dashboard')" title="Seller dashboard"><span class="hide-mobile">Seller</span><span style="display:none;" class="show-mobile">📊</span></a>
         <a onclick="showPage('profile')"><span class="hide-mobile">Profile</span><span style="display:none;" class="show-mobile">👤</span></a>
         <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬 <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
+        <a onclick="notifOpen()" style="position:relative;" title="Notifications" class="hide-mobile">🔔 <span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="openWishlist()" style="position:relative;" title="Wishlist" class="hide-mobile">❤️</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒 <span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
@@ -1016,22 +1030,85 @@ p{color:var(--text2);margin:0 0 1em;}
     </div>
   </header>
   <div class="wrap mkt-layout">
-    <aside class="filter-panel">
-      <h3>Filters</h3>
+    <aside class="filter-panel" id="filter-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="margin:0;">Filters</h3>
+        <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()" id="filter-clear-btn" style="display:none;font-size:11.5px;padding:4px 10px;">Clear all</button>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-group">
+        <h4>Price range</h4>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Min (₦)</div>
+            <input type="number" id="filter-price-min" placeholder="0" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Max (₦)</div>
+            <input type="number" id="filter-price-max" placeholder="Any" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          </div>
+        </div>
+        <!-- Quick price presets -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="fp-preset" onclick="setFilterPreset(0,5000)">Under ₦5k</button>
+          <button class="fp-preset" onclick="setFilterPreset(5000,20000)">₦5k–20k</button>
+          <button class="fp-preset" onclick="setFilterPreset(20000,100000)">₦20k–100k</button>
+          <button class="fp-preset" onclick="setFilterPreset(100000,0)">₦100k+</button>
+        </div>
+      </div>
+
+      <!-- Category -->
       <div class="filter-group">
         <h4>Category</h4>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Fashion</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Electronics</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Ebooks</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Courses</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Beauty</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Other</label>
+        <label class="fcheck"><input type="checkbox" value="fashion" onchange="applyFilters()"> Fashion</label>
+        <label class="fcheck"><input type="checkbox" value="electronics" onchange="applyFilters()"> Electronics</label>
+        <label class="fcheck"><input type="checkbox" value="ebooks" onchange="applyFilters()"> Ebooks</label>
+        <label class="fcheck"><input type="checkbox" value="courses" onchange="applyFilters()"> Courses</label>
+        <label class="fcheck"><input type="checkbox" value="beauty" onchange="applyFilters()"> Beauty</label>
+        <label class="fcheck"><input type="checkbox" value="realestate" onchange="applyFilters()"> Real Estate</label>
+        <label class="fcheck"><input type="checkbox" value="food" onchange="applyFilters()"> Food & Drinks</label>
+        <label class="fcheck"><input type="checkbox" value="other" onchange="applyFilters()"> Other</label>
       </div>
+
+      <!-- Type -->
       <div class="filter-group">
-        <h4>Type</h4>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Physical</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Digital</label>
-        <label class="fcheck"><input type="checkbox" onchange="applyFilters()"> Course</label>
+        <h4>Product type</h4>
+        <label class="fcheck"><input type="checkbox" value="physical" onchange="applyFilters()"> Physical</label>
+        <label class="fcheck"><input type="checkbox" value="digital" onchange="applyFilters()"> Digital</label>
+        <label class="fcheck"><input type="checkbox" value="course" onchange="applyFilters()"> Course</label>
+        <label class="fcheck"><input type="checkbox" value="realestate" onchange="applyFilters()"> Real Estate</label>
+        <label class="fcheck"><input type="checkbox" value="service" onchange="applyFilters()"> Service</label>
+      </div>
+
+      <!-- Rating -->
+      <div class="filter-group">
+        <h4>Min. rating</h4>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> ★★★ 3+ stars</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()"> ★★★★ 4+ stars</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> ★★★★★ 4.5+ stars</label>
+        </div>
+      </div>
+
+      <!-- Seller -->
+      <div class="filter-group">
+        <h4>Seller</h4>
+        <label class="fcheck"><input type="checkbox" id="filter-verified-only" onchange="applyFilters()"> 🛡 Verified sellers only</label>
+        <label class="fcheck"><input type="checkbox" id="filter-has-affiliate" onchange="applyFilters()"> 💰 Has affiliate programme</label>
+      </div>
+
+      <!-- Sort -->
+      <div class="filter-group" style="border:none;padding-bottom:0;">
+        <h4>Sort by</h4>
+        <select id="filter-sort" onchange="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <option value="newest">Newest first</option>
+          <option value="price_asc">Price: low to high</option>
+          <option value="price_desc">Price: high to low</option>
+          <option value="rating">Highest rated</option>
+          <option value="name">Name A–Z</option>
+        </select>
       </div>
     </aside>
     <main>
@@ -1112,6 +1189,12 @@ p{color:var(--text2);margin:0 0 1em;}
             <input id="pd-affiliate-link" readonly style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-size:12px;" value="">
             <button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="pdCopyAffLink()">Copy</button>
           </div>
+        </div>
+
+        <!-- Social share row -->
+        <div style="margin-top:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Share this product</div>
+          <div id="pd-share-row" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
         </div>
       </div>
     </div>
@@ -2720,13 +2803,34 @@ if (_kycOrigShowPage) {
       <div>
         <!-- ACCOUNT -->
         <div class="settings-section active" id="stab-account">
+          <!-- Avatar / Profile Photo Upload -->
+          <div class="settings-card">
+            <h3>Profile photo</h3>
+            <div class="sc-sub">Your photo appears on your public profile and reviews</div>
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="position:relative;cursor:pointer;" onclick="document.getElementById('avatar-upload-input').click()">
+                <div id="st-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;border:3px solid var(--border2);flex-shrink:0;">?</div>
+                <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--surface);">📷</div>
+                <input type="file" id="avatar-upload-input" accept="image/*" style="display:none" onchange="avatarHandleUpload(this)">
+              </div>
+              <div>
+                <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">Tap the photo to change it</div>
+                <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px;">JPG or PNG · Square image recommended · Max 5MB</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="btn btn-primary btn-sm" id="avatar-save-btn" style="display:none;" onclick="avatarSavePhoto()">Save photo</button>
+                  <button class="btn btn-ghost btn-sm" id="avatar-remove-btn" style="display:none;" onclick="avatarRemovePhoto()">Remove photo</button>
+                </div>
+              </div>
+            </div>
+            <div id="avatar-upload-progress" style="display:none;margin-top:12px;font-size:12.5px;color:var(--accent);">⏳ Uploading…</div>
+          </div>
           <div class="settings-card">
             <h3>Account information</h3>
             <div class="sc-sub">Update your name, phone and bio</div>
             <div class="form-field"><label>Full name</label><input type="text" id="st-name" placeholder="Your full name"></div>
             <div class="form-field"><label>Phone number</label><input type="tel" id="st-phone" placeholder="+234 800 000 0000"></div>
             <div class="form-field"><label>Bio</label><textarea id="st-bio" style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Tell buyers about yourself…"></textarea></div>
-            <button class="btn btn-primary btn-sm" onclick="saveSettings();showToast('✅ Account updated!')">Save changes</button>
+            <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save changes</button>
           </div>
           <div class="settings-card">
             <h3>Email address</h3>
@@ -2793,15 +2897,39 @@ if (_kycOrigShowPage) {
             </div>
           </div>
         </div>
-        <!-- SECURITY -->
+        <!-- SECURITY — wired to Firebase Auth -->
         <div class="settings-section" id="stab-security">
           <div class="settings-card">
-            <h3>Password</h3>
-            <div class="sc-sub">Change your account password</div>
-            <div class="form-field"><label>Current password</label><input type="password" placeholder="Enter current password"></div>
-            <div class="form-field"><label>New password</label><input type="password" placeholder="Min. 8 characters"></div>
-            <div class="form-field"><label>Confirm new password</label><input type="password" placeholder="Repeat new password"></div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('✅ Password updated!')">Update password</button>
+            <h3>Change password</h3>
+            <div class="sc-sub">Enter your current password to set a new one</div>
+            <div class="form-field">
+              <label>Current password</label>
+              <div style="position:relative;">
+                <input type="password" id="sec-curr-pass" placeholder="Enter current password" autocomplete="current-password">
+                <button type="button" onclick="secToggleVis('sec-curr-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;">👁</button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>New password</label>
+              <div style="position:relative;">
+                <input type="password" id="sec-new-pass" placeholder="Min. 8 characters" autocomplete="new-password" oninput="secCheckStrength(this.value)">
+                <button type="button" onclick="secToggleVis('sec-new-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;">👁</button>
+              </div>
+              <!-- Password strength meter -->
+              <div style="margin-top:8px;display:flex;gap:4px;" id="sec-strength-bars">
+                <div class="sec-str-bar" id="ssb-1"></div>
+                <div class="sec-str-bar" id="ssb-2"></div>
+                <div class="sec-str-bar" id="ssb-3"></div>
+                <div class="sec-str-bar" id="ssb-4"></div>
+              </div>
+              <div id="sec-strength-label" style="font-size:11.5px;color:var(--text3);margin-top:4px;"></div>
+            </div>
+            <div class="form-field">
+              <label>Confirm new password</label>
+              <input type="password" id="sec-confirm-pass" placeholder="Repeat new password" autocomplete="new-password">
+            </div>
+            <div id="sec-pass-err" style="display:none;font-size:12.5px;color:var(--red);margin-bottom:10px;padding:8px 12px;background:rgba(240,82,82,.08);border-radius:var(--radius-xs);"></div>
+            <button class="btn btn-primary btn-sm" id="sec-pass-btn" onclick="secChangePassword()">Update password</button>
           </div>
           <div class="settings-card">
             <h3>Two-factor authentication</h3>
@@ -2809,34 +2937,67 @@ if (_kycOrigShowPage) {
             <button class="btn btn-ghost btn-sm" onclick="showPage('twofa')">🔐 Set up 2FA →</button>
           </div>
         </div>
-        <!-- PAYOUT -->
+        <!-- PAYOUT — wired to Firestore -->
         <div class="settings-section" id="stab-payout">
           <div class="settings-card">
             <h3>Payout bank account</h3>
-            <div class="sc-sub">Where your seller earnings will be sent</div>
-            <div class="form-field"><label>Bank name</label><input type="text" placeholder="e.g. GTBank, Access Bank"></div>
-            <div class="form-field"><label>Account number</label><input type="text" placeholder="10-digit account number"></div>
-            <div class="form-field"><label>Account name</label><input type="text" placeholder="Exactly as it appears on account"></div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('✅ Payout details saved!')">Save bank details</button>
+            <div class="sc-sub">Where your seller earnings will be sent. Saved securely and used for all future payouts.</div>
+            <!-- Current saved bank display -->
+            <div id="st-payout-saved" style="display:none;background:rgba(39,201,122,.06);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:12px 16px;margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">✅ Saved bank account</div>
+              <div style="font-size:13px;font-weight:600;" id="st-payout-display-name">—</div>
+              <div style="font-size:12.5px;color:var(--text3);" id="st-payout-display-details">—</div>
+            </div>
+            <div class="form-field">
+              <label>Bank name <span style="color:var(--red);">*</span></label>
+              <input type="text" id="st-payout-bank" placeholder="e.g. GTBank, Access Bank, Opay">
+            </div>
+            <div class="form-field">
+              <label>Account number <span style="color:var(--red);">*</span></label>
+              <input type="text" id="st-payout-acct" placeholder="10-digit NUBAN account number" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+            <div class="form-field">
+              <label>Account name <span style="color:var(--red);">*</span></label>
+              <input type="text" id="st-payout-acct-name" placeholder="Exactly as it appears on your account">
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">⚠️ Make sure the account name matches your ID. Wrong details may delay payouts.</div>
+            <button class="btn btn-primary btn-sm" id="st-payout-save-btn" onclick="savePayoutSettings()">Save bank details</button>
           </div>
         </div>
-        <!-- DISPLAY -->
+        <!-- DISPLAY — with working dark/light/auto theme toggle -->
         <div class="settings-section" id="stab-display">
           <div class="settings-card">
-            <h3>Display preferences</h3>
-            <div class="sc-sub">Customise how ZÚLA looks for you</div>
-            <div style="margin-bottom:16px;">
-              <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">Currency display</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm">NGN ₦</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Currency switched to USD')">USD $</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Currency switched to GBP')">GBP £</button>
-              </div>
+            <h3>Appearance</h3>
+            <div class="sc-sub">Choose your preferred colour theme</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;" id="theme-picker">
+              <button class="theme-opt active" id="theme-btn-dark" onclick="setTheme('dark')">
+                <div class="theme-swatch" style="background:linear-gradient(135deg,#0d0d0f 50%,#1e1e22 50%);"></div>
+                <div class="theme-opt-label">Dark</div>
+              </button>
+              <button class="theme-opt" id="theme-btn-light" onclick="setTheme('light')">
+                <div class="theme-swatch" style="background:linear-gradient(135deg,#f5f5f7 50%,#ffffff 50%);"></div>
+                <div class="theme-opt-label">Light</div>
+              </button>
+              <button class="theme-opt" id="theme-btn-auto" onclick="setTheme('auto')">
+                <div class="theme-swatch" style="background:linear-gradient(135deg,#0d0d0f 50%,#f5f5f7 50%);"></div>
+                <div class="theme-opt-label">Auto</div>
+              </button>
             </div>
-            <div style="margin-bottom:16px;">
-              <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;">Language</div>
-              <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Change language</button>
+            <div style="font-size:11.5px;color:var(--text3);">Auto follows your device's system setting.</div>
+          </div>
+          <div class="settings-card">
+            <h3>Currency display</h3>
+            <div class="sc-sub">How prices are shown across the app</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" id="curr-btn-ngn" onclick="setCurrency('NGN','₦')">NGN ₦</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-usd" onclick="setCurrency('USD','$')">USD $</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-gbp" onclick="setCurrency('GBP','£')">GBP £</button>
             </div>
+          </div>
+          <div class="settings-card">
+            <h3>Language</h3>
+            <div class="sc-sub">App display language</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('language')">🌐 Change language</button>
           </div>
         </div>
         <!-- DANGER ZONE -->
@@ -3192,8 +3353,15 @@ onAuthStateChanged(auth, async (user) => {
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
     }
+    // Start notification badge polling
+    notifPollBadge();
+    if (window._notifPollInterval) clearInterval(window._notifPollInterval);
+    window._notifPollInterval = setInterval(notifPollBadge, 60000); // refresh every 60s
   } else {
     window._currentUser = null;
+    if (window._notifPollInterval) { clearInterval(window._notifPollInterval); window._notifPollInterval = null; }
+    var badge = document.getElementById('nav-notif-badge');
+    if (badge) badge.style.display = 'none';
   }
 });
 
@@ -3205,7 +3373,20 @@ function updateNavAvatar() {
    'nav-avatar-chat','nav-avatar-settings','nav-avatar-notif',
    'nav-avatar-verif','nav-avatar-v2','nav-avatar-myprofile'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = initials || '?';
+    if (!el) return;
+    if (u.photoUrl) {
+      el.innerHTML = '<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      el.textContent = initials || '?';
+    }
+  });
+  // Also update all .avatar-btn elements not specifically IDed
+  document.querySelectorAll('.avatar-btn:not([id])').forEach(function(el) {
+    if (u.photoUrl) {
+      el.innerHTML = '<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      el.textContent = initials || '?';
+    }
   });
 }
 
@@ -3346,33 +3527,133 @@ function renderProducts(products) {
   }
   if (empty) empty.style.display = 'none';
   if (count) count.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
-  grid.innerHTML = products.map(p => `
-    <div class="pcard" onclick="viewProduct('${p.id}')">
-      <div class="pcard-img">${p.emoji || '📦'}</div>
+  grid.innerHTML = products.map(p => {
+    const stars = p.avgRating ? '★'.repeat(Math.round(p.avgRating)) + '☆'.repeat(5 - Math.round(p.avgRating)) : '';
+    const ratingHtml = p.avgRating ? `<div style="font-size:11px;color:var(--gold);letter-spacing:.5px;" title="${p.avgRating} / 5">${stars} <span style="color:var(--text3);">(${p.reviewCount||0})</span></div>` : '';
+    const verifiedBadge = p.sellerVerified ? '<span style="font-size:10px;color:var(--accent);margin-left:4px;">🛡</span>' : '';
+    const imgHtml = p.photo ? `<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
+    return `<div class="pcard" onclick="viewProduct('${p.id}')">
+      <div class="pcard-img" style="overflow:hidden;">${imgHtml}</div>
       <div class="pcard-body">
         <div class="pcard-name">${p.name}</div>
-        <div class="pcard-seller">By ${p.sellerName || 'ZÚLA Seller'}</div>
+        <div class="pcard-seller" style="display:flex;align-items:center;">By ${p.sellerName || 'ZÚLA Seller'}${verifiedBadge}</div>
+        ${ratingHtml}
         <div class="pcard-foot">
-          <div class="pcard-price">NGN ${Number(p.price).toLocaleString()}</div>
+          <div class="pcard-price">${p.currency||'NGN'} ${Number(p.price).toLocaleString()}</div>
           <div class="pcard-type">${p.type || 'Physical'}</div>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
+// Current search query (kept in sync by the search input)
+window._searchQuery = '';
+
 window.filterProducts = function(query) {
-  if (!window._allProducts) return;
-  const q = query.toLowerCase();
-  const filtered = window._allProducts.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    (p.description||'').toLowerCase().includes(q) ||
-    (p.category||'').toLowerCase().includes(q)
-  );
-  renderProducts(filtered);
+  window._searchQuery = query;
+  applyFilters();
 };
 
-window.applyFilters = function() { };
+window.applyFilters = function() {
+  if (!window._allProducts) return;
+
+  const q = (window._searchQuery || '').toLowerCase().trim();
+  const priceMin = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
+  const priceMax = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
+  const minRating = parseFloat(document.querySelector('input[name="filter-rating"]:checked')?.value || '0');
+  const verifiedOnly = document.getElementById('filter-verified-only')?.checked;
+  const hasAffiliate = document.getElementById('filter-has-affiliate')?.checked;
+  const sort = document.getElementById('filter-sort')?.value || 'newest';
+
+  // Collect checked categories & types
+  const checkedCats  = Array.from(document.querySelectorAll('.filter-panel input[type="checkbox"][value]'))
+    .filter(cb => cb.checked && ['fashion','electronics','ebooks','courses','beauty','realestate','food','other'].includes(cb.value))
+    .map(cb => cb.value.toLowerCase());
+  const checkedTypes = Array.from(document.querySelectorAll('.filter-panel input[type="checkbox"][value]'))
+    .filter(cb => cb.checked && ['physical','digital','course','service'].includes(cb.value))
+    .map(cb => cb.value.toLowerCase());
+
+  let filtered = window._allProducts.filter(p => {
+    // Search text
+    if (q && !(
+      (p.name||'').toLowerCase().includes(q) ||
+      (p.description||'').toLowerCase().includes(q) ||
+      (p.category||'').toLowerCase().includes(q) ||
+      (p.sellerName||'').toLowerCase().includes(q)
+    )) return false;
+    // Price
+    const price = Number(p.price || 0);
+    if (price < priceMin) return false;
+    if (priceMax !== Infinity && price > priceMax) return false;
+    // Category checkboxes
+    if (checkedCats.length && !checkedCats.includes((p.category||'').toLowerCase())) return false;
+    // Type checkboxes
+    if (checkedTypes.length && !checkedTypes.includes((p.type||'').toLowerCase())) return false;
+    // Rating
+    if (minRating > 0 && (Number(p.avgRating)||0) < minRating) return false;
+    // Verified
+    if (verifiedOnly && !p.sellerVerified) return false;
+    // Affiliate
+    if (hasAffiliate && !p.commission) return false;
+    return true;
+  });
+
+  // Sort
+  filtered = filtered.slice().sort((a, b) => {
+    if (sort === 'price_asc')  return Number(a.price||0) - Number(b.price||0);
+    if (sort === 'price_desc') return Number(b.price||0) - Number(a.price||0);
+    if (sort === 'rating')     return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
+    if (sort === 'name')       return (a.name||'').localeCompare(b.name||'');
+    // newest: rely on original order from Firestore (already sorted desc by createdAt)
+    return 0;
+  });
+
+  renderProducts(filtered);
+
+  // Show "Clear all" button when any filter is active
+  const anyActive = q || priceMin > 0 || priceMax !== Infinity || minRating > 0 ||
+    verifiedOnly || hasAffiliate || checkedCats.length || checkedTypes.length || sort !== 'newest';
+  const clearBtn = document.getElementById('filter-clear-btn');
+  if (clearBtn) clearBtn.style.display = anyActive ? '' : 'none';
+
+  // Update the page title to show search context
+  const titleEl = document.querySelector('.mkt-topbar h2');
+  if (titleEl) titleEl.textContent = q ? `Results for "${q}"` : 'All products';
+};
+
+window.setFilterPreset = function(min, max) {
+  const minEl = document.getElementById('filter-price-min');
+  const maxEl = document.getElementById('filter-price-max');
+  if (minEl) minEl.value = min > 0 ? min : '';
+  if (maxEl) maxEl.value = max > 0 ? max : '';
+  // Highlight active preset
+  document.querySelectorAll('.fp-preset').forEach(function(b) { b.classList.remove('active'); });
+  event && event.target && event.target.classList.add('active');
+  applyFilters();
+};
+
+window.clearAllFilters = function() {
+  window._searchQuery = '';
+  // Clear search input
+  const searchInput = document.querySelector('.hdr-search input');
+  if (searchInput) searchInput.value = '';
+  // Clear price inputs
+  ['filter-price-min','filter-price-max'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  // Uncheck all checkboxes in filter panel
+  document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+  // Reset rating
+  const anyRating = document.querySelector('input[name="filter-rating"][value="0"]');
+  if (anyRating) anyRating.checked = true;
+  // Reset sort
+  const sortEl = document.getElementById('filter-sort');
+  if (sortEl) sortEl.value = 'newest';
+  // Remove preset highlights
+  document.querySelectorAll('.fp-preset').forEach(function(b) { b.classList.remove('active'); });
+  applyFilters();
+};
 
 window.viewProduct = function(id) {
   const p = (window._allProducts||[]).find(x => x.id === id);
@@ -3502,17 +3783,271 @@ window.loadProfilePage = async function() {
 window.saveSettings = async function() {
   const user = auth.currentUser;
   if (!user) return;
-  const name  = document.getElementById('settings-name').value.trim();
-  const phone = document.getElementById('settings-phone').value.trim();
-  const bio   = document.getElementById('settings-bio') ? document.getElementById('settings-bio').value.trim() : '';
+  const name  = document.getElementById('st-name') ? document.getElementById('st-name').value.trim() : (document.getElementById('settings-name') ? document.getElementById('settings-name').value.trim() : '');
+  const phone = document.getElementById('st-phone') ? document.getElementById('st-phone').value.trim() : (document.getElementById('settings-phone') ? document.getElementById('settings-phone').value.trim() : '');
+  const bio   = document.getElementById('st-bio') ? document.getElementById('st-bio').value.trim() : (document.getElementById('settings-bio') ? document.getElementById('settings-bio').value.trim() : '');
   try {
     await window._fns.setDoc(doc(db, 'users', user.uid), { fullName: name, phone, bio }, { merge: true });
     if (window._currentUser) { window._currentUser.fullName = name; window._currentUser.phone = phone; window._currentUser.bio = bio; }
     const nameEl = document.getElementById('profile-name');
     if (nameEl && name) nameEl.textContent = name;
-    showToast('✅ Settings saved!');
+    showToast('✅ Account updated!');
   } catch(e) { showToast('❌ Could not save. Try again.'); }
 };
+
+// ── 1. PASSWORD CHANGE — wired to Firebase Auth ───────────────────
+window.secToggleVis = function(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+};
+
+window.secCheckStrength = function(val) {
+  var bars = [document.getElementById('ssb-1'), document.getElementById('ssb-2'), document.getElementById('ssb-3'), document.getElementById('ssb-4')];
+  var label = document.getElementById('sec-strength-label');
+  if (!bars[0]) return;
+  var score = 0;
+  if (val.length >= 8)  score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  var colours = ['','#e53935','#ff9800','#f5c842','#27c97a'];
+  var labels  = ['','Weak','Fair','Good','Strong'];
+  bars.forEach(function(b, i) { if (b) b.style.background = i < score ? colours[score] : 'var(--border)'; });
+  if (label) { label.textContent = val ? labels[score] : ''; label.style.color = colours[score]; }
+};
+
+window.secChangePassword = async function() {
+  var currPass = (document.getElementById('sec-curr-pass') || {}).value;
+  var newPass  = (document.getElementById('sec-new-pass') || {}).value;
+  var confPass = (document.getElementById('sec-confirm-pass') || {}).value;
+  var errEl    = document.getElementById('sec-pass-err');
+  var btn      = document.getElementById('sec-pass-btn');
+
+  var showErr = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = ''; } };
+  var hideErr = function() { if (errEl) errEl.style.display = 'none'; };
+  hideErr();
+
+  if (!currPass) { showErr('Please enter your current password.'); return; }
+  if (!newPass || newPass.length < 8) { showErr('New password must be at least 8 characters.'); return; }
+  if (newPass !== confPass) { showErr('New passwords do not match.'); return; }
+  if (newPass === currPass) { showErr('New password must be different from your current password.'); return; }
+
+  var user = auth.currentUser;
+  if (!user || !user.email) { showErr('You must be signed in.'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+
+  try {
+    // Re-authenticate first
+    var credential = firebase.auth.EmailAuthProvider.credential(user.email, currPass);
+    await user.reauthenticateWithCredential(credential);
+    // Now update
+    await user.updatePassword(newPass);
+    hideErr();
+    ['sec-curr-pass','sec-new-pass','sec-confirm-pass'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+    secCheckStrength('');
+    showToast('✅ Password updated successfully!');
+  } catch(e) {
+    var msg = 'Could not update password.';
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Current password is incorrect.';
+    else if (e.code === 'auth/weak-password') msg = 'New password is too weak — use at least 8 characters with a mix of letters and numbers.';
+    else if (e.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait a moment and try again.';
+    else if (e.code === 'auth/requires-recent-login') msg = 'Session expired. Please sign out and sign in again before changing your password.';
+    showErr(msg);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Update password'; }
+  }
+};
+
+// ── 2. PAYOUT SETTINGS — saved to Firestore ──────────────────────
+window.savePayoutSettings = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in first.'); return; }
+
+  var bank  = (document.getElementById('st-payout-bank') || {}).value.trim();
+  var acct  = (document.getElementById('st-payout-acct') || {}).value.trim();
+  var name  = (document.getElementById('st-payout-acct-name') || {}).value.trim();
+  var btn   = document.getElementById('st-payout-save-btn');
+
+  if (!bank)  { showToast('Please enter your bank name.'); return; }
+  if (!acct || acct.length !== 10) { showToast('Account number must be exactly 10 digits.'); return; }
+  if (!name)  { showToast('Please enter the account name.'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    var payoutData = { bankName: bank, accountNumber: acct, accountName: name, payoutSetupAt: fns.serverTimestamp() };
+    await fns.setDoc(fns.doc(db, 'users', user.uid), { payout: payoutData }, { merge: true });
+    if (window._currentUser) window._currentUser.payout = payoutData;
+    // Update display
+    payoutShowSaved(name, bank, acct);
+    showToast('✅ Bank details saved successfully!');
+  } catch(e) { console.error(e); showToast('❌ Could not save bank details. Try again.'); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = 'Save bank details'; } }
+};
+
+function payoutShowSaved(name, bank, acct) {
+  var box  = document.getElementById('st-payout-saved');
+  var dName = document.getElementById('st-payout-display-name');
+  var dDet  = document.getElementById('st-payout-display-details');
+  if (box)  box.style.display = '';
+  if (dName) dName.textContent = name;
+  if (dDet)  dDet.textContent  = bank + ' · ****' + acct.slice(-4);
+}
+
+// Load saved payout details when settings page opens
+window.settingsLoadPayout = function() {
+  var u = window._currentUser;
+  if (!u || !u.payout) return;
+  var p = u.payout;
+  var bankEl = document.getElementById('st-payout-bank');
+  var acctEl = document.getElementById('st-payout-acct');
+  var nameEl = document.getElementById('st-payout-acct-name');
+  if (bankEl && p.bankName)       bankEl.value = p.bankName;
+  if (acctEl && p.accountNumber)  acctEl.value = p.accountNumber;
+  if (nameEl && p.accountName)    nameEl.value = p.accountName;
+  if (p.accountName) payoutShowSaved(p.accountName, p.bankName || '', p.accountNumber || '');
+};
+
+// ── 3. DARK / LIGHT / AUTO THEME TOGGLE ──────────────────────────
+// Light theme CSS variable overrides injected into a <style> tag
+var _themeStyleEl = null;
+var _lightVars = [
+  '--bg:#f5f5f7','--bg2:#ebebed','--bg3:#e2e2e5',
+  '--surface:#ffffff','--surface2:#f0f0f2',
+  '--border:#d0d0d4','--border2:#c0c0c4',
+  '--text:#111114','--text2:#333338','--text3:#777780',
+  '--accent:#6c47e8','--accent2:#8b6ef5',
+  '--green:#1b9e5a','--red:#d32f2f','--gold:#c07d00'
+].join(';');
+
+window.setTheme = function(mode) {
+  localStorage.setItem('zula_theme', mode);
+  applyTheme(mode);
+  ['dark','light','auto'].forEach(function(m) {
+    var b = document.getElementById('theme-btn-' + m);
+    if (b) b.classList.toggle('active', m === mode);
+  });
+};
+
+window.applyTheme = function(mode) {
+  if (!_themeStyleEl) {
+    _themeStyleEl = document.createElement('style');
+    _themeStyleEl.id = 'zula-theme-override';
+    document.head.appendChild(_themeStyleEl);
+  }
+  var isLight = mode === 'light' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: light)').matches);
+  _themeStyleEl.textContent = isLight ? ':root{' + _lightVars + '}' : '';
+  document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+};
+
+// Apply saved theme on load
+(function() {
+  var saved = localStorage.getItem('zula_theme') || 'dark';
+  window.applyTheme(saved);
+  // Listen for OS preference changes when in auto mode
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function() {
+    if (localStorage.getItem('zula_theme') === 'auto') window.applyTheme('auto');
+  });
+})();
+
+// ── 4. AVATAR / PROFILE PHOTO UPLOAD ─────────────────────────────
+var _pendingAvatarFile = null;
+var _pendingAvatarDataUrl = null;
+
+window.avatarHandleUpload = function(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Photo too large — max 5MB.'); return; }
+  if (!file.type.startsWith('image/')) { showToast('Please choose an image file.'); return; }
+  _pendingAvatarFile = file;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _pendingAvatarDataUrl = e.target.result;
+    var preview = document.getElementById('st-avatar-preview');
+    if (preview) preview.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    var saveBtn = document.getElementById('avatar-save-btn');
+    var rmBtn   = document.getElementById('avatar-remove-btn');
+    if (saveBtn) saveBtn.style.display = '';
+    if (rmBtn)   rmBtn.style.display   = '';
+  };
+  reader.readAsDataURL(file);
+};
+
+window.avatarSavePhoto = async function() {
+  if (!_pendingAvatarFile) return;
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in.'); return; }
+
+  var progress = document.getElementById('avatar-upload-progress');
+  var saveBtn  = document.getElementById('avatar-save-btn');
+  if (progress) progress.style.display = '';
+  if (saveBtn)  { saveBtn.disabled = true; saveBtn.textContent = 'Uploading…'; }
+
+  try {
+    var url = await uploadToCloudinary(_pendingAvatarFile, 'zula_avatars/' + user.uid);
+    // Save to Firestore
+    await fns.setDoc(fns.doc(db, 'users', user.uid), { photoUrl: url }, { merge: true });
+    if (window._currentUser) window._currentUser.photoUrl = url;
+    // Update all avatar buttons in the app
+    avatarApplyPhoto(url);
+    _pendingAvatarFile = null;
+    _pendingAvatarDataUrl = null;
+    showToast('✅ Profile photo updated!');
+    if (saveBtn) saveBtn.style.display = 'none';
+  } catch(e) { console.error(e); showToast('❌ Could not upload photo. Try again.'); }
+  finally {
+    if (progress) progress.style.display = 'none';
+    if (saveBtn)  { saveBtn.disabled = false; saveBtn.textContent = 'Save photo'; }
+  }
+};
+
+window.avatarRemovePhoto = async function() {
+  if (!confirm('Remove your profile photo?')) return;
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    await fns.setDoc(fns.doc(db, 'users', user.uid), { photoUrl: '' }, { merge: true });
+    if (window._currentUser) window._currentUser.photoUrl = '';
+    _pendingAvatarFile = null;
+    avatarApplyPhoto('');
+    showToast('Profile photo removed.');
+    var rmBtn = document.getElementById('avatar-remove-btn');
+    if (rmBtn) rmBtn.style.display = 'none';
+  } catch(e) { showToast('Could not remove photo.'); }
+};
+
+window.avatarApplyPhoto = function(url) {
+  // Update the large preview in settings
+  var preview = document.getElementById('st-avatar-preview');
+  if (preview) {
+    if (url) {
+      preview.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      var u = window._currentUser || {};
+      var initials = ((u.firstName||u.fullName||'')[0]||'?').toUpperCase();
+      preview.innerHTML = initials;
+    }
+  }
+  // Update all nav avatar buttons
+  document.querySelectorAll('.avatar-btn').forEach(function(el) {
+    if (url) {
+      el.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      var u = window._currentUser || {};
+      var initials = ((u.firstName||'')[0]||'') + ((u.lastName||'')[0]||'');
+      el.textContent = initials || '?';
+    }
+  });
+};
+
+// ── 5. SOCIAL SHARING on product detail page ────────────────────
 
 // ── VERIFICATION FILE UPLOADS (Cloudinary) ───────────────────────────
 const CLOUDINARY_CLOUD = 'dclahlchz';
@@ -7433,6 +7968,35 @@ window.pdCopyAffLink = function() {
   if (inp) { navigator.clipboard.writeText(inp.value); showToast('Affiliate link copied!'); }
 };
 
+// ── SOCIAL SHARING ────────────────────────────────────────────────
+window.pdRenderShareRow = function() {
+  var row = document.getElementById('pd-share-row');
+  if (!row) return;
+  var p = window._currentProduct;
+  if (!p) return;
+  var url = encodeURIComponent(window.location.href.split('?')[0] + '?product=' + p.id);
+  var text = encodeURIComponent('Check out ' + (p.name||'this product') + ' on ZÚLA — ' + (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString());
+  var shares = [
+    { label:'WhatsApp', icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.103 1.512 5.827L0 24l6.272-1.494A11.947 11.947 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.6a9.6 9.6 0 01-4.896-1.336l-.352-.208-3.648.868.882-3.54-.228-.364A9.6 9.6 0 0112 2.4c5.292 0 9.6 4.308 9.6 9.6s-4.308 9.6-9.6 9.6z"/></svg>', color:'#25d366', href:'https://wa.me/?text='+text+'%20'+url },
+    { label:'X', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>', color:'#000', href:'https://twitter.com/intent/tweet?text='+text+'&url='+url },
+    { label:'Telegram', icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>', color:'#2AABEE', href:'https://t.me/share/url?url='+url+'&text='+text },
+    { label:'Facebook', icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>', color:'#1877F2', href:'https://www.facebook.com/sharer/sharer.php?u='+url },
+    { label:'Copy link', icon:'🔗', color:'var(--text3)', isBtn: true },
+  ];
+  row.innerHTML = shares.map(function(s) {
+    if (s.isBtn) {
+      return '<button onclick="pdShareCopyLink()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);">'+s.icon+' '+s.label+'</button>';
+    }
+    return '<a href="'+s.href+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:'+s.color+';font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s;" onmouseenter="this.style.borderColor=\''+s.color+'\'" onmouseleave="this.style.borderColor=\'var(--border)\'">'+s.icon+' '+s.label+'</a>';
+  }).join('');
+};
+
+window.pdShareCopyLink = function() {
+  var p = window._currentProduct;
+  var url = window.location.href.split('?')[0] + (p ? '?product=' + p.id : '');
+  navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Link copied!'); }).catch(function(){ showToast('Link: ' + url); });
+};
+
 window.pdWatchCourse = function() {
   var p = window._currentProduct;
   if (!p) return;
@@ -7576,11 +8140,39 @@ function notifRender(items) {
   }).join('');
 }
 
+window.notifPollBadge = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user || !db || !fns) return;
+  try {
+    var snap = await fns.getDocs(fns.query(
+      fns.collection(db, 'notifications'),
+      fns.where('userId', '==', user.uid),
+      fns.where('read', '==', false)
+    ));
+    var unread = snap.size;
+    var badge = document.getElementById('nav-notif-badge');
+    if (badge) {
+      badge.textContent = unread > 9 ? '9+' : unread;
+      badge.style.display = unread > 0 ? 'inline-block' : 'none';
+    }
+  } catch(e) { /* silent fail — badge is best-effort */ }
+};
+
+
 window.notifMarkRead = async function(id, el) {
   var db = window._db, fns = window._fns;
   try {
     await fns.updateDoc(fns.doc(db,'notifications',id), { read:true });
     if (el) { el.classList.remove('unread'); var dot = el.querySelector('.notif-dot'); if (dot) dot.remove(); }
+    // Decrement badge
+    var badge = document.getElementById('nav-notif-badge');
+    if (badge) {
+      var cur = parseInt(badge.textContent) || 0;
+      var next = Math.max(0, cur - 1);
+      badge.textContent = next > 9 ? '9+' : next;
+      badge.style.display = next > 0 ? 'inline-block' : 'none';
+    }
   } catch(e) {}
 };
 
@@ -7595,6 +8187,9 @@ window.notifMarkAllRead = async function() {
     await batch.commit();
     showToast('All marked as read');
     notifLoad();
+    // Clear badge
+    var badge = document.getElementById('nav-notif-badge');
+    if (badge) { badge.textContent = '0'; badge.style.display = 'none'; }
   } catch(e) { showToast('Could not mark all read.'); }
 };
 
@@ -8314,6 +8909,9 @@ window.sdTab = function(name) {
 <!-- ================================================================
      PAGE: RAISE DISPUTE (buyer)
      ================================================================ -->
+<!-- ================================================================
+     PAGE: DISPUTE / REFUND CENTRE
+     ================================================================ -->
 <div class="page" id="page-dispute">
   <header class="hdr">
     <div class="wrap hdr-inner">
@@ -8324,37 +8922,116 @@ window.sdTab = function(name) {
       </nav>
     </div>
   </header>
-  <div class="dash-wrap" style="max-width:600px;">
-    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">⚠️ Raise a Dispute</h1>
-    <p style="color:var(--text3);font-size:13px;margin-bottom:24px;">We will review your case and respond within 48 hours.</p>
-    <div class="dash-card" style="display:flex;flex-direction:column;gap:14px;">
-      <div>
-        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Order ID</label>
-        <input id="dispute-order-id" placeholder="Paste your order ID" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+  <div class="dash-wrap" style="max-width:680px;">
+
+    <!-- Tab bar -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border);">
+      <button class="dispute-tab active" id="dtab-new" onclick="disputeTab('new')">⚠️ Raise dispute</button>
+      <button class="dispute-tab" id="dtab-my" onclick="disputeTab('my')">📋 My disputes</button>
+    </div>
+
+    <!-- ── TAB: RAISE DISPUTE ── -->
+    <div id="dispute-sec-new">
+      <h1 style="font-size:20px;font-weight:800;margin-bottom:4px;">Raise a Dispute</h1>
+      <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">Our team reviews all disputes within 48 hours. Funds are held in escrow until resolved.</p>
+
+      <!-- Escrow info banner -->
+      <div style="background:rgba(39,201,122,.06);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:12px 16px;font-size:12.5px;color:var(--green);margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:16px;flex-shrink:0;">🔒</span>
+        <div>Your payment is <strong>held in escrow</strong> and will not be released to the seller until you confirm receipt or this dispute is resolved in the seller's favour.</div>
       </div>
-      <div>
-        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Product name</label>
-        <input id="dispute-product-name" placeholder="What did you order?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+
+      <div class="dash-card" style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Order ID auto-filled from My Orders -->
+        <div>
+          <label class="field-label">Order ID <span style="color:var(--red);">*</span></label>
+          <input id="dispute-order-id" placeholder="Paste your order ID (e.g. ABC123XYZ)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;" oninput="disputeLookupOrder()">
+          <div id="dispute-order-preview" style="display:none;margin-top:8px;padding:10px 14px;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);font-size:13px;"></div>
+        </div>
+        <div>
+          <label class="field-label">Product name <span style="color:var(--red);">*</span></label>
+          <input id="dispute-product-name" placeholder="What did you order?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+        </div>
+        <div>
+          <label class="field-label">Reason for dispute <span style="color:var(--red);">*</span></label>
+          <select id="dispute-reason" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+            <option value="">Select a reason…</option>
+            <option value="not_received">Item not received</option>
+            <option value="not_described">Item not as described</option>
+            <option value="damaged">Damaged or defective item</option>
+            <option value="outside_payment">Seller asked for payment outside app</option>
+            <option value="wrong_item">Wrong item delivered</option>
+            <option value="unauthorised">Unauthorised charge</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">What happened? <span style="color:var(--red);">*</span></label>
+          <textarea id="dispute-details" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:110px;resize:vertical;" placeholder="Describe the issue clearly — include dates, what was promised vs what happened, and any steps already taken…"></textarea>
+        </div>
+
+        <!-- What resolution do you want? -->
+        <div>
+          <label class="field-label">What resolution do you want?</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+            <label class="dispute-res-btn" id="dres-refund"><input type="radio" name="dispute-resolution" value="refund" style="display:none;" onclick="disputeSelectRes('refund')"> 💰 Full refund</label>
+            <label class="dispute-res-btn" id="dres-replace"><input type="radio" name="dispute-resolution" value="replacement" style="display:none;" onclick="disputeSelectRes('replacement')"> 🔄 Replacement</label>
+            <label class="dispute-res-btn" id="dres-partial"><input type="radio" name="dispute-resolution" value="partial" style="display:none;" onclick="disputeSelectRes('partial')"> 🤝 Partial refund</label>
+            <label class="dispute-res-btn" id="dres-other"><input type="radio" name="dispute-resolution" value="other" style="display:none;" onclick="disputeSelectRes('other')"> 💬 Other</label>
+          </div>
+        </div>
+
+        <!-- Evidence upload -->
+        <div>
+          <label class="field-label">Evidence <span style="color:var(--text3);font-weight:400;">(optional — photo/screenshot)</span></label>
+          <div class="kyc-upload-zone" id="dispute-evidence-zone" onclick="document.getElementById('dispute-evidence-file').click()" style="padding:20px;">
+            <input type="file" id="dispute-evidence-file" accept="image/*,application/pdf" style="display:none" onchange="disputeHandleEvidence(this)">
+            <div id="dispute-evidence-inner">
+              <div style="font-size:28px;margin-bottom:6px;">📎</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px;">Tap to attach evidence</div>
+              <div style="font-size:11.5px;color:var(--text3);">Photo, screenshot or PDF · Max 10MB</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="padding:13px;" onclick="submitDispute()">Submit dispute →</button>
+        <div style="font-size:12px;color:var(--text3);text-align:center;">By submitting, you confirm the information above is accurate.</div>
       </div>
-      <div>
-        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Reason</label>
-        <select id="dispute-reason" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
-          <option>Item not received</option>
-          <option>Item not as described</option>
-          <option>Seller asked for payment outside app</option>
-          <option>Damaged or defective item</option>
-          <option>Unauthorised charge</option>
-          <option>Other</option>
-        </select>
+
+      <!-- RELEASE FUNDS SECTION (shown for buyers who are ready to release) -->
+      <div style="margin-top:24px;background:rgba(39,201,122,.06);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-sm);padding:20px;" id="dispute-release-section" style="display:none;">
+        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:6px;">✅ Everything good?</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">If you've received your order and are satisfied, you can release the funds to the seller without opening a dispute.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input id="release-order-id" placeholder="Order ID" style="flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <button class="btn btn-primary" onclick="buyerReleaseFunds()" style="white-space:nowrap;">Release funds ✓</button>
+        </div>
       </div>
-      <div>
-        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Details</label>
-        <textarea id="dispute-details" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:100px;resize:vertical;" placeholder="Describe what happened in detail…"></textarea>
+    </div>
+
+    <!-- ── TAB: MY DISPUTES ── -->
+    <div id="dispute-sec-my" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <h1 style="font-size:20px;font-weight:800;">📋 My Disputes</h1>
+        <button class="btn btn-ghost btn-sm" onclick="loadMyDisputes()">↺ Refresh</button>
       </div>
-      <button class="btn btn-primary" onclick="submitDispute()">Submit dispute →</button>
+      <div id="my-disputes-list">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading your disputes…</div>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+.dispute-tab{background:none;border:none;border-bottom:2px solid transparent;padding:10px 18px;font-size:13.5px;font-weight:600;color:var(--text3);cursor:pointer;font-family:var(--font-body);margin-bottom:-2px;transition:.15s;}
+.dispute-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.dispute-res-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);border:2px solid var(--border);background:transparent;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:.15s;user-select:none;}
+.dispute-res-btn:hover{border-color:var(--accent);}
+.dispute-res-btn.selected{border-color:var(--accent);background:rgba(124,92,252,.1);color:var(--accent);}
+.dispute-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:12px;}
+.dispute-status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:700;}
+.field-label{font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;color:var(--text2);}
+</style>
 
 <!-- styles moved to pages above -->
 
@@ -8647,35 +9324,216 @@ window.wishRemove = function(idx) {
 };
 
 // --------------------------------------------------
-// DISPUTE SUBMISSION
+// DISPUTE / REFUND SYSTEM
 // --------------------------------------------------
+var _disputeResolution = '';
+var _disputeEvidenceFile = null;
+
+window.disputeTab = function(tab) {
+  document.getElementById('dispute-sec-new').style.display = tab === 'new' ? '' : 'none';
+  document.getElementById('dispute-sec-my').style.display  = tab === 'my'  ? '' : 'none';
+  document.getElementById('dtab-new').classList.toggle('active', tab === 'new');
+  document.getElementById('dtab-my').classList.toggle('active', tab === 'my');
+  if (tab === 'my') loadMyDisputes();
+};
+
+window.disputeSelectRes = function(val) {
+  _disputeResolution = val;
+  ['refund','replace','partial','other'].forEach(function(k) {
+    var el = document.getElementById('dres-' + k);
+    if (el) el.classList.toggle('selected', k === val || ('dres-'+k) === 'dres-'+val);
+  });
+  // map key to element id suffix
+  var map = { refund:'refund', replacement:'replace', partial:'partial', other:'other' };
+  Object.keys(map).forEach(function(v) {
+    var el = document.getElementById('dres-' + map[v]);
+    if (el) el.classList.toggle('selected', v === val);
+  });
+};
+
+window.disputeHandleEvidence = function(input) {
+  var file = input.files[0];
+  if (!file || file.size > 10 * 1024 * 1024) { showToast('Max 10MB'); return; }
+  _disputeEvidenceFile = file;
+  var zone = document.getElementById('dispute-evidence-zone');
+  var inner = document.getElementById('dispute-evidence-inner');
+  if (zone) zone.classList.add('has-file');
+  if (inner) {
+    if (file.type.startsWith('image/')) {
+      var r = new FileReader();
+      r.onload = function(e) { inner.innerHTML = '<img src="'+e.target.result+'" style="max-height:90px;border-radius:6px;margin-bottom:6px;"><div style="font-size:12px;font-weight:600;color:var(--green);">✓ ' + file.name + '</div>'; };
+      r.readAsDataURL(file);
+    } else {
+      inner.innerHTML = '<div style="font-size:26px;margin-bottom:6px;">📄</div><div style="font-size:12px;font-weight:600;color:var(--green);">✓ ' + file.name + '</div>';
+    }
+  }
+};
+
+window.disputeLookupOrder = async function() {
+  var orderId = (document.getElementById('dispute-order-id') || {}).value.trim();
+  var preview = document.getElementById('dispute-order-preview');
+  if (!preview) return;
+  if (orderId.length < 10) { preview.style.display = 'none'; return; }
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'orders', orderId));
+    if (snap.exists()) {
+      var o = snap.data();
+      preview.style.display = '';
+      preview.innerHTML = '📦 <strong>' + (o.productName||'Product') + '</strong> &nbsp;·&nbsp; ' +
+        (o.currency||'₦') + ' ' + Number(o.price||0).toLocaleString() +
+        ' &nbsp;·&nbsp; Seller: ' + (o.sellerName||'—') +
+        ' &nbsp;·&nbsp; Status: <strong>' + (o.status||'—') + '</strong>';
+      var pName = document.getElementById('dispute-product-name');
+      if (pName && !pName.value) pName.value = o.productName || '';
+    } else { preview.style.display = 'none'; }
+  } catch(e) { preview.style.display = 'none'; }
+};
+
 window.submitDispute = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
   if (!user) { showToast('Please sign in.'); return; }
-  var orderId = document.getElementById('dispute-order-id')?.value.trim();
-  var productName = document.getElementById('dispute-product-name')?.value.trim();
-  var reason = document.getElementById('dispute-reason')?.value;
-  var details = document.getElementById('dispute-details')?.value.trim();
-  if (!orderId || !reason || !details) { showToast('Please fill all fields.'); return; }
+  var orderId = (document.getElementById('dispute-order-id') || {}).value.trim();
+  var productName = (document.getElementById('dispute-product-name') || {}).value.trim();
+  var reason = (document.getElementById('dispute-reason') || {}).value;
+  var details = (document.getElementById('dispute-details') || {}).value.trim();
+  if (!orderId) { showToast('Please enter your Order ID.'); return; }
+  if (!reason) { showToast('Please select a reason.'); return; }
+  if (!details || details.length < 20) { showToast('Please describe the issue in more detail (at least 20 characters).'); return; }
+
+  var btn = document.querySelector('#dispute-sec-new .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
   var profile = window._currentUser || {};
   try {
-    // Find order to get sellerId
-    var ordSnap = await fns.getDoc(fns.doc(db,'orders',orderId));
+    var ordSnap = await fns.getDoc(fns.doc(db, 'orders', orderId));
     var sellerId = ordSnap.exists() ? ordSnap.data().sellerId : '';
     var sellerName = ordSnap.exists() ? ordSnap.data().sellerName : '';
-    await fns.addDoc(fns.collection(db,'disputes'), {
+    var price = ordSnap.exists() ? ordSnap.data().price : 0;
+
+    // Upload evidence if provided
+    var evidenceUrl = '';
+    if (_disputeEvidenceFile) {
+      try { evidenceUrl = await uploadToCloudinary(_disputeEvidenceFile, 'zula_disputes/' + user.uid); } catch(e) {}
+    }
+
+    var docRef = await fns.addDoc(fns.collection(db, 'disputes'), {
       orderId, productName, reason, details,
+      resolution: _disputeResolution || 'refund',
+      evidenceUrl,
       buyerId: user.uid,
-      buyerName: profile.fullName||user.displayName||'Buyer',
+      buyerName: profile.fullName || user.displayName || 'Buyer',
       buyerEmail: user.email,
-      sellerId, sellerName,
+      sellerId, sellerName, price,
       status: 'open',
       createdAt: fns.serverTimestamp(),
     });
-    showToast('Dispute submitted. We will review within 48 hours.');
-    showPage('my-orders');
-  } catch(e) { console.error(e); showToast('Could not submit dispute.'); }
+
+    // Update order status to 'disputed'
+    if (ordSnap.exists()) {
+      await fns.updateDoc(fns.doc(db, 'orders', orderId), { status: 'disputed', disputeId: docRef.id });
+    }
+
+    // Notify admin & seller
+    var notifBase = { type: 'dispute', read: false, createdAt: fns.serverTimestamp(), disputeId: docRef.id };
+    await fns.addDoc(fns.collection(db, 'notifications'), Object.assign({}, notifBase, {
+      userId: sellerId,
+      title: '⚠️ Dispute opened',
+      body: (profile.fullName || 'A buyer') + ' opened a dispute for: ' + (productName || 'your product') + '. Reason: ' + reason,
+    }));
+
+    // Reset form
+    ['dispute-order-id','dispute-product-name','dispute-details'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+    var sel = document.getElementById('dispute-reason'); if (sel) sel.value = '';
+    var preview = document.getElementById('dispute-order-preview'); if (preview) preview.style.display = 'none';
+    _disputeEvidenceFile = null; _disputeResolution = '';
+    document.querySelectorAll('.dispute-res-btn').forEach(function(b){ b.classList.remove('selected'); });
+    var zone = document.getElementById('dispute-evidence-zone'); if (zone) zone.classList.remove('has-file');
+
+    showToast('✅ Dispute #' + docRef.id.slice(0,8).toUpperCase() + ' submitted. We'll respond in 48 hrs.');
+    disputeTab('my');
+  } catch(e) {
+    console.error(e); showToast('Could not submit dispute. Try again.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit dispute →'; }
+  }
+};
+
+window.buyerReleaseFunds = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in.'); return; }
+  var orderId = (document.getElementById('release-order-id') || {}).value.trim();
+  if (!orderId) { showToast('Please enter your Order ID.'); return; }
+  if (!confirm('Release escrow funds to the seller for order ' + orderId + '? This cannot be undone.')) return;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'orders', orderId));
+    if (!snap.exists()) { showToast('Order not found.'); return; }
+    var o = snap.data();
+    if (o.buyerId !== user.uid) { showToast('This is not your order.'); return; }
+    await fns.updateDoc(fns.doc(db, 'orders', orderId), { status: 'completed' });
+    await fns.addDoc(fns.collection(db, 'notifications'), {
+      userId: o.sellerId,
+      type: 'payment',
+      title: '💰 Funds released!',
+      body: 'The buyer has confirmed receipt of ' + (o.productName||'your product') + '. Funds have been released to you.',
+      read: false,
+      createdAt: fns.serverTimestamp(),
+    });
+    showToast('✅ Funds released to seller. Thank you!');
+    var el = document.getElementById('release-order-id'); if (el) el.value = '';
+  } catch(e) { console.error(e); showToast('Could not release funds.'); }
+};
+
+window.loadMyDisputes = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('my-disputes-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'disputes'), fns.where('buyerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    if (snap.empty) {
+      el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">✅</div><div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px;">No disputes</div><div style="font-size:13px;">All your orders look good!</div></div>';
+      return;
+    }
+    var statusMeta = {
+      open:     { label:'Open — under review', color:'var(--gold)', bg:'rgba(245,200,66,.12)' },
+      resolved: { label:'Resolved', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
+      closed:   { label:'Closed', color:'var(--text3)', bg:'var(--bg3)' },
+      refunded: { label:'Refund issued', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
+      rejected: { label:'Rejected', color:'var(--red)', bg:'rgba(240,82,82,.12)' },
+    };
+    var reasonLabels = { not_received:'Item not received', not_described:'Not as described', damaged:'Damaged/defective', outside_payment:'Payment outside app', wrong_item:'Wrong item', unauthorised:'Unauthorised charge', other:'Other' };
+    el.innerHTML = snap.docs.map(function(d) {
+      var dis = Object.assign({ _id: d.id }, d.data());
+      var date = dis.createdAt && dis.createdAt.toDate ? dis.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
+      var sm = statusMeta[dis.status] || { label: dis.status||'Open', color:'var(--text3)', bg:'var(--bg3)' };
+      var adminNote = dis.adminNote ? '<div style="margin-top:10px;padding:10px 12px;background:rgba(124,92,252,.07);border-left:3px solid var(--accent);border-radius:0 var(--radius-xs) var(--radius-xs) 0;font-size:13px;"><strong>Admin note:</strong> ' + dis.adminNote + '</div>' : '';
+      var evidenceLink = dis.evidenceUrl ? '<a href="'+dis.evidenceUrl+'" target="_blank" style="font-size:12px;color:var(--accent);display:inline-flex;align-items:center;gap:4px;margin-top:6px;">📎 View evidence →</a>' : '';
+      return '<div class="dispute-card">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;">' +
+          '<div>' +
+            '<div style="font-size:14px;font-weight:700;margin-bottom:3px;">' + (dis.productName||'Product') + '</div>' +
+            '<div style="font-size:12px;color:var(--text3);">Order #' + dis.orderId.slice(0,10).toUpperCase() + ' · ' + date + '</div>' +
+          '</div>' +
+          '<span class="dispute-status-pill" style="color:'+sm.color+';background:'+sm.bg+';">'+sm.label+'</span>' +
+        '</div>' +
+        '<div style="font-size:13px;color:var(--text2);margin-bottom:6px;"><strong>Reason:</strong> ' + (reasonLabels[dis.reason]||dis.reason||'-') + '</div>' +
+        '<div style="font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:4px;">' + (dis.details||'').slice(0,200) + (dis.details && dis.details.length > 200 ? '…' : '') + '</div>' +
+        '<div style="font-size:12.5px;color:var(--text3);">Resolution requested: <strong>' + (dis.resolution||'refund') + '</strong></div>' +
+        evidenceLink + adminNote + '</div>';
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:var(--red);font-size:13px;text-align:center;padding:30px;">Could not load disputes.</div>'; }
+};
+
+// Show release-funds box on dispute page open
+window.disputeInitPage = function() {
+  var sec = document.getElementById('dispute-release-section');
+  if (sec) sec.style.display = '';
 };
 
 // --------------------------------------------------
@@ -8864,6 +9722,49 @@ window.showPage = function(name) {
   if (name === 'my-orders') { setTimeout(myOrdersLoad, 100); }
   if (name === 'seller-dashboard') { setTimeout(sdLoadOverview, 200); }
   if (name === 'notifications') { setTimeout(notifLoad, 100); }
+  if (name === 'dispute') { setTimeout(function(){ var s = document.getElementById('dispute-release-section'); if (s) s.style.display = ''; }, 50); }
+  if (name === 'settings') {
+    setTimeout(function() {
+      // Load saved payout details into form
+      settingsLoadPayout();
+      // Load avatar photo into the settings preview
+      var u = window._currentUser || {};
+      var preview = document.getElementById('st-avatar-preview');
+      if (preview) {
+        if (u.photoUrl) {
+          preview.innerHTML = '<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+          var rmBtn = document.getElementById('avatar-remove-btn');
+          if (rmBtn) rmBtn.style.display = '';
+        } else {
+          var initials = ((u.firstName||u.fullName||'')[0]||'?').toUpperCase();
+          preview.innerHTML = initials;
+        }
+      }
+      // Sync theme buttons
+      var saved = localStorage.getItem('zula_theme') || 'dark';
+      ['dark','light','auto'].forEach(function(m) {
+        var b = document.getElementById('theme-btn-' + m);
+        if (b) b.classList.toggle('active', m === saved);
+      });
+      // Load email
+      var auth = window._auth;
+      var user = auth && auth.currentUser;
+      if (user) {
+        var emailEl = document.getElementById('st-email-display');
+        if (emailEl) emailEl.textContent = user.email;
+      }
+      // Pre-fill name/phone/bio
+      if (u) {
+        var nameEl = document.getElementById('st-name');
+        var phoneEl = document.getElementById('st-phone');
+        var bioEl = document.getElementById('st-bio');
+        if (nameEl) nameEl.value = u.fullName || '';
+        if (phoneEl) phoneEl.value = u.phone || '';
+        if (bioEl) bioEl.value = u.bio || '';
+      }
+    }, 100);
+  }
+  if (name === 'product') { setTimeout(function(){ if (typeof pdRenderShareRow === 'function') pdRenderShareRow(); }, 100); }
 };
 
 // --------------------------------------------------
