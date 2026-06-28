@@ -776,12 +776,16 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('home')">Home</a>
-        <a onclick="requireAuth('marketplace')">Browse</a>
-        <a onclick="showPage('affiliate-info')">Affiliate</a>
-        <a onclick="goAddProduct()">Sell</a>
-        <a onclick="showPage('login')" class="btn btn-ghost btn-sm" style="padding:7px 16px;">Sign in</a>
-        <a onclick="showPage('signup')" class="btn btn-primary btn-sm" style="padding:7px 16px;">Join free</a>
+        <span id="lp-nav-links" style="display:none;gap:10px;align-items:center;">
+          <a onclick="showPage('home')">Home</a>
+          <a onclick="showPage('marketplace')">Browse</a>
+          <a onclick="showPage('affiliate-info')">Affiliate</a>
+          <a onclick="goAddProduct()">Sell</a>
+        </span>
+        <span id="lp-nav-guest" style="display:flex;gap:10px;align-items:center;">
+          <a onclick="showPage('login')" class="btn btn-ghost btn-sm" style="padding:7px 16px;">Sign in</a>
+          <a onclick="showPage('signup')" class="btn btn-primary btn-sm" style="padding:7px 16px;">Join free</a>
+        </span>
       </nav>
     </div>
   </header>
@@ -2870,6 +2874,20 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 window._auth = auth;
+
+// Show/hide landing page nav links based on auth
+function updateLandingNav(user) {
+  var links = document.getElementById('lp-nav-links');
+  var guest = document.getElementById('lp-nav-guest');
+  if (user) {
+    if (links) links.style.display = 'flex';
+    if (guest) guest.style.display = 'none';
+  } else {
+    if (links) links.style.display = 'none';
+    if (guest) guest.style.display = 'flex';
+  }
+}
+
 window._db   = db;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
@@ -4083,7 +4101,7 @@ function showPage(name) {
     if(el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
   }
   if (name === 'settings') {
-    if(el('st-email-display')) el('st-email-display').textContent = user ? user.email : '—';
+    if(el('st-email-display')) el('st-email-display').textContent = user ? user.email : '-';
     if(el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
     if(el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
     if(el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
@@ -4124,7 +4142,7 @@ function checkStrength(val) {
   const segs = ['str1','str2','str3','str4'];
   const cls  = !val ? '' : val.length < 6 ? 'weak' : val.length < 10 ? 'ok' : 'strong';
   const filled = !val ? 0 : val.length < 6 ? 1 : val.length < 10 ? 2 : val.length < 14 ? 3 : 4;
-  const labels = { '':'Enter a password', weak:'Too short', ok:'OK — add numbers or symbols', strong:'Strong password ✓' };
+  const labels = { '':'Enter a password', weak:'Too short', ok:'OK - add numbers or symbols', strong:'Strong password ✓' };
   segs.forEach((s, i) => {
     const el = document.getElementById(s);
     if (el) { el.className = 'strength-seg'; if (i < filled) el.classList.add(cls); }
@@ -4212,7 +4230,7 @@ function previewImage(input) {
   }
 }
 
-// ADMIN EMAILS — only these 2 can access admin
+// ADMIN EMAILS - only these 2 can access admin
 const ADMIN_EMAILS = ['sundaygift050@gmail.com', 'okoroaugustine050@gmail.com'];
 
 function isAdmin() {
@@ -4221,7 +4239,7 @@ function isAdmin() {
 }
 
 window.openAdmin = function() {
-  // Don't call showPage here — called directly from nav link
+  // Don't call showPage here - called directly from nav link
   if (!isAdmin()) {
     document.getElementById('admin-denied').style.display = 'flex';
     document.getElementById('admin-panel').style.display = 'none';
@@ -4274,8 +4292,8 @@ window.loadAdminData = async function() {
         : products.slice(0,10).map(p => `
           <tr>
             <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
-            <td>${p.sellerName||'—'}<\/td>
-            <td>${p.category||'—'}<\/td>
+            <td>${p.sellerName||'-'}<\/td>
+            <td>${p.category||'-'}<\/td>
             <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
             <td><span class="tag tag-gold">${p.type||'Physical'}<\/span><\/td>
           <\/tr>`).join('');
@@ -4289,9 +4307,9 @@ window.loadAdminData = async function() {
         : products.map(p => `
           <tr>
             <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
-            <td>${p.sellerName||'—'}<\/td>
+            <td>${p.sellerName||'-'}<\/td>
             <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
-            <td>${p.category||'—'}<\/td>
+            <td>${p.category||'-'}<\/td>
             <td><span class="tag tag-gold">${p.type||'Physical'}<\/span><\/td>
             <td><button class="btn btn-sm btn-danger" onclick="adminDeleteProduct('${p.id}')">Remove<\/button><\/td>
           <\/tr>`).join('');
@@ -4304,10 +4322,10 @@ window.loadAdminData = async function() {
         ? '<tr><td colspan="4" style="color:var(--text3);">No users yet.<\/td><\/tr>'
         : users.map(u => `
           <tr>
-            <td>${u.fullName||u.firstName||'—'}<\/td>
-            <td style="font-size:12px;">${u.email||'—'}<\/td>
+            <td>${u.fullName||u.firstName||'-'}<\/td>
+            <td style="font-size:12px;">${u.email||'-'}<\/td>
             <td><span class="tag ${u.sellerVerified?'tag-green':'tag-gold'}">${u.sellerVerified?'Seller':'Buyer'}<\/span><\/td>
-            <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '—'}<\/td>
+            <td style="font-size:12px;">${u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '-'}<\/td>
           <\/tr>`).join('');
     }
   } catch(e) {
@@ -4316,7 +4334,7 @@ window.loadAdminData = async function() {
   }
 };
 
-// ── ADMIN VERIF QUEUE ───────────────────────────────────────────────
+// - ADMIN VERIF QUEUE -
 window.loadAdminVerifQueue = async function() {
   const db  = window._db;
   const fns = window._fns;
@@ -4358,14 +4376,14 @@ window.loadAdminVerifQueue = async function() {
           <button class="btn btn-sm btn-primary" onclick="adminApproveVerif('${u.id}')">✅ Approve<\/button>
           <button class="btn btn-sm" style="background:var(--red);color:#fff;" onclick="adminRejectVerif('${u.id}')">❌ Reject<\/button>`;
       }
-      const date = u.verifSubmittedAt ? new Date(u.verifSubmittedAt.seconds*1000).toLocaleDateString() : '—';
+      const date = u.verifSubmittedAt ? new Date(u.verifSubmittedAt.seconds*1000).toLocaleDateString() : '-';
       const rejectReason = u.verifRejectedReason ? `<div style="margin-top:8px;font-size:12px;color:var(--red);">Reason: ${u.verifRejectedReason}<\/div>` : '';
       return `
         <div style="border:1px solid var(--border);border-radius:var(--radius-xs);padding:16px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
             <div>
               <div style="font-size:14px;font-weight:700;">${u.fullName||u.firstName||'Unknown'}<\/div>
-              <div style="font-size:12px;color:var(--text3);">${u.email||'—'} · Submitted ${date}<\/div>
+              <div style="font-size:12px;color:var(--text3);">${u.email||'-'} · Submitted ${date}<\/div>
             <\/div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               ${statusBadge}
@@ -4447,7 +4465,7 @@ function goAddProduct() {
   if (!user) { showPage('login'); return; }
   const profile = window._currentUser || {};
   if (!profile.sellerVerified) {
-    // Not verified — go to verification page with banner
+    // Not verified - go to verification page with banner
     showPage('verification');
     const banner = document.getElementById('verif-required-banner');
     if (banner) banner.style.display = 'block';
@@ -4475,9 +4493,9 @@ function _showAdminNavIfNeeded() {
 
 window._selectedType = 'Physical';
 
-// ── PROFILE FEATURE JS ──────────────────────────────────────────
+// - PROFILE FEATURE JS -
 
-// showPage merged above — no override needed
+// showPage merged above - no override needed
 
 // Profile v2 tabs
 window.switchPv2Tab = function(tab, btn) {
@@ -4503,9 +4521,9 @@ window.filterNotifs = function(type, btn) {
   if (btn) btn.classList.add('active');
 };
 
-// sendChatMsg is defined in the Firebase module above — do not redefine here
+// sendChatMsg is defined in the Firebase module above - do not redefine here
 
-// ── USER DROPDOWN (avatar click) ──────────────────────────────────────
+// - USER DROPDOWN (avatar click) -
 window.toggleAdminDropdown = function(e) {
   e.stopPropagation();
   const dd = document.getElementById('user-dropdown');
@@ -4531,7 +4549,7 @@ window.closeDropdown = function() {
   if (dd) dd.style.display = 'none';
 };
 
-// ── EDIT BIO MODAL ────────────────────────────────────────────────────
+// - EDIT BIO MODAL -
 window.openEditBioModal = function() {
   const u = window._currentUser || {};
   const nameInput     = document.getElementById('bio-name-input');
@@ -4566,22 +4584,22 @@ window.saveEditBio = async function() {
   } catch(e) { console.error(e); showToast('❌ Could not save. Try again.'); }
 };
 
-// ── SELLER DASHBOARD PAGE ─────────────────────────────────────────────
-// ── ADD PRODUCT: type picker ────────────────────────────────────────
+// - SELLER DASHBOARD PAGE -
+// - ADD PRODUCT: type picker -
 window._selectedProductType = 'physical';
-// ══ ADD PRODUCT PAGE JS ══════════════════════════════════════════════
+// - ADD PRODUCT PAGE JS -
 var _apType = null, _apPriceMode = 'paid', _apAffEnabled = true, _apVisMode = 'public';
 
 var _apTypeMeta = {
-  course:   {icon:'🎓', label:'Online course',       digital:true,  sections:['ap-sec-course'],   uploadHint:'MP4, MOV, ZIP — video content up to 5 GB'},
-  ebook:    {icon:'📚', label:'Ebook / PDF',          digital:true,  sections:['ap-sec-ebook'],    uploadHint:'PDF, ePub, MOBI — up to 500 MB'},
-  template: {icon:'🎨', label:'Template',             digital:true,  sections:['ap-sec-template'], uploadHint:'ZIP, Figma, .fig, Notion export — up to 500 MB'},
-  software: {icon:'💻', label:'Software / App',       digital:true,  sections:['ap-sec-software'], uploadHint:'EXE, DMG, ZIP — up to 2 GB'},
-  audio:    {icon:'🎵', label:'Music / Audio',        digital:true,  sections:['ap-sec-audio'],    uploadHint:'MP3, WAV, FLAC, ZIP — up to 1 GB'},
+  course:   {icon:'🎓', label:'Online course',       digital:true,  sections:['ap-sec-course'],   uploadHint:'MP4, MOV, ZIP - video content up to 5 GB'},
+  ebook:    {icon:'📚', label:'Ebook / PDF',          digital:true,  sections:['ap-sec-ebook'],    uploadHint:'PDF, ePub, MOBI - up to 500 MB'},
+  template: {icon:'🎨', label:'Template',             digital:true,  sections:['ap-sec-template'], uploadHint:'ZIP, Figma, .fig, Notion export - up to 500 MB'},
+  software: {icon:'💻', label:'Software / App',       digital:true,  sections:['ap-sec-software'], uploadHint:'EXE, DMG, ZIP - up to 2 GB'},
+  audio:    {icon:'🎵', label:'Music / Audio',        digital:true,  sections:['ap-sec-audio'],    uploadHint:'MP3, WAV, FLAC, ZIP - up to 1 GB'},
   coaching: {icon:'🧑‍💼', label:'Coaching / Service',  digital:true,  sections:['ap-sec-coaching'], uploadHint:'Optional: slide deck or resource PDF'},
-  vehicle:  {icon:'🚗', label:'Vehicle',              digital:false, sections:['ap-sec-vehicle'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
-  physical:   {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'],   uploadHint:'JPG, PNG, GIF — up to 8 images, 10 MB each'},
-  realestate: {icon:'🏠', label:'Real Estate',           digital:false, sections:['ap-sec-realestate'],  uploadHint:'JPG, PNG — up to 20 photos, 10 MB each'},
+  vehicle:  {icon:'🚗', label:'Vehicle',              digital:false, sections:['ap-sec-vehicle'],  uploadHint:'JPG, PNG - up to 20 photos, 10 MB each'},
+  physical:   {icon:'📦', label:'Physical item',        digital:false, sections:['ap-sec-physical'],   uploadHint:'JPG, PNG, GIF - up to 8 images, 10 MB each'},
+  realestate: {icon:'🏠', label:'Real Estate',           digital:false, sections:['ap-sec-realestate'],  uploadHint:'JPG, PNG - up to 20 photos, 10 MB each'},
 };
 
 window.apSelectType = function(el) {
@@ -4629,11 +4647,11 @@ window.apApplyType = function() {
   var hint = document.getElementById('ap-digital-upload-sub');
   if (hint && m.digital) hint.textContent = m.uploadHint;
   var coverHint = document.getElementById('ap-cover-upload-hint');
-  if (coverHint) coverHint.textContent = m.digital ? 'JPG, PNG — cover image / thumbnail · 10 MB max' : m.uploadHint;
+  if (coverHint) coverHint.textContent = m.digital ? 'JPG, PNG - cover image / thumbnail · 10 MB max' : m.uploadHint;
   var title = document.getElementById('ap-upload-card-title');
   if (title) title.textContent = m.digital ? '🖼 Cover image' : '📸 Product photos';
   var sub = document.getElementById('ap-upload-card-sub');
-  if (sub) sub.textContent = m.digital ? 'Your cover is the first thing buyers see — make it count.' : 'Upload clear photos. First image is your cover.';
+  if (sub) sub.textContent = m.digital ? 'Your cover is the first thing buyers see - make it count.' : 'Upload clear photos. First image is your cover.';
   var langWrap = document.getElementById('ap-field-lang-wrap');
   if (langWrap) langWrap.style.display = (_apType==='course'||_apType==='ebook') ? '' : 'none';
   var pvIcon = document.getElementById('ap-pv-icon');
@@ -4681,11 +4699,11 @@ window.apUpdateAffPreview = function() {
   var currency = curEl ? curEl.value : 'NGN';
   var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
   var platFee = price * 0.05, affEarn = price * (affPct/100), sellerGet = price - affEarn - platFee;
-  var fmt = function(v){ return price > 0 ? sym + v.toLocaleString('en',{maximumFractionDigits:0}) : '—'; };
+  var fmt = function(v){ return price > 0 ? sym + v.toLocaleString('en',{maximumFractionDigits:0}) : '-'; };
   var e = id => document.getElementById(id);
   if (e('ap-aep-affiliate')) e('ap-aep-affiliate').textContent = fmt(affEarn);
   if (e('ap-aep-seller'))    e('ap-aep-seller').textContent    = fmt(sellerGet);
-  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (5%)' : '—';
+  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (5%)' : '-';
   var affTag = e('ap-pv-aff-tag');
   if (affTag) affTag.textContent = 'Affiliate · ' + affPct + '%';
 };
@@ -4795,7 +4813,7 @@ window.apFillSummary = function() {
   var affPct = rangeEl ? parseInt(rangeEl.value) : 20;
   var e = id => document.getElementById(id);
   if (e('ap-summary-name'))  e('ap-summary-name').textContent  = (name && name.value.trim()) || '(untitled)';
-  if (e('ap-summary-type'))  e('ap-summary-type').textContent  = m.label || '—';
+  if (e('ap-summary-type'))  e('ap-summary-type').textContent  = m.label || '-';
   if (e('ap-summary-price')) e('ap-summary-price').textContent = _apPriceMode==='free' ? 'Free' : sym + priceVal.toLocaleString('en');
   if (e('ap-summary-aff'))   e('ap-summary-aff').textContent   = _apAffEnabled ? 'Enabled · ' + affPct + '% commission' : 'Disabled';
 };
@@ -4855,7 +4873,7 @@ window.pickType = function(el, type) {
   }
 };
 
-// ── COURSE MODULE BUILDER ────────────────────────────────────────────
+// - COURSE MODULE BUILDER -
 let _moduleCount = 0;
 window.addCourseModule = function() {
   _moduleCount++;
@@ -4887,7 +4905,7 @@ window.addCourseModule = function() {
   addLesson(idx);
 };
 
-// ── ADD PRODUCT: preview modal ───────────────────────────────────────
+// - ADD PRODUCT: preview modal -
 window.openListingPreview = function() {
   const name   = document.getElementById('ap-name')?.value   || 'Your product name';
   const desc   = document.getElementById('ap-desc')?.value   || 'Your description.';
@@ -4911,7 +4929,7 @@ window.closeListingPreview = function() {
   if (modal) modal.classList.remove('open');
 };
 
-// ── ADD PRODUCT: submit to Firebase ─────────────────────────────────
+// - ADD PRODUCT: submit to Firebase -
 window.submitProduct = async function() {
   const auth = window._auth; const db = window._db; const fns = window._fns;
   const user = auth.currentUser;
@@ -5008,7 +5026,7 @@ window.submitProduct = async function() {
   }
 };
 
-// ── SELLER DASHBOARD TAB SYSTEM ─────────────────────────────────────
+// - SELLER DASHBOARD TAB SYSTEM -
 window.sdTab = function(name) {
   // Update sidebar nav
   document.querySelectorAll('.sd-nav-item').forEach(i => i.classList.remove('active'));
@@ -5078,7 +5096,7 @@ function sdProductRow(id, p, compact) {
     '<div class="sd-product-thumb">' + icon + '<\/div>' +
     '<div class="sd-product-info">' +
       '<div class="sd-product-name">' + (p.name || '(Untitled)') + '<\/div>' +
-      '<div class="sd-product-meta">' + (p.category || p.type || '—') + ' · <span style="color:' + statusColor + ';">' + status + '<\/span><\/div>' +
+      '<div class="sd-product-meta">' + (p.category || p.type || '-') + ' · <span style="color:' + statusColor + ';">' + status + '<\/span><\/div>' +
     '<\/div>' +
     '<div class="sd-product-price">\u20a6' + price + '<\/div>' +
     '<div class="sd-product-actions">' +
@@ -5141,9 +5159,9 @@ window.sdLoadPayout = async function() {
     snap.docs.forEach(function(d) {
       var p = d.data();
       if (p.status === 'approved') total += Number(p.amount||0);
-      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '—';
+      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
       var color = {pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)'}[p.status]||'var(--text3)';
-      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + '</div></div><span style="color:' + color + ';font-weight:700;">' + (p.status||'—') + '</span></div>';
+      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + '</div></div><span style="color:' + color + ';font-weight:700;">' + (p.status||'-') + '</span></div>';
     });
     var hist = document.getElementById('sd-payout-history');
     if (hist) hist.innerHTML = rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout history yet.</div>';
@@ -5162,7 +5180,7 @@ window.sdAddBank = function() {
 };
 
 window.sdRequestPayout = function() {
-  showToast('💸 Payout request coming soon — add a bank account first');
+  showToast('💸 Payout request coming soon - add a bank account first');
 };
 
 window.sdSaveSettings = async function() {
@@ -5838,7 +5856,7 @@ window.saveManualLocation = function() {
 <script>
 
 
-// ── REAL ESTATE HELPERS ────────────────────────────────────────────
+// - REAL ESTATE HELPERS -
 window.reAddFeature = function() {
   var list = document.getElementById('re-features-list');
   if (!list) return;
@@ -5853,11 +5871,7 @@ window.reAddSlot = function() {
   if (!list) return;
   var row = document.createElement('div');
   row.className = 're-slot-row';
-  row.innerHTML = '<select class="re-slot-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>' +
-    '<input type="time" class="re-slot-from" value="09:00">' +
-    '<span style="font-size:12px;color:var(--text3);">to</span>' +
-    '<input type="time" class="re-slot-to" value="17:00">' +
-    '<button class="ap-variant-rm" onclick="this.closest(\'.re-slot-row\').remove()" type="button">×</button>';
+  row.innerHTML = '<select class="re-slot-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select><input type="time" class="re-slot-from" value="09:00"><span style="font-size:12px;color:var(--text3);">to</span><input type="time" class="re-slot-to" value="17:00"><button class="ap-variant-rm" onclick="this.closest(\'.re-slot-row\').remove()" type="button">x</button>';
   list.appendChild(row);
 };
 
@@ -5881,7 +5895,7 @@ window.reGetFeatures = function() {
   return feats;
 };
 
-// ── VIEWING REQUEST (buyer books a viewing slot) ───────────────────
+// - VIEWING REQUEST (buyer books a viewing slot) -
 window.reRequestViewing = async function(productId, productName, sellerId, slots) {
   var auth = window._auth, db = window._db, fns = window._fns;
   var user = auth && auth.currentUser;
@@ -5892,7 +5906,7 @@ window.reRequestViewing = async function(productId, productName, sellerId, slots
   var slotsEl = document.getElementById('re-book-slots');
   var titleEl = document.getElementById('re-book-title');
   if (!modal) return;
-  if (titleEl) titleEl.textContent = 'Book a viewing — ' + productName;
+  if (titleEl) titleEl.textContent = 'Book a viewing - ' + productName;
   if (slotsEl) {
     slotsEl.innerHTML = '';
     (slots || []).forEach(function(slot, i) {
@@ -5953,7 +5967,7 @@ window.reCloseBookModal = function() {
   if (m) m.style.display = 'none';
 };
 
-// ── SELLER: CONFIRM OR DECLINE VIEWING ────────────────────────────
+// - SELLER: CONFIRM OR DECLINE VIEWING -
 window.reRespondViewing = async function(requestId, action, buyerId, productName) {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -5979,7 +5993,7 @@ window.reRespondViewing = async function(requestId, action, buyerId, productName
   } catch(e) { console.error(e); showToast('Could not update request.'); }
 };
 
-// ── BUYER: POST-VIEWING INTEREST ──────────────────────────────────
+// - BUYER: POST-VIEWING INTEREST -
 window.reMarkInterest = async function(requestId, productId, productName, sellerId, interested) {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -6011,7 +6025,7 @@ window.reMarkInterest = async function(requestId, productId, productName, seller
   } catch(e) { console.error(e); showToast('Could not save your response.'); }
 };
 
-// ── IN-APP PAYMENT FOR REAL ESTATE ───────────────────────────────
+// - IN-APP PAYMENT FOR REAL ESTATE -
 window.reSubmitPayment = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -6065,7 +6079,7 @@ window.reLoadViewingRequests = async function() {
       var r = d.data();
       var statusClass = { pending:'re-status-pending', confirmed:'re-status-confirmed', declined:'re-status-declined', done:'re-status-done', payment_submitted:'re-status-confirmed' }[r.status] || 're-status-pending';
       var statusLabel = { pending:'Pending', confirmed:'Confirmed', declined:'Declined', done:'Viewed', payment_submitted:'Payment received' }[r.status] || r.status;
-      var slotTxt = r.slot ? r.slot.day + ' ' + r.slot.from + '–' + r.slot.to : '—';
+      var slotTxt = r.slot ? r.slot.day + ' ' + r.slot.from + '–' + r.slot.to : '-';
       var card = document.createElement('div');
       card.className = 're-view-card';
       card.innerHTML =
@@ -6104,7 +6118,7 @@ window.reVerifyPayment = async function(requestId, buyerId, productName) {
   } catch(e) { showToast('Could not verify.'); }
 };
 
-// ── MULTI-PHOTO UPLOAD ─────────────────────────────────────────────
+// - MULTI-PHOTO UPLOAD -
 var _apPhotos = []; // [{dataUrl, name}]
 var MAX_PHOTOS = 20;
 
@@ -6151,7 +6165,7 @@ window.apRenderPhotoGrid = function() {
   if (addBtn) addBtn.style.display = _apPhotos.length >= MAX_PHOTOS ? 'none' : '';
 };
 
-// ── LESSON BUILDER (Add Product form) ──────────────────────────────
+// - LESSON BUILDER (Add Product form) -
 var _apLessonSeq = 0;
 
 window.apAddLesson = function() {
@@ -6210,7 +6224,7 @@ window.apGetLessons = function() {
   return lessons;
 };
 
-// ── VIDEO URL CONVERTER ────────────────────────────────────────────
+// - VIDEO URL CONVERTER -
 // Converts any shareable link into an embeddable URL
 function cpToEmbedUrl(url) {
   if (!url) return '';
@@ -6223,13 +6237,13 @@ function cpToEmbedUrl(url) {
   // Google Drive
   var gdMatch = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
   if (gdMatch) return 'https://drive.google.com/file/d/' + gdMatch[1] + '/preview';
-  // Firebase Storage direct link — use as-is in iframe
+  // Firebase Storage direct link - use as-is in iframe
   if (/firebasestorage\.googleapis/.test(url)) return url;
   // Fallback: treat as direct video src
   return url;
 }
 
-// ── COURSE PLAYER STATE ───────────────────────────────────────────
+// - COURSE PLAYER STATE -
 var _cpLessons = [];
 var _cpCurrentIdx = 0;
 var _cpDone = {};
@@ -6346,7 +6360,7 @@ function cpUpdateProgress() {
   if (label) label.textContent = pct + '% complete';
 }
 
-// ── WIRE submitProduct TO SAVE LESSONS TO FIREBASE ─────────────────
+// - WIRE submitProduct TO SAVE LESSONS TO FIREBASE -
 // Patch submitProduct to also save lessons
 var _origSubmitProduct = window.submitProduct;
 window.submitProduct = async function() {
@@ -6357,10 +6371,10 @@ window.submitProduct = async function() {
   await _origSubmitProduct();
 };
 
-// Override addDoc call to include lessons — we patch in submitProduct directly
+// Override addDoc call to include lessons - we patch in submitProduct directly
 // (Already handled: submitProduct reads _pendingLessons via closure below)
 
-// ── OPEN COURSE PLAYER FROM PURCHASE / ORDER PAGE ──────────────────
+// - OPEN COURSE PLAYER FROM PURCHASE / ORDER PAGE -
 window.watchCourse = async function(productId) {
   var db = window._db, fns = window._fns;
   try {
@@ -6478,7 +6492,7 @@ window.watchCourse = async function(productId) {
 </style>
 
 <script>
-// ─── REAL ESTATE: COMPLETE FLOW ────────────────────────────────────
+// --------------------------------------------------
 
 // Filter viewings on seller dashboard
 window._reAllViewings = [];
@@ -6527,7 +6541,7 @@ window.reRenderViewingCards = function(viewings, container) {
   viewings.forEach(function(r) {
     var statusClass = { pending:'re-status-pending', confirmed:'re-status-confirmed', declined:'re-status-declined', done:'re-status-done', payment_submitted:'re-status-confirmed', completed:'re-status-confirmed' }[r.status] || 're-status-pending';
     var statusLabel = { pending:'Pending', confirmed:'Confirmed', declined:'Declined', done:'Viewed', payment_submitted:'Payment received', completed:'Completed' }[r.status] || r.status;
-    var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '—';
+    var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '-';
     var card = document.createElement('div');
     card.className = 're-view-card';
 
@@ -6540,7 +6554,7 @@ window.reRenderViewingCards = function(viewings, container) {
     } else if (r.status === 'payment_submitted') {
       actionBtns = '<div style="margin-top:12px;padding:10px 14px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
         '<div><div style="font-size:12.5px;font-weight:700;color:var(--green);">💰 Payment submitted by buyer</div>' +
-        '<div style="font-size:12px;color:var(--text3);">Ref: ' + (r.paymentRef||'—') + '</div></div>' +
+        '<div style="font-size:12px;color:var(--text3);">Ref: ' + (r.paymentRef||'-') + '</div></div>' +
         '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" onclick="reVerifyPayment('' + r._id + '','' + r.buyerId + '','' + (r.productName||'').replace(/'/g,"\'") + '')">Verify & confirm</button>' +
         '</div>';
     } else if (r.status === 'completed') {
@@ -6553,7 +6567,7 @@ window.reRenderViewingCards = function(viewings, container) {
         '<span class="re-view-status ' + statusClass + '">' + statusLabel + '</span>' +
       '</div>' +
       '<div style="font-size:12.5px;color:var(--text2);margin:4px 0 2px;font-weight:600;">' + (r.productName||'Property') + '</div>' +
-      '<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">📅 ' + slotTxt + ' &nbsp;|&nbsp; 📧 ' + (r.buyerEmail||'—') + '</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">📅 ' + slotTxt + ' &nbsp;|&nbsp; 📧 ' + (r.buyerEmail||'-') + '</div>' +
       (r.note ? '<div style="font-size:12.5px;color:var(--text2);background:var(--bg3);padding:8px 12px;border-radius:var(--radius-xs);margin-bottom:6px;font-style:italic;">"' + r.note + '"</div>' : '') +
       actionBtns;
 
@@ -6561,7 +6575,7 @@ window.reRenderViewingCards = function(viewings, container) {
   });
 };
 
-// ─── BUYER: Show interest modal after viewing ──────────────────────
+// --------------------------------------------------
 window.reShowInterestModal = function(requestId, productName, sellerId) {
   window._reInterestData = { requestId, productName, sellerId };
   var nameEl = document.getElementById('re-interest-name');
@@ -6611,7 +6625,7 @@ window.reSubmitInterest = async function(interested) {
   } catch(e) { console.error(e); showToast('Could not save your response.'); }
 };
 
-// ─── BUYER: My Viewings tab (in buyer profile / orders area) ────────
+// --------------------------------------------------
 window.reLoadBuyerViewings = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -6628,9 +6642,9 @@ window.reLoadBuyerViewings = async function() {
     el.innerHTML = '';
     snap.docs.forEach(function(d) {
       var r = d.data();
-      var statusLabel = { pending:'Awaiting confirmation', confirmed:'Confirmed — visit the property!', declined:'Declined by seller', done:'Viewing done', payment_submitted:'Payment submitted — awaiting verification', completed:'Completed!' }[r.status] || r.status;
+      var statusLabel = { pending:'Awaiting confirmation', confirmed:'Confirmed - visit the property!', declined:'Declined by seller', done:'Viewing done', payment_submitted:'Payment submitted - awaiting verification', completed:'Completed!' }[r.status] || r.status;
       var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--green)', completed:'var(--green)' }[r.status] || 'var(--text3)';
-      var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '—';
+      var slotTxt = r.slot ? r.slot.day + '  ' + r.slot.from + ' – ' + r.slot.to : '-';
       var card = document.createElement('div');
       card.className = 're-buy-view-card';
 
@@ -6650,7 +6664,7 @@ window.reLoadBuyerViewings = async function() {
   } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px;">Could not load viewings.</div>'; }
 };
 
-// ─── FIREBASE INDEXES NEEDED FOR VIEWINGS ─────────────────────────
+// --------------------------------------------------
 // Firestore composite indexes required:
 // Collection: viewingRequests
 //   sellerId ASC + createdAt DESC
@@ -6660,9 +6674,9 @@ window.reLoadBuyerViewings = async function() {
 
 
 <script>
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // CART & WISHLIST
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 var _cart = JSON.parse(localStorage.getItem('zula_cart') || '[]');
 var _wishlist = JSON.parse(localStorage.getItem('zula_wishlist') || '[]');
 
@@ -6706,9 +6720,9 @@ window.pdBuyNow = function() {
   }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// CHECKOUT — Paystack integration
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// CHECKOUT - Paystack integration
+// --------------------------------------------------
 window.coSubmitOrder = async function() {
   var auth = window._auth, db = window._db, fns = window._fns;
   var user = auth && auth.currentUser;
@@ -6778,9 +6792,9 @@ window.coCancelCheckout = function() {
   if (m) m.style.display = 'none';
 };
 
-// ══════════════════════════════════════════════════════════════════
-// PRODUCT DETAIL PAGE — full logic
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// PRODUCT DETAIL PAGE - full logic
+// --------------------------------------------------
 var _pdCurrentRating = 0;
 window._currentProduct = null;
 
@@ -6852,12 +6866,12 @@ window.openProduct = async function(productId) {
         el('pd-realestate-details').style.display = 'block';
         el('pd-realestate-details').innerHTML =
           '<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
-          '<div><div style="font-size:11px;color:var(--text3);">Type</div><div style="font-size:13px;font-weight:600;">' + (re.propertyType||'—') + '</div></div>' +
-          '<div><div style="font-size:11px;color:var(--text3);">Listing</div><div style="font-size:13px;font-weight:600;">' + (re.listingType||'—') + '</div></div>' +
-          '<div><div style="font-size:11px;color:var(--text3);">Bedrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bedrooms||'—') + '</div></div>' +
-          '<div><div style="font-size:11px;color:var(--text3);">Bathrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bathrooms||'—') + '</div></div>' +
-          '<div><div style="font-size:11px;color:var(--text3);">Size</div><div style="font-size:13px;font-weight:600;">' + (re.size ? re.size + ' sqm' : '—') + '</div></div>' +
-          '<div><div style="font-size:11px;color:var(--text3);">Condition</div><div style="font-size:13px;font-weight:600;">' + (re.condition||'—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Type</div><div style="font-size:13px;font-weight:600;">' + (re.propertyType||'-') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Listing</div><div style="font-size:13px;font-weight:600;">' + (re.listingType||'-') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Bedrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bedrooms||'-') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Bathrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bathrooms||'-') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Size</div><div style="font-size:13px;font-weight:600;">' + (re.size ? re.size + ' sqm' : '-') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Condition</div><div style="font-size:13px;font-weight:600;">' + (re.condition||'-') + '</div></div>' +
           (re.address ? '<div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);">Address</div><div style="font-size:13px;font-weight:600;">📍 ' + re.address + '</div></div>' : '') +
           (re.features&&re.features.length ? '<div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Features</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + re.features.map(function(f){ return '<span style="background:rgba(124,92,252,.1);color:var(--accent);font-size:12px;padding:3px 10px;border-radius:999px;">✓ '+f+'</span>'; }).join('') + '</div></div>' : '') +
           '</div>';
@@ -6875,7 +6889,7 @@ window.openProduct = async function(productId) {
     // Load reviews
     pdLoadReviews(productId);
 
-    // Write review button — only if buyer has purchased
+    // Write review button - only if buyer has purchased
     if (user && user.uid !== p.sellerId) {
       try {
         var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',productId), fns.where('buyerId','==',user.uid)));
@@ -6908,9 +6922,9 @@ window.pdViewSellerProfile = function() {
   if (p && p.sellerId) { window._viewingSellerId = p.sellerId; showPage('profile-v2'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // REVIEWS & RATINGS
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.pdSetStar = function(n) {
   _pdCurrentRating = n;
   document.querySelectorAll('.rv-star').forEach(function(s,i){ s.style.color = i < n ? '#f5c842' : 'var(--border2)'; });
@@ -6991,9 +7005,9 @@ window.pdSubmitReview = async function() {
   } catch(e) { console.error(e); showToast('Could not submit review.'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// NOTIFICATIONS — Firebase real-time
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// NOTIFICATIONS - Firebase real-time
+// --------------------------------------------------
 var _notifAll = [];
 var _notifUnsub = null;
 
@@ -7063,9 +7077,9 @@ window.filterNotifs = function(type, btn) {
   notifRender(filtered);
 };
 
-// ══════════════════════════════════════════════════════════════════
-// SELLER ORDERS — Firebase
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// SELLER ORDERS - Firebase
+// --------------------------------------------------
 var _sdAllOrders = [];
 
 window.sdLoadOrders = async function() {
@@ -7095,16 +7109,16 @@ function sdRenderOrders(orders) {
   if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:30px;text-align:center;">No orders yet.</td></tr>'; return; }
   var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)' };
   tbody.innerHTML = orders.map(function(o) {
-    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '-';
     var color = statusColor[o.status]||'var(--text3)';
     return '<tr>' +
       '<td style="font-size:11px;color:var(--text3);font-family:monospace;">' + o._id.slice(0,8) + '</td>' +
-      '<td>' + (o.buyerName||'—') + '</td>' +
-      '<td>' + (o.productName||'—') + '</td>' +
+      '<td>' + (o.buyerName||'-') + '</td>' +
+      '<td>' + (o.productName||'-') + '</td>' +
       '<td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td>' +
-      '<td><span style="color:' + color + ';font-weight:700;font-size:12px;">' + (o.status||'—') + '</span></td>' +
+      '<td><span style="color:' + color + ';font-weight:700;font-size:12px;">' + (o.status||'-') + '</span></td>' +
       '<td style="font-size:12px;color:var(--text3);">' + date + '</td>' +
-      '<td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;" onclick="sdFulfillOrder(\'' + o._id + '\')">Mark fulfilled</button>':'—') + '</td>' +
+      '<td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;" onclick="sdFulfillOrder(\'' + o._id + '\')">Mark fulfilled</button>':'-') + '</td>' +
       '</tr>';
   }).join('');
 }
@@ -7125,9 +7139,9 @@ window.sdFulfillOrder = async function(orderId) {
   } catch(e) { showToast('Could not update order.'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // SELLER: EDIT & DELETE PRODUCT
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.sdEditProduct = async function(productId) {
   var db = window._db, fns = window._fns;
   try {
@@ -7144,7 +7158,7 @@ window.sdEditProduct = async function(productId) {
       if (e('ap-field-price')) e('ap-field-price').value = p.price||'';
       if (e('ap-field-category')) e('ap-field-category').value = p.category||'';
       if (e('ap-field-currency')) e('ap-field-currency').value = p.currency||'NGN';
-      showToast('Editing product — make changes and publish to save.');
+      showToast('Editing product - make changes and publish to save.');
     }, 400);
   } catch(e) { showToast('Could not load product for editing.'); }
 };
@@ -7159,9 +7173,9 @@ window.sdDeleteProduct = async function(productId, productName) {
   } catch(e) { showToast('Could not delete product.'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // SELLER: PAYOUT REQUEST
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.sdRequestPayout = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -7205,9 +7219,9 @@ window.sdAddBank = function() {
   if (m) m.style.display = 'flex';
 };
 
-// ══════════════════════════════════════════════════════════════════
-// SELLER: AFFILIATE EARNINGS — real data
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// SELLER: AFFILIATE EARNINGS - real data
+// --------------------------------------------------
 window.sdLoadAffiliate = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -7220,8 +7234,8 @@ window.sdLoadAffiliate = async function() {
       var e = d.data();
       total += Number(e.amount||0);
       clicks += Number(e.clicks||0);
-      var date = e.createdAt&&e.createdAt.toDate ? e.createdAt.toDate().toLocaleDateString() : '—';
-      rows += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div>' + (e.productName||'—') + '</div><div style="font-weight:700;color:var(--gold);">₦' + Number(e.amount||0).toLocaleString() + '</div><div style="color:var(--text3);">' + date + '</div></div>';
+      var date = e.createdAt&&e.createdAt.toDate ? e.createdAt.toDate().toLocaleDateString() : '-';
+      rows += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div>' + (e.productName||'-') + '</div><div style="font-weight:700;color:var(--gold);">₦' + Number(e.amount||0).toLocaleString() + '</div><div style="color:var(--text3);">' + date + '</div></div>';
     });
     var e = function(id){ return document.getElementById(id); };
     var sec = document.getElementById('sd-sec-affiliate');
@@ -7235,9 +7249,9 @@ window.sdLoadAffiliate = async function() {
   } catch(e) { console.error(e); }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// ADMIN — wire all tabs to Firebase
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// ADMIN - wire all tabs to Firebase
+// --------------------------------------------------
 var _adminAllUsers = [];
 
 // Extend adminTab to handle new tabs
@@ -7272,15 +7286,15 @@ function adminRenderUsers(users) {
   if (!tbody) return;
   if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No users found.</td></tr>'; return; }
   tbody.innerHTML = users.map(function(u) {
-    var joined = u.createdAt&&u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString() : '—';
+    var joined = u.createdAt&&u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString() : '-';
     var role = u.isAdmin ? '🛡 Admin' : u.sellerVerified ? '✅ Seller' : '👤 Buyer';
     var status = u.banned ? '<span style="color:var(--red);font-weight:700;">Banned</span>' : '<span style="color:var(--green);">Active</span>';
     var action = u.banned
       ? '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + u._id + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button>'
       : '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminBanUser(\'' + u._id + '\',\'' + (u.email||'').replace(/'/g,"\\'") + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Ban</button>';
     return '<tr>' +
-      '<td>' + (u.fullName||u.firstName||'—') + '</td>' +
-      '<td style="font-size:12px;color:var(--text3);">' + (u.email||'—') + '</td>' +
+      '<td>' + (u.fullName||u.firstName||'-') + '</td>' +
+      '<td style="font-size:12px;color:var(--text3);">' + (u.email||'-') + '</td>' +
       '<td>' + role + '</td>' +
       '<td style="font-size:12px;color:var(--text3);">' + joined + '</td>' +
       '<td>' + status + '</td>' +
@@ -7339,9 +7353,9 @@ window.adminLoadOrders = async function() {
     if (e('astat-escrow')) e('astat-escrow').textContent = '₦' + escrow.toLocaleString();
     var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)' };
     tbody.innerHTML = orders.length ? orders.map(function(o) {
-      var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+      var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '-';
       var color = statusColor[o.status]||'var(--text3)';
-      return '<tr><td style="font-size:11px;font-family:monospace;color:var(--text3);">' + o._id.slice(0,8) + '</td><td>' + (o.buyerName||'—') + '</td><td>' + (o.productName||'—') + '</td><td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td><td style="color:' + color + ';font-weight:700;">' + (o.status||'—') + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminRefundOrder(\'' + o._id + '\',\'' + o.buyerId + '\',\'' + (o.productName||'').replace(/'/g,"\\'") + '\')">Refund</button>':'—') + '</td></tr>';
+      return '<tr><td style="font-size:11px;font-family:monospace;color:var(--text3);">' + o._id.slice(0,8) + '</td><td>' + (o.buyerName||'-') + '</td><td>' + (o.productName||'-') + '</td><td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td><td style="color:' + color + ';font-weight:700;">' + (o.status||'-') + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminRefundOrder(\'' + o._id + '\',\'' + o.buyerId + '\',\'' + (o.productName||'').replace(/'/g,"\\'") + '\')">Refund</button>':'-') + '</td></tr>';
     }).join('') : '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No orders yet.</td></tr>';
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red);padding:20px;">Error loading orders.</td></tr>'; }
 };
@@ -7366,9 +7380,9 @@ window.adminLoadViewings = async function() {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.orderBy('createdAt','desc')));
     var rows = snap.docs.map(function(d) {
       var r = d.data();
-      var slot = r.slot ? r.slot.day + ' ' + r.slot.from + '-' + r.slot.to : '—';
+      var slot = r.slot ? r.slot.day + ' ' + r.slot.from + '-' + r.slot.to : '-';
       var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--blue)', completed:'var(--green)' }[r.status]||'var(--text3)';
-      return '<tr><td>' + (r.productName||'—') + '</td><td>' + (r.buyerName||'—') + '</td><td>' + (r.sellerId||'—').slice(0,8) + '</td><td style="font-size:12px;">' + slot + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'—') + '</td><td>—</td></tr>';
+      return '<tr><td>' + (r.productName||'-') + '</td><td>' + (r.buyerName||'-') + '</td><td>' + (r.sellerId||'-').slice(0,8) + '</td><td style="font-size:12px;">' + slot + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'-') + '</td><td>-</td></tr>';
     });
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No viewings yet.</td></tr>';
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Error loading viewings.</td></tr>'; }
@@ -7383,13 +7397,13 @@ window.adminLoadPayouts = async function() {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.orderBy('createdAt','desc')));
     var rows = snap.docs.map(function(d) {
       var p = d.data(); var did = d.id;
-      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '—';
+      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
       var statusColor = { pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)' }[p.status]||'var(--text3)';
       var action = p.status==='pending'
         ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;margin-right:4px;" onclick="adminApprovePayout(\'' + did + '\',\'' + p.sellerId + '\',\'' + p.amount + '\')">Approve</button>' +
           '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminRejectPayout(\'' + did + '\',\'' + p.sellerId + '\')">Reject</button>'
         : '<span style="color:' + statusColor + ';font-weight:700;">' + p.status + '</span>';
-      return '<tr><td>' + (p.sellerName||'—') + '</td><td style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</td><td>' + (p.bankName||'—') + ' •••• ' + (p.accountNumber||'').slice(-4) + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (p.status||'—') + '</td><td>' + action + '</td></tr>';
+      return '<tr><td>' + (p.sellerName||'-') + '</td><td style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</td><td>' + (p.bankName||'-') + ' •••• ' + (p.accountNumber||'').slice(-4) + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (p.status||'-') + '</td><td>' + action + '</td></tr>';
     });
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>';
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Error loading payouts.</td></tr>'; }
@@ -7429,8 +7443,8 @@ window.adminLoadDisputes = async function() {
       var statusColor = { open:'var(--red)', resolved:'var(--green)', closed:'var(--text3)' }[r.status]||'var(--gold)';
       var action = r.status==='open'
         ? '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;font-size:11px;" onclick="adminResolveDispute(\'' + did + '\',\'' + r.buyerId + '\',\'' + r.sellerId + '\')">Resolve</button>'
-        : '—';
-      return '<tr><td style="font-size:11px;font-family:monospace;">' + did.slice(0,8) + '</td><td>' + (r.buyerName||'—') + '</td><td>' + (r.sellerName||'—') + '</td><td>' + (r.productName||'—') + '</td><td>' + (r.reason||'—') + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'open') + '</td><td>' + action + '</td></tr>';
+        : '-';
+      return '<tr><td style="font-size:11px;font-family:monospace;">' + did.slice(0,8) + '</td><td>' + (r.buyerName||'-') + '</td><td>' + (r.sellerName||'-') + '</td><td>' + (r.productName||'-') + '</td><td>' + (r.reason||'-') + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'open') + '</td><td>' + action + '</td></tr>';
     });
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No disputes filed.</td></tr>';
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red);padding:20px;">Error loading disputes.</td></tr>'; }
@@ -7457,8 +7471,8 @@ window.adminLoadBanned = async function() {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('banned','==',true)));
     var rows = snap.docs.map(function(d) {
       var u = d.data(); var uid = d.id;
-      var date = u.bannedAt&&u.bannedAt.toDate ? u.bannedAt.toDate().toLocaleDateString() : '—';
-      return '<tr><td>' + (u.fullName||'—') + '</td><td style="font-size:12px;color:var(--text3);">' + (u.email||'—') + '</td><td style="color:var(--red);">' + (u.banReason||'—') + '</td><td style="font-size:12px;">' + date + '</td><td><button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + uid + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button></td></tr>';
+      var date = u.bannedAt&&u.bannedAt.toDate ? u.bannedAt.toDate().toLocaleDateString() : '-';
+      return '<tr><td>' + (u.fullName||'-') + '</td><td style="font-size:12px;color:var(--text3);">' + (u.email||'-') + '</td><td style="color:var(--red);">' + (u.banReason||'-') + '</td><td style="font-size:12px;">' + date + '</td><td><button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + uid + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button></td></tr>';
     });
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5" style="color:var(--text3);padding:20px;text-align:center;">No banned accounts.</td></tr>';
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red);padding:20px;">Error loading banned list.</td></tr>'; }
@@ -7733,9 +7747,9 @@ window.sdTab = function(name) {
 </style>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // CART PAGE
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.openCart = function() {
   showPage('cart');
   cartRender();
@@ -7745,7 +7759,7 @@ window.cartRender = function() {
   var list = document.getElementById('cart-items-list');
   if (!list) return;
   if (!_cart.length) {
-    list.innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">🛒</div><div style="font-size:15px;font-weight:700;margin-bottom:8px;">Your cart is empty</div><button class="btn btn-primary" onclick="showPage('marketplace')">Browse products →</button></div>';
+    list.innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">🛒</div><div style="font-size:15px;font-weight:700;margin-bottom:8px;">Your cart is empty</div><button class="btn btn-primary" onclick="showPage(\'marketplace\')">Browse products →</button></div>';
     cartCalcTotals();
     return;
   }
@@ -7805,9 +7819,9 @@ window.cartCheckout = function() {
   }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // MY ORDERS PAGE (buyer)
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 var _myAllOrders = [];
 
 window.openMyOrders = async function() {
@@ -7837,7 +7851,7 @@ function myOrdersRender(orders) {
   }
   var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)' };
   el.innerHTML = orders.map(function(o) {
-    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '-';
     var color = statusColor[o.status]||'var(--text3)';
     var actions = '';
     if (o.status==='paid'||o.status==='completed') {
@@ -7847,10 +7861,10 @@ function myOrdersRender(orders) {
     actions += ' <button class="btn btn-sm btn-ghost" style="color:var(--red);" onclick="showPage('dispute');document.getElementById('dispute-order-id').value=''+o._id+'';document.getElementById('dispute-product-name').value=''+(o.productName||'').replace(/'/g,"\'")+''">⚠️ Dispute</button>';
     return '<div class="my-order-card">' +
       '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">' +
-      '<div><div style="font-size:14px;font-weight:700;">' + (o.productName||'—') + '</div>' +
+      '<div><div style="font-size:14px;font-weight:700;">' + (o.productName||'-') + '</div>' +
       '<div style="font-size:12px;color:var(--text3);">Order ' + o._id.slice(0,8) + ' · ' + date + '</div></div>' +
       '<div style="font-size:15px;font-weight:800;color:var(--accent);">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div></div>' +
-      '<div style="font-size:12.5px;font-weight:700;color:' + color + ';margin-bottom:10px;">' + (o.status||'—') + '</div>' +
+      '<div style="font-size:12.5px;font-weight:700;color:' + color + ';margin-bottom:10px;">' + (o.status||'-') + '</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + actions + '</div></div>';
   }).join('');
 }
@@ -7872,9 +7886,9 @@ window.myOrderConfirmReceipt = async function(orderId) {
   } catch(e) { showToast('Could not confirm receipt.'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // WISHLIST PAGE
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.openWishlist = function() {
   showPage('wishlist');
   wishlistRender();
@@ -7905,9 +7919,9 @@ window.wishRemove = function(idx) {
   wishlistRender();
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // DISPUTE SUBMISSION
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 window.submitDispute = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -7937,9 +7951,9 @@ window.submitDispute = async function() {
   } catch(e) { console.error(e); showToast('Could not submit dispute.'); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // WIRE BUYER LINKS IN NAV / PROFILE
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // Add My Orders, Wishlist, Cart, Viewings to user dropdown
 document.addEventListener('DOMContentLoaded', function() {
   var dd = document.getElementById('user-dropdown');
@@ -7960,9 +7974,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-// SELLER OVERVIEW — real stats from Firebase
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// SELLER OVERVIEW - real stats from Firebase
+// --------------------------------------------------
 window.sdLoadOverview = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -7989,9 +8003,9 @@ window.sdLoadOverview = async function() {
   } catch(e) { console.error(e); }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// MARKETPLACE — search + category filter wired to real Firebase data
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// MARKETPLACE - search + category filter wired to real Firebase data
+// --------------------------------------------------
 var _allProducts = [];
 
 // Override filterProducts to work with real data
@@ -8048,7 +8062,7 @@ function renderProductGrid(products) {
   }).join('');
 }
 
-// Load all products on marketplace open — patch the existing loadProducts
+// Load all products on marketplace open - patch the existing loadProducts
 var _origLoadProducts = window.loadProducts;
 window.loadProducts = async function() {
   if (_origLoadProducts) { try { await _origLoadProducts(); } catch(e) {} }
@@ -8063,9 +8077,9 @@ window.loadProducts = async function() {
   } catch(e) { console.error('loadProducts error', e); }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// SELLER ANALYTICS — real chart data
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
+// SELLER ANALYTICS - real chart data
+// --------------------------------------------------
 window.sdLoadAnalytics = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -8113,9 +8127,9 @@ window.sdTab = function(name) {
   if (name === 'analytics') sdLoadAnalytics();
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // ALSO LOAD OVERVIEW ON SELLER DASHBOARD OPEN
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 var _origShowPage = window.showPage;
 window.showPage = function(name) {
   _origShowPage(name);
@@ -8125,9 +8139,9 @@ window.showPage = function(name) {
   if (name === 'notifications') { setTimeout(notifLoad, 100); }
 };
 
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 // PAYSTACK SCRIPT LOADER
-// ══════════════════════════════════════════════════════════════════
+// --------------------------------------------------
 (function() {
   if (document.getElementById('paystack-script')) return;
   var s = document.createElement('script');
