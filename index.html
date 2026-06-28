@@ -777,9 +777,9 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('home')">Home</a>
-        <a onclick="showPage('marketplace')">Browse</a>
+        <a onclick="requireAuth('marketplace')">Browse</a>
         <a onclick="showPage('affiliate-info')">Affiliate</a>
-        <a onclick="requireAuth('sell')">Sell</a>
+        <a onclick="goAddProduct()">Sell</a>
         <a onclick="showPage('login')" class="btn btn-ghost btn-sm" style="padding:7px 16px;">Sign in</a>
         <a onclick="showPage('signup')" class="btn btn-primary btn-sm" style="padding:7px 16px;">Join free</a>
       </nav>
@@ -793,7 +793,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <h1>Buy anything.<br>Sell everything.<br><em>Earn on every share.</em></h1>
       <p class="lede">Physical goods, digital downloads, online courses — all in one place, in your currency. Real sellers, real products, escrow-protected payments.</p>
       <div class="hero-cta">
-        <button class="btn btn-primary" style="font-size:15px;padding:14px 28px;" onclick="showPage('marketplace')">Start shopping →</button>
+        <button class="btn btn-primary" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
         <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-info')">Become an affiliate</button>
       </div>
       <div class="hero-stats">
@@ -1062,21 +1062,80 @@ p{color:var(--text2);margin:0 0 1em;}
   </header>
   <div class="pdetail-wrap">
     <div class="pdetail-layout">
-      <div class="pdetail-img" id="pd-img">📦</div>
+      <!-- Photo gallery -->
+      <div>
+        <div class="pdetail-img" id="pd-img">📦</div>
+        <div id="pd-photo-thumbs" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;"></div>
+      </div>
       <div>
         <div id="pd-tags" style="margin-bottom:12px;"></div>
         <div class="pdetail-title" id="pd-title">Product name</div>
-        <div class="pdetail-seller" id="pd-seller">By seller</div>
+        <div class="pdetail-seller" id="pd-seller" style="cursor:pointer;" onclick="pdViewSellerProfile()">By seller</div>
         <div class="pdetail-price" id="pd-price">NGN 0</div>
+        <div id="pd-original-price" style="display:none;font-size:13px;color:var(--text3);text-decoration:line-through;margin-top:-8px;margin-bottom:8px;"></div>
+
+        <!-- Star rating display -->
+        <div id="pd-rating-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div id="pd-stars" style="color:#f5c842;font-size:15px;"></div>
+          <span id="pd-rating-count" style="font-size:12.5px;color:var(--text3);"></span>
+        </div>
+
         <div class="pdetail-desc" id="pd-desc">Description</div>
+
+        <!-- Real estate details -->
+        <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
+
         <div class="pdetail-actions">
-          <button class="btn btn-primary" onclick="showToast('🛒 Added to cart!')">Add to cart</button>
-          <button class="btn btn-ghost" onclick="showToast('❤️ Saved to wishlist!')">Save</button>
+          <button class="btn btn-primary" id="pd-buy-btn" onclick="pdBuyNow()">Buy now</button>
+          <button class="btn btn-ghost" id="pd-cart-btn" onclick="pdAddToCart()">🛒 Add to cart</button>
+          <button class="btn btn-ghost" id="pd-wishlist-btn" onclick="pdToggleWishlist()">♡ Save</button>
           <button class="btn btn-ghost" id="pd-msg-seller-btn" onclick="msgSeller()" style="display:none;">💬 Message seller</button>
+          <button class="btn btn-ghost" id="pd-view-btn" onclick="pdBookViewing()" style="display:none;">📅 Book viewing</button>
+          <button class="btn btn-ghost" id="pd-watch-btn" onclick="pdWatchCourse()" style="display:none;">▶ Watch course</button>
         </div>
-        <div style="margin-top:20px;padding:14px;background:var(--bg3);border-radius:var(--radius-xs);font-size:13px;color:var(--text2);">
-          🔒 Payment held in escrow until you confirm receipt.
+
+        <div style="margin-top:16px;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-xs);font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px;">
+          🔒 Payment held in escrow until you confirm receipt. Fully protected.
         </div>
+
+        <!-- Affiliate link -->
+        <div id="pd-affiliate-wrap" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);">
+          <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:6px;">🔗 Earn as an affiliate</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Share this product and earn <span id="pd-commission-pct"></span>% commission on every sale.</div>
+          <div style="display:flex;gap:8px;">
+            <input id="pd-affiliate-link" readonly style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-size:12px;" value="">
+            <button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="pdCopyAffLink()">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews section -->
+    <div style="max-width:800px;margin:32px auto 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-size:16px;font-weight:700;">Reviews</h3>
+        <button class="btn btn-ghost btn-sm" id="pd-write-review-btn" onclick="pdShowReviewForm()" style="display:none;">✍ Write a review</button>
+      </div>
+      <div id="pd-reviews-list" style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No reviews yet — be the first!</div>
+      </div>
+
+      <!-- Review form -->
+      <div id="pd-review-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">Leave a review</div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12.5px;color:var(--text3);margin-bottom:6px;">Your rating</div>
+          <div id="pd-star-picker" style="display:flex;gap:4px;font-size:28px;cursor:pointer;">
+            <span onclick="pdSetStar(1)" class="rv-star">★</span>
+            <span onclick="pdSetStar(2)" class="rv-star">★</span>
+            <span onclick="pdSetStar(3)" class="rv-star">★</span>
+            <span onclick="pdSetStar(4)" class="rv-star">★</span>
+            <span onclick="pdSetStar(5)" class="rv-star">★</span>
+          </div>
+        </div>
+        <textarea id="pd-review-text" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:80px;resize:vertical;margin-bottom:10px;" placeholder="Share your experience with this product…"></textarea>
+        <button class="btn btn-primary btn-sm" onclick="pdSubmitReview()">Submit review</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pd-review-form').style.display='none'">Cancel</button>
       </div>
     </div>
   </div>
@@ -1895,7 +1954,12 @@ p{color:var(--text2);margin:0 0 1em;}
         <a id="anav-products"   onclick="adminTab('products')">📦 Products</a>
         <a id="anav-users"      onclick="adminTab('users')">👥 Users</a>
         <a id="anav-orders"     onclick="adminTab('orders')">🛍 Orders</a>
+        <a id="anav-viewings"   onclick="adminTab('viewings')">🏠 Viewings</a>
+        <a id="anav-payouts"    onclick="adminTab('payouts')">💸 Payouts</a>
+        <a id="anav-disputes"   onclick="adminTab('disputes')">⚠️ Disputes</a>
         <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
+        <a id="anav-broadcast"  onclick="adminTab('broadcast')">📢 Broadcast</a>
+        <a id="anav-banned"     onclick="adminTab('banned')">🚫 Banned</a>
         <a id="anav-settings"   onclick="adminTab('settings')">⚙️ Settings</a>
         <a style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;" onclick="showPage('marketplace')">← Marketplace</a>
         <a style="color:var(--red);" onclick="zulaSignOut()">Sign out</a>
@@ -1939,10 +2003,18 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="admin-section" id="asec-users">
         <div class="dash-h1">All Users</div>
         <div class="dash-sub">Everyone registered on ZÚLA</div>
-        <div class="dash-card">
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <input id="a-user-search" placeholder="Search by name or email…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;" oninput="adminFilterUsers(this.value)">
+          <select id="a-user-filter" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;" onchange="adminFilterUsers(document.getElementById('a-user-search').value)">
+            <option value="all">All users</option>
+            <option value="seller">Sellers only</option>
+            <option value="banned">Banned</option>
+          </select>
+        </div>
+        <div class="dash-card" style="padding:0;">
           <table class="dtable">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
-            <tbody id="a-users-table"><tr><td colspan="4" style="color:var(--text3);">Loading…</td></tr></tbody>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="a-users-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1952,15 +2024,88 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="dash-h1">Orders</div>
         <div class="dash-sub">All orders across every seller and product type</div>
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">0</div></div>
-          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val">NGN 0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Revenue (NGN)</div><div class="stat-val" id="astat-revenue">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val" id="astat-escrow">—</div></div>
         </div>
-        <div class="dash-card">
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="es-icon">🛍</div>
-            <h3>No orders yet</h3>
-            <p>Orders will appear here when buyers start purchasing.</p>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Order ID</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="a-orders-table"><tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEWINGS (admin) -->
+      <div class="admin-section" id="asec-viewings">
+        <div class="dash-h1">Property Viewings</div>
+        <div class="dash-sub">All real estate viewing requests across the platform</div>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Property</th><th>Buyer</th><th>Seller</th><th>Slot</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="a-viewings-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAYOUTS (admin) -->
+      <div class="admin-section" id="asec-payouts">
+        <div class="dash-h1">Payout Requests</div>
+        <div class="dash-sub">Sellers requesting withdrawals — approve or reject</div>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Seller</th><th>Amount</th><th>Bank</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="a-payouts-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DISPUTES (admin) -->
+      <div class="admin-section" id="asec-disputes">
+        <div class="dash-h1">Disputes & Refunds</div>
+        <div class="dash-sub">Buyer disputes requiring admin resolution</div>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Dispute ID</th><th>Buyer</th><th>Seller</th><th>Product</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="a-disputes-table"><tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BROADCAST (admin) -->
+      <div class="admin-section" id="asec-broadcast">
+        <div class="dash-h1">📢 Broadcast Notification</div>
+        <div class="dash-sub">Send a message to all users or a specific group</div>
+        <div class="dash-card" style="max-width:600px;">
+          <div style="margin-bottom:14px;">
+            <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;">Send to</label>
+            <select id="bc-target" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;width:100%;">
+              <option value="all">All users</option>
+              <option value="sellers">Verified sellers only</option>
+              <option value="buyers">Buyers only</option>
+            </select>
           </div>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;">Title</label>
+            <input id="bc-title" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;" placeholder="e.g. New feature alert!">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;">Message</label>
+            <textarea id="bc-body" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:100px;resize:vertical;" placeholder="Write your broadcast message…"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="adminSendBroadcast()">📢 Send to all users</button>
+        </div>
+      </div>
+
+      <!-- BANNED ACCOUNTS (admin) -->
+      <div class="admin-section" id="asec-banned">
+        <div class="dash-h1">🚫 Banned Accounts</div>
+        <div class="dash-sub">Users and sellers who have been banned from the platform</div>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Name</th><th>Email</th><th>Reason</th><th>Banned date</th><th>Action</th></tr></thead>
+            <tbody id="a-banned-table"><tr><td colspan="5" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -2249,7 +2394,7 @@ p{color:var(--text2);margin:0 0 1em;}
   <div class="dash-wrap" style="max-width:700px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <h1 style="font-size:22px;font-weight:700;">Notifications</h1>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('✓ All marked as read')">Mark all read</button>
+      <button class="btn btn-ghost btn-sm" onclick="notifMarkAllRead()">Mark all read</button>
     </div>
     <div class="notif-filter-bar">
       <button class="nfpill active" onclick="filterNotifs('all',this)">All</button>
@@ -2258,56 +2403,9 @@ p{color:var(--text2);margin:0 0 1em;}
       <button class="nfpill" onclick="filterNotifs('payments',this)">Payments</button>
       <button class="nfpill" onclick="filterNotifs('system',this)">System</button>
     </div>
-    <div class="dash-card" style="padding:0 20px;">
-      <div class="notif-item unread">
-        <div class="notif-icon">🛍</div>
-        <div class="notif-body">
-          <div class="notif-title">New order received!</div>
-          <div class="notif-desc">Kemi Adeyemi just ordered your Ankara Wrap Dress (Size M). Payment is held in escrow.</div>
-          <div class="notif-time">2 minutes ago</div>
-        </div>
-        <div class="notif-dot"></div>
-      </div>
-      <div class="notif-item unread">
-        <div class="notif-icon">✉️</div>
-        <div class="notif-body">
-          <div class="notif-title">New message from Tunde Nwosu</div>
-          <div class="notif-desc">"Can I get a bulk discount for 5 units of the Tote Bag?"</div>
-          <div class="notif-time">1 hour ago</div>
-        </div>
-        <div class="notif-dot"></div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">💳</div>
-        <div class="notif-body">
-          <div class="notif-title">Payout of NGN 45,000 sent</div>
-          <div class="notif-desc">Your payout has been sent to GTBank •••• 7823. It should arrive within 24 hours.</div>
-          <div class="notif-time">Yesterday at 3:42 PM</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">⭐</div>
-        <div class="notif-body">
-          <div class="notif-title">New review on 6-Figure Blueprint</div>
-          <div class="notif-desc">Biodun gave you 5 stars: "Life-changing content, worth every naira!"</div>
-          <div class="notif-time">Jun 22 · 11:00 AM</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">🛡</div>
-        <div class="notif-body">
-          <div class="notif-title">Seller verification approved ✅</div>
-          <div class="notif-desc">Congratulations! You are now a verified seller on ZÚLA. Your products are now live.</div>
-          <div class="notif-time">Jun 20 · 9:15 AM</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">🔗</div>
-        <div class="notif-body">
-          <div class="notif-title">Affiliate commission earned</div>
-          <div class="notif-desc">You earned NGN 2,700 from an affiliate sale of "Grow Your Business" eBook.</div>
-          <div class="notif-time">Jun 19 · 4:55 PM</div>
-        </div>
+    <div class="dash-card" style="padding:0 20px;" id="notif-list-wrap">
+      <div id="notif-list" style="min-height:100px;">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading notifications…</div>
       </div>
     </div>
   </div>
@@ -2751,8 +2849,7 @@ p{color:var(--text2);margin:0 0 1em;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
          sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
-         updateProfile, browserLocalStoragePersistence, setPersistence }
-         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+         updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
          getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
          updateDoc, arrayUnion, arrayRemove, increment, deleteDoc }
@@ -2772,48 +2869,12 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── KEEP USER LOGGED IN across refreshes (localStorage persistence) ──
-setPersistence(auth, browserLocalStoragePersistence).catch(e => console.warn('Persistence:', e));
-
 window._auth = auth;
 window._db   = db;
-window._firebaseReady = true;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
   doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
   where, onSnapshot, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc };
-
-// ── INACTIVITY AUTO-LOGOUT (10 minutes) ─────────────────────────────
-const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
-let _inactivityTimer = null;
-
-function resetInactivityTimer() {
-  clearTimeout(_inactivityTimer);
-  if (!auth.currentUser) return;
-  _inactivityTimer = setTimeout(async () => {
-    await signOut(auth);
-    localStorage.removeItem('zula_last_page');
-    showPage('home');
-    showToast('You were signed out after 10 minutes of inactivity.');
-  }, INACTIVITY_MS);
-}
-
-['click','keydown','mousemove','touchstart','scroll'].forEach(evt =>
-  document.addEventListener(evt, resetInactivityTimer, { passive: true })
-);
-
-// ── SAVE & RESTORE LAST PAGE across refreshes ────────────────────────
-const _protectedPages = ['marketplace','profile','seller-dashboard','messaging',
-  'settings','notifications','addproduct','verification','my-orders','admin'];
-
-// Patch showPage to also save last page (non-destructive)
-const _spOrig = window.showPage;
-window.showPage = function(name) {
-  if (typeof _spOrig === 'function') _spOrig(name);
-  if (_protectedPages.some(p => name.startsWith(p))) {
-    try { localStorage.setItem('zula_last_page', name); } catch(e){}
-  }
-};
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
@@ -2837,18 +2898,8 @@ onAuthStateChanged(auth, async (user) => {
     if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
       adminLink.style.display = 'inline';
     }
-    // ── Restore last page after refresh ──
-    const lastPage = localStorage.getItem('zula_last_page');
-    if (lastPage) {
-      setTimeout(() => showPage(lastPage), 300);
-    } else {
-      setTimeout(() => showPage('marketplace'), 300);
-    }
-    // Start inactivity timer
-    resetInactivityTimer();
   } else {
     window._currentUser = null;
-    clearTimeout(_inactivityTimer);
   }
 });
 
@@ -2866,24 +2917,13 @@ function updateNavAvatar() {
 
 // ── AUTH FUNCTIONS ──────────────────────────────────────────────────
 window.doLogin = function() {
-  const email = (document.getElementById('login-email')||{}).value||'';
-  const pass  = (document.getElementById('login-pass')||{}).value||'';
-  const emailErr = document.getElementById('login-email-err');
-  const passErr  = document.getElementById('login-pass-err');
-  if (emailErr) emailErr.classList.remove('show');
-  if (passErr)  passErr.classList.remove('show');
-  if (!email.trim()) { if(emailErr) emailErr.classList.add('show'); return; }
-  if (!pass)         { if(passErr)  passErr.classList.add('show');  return; }
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if (!email) { document.getElementById('login-email-err').classList.add('show'); return; }
+  if (!pass)  { document.getElementById('login-pass-err').classList.add('show'); return; }
   const btn = document.getElementById('login-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
-  const fns = window._fns;
-  const auth = window._auth;
-  if (!fns || !auth) {
-    if(btn){btn.disabled=false;btn.textContent='Sign in \u2192';}
-    showToast('\u23f3 Still connecting, please tap Sign in again in a moment.');
-    return;
-  }
-  fns.signInWithEmailAndPassword(auth, email.trim(), pass)
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  signInWithEmailAndPassword(auth, email, pass)
     .then(r => {
       if (!r.user.emailVerified) {
         document.getElementById('verify-email-addr').textContent = r.user.email;
@@ -2945,10 +2985,8 @@ window.doSignup = function() {
 };
 
 window.zulaSignOut = function() {
-  clearTimeout(_inactivityTimer);
   signOut(auth).then(() => {
     window._currentUser = null;
-    localStorage.removeItem('zula_last_page');
     showToast('👋 Signed out.');
     showPage('home');
   });
@@ -4985,6 +5023,7 @@ window.sdTab = function(name) {
   // Lazy-load section data
   if (name === 'products') sdLoadProducts();
   if (name === 'viewings') reLoadViewingRequests();
+  if (name === 'overview') sdLoadOverview();
   if (name === 'verification') sdLoadVerification();
   if (name === 'payout') sdLoadPayout();
 };
@@ -5075,9 +5114,7 @@ window.sdFilterProducts = function(btn, filter) {
   });
 };
 
-window.sdEditProduct = function(id) {
-  showToast('✏️ Edit coming soon — product: ' + id.slice(0,6));
-};
+window.sdEditProduct = function(id) { sdEditProduct(id); };
 
 window.sdDeleteProduct = async function(id, btn) {
   if (!confirm('Delete this product? This cannot be undone.')) return;
@@ -5093,13 +5130,35 @@ window.sdDeleteProduct = async function(id, btn) {
 
 // sdLoadVerification defined above
 
-window.sdLoadPayout = function() {
-  const u = window._currentUser || {};
-  // placeholder — real payout data would come from Firestore
+window.sdLoadPayout = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    var total = 0;
+    var rows = '';
+    snap.docs.forEach(function(d) {
+      var p = d.data();
+      if (p.status === 'approved') total += Number(p.amount||0);
+      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '—';
+      var color = {pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)'}[p.status]||'var(--text3)';
+      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + '</div></div><span style="color:' + color + ';font-weight:700;">' + (p.status||'—') + '</span></div>';
+    });
+    var hist = document.getElementById('sd-payout-history');
+    if (hist) hist.innerHTML = rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout history yet.</div>';
+    var totEl = document.getElementById('sd-payout-total');
+    if (totEl) totEl.textContent = '₦' + total.toLocaleString();
+    // Revenue = completed orders
+    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.where('status','in',['paid','completed'])));
+    var revenue = ordSnap.docs.reduce(function(s,d){ return s + Number(d.data().price||0); }, 0);
+    var avail = document.getElementById('sd-payout-available');
+    if (avail) avail.textContent = '₦' + (revenue - total).toLocaleString();
+  } catch(e) { console.error(e); }
 };
 
 window.sdAddBank = function() {
-  showToast('🏦 Bank account setup coming soon');
+  var m = document.getElementById('payout-modal'); if(m) m.style.display='flex';
 };
 
 window.sdRequestPayout = function() {
@@ -5419,10 +5478,22 @@ window.saveManualLocation = function() {
       <div class="sd-section" id="sd-sec-orders">
         <div class="sd-page-hd">Orders</div>
         <div class="sd-page-sub">Track purchases made on your listings</div>
-        <div class="dash-card">
-          <div id="sd-orders-list">
-            <div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No orders yet — your sales will appear here.</div>
-          </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-ord-total">0</div><div class="sd-stat-lbl">Total orders</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-ord-pending">0</div><div class="sd-stat-lbl">Pending</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--accent);" id="sd-ord-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="sdFilterOrders(this,'all')">All</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'pending')">Pending</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'completed')">Completed</button>
+          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'refunded')">Refunded</button>
+        </div>
+        <div class="dash-card" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Order</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="sd-orders-list"><tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">Loading orders…</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -6003,12 +6074,12 @@ window.reLoadViewingRequests = async function() {
         (r.note ? '<div style="font-size:12.5px;color:var(--text2);margin-bottom:10px;font-style:italic;">"' + r.note + '"</div>' : '') +
         (r.status === 'pending'
           ? '<div style="display:flex;gap:8px;">' +
-              '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" data-action="confirm-viewing" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">✓ Confirm</button>' +
-              '<button class="btn btn-sm btn-ghost" data-action="decline-viewing" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">✗ Decline</button>' +
+              '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" onclick="reRespondViewing('' + d.id + '','confirmed','' + r.buyerId + '','' + (r.productName||'') + '')">✓ Confirm</button>' +
+              '<button class="btn btn-sm btn-ghost" onclick="reRespondViewing('' + d.id + '','declined','' + r.buyerId + '','' + (r.productName||'') + '')">✗ Decline</button>' +
             '</div>'
           : '') +
         (r.status === 'payment_submitted'
-          ? '<div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" data-action="verify-payment" data-rid="' + d.id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">Verify payment</button></div>'
+          ? '<div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="reVerifyPayment('' + d.id + '','' + r.buyerId + '','' + (r.productName||'') + '')">Verify payment</button></div>'
           : '');
       el.appendChild(card);
     });
@@ -6463,14 +6534,14 @@ window.reRenderViewingCards = function(viewings, container) {
     var actionBtns = '';
     if (r.status === 'pending') {
       actionBtns = '<div style="display:flex;gap:8px;margin-top:12px;">' +
-        '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-weight:700;" data-action="confirm-viewing" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">\u2713 Confirm viewing</button>' +
-        '<button class="btn btn-sm btn-ghost" data-action="decline-viewing" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">\u2717 Decline</button>' +
+        '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-weight:700;" onclick="reRespondViewing('' + r._id + '','confirmed','' + r.buyerId + '','' + (r.productName||'').replace(/'/g,"\'") + '')">✓ Confirm viewing</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="reRespondViewing('' + r._id + '','declined','' + r.buyerId + '','' + (r.productName||'').replace(/'/g,"\'") + '')">✗ Decline</button>' +
         '</div>';
     } else if (r.status === 'payment_submitted') {
       actionBtns = '<div style="margin-top:12px;padding:10px 14px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
         '<div><div style="font-size:12.5px;font-weight:700;color:var(--green);">💰 Payment submitted by buyer</div>' +
         '<div style="font-size:12px;color:var(--text3);">Ref: ' + (r.paymentRef||'—') + '</div></div>' +
-        '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" data-action="verify-payment" data-rid="' + r._id + '" data-bid="' + r.buyerId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '">Verify &amp; confirm</button>' +
+        '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" onclick="reVerifyPayment('' + r._id + '','' + r.buyerId + '','' + (r.productName||'').replace(/'/g,"\'") + '')">Verify & confirm</button>' +
         '</div>';
     } else if (r.status === 'completed') {
       actionBtns = '<div style="margin-top:10px;padding:8px 12px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);font-size:12.5px;color:var(--green);font-weight:700;">🎉 Sale completed!</div>';
@@ -6565,7 +6636,7 @@ window.reLoadBuyerViewings = async function() {
 
       var actionBtns = '';
       if (r.status === 'confirmed') {
-        actionBtns = '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-top:10px;" data-action="mark-viewing-done" data-rid="' + d.id + '" data-pid="' + r.productId + '" data-pname="' + (r.productName||'').replace(/"/g,'') + '" data-sid="' + r.sellerId + '">Mark viewing as done \u2192</button>';
+        actionBtns = '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-top:10px;" onclick="window._reInterestProductId='' + r.productId + '';reShowInterestModal('' + d.id + '','' + (r.productName||'').replace(/'/g,"\'") + '','' + r.sellerId + '')">Mark viewing as done →</button>';
       }
 
       card.innerHTML =
@@ -6585,23 +6656,1485 @@ window.reLoadBuyerViewings = async function() {
 //   sellerId ASC + createdAt DESC
 //   buyerId  ASC + createdAt DESC
 // Create them at: https://console.firebase.google.com
+</script>
 
-// ── Data-attribute event delegation for viewing request buttons ──────
-document.addEventListener('click', function(e) {
-  var btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  var action = btn.dataset.action;
-  var rid    = btn.dataset.rid;
-  var bid    = btn.dataset.bid;
-  var pname  = btn.dataset.pname;
-  if (action === 'confirm-viewing') reRespondViewing(rid, 'confirmed', bid, pname);
-  if (action === 'decline-viewing') reRespondViewing(rid, 'declined',  bid, pname);
-  if (action === 'verify-payment')  reVerifyPayment(rid, bid, pname);
-  if (action === 'mark-viewing-done') {
-    window._reInterestProductId = btn.dataset.pid;
-    if(typeof reShowInterestModal==='function') reShowInterestModal(rid, btn.dataset.pname, btn.dataset.sid);
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CART & WISHLIST
+// ══════════════════════════════════════════════════════════════════
+var _cart = JSON.parse(localStorage.getItem('zula_cart') || '[]');
+var _wishlist = JSON.parse(localStorage.getItem('zula_wishlist') || '[]');
+
+function cartSave() { localStorage.setItem('zula_cart', JSON.stringify(_cart)); cartUpdateBadge(); }
+function wishSave() { localStorage.setItem('zula_wishlist', JSON.stringify(_wishlist)); }
+function cartUpdateBadge() {
+  var badge = document.getElementById('cart-badge');
+  if (badge) { badge.textContent = _cart.reduce(function(s,i){ return s + (i.qty||1); }, 0); badge.style.display = _cart.length ? 'inline-block' : 'none'; }
+}
+
+window.pdAddToCart = function() {
+  var p = window._currentProduct;
+  if (!p) return;
+  var existing = _cart.find(function(i){ return i.id === p.id; });
+  if (existing) { existing.qty = (existing.qty||1) + 1; } else { _cart.push({ id:p.id, name:p.name, price:p.price, currency:p.currency||'NGN', sellerId:p.sellerId, sellerName:p.sellerName, qty:1 }); }
+  cartSave();
+  showToast('🛒 Added to cart!');
+  document.getElementById('pd-cart-btn').textContent = '🛒 In cart (' + (_cart.find(function(i){return i.id===p.id;})||{qty:1}).qty + ')';
+};
+
+window.pdToggleWishlist = function() {
+  var p = window._currentProduct;
+  if (!p) return;
+  var idx = _wishlist.findIndex(function(i){ return i.id === p.id; });
+  if (idx >= 0) { _wishlist.splice(idx, 1); showToast('Removed from wishlist'); document.getElementById('pd-wishlist-btn').textContent = '♡ Save'; }
+  else { _wishlist.push({ id:p.id, name:p.name, price:p.price, currency:p.currency||'NGN' }); showToast('❤️ Saved to wishlist!'); document.getElementById('pd-wishlist-btn').textContent = '❤️ Saved'; }
+  wishSave();
+};
+
+window.pdBuyNow = function() {
+  var p = window._currentProduct;
+  if (!p) return;
+  var auth = window._auth;
+  if (!auth || !auth.currentUser) { showToast('Please sign in to purchase.'); showPage('login'); return; }
+  window._checkoutProduct = p;
+  var modal = document.getElementById('checkout-modal');
+  if (modal) {
+    document.getElementById('co-product-name').textContent = p.name;
+    document.getElementById('co-product-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+    modal.style.display = 'flex';
   }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// CHECKOUT — Paystack integration
+// ══════════════════════════════════════════════════════════════════
+window.coSubmitOrder = async function() {
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  var p = window._checkoutProduct;
+  if (!user || !p) return;
+  var profile = window._currentUser || {};
+  var email = user.email;
+  var amountKobo = Math.round(Number(p.price) * 100);
+
+  // Close checkout modal and open Paystack
+  document.getElementById('checkout-modal').style.display = 'none';
+
+  if (typeof PaystackPop !== 'undefined') {
+    var handler = PaystackPop.setup({
+      key: 'pk_test_YOUR_PAYSTACK_PUBLIC_KEY', // ← replace with your key
+      email: email,
+      amount: amountKobo,
+      currency: p.currency === 'USD' ? 'USD' : 'NGN',
+      ref: 'ZULA_' + Date.now() + '_' + user.uid.slice(0,6),
+      metadata: { productId: p.id, sellerId: p.sellerId, buyerId: user.uid },
+      callback: async function(response) {
+        await coSaveOrder(p, user, profile, response.reference, 'paid');
+      },
+      onClose: function() { showToast('Payment cancelled.'); }
+    });
+    handler.openIframe();
+  } else {
+    // Fallback: save as pending if Paystack not loaded
+    var ref = 'ZULA_MANUAL_' + Date.now();
+    await coSaveOrder(p, user, profile, ref, 'pending');
+    showToast('Order placed! Complete payment to confirm.');
+  }
+};
+
+async function coSaveOrder(p, user, profile, payRef, status) {
+  var db = window._db, fns = window._fns;
+  try {
+    var orderRef = await fns.addDoc(fns.collection(db, 'orders'), {
+      productId:   p.id,
+      productName: p.name,
+      productType: p.productType || p.type || 'physical',
+      price:       Number(p.price),
+      currency:    p.currency || 'NGN',
+      sellerId:    p.sellerId,
+      sellerName:  p.sellerName || '',
+      buyerId:     user.uid,
+      buyerName:   profile.fullName || user.displayName || 'Buyer',
+      buyerEmail:  user.email,
+      paymentRef:  payRef,
+      status:      status,
+      createdAt:   fns.serverTimestamp(),
+    });
+    // Notify seller
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId: p.sellerId, type:'new_order',
+      title: 'New order!',
+      body: (profile.fullName||'A buyer') + ' purchased ' + p.name + '. Payment: ' + (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString(),
+      orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
+    });
+    showToast('🎉 Order confirmed! Check My Orders for details.');
+    document.getElementById('checkout-modal').style.display = 'none';
+  } catch(e) { console.error(e); showToast('Could not save order. Contact support.'); }
+}
+
+window.coCancelCheckout = function() {
+  var m = document.getElementById('checkout-modal');
+  if (m) m.style.display = 'none';
+};
+
+// ══════════════════════════════════════════════════════════════════
+// PRODUCT DETAIL PAGE — full logic
+// ══════════════════════════════════════════════════════════════════
+var _pdCurrentRating = 0;
+window._currentProduct = null;
+
+window.openProduct = async function(productId) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  showPage('product');
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'products', productId));
+    if (!snap.exists()) { showToast('Product not found.'); showPage('marketplace'); return; }
+    var p = Object.assign({ id: productId }, snap.data());
+    window._currentProduct = p;
+
+    // Basic fields
+    var el = function(id){ return document.getElementById(id); };
+    if (el('pd-title')) el('pd-title').textContent = p.name || '';
+    if (el('pd-seller')) el('pd-seller').textContent = 'By ' + (p.sellerName || 'Seller');
+    if (el('pd-price')) el('pd-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+    if (el('pd-desc')) el('pd-desc').textContent = p.description || '';
+
+    // Original price
+    if (p.originalPrice && p.originalPrice > p.price) {
+      if (el('pd-original-price')) { el('pd-original-price').textContent = (p.currency||'NGN') + ' ' + Number(p.originalPrice).toLocaleString(); el('pd-original-price').style.display = 'block'; }
+    } else { if (el('pd-original-price')) el('pd-original-price').style.display = 'none'; }
+
+    // Photos
+    var imgEl = el('pd-img');
+    if (imgEl) {
+      if (p.photos && p.photos.length > 0) { imgEl.innerHTML = '<img src="' + p.photos[0] + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">'; }
+      else { imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦'); imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex'; imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center'; }
+    }
+    // Thumbnail strip
+    var thumbs = el('pd-photo-thumbs');
+    if (thumbs && p.photos && p.photos.length > 1) {
+      thumbs.innerHTML = p.photos.map(function(ph,i){ return '<img src="'+ph+'" onclick="document.getElementById(\'pd-img\').innerHTML=\'<img src=\\\'' + ph + '\\\' style=\\\"width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);\\\">\';" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--accent)':'var(--border)')+'" >'; }).join('');
+    }
+
+    // Tags
+    var tagsEl = el('pd-tags');
+    if (tagsEl) {
+      var tags = [];
+      if (p.type) tags.push('<span style="background:rgba(124,92,252,.12);color:var(--accent);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">' + p.type + '</span>');
+      if (p.category) tags.push('<span style="background:var(--bg3);color:var(--text3);font-size:11px;padding:3px 10px;border-radius:999px;">' + p.category + '</span>');
+      if (p.status === 'active') tags.push('<span style="background:rgba(39,201,122,.12);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">Active</span>');
+      tagsEl.innerHTML = tags.join(' ');
+    }
+
+    // Show/hide action buttons based on product type
+    var user = auth && auth.currentUser;
+    var isOwner = user && user.uid === p.sellerId;
+    if (el('pd-buy-btn')) el('pd-buy-btn').style.display = (p.productType === 'realestate' || isOwner) ? 'none' : '';
+    if (el('pd-cart-btn')) el('pd-cart-btn').style.display = (p.productType === 'realestate' || isOwner) ? 'none' : '';
+    if (el('pd-view-btn')) el('pd-view-btn').style.display = p.productType === 'realestate' ? '' : 'none';
+    if (el('pd-watch-btn')) el('pd-watch-btn').style.display = p.productType === 'course' ? '' : 'none';
+    if (el('pd-msg-seller-btn')) el('pd-msg-seller-btn').style.display = (!isOwner && user) ? '' : 'none';
+
+    // Wishlist button
+    var inWish = _wishlist.some(function(i){ return i.id === productId; });
+    if (el('pd-wishlist-btn')) el('pd-wishlist-btn').textContent = inWish ? '❤️ Saved' : '♡ Save';
+    if (el('pd-wishlist-btn')) el('pd-wishlist-btn').style.display = (p.productType==='realestate'||isOwner) ? 'none' : '';
+
+    // Cart button text
+    var inCart = _cart.find(function(i){ return i.id === productId; });
+    if (el('pd-cart-btn') && inCart) el('pd-cart-btn').textContent = '🛒 In cart (' + (inCart.qty||1) + ')';
+
+    // Real estate details
+    if (p.productType === 'realestate' && p.realestate) {
+      var re = p.realestate;
+      if (el('pd-realestate-details')) {
+        el('pd-realestate-details').style.display = 'block';
+        el('pd-realestate-details').innerHTML =
+          '<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+          '<div><div style="font-size:11px;color:var(--text3);">Type</div><div style="font-size:13px;font-weight:600;">' + (re.propertyType||'—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Listing</div><div style="font-size:13px;font-weight:600;">' + (re.listingType||'—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Bedrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bedrooms||'—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Bathrooms</div><div style="font-size:13px;font-weight:600;">' + (re.bathrooms||'—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Size</div><div style="font-size:13px;font-weight:600;">' + (re.size ? re.size + ' sqm' : '—') + '</div></div>' +
+          '<div><div style="font-size:11px;color:var(--text3);">Condition</div><div style="font-size:13px;font-weight:600;">' + (re.condition||'—') + '</div></div>' +
+          (re.address ? '<div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);">Address</div><div style="font-size:13px;font-weight:600;">📍 ' + re.address + '</div></div>' : '') +
+          (re.features&&re.features.length ? '<div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Features</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + re.features.map(function(f){ return '<span style="background:rgba(124,92,252,.1);color:var(--accent);font-size:12px;padding:3px 10px;border-radius:999px;">✓ '+f+'</span>'; }).join('') + '</div></div>' : '') +
+          '</div>';
+      }
+    }
+
+    // Affiliate section
+    if (p.affiliateEnabled && user && user.uid !== p.sellerId) {
+      if (el('pd-affiliate-wrap')) el('pd-affiliate-wrap').style.display = 'block';
+      if (el('pd-commission-pct')) el('pd-commission-pct').textContent = p.commission || 20;
+      var affLink = window.location.origin + '?ref=' + user.uid + '&product=' + productId;
+      if (el('pd-affiliate-link')) el('pd-affiliate-link').value = affLink;
+    }
+
+    // Load reviews
+    pdLoadReviews(productId);
+
+    // Write review button — only if buyer has purchased
+    if (user && user.uid !== p.sellerId) {
+      try {
+        var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',productId), fns.where('buyerId','==',user.uid)));
+        if (!ordSnap.empty && el('pd-write-review-btn')) el('pd-write-review-btn').style.display = '';
+      } catch(e) {}
+    }
+
+  } catch(e) { console.error(e); showToast('Could not load product.'); }
+};
+
+window.pdCopyAffLink = function() {
+  var inp = document.getElementById('pd-affiliate-link');
+  if (inp) { navigator.clipboard.writeText(inp.value); showToast('Affiliate link copied!'); }
+};
+
+window.pdWatchCourse = function() {
+  var p = window._currentProduct;
+  if (!p) return;
+  watchCourse(p.id);
+};
+
+window.pdBookViewing = function() {
+  var p = window._currentProduct;
+  if (!p || !p.realestate) return;
+  reRequestViewing(p.id, p.name, p.sellerId, p.realestate.schedule || []);
+};
+
+window.pdViewSellerProfile = function() {
+  var p = window._currentProduct;
+  if (p && p.sellerId) { window._viewingSellerId = p.sellerId; showPage('profile-v2'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// REVIEWS & RATINGS
+// ══════════════════════════════════════════════════════════════════
+window.pdSetStar = function(n) {
+  _pdCurrentRating = n;
+  document.querySelectorAll('.rv-star').forEach(function(s,i){ s.style.color = i < n ? '#f5c842' : 'var(--border2)'; });
+};
+
+window.pdShowReviewForm = function() {
+  var form = document.getElementById('pd-review-form');
+  if (form) form.style.display = 'block';
+  _pdCurrentRating = 0;
+  document.querySelectorAll('.rv-star').forEach(function(s){ s.style.color = 'var(--border2)'; });
+};
+
+window.pdLoadReviews = async function(productId) {
+  var db = window._db, fns = window._fns;
+  var el = document.getElementById('pd-reviews-list');
+  if (!el) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('productId','==',productId), fns.orderBy('createdAt','desc')));
+    if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No reviews yet.</div>'; pdUpdateStars(0,0); return; }
+    var total = 0; var count = snap.size;
+    el.innerHTML = '';
+    snap.docs.forEach(function(d) {
+      var r = d.data();
+      total += (r.rating||0);
+      var stars = '';
+      for (var i=1;i<=5;i++) stars += '<span style="color:'+(i<=r.rating?'#f5c842':'var(--border2)')+';">★</span>';
+      var card = document.createElement('div');
+      card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;';
+      card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;">' + (r.reviewerName||'Buyer') + '</div><div style="font-size:14px;">' + stars + '</div></div>' +
+        '<div style="font-size:13px;color:var(--text2);line-height:1.5;">' + (r.text||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:6px;">' + (r.createdAt&&r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '') + '</div>';
+      el.appendChild(card);
+    });
+    pdUpdateStars(total/count, count);
+  } catch(e) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load reviews.</div>'; }
+};
+
+function pdUpdateStars(avg, count) {
+  var stars = document.getElementById('pd-stars');
+  var label = document.getElementById('pd-rating-count');
+  if (!stars) return;
+  var s = '';
+  for (var i=1;i<=5;i++) s += '<span style="color:'+(i<=Math.round(avg)?'#f5c842':'var(--border2)')+';">★</span>';
+  stars.innerHTML = s;
+  if (label) label.textContent = count > 0 ? avg.toFixed(1) + ' (' + count + ' review' + (count===1?'':'s') + ')' : 'No reviews yet';
+}
+
+window.pdSubmitReview = async function() {
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  var p = window._currentProduct;
+  if (!user || !p) return;
+  if (!_pdCurrentRating) { showToast('Please select a star rating.'); return; }
+  var text = (document.getElementById('pd-review-text')?.value||'').trim();
+  if (!text) { showToast('Please write something in your review.'); return; }
+  try {
+    var profile = window._currentUser || {};
+    await fns.addDoc(fns.collection(db,'reviews'), {
+      productId:    p.id,
+      sellerId:     p.sellerId,
+      reviewerId:   user.uid,
+      reviewerName: profile.fullName || user.displayName || 'Buyer',
+      rating:       _pdCurrentRating,
+      text:         text,
+      createdAt:    fns.serverTimestamp(),
+    });
+    // Notify seller
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId: p.sellerId, type:'review',
+      title: 'New ' + _pdCurrentRating + '-star review!',
+      body: (profile.fullName||'A buyer') + ' reviewed ' + p.name + ': "' + text.slice(0,80) + (text.length>80?'…':'') + '"',
+      read: false, createdAt: fns.serverTimestamp(),
+    });
+    document.getElementById('pd-review-form').style.display = 'none';
+    document.getElementById('pd-review-text').value = '';
+    showToast('✅ Review submitted!');
+    pdLoadReviews(p.id);
+  } catch(e) { console.error(e); showToast('Could not submit review.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// NOTIFICATIONS — Firebase real-time
+// ══════════════════════════════════════════════════════════════════
+var _notifAll = [];
+var _notifUnsub = null;
+
+window.notifOpen = async function() {
+  showPage('notifications');
+  notifLoad();
+};
+
+window.notifLoad = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('notif-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid), fns.orderBy('createdAt','desc')));
+    _notifAll = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    notifRender(_notifAll);
+    // Update nav badge
+    var unread = _notifAll.filter(function(n){ return !n.read; }).length;
+    var badge = document.getElementById('nav-notif-badge');
+    if (badge) { badge.textContent = unread; badge.style.display = unread ? 'inline-block' : 'none'; }
+  } catch(e) { if (el) el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load notifications.</div>'; }
+};
+
+function notifRender(items) {
+  var el = document.getElementById('notif-list');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">No notifications yet.</div>'; return; }
+  var icons = { new_order:'🛍', review:'⭐', payment_received:'💰', payment_verified:'✅', viewing_request:'📅', viewing_confirmed:'✅', viewing_declined:'❌', viewing_not_interested:'🏠', payout:'💸', broadcast:'📢', system:'🛡' };
+  el.innerHTML = items.map(function(n) {
+    var icon = icons[n.type] || '🔔';
+    var time = n.createdAt && n.createdAt.toDate ? n.createdAt.toDate().toLocaleString() : '';
+    return '<div class="notif-item' + (n.read?'':' unread') + '" onclick="notifMarkRead(\'' + n._id + '\',this)">' +
+      '<div class="notif-icon">' + icon + '</div>' +
+      '<div class="notif-body"><div class="notif-title">' + (n.title||'') + '</div><div class="notif-desc">' + (n.body||'') + '</div><div class="notif-time">' + time + '</div></div>' +
+      (n.read ? '' : '<div class="notif-dot"></div>') + '</div>';
+  }).join('');
+}
+
+window.notifMarkRead = async function(id, el) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'notifications',id), { read:true });
+    if (el) { el.classList.remove('unread'); var dot = el.querySelector('.notif-dot'); if (dot) dot.remove(); }
+  } catch(e) {}
+};
+
+window.notifMarkAllRead = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid), fns.where('read','==',false)));
+    var batch = fns.writeBatch(db);
+    snap.docs.forEach(function(d){ batch.update(d.ref, { read:true }); });
+    await batch.commit();
+    showToast('All marked as read');
+    notifLoad();
+  } catch(e) { showToast('Could not mark all read.'); }
+};
+
+window.filterNotifs = function(type, btn) {
+  document.querySelectorAll('.nfpill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var filtered = type === 'all' ? _notifAll : _notifAll.filter(function(n){ return n.type && n.type.includes(type.replace('orders','order').replace('payments','payment').replace('messages','msg').replace('system','system')); });
+  notifRender(filtered);
+};
+
+// ══════════════════════════════════════════════════════════════════
+// SELLER ORDERS — Firebase
+// ══════════════════════════════════════════════════════════════════
+var _sdAllOrders = [];
+
+window.sdLoadOrders = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var tbody = document.getElementById('sd-orders-list');
+  if (!tbody || !user) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">Loading…</td></tr>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    _sdAllOrders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    sdRenderOrders(_sdAllOrders);
+    // Stats
+    var total = _sdAllOrders.length;
+    var pending = _sdAllOrders.filter(function(o){ return o.status==='pending'; }).length;
+    var revenue = _sdAllOrders.filter(function(o){ return o.status==='paid'||o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); }, 0);
+    var e = function(id){ return document.getElementById(id); };
+    if (e('sd-ord-total')) e('sd-ord-total').textContent = total;
+    if (e('sd-ord-pending')) e('sd-ord-pending').textContent = pending;
+    if (e('sd-ord-revenue')) e('sd-ord-revenue').textContent = '₦' + revenue.toLocaleString();
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red);padding:20px;">Could not load orders.</td></tr>'; }
+};
+
+function sdRenderOrders(orders) {
+  var tbody = document.getElementById('sd-orders-list');
+  if (!tbody) return;
+  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:30px;text-align:center;">No orders yet.</td></tr>'; return; }
+  var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)' };
+  tbody.innerHTML = orders.map(function(o) {
+    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+    var color = statusColor[o.status]||'var(--text3)';
+    return '<tr>' +
+      '<td style="font-size:11px;color:var(--text3);font-family:monospace;">' + o._id.slice(0,8) + '</td>' +
+      '<td>' + (o.buyerName||'—') + '</td>' +
+      '<td>' + (o.productName||'—') + '</td>' +
+      '<td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td>' +
+      '<td><span style="color:' + color + ';font-weight:700;font-size:12px;">' + (o.status||'—') + '</span></td>' +
+      '<td style="font-size:12px;color:var(--text3);">' + date + '</td>' +
+      '<td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;" onclick="sdFulfillOrder(\'' + o._id + '\')">Mark fulfilled</button>':'—') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+window.sdFilterOrders = function(btn, status) {
+  document.querySelectorAll('.sd-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var filtered = status==='all' ? _sdAllOrders : _sdAllOrders.filter(function(o){ return o.status===status; });
+  sdRenderOrders(filtered);
+};
+
+window.sdFulfillOrder = async function(orderId) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'completed' });
+    showToast('Order marked as fulfilled!');
+    sdLoadOrders();
+  } catch(e) { showToast('Could not update order.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// SELLER: EDIT & DELETE PRODUCT
+// ══════════════════════════════════════════════════════════════════
+window.sdEditProduct = async function(productId) {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db,'products',productId));
+    if (!snap.exists()) { showToast('Product not found.'); return; }
+    var p = snap.data();
+    // Pre-fill the add-product form fields
+    window._editingProductId = productId;
+    goAddProduct();
+    setTimeout(function() {
+      var e = function(id){ return document.getElementById(id); };
+      if (e('ap-field-name')) e('ap-field-name').value = p.name||'';
+      if (e('ap-field-desc')) e('ap-field-desc').value = p.description||'';
+      if (e('ap-field-price')) e('ap-field-price').value = p.price||'';
+      if (e('ap-field-category')) e('ap-field-category').value = p.category||'';
+      if (e('ap-field-currency')) e('ap-field-currency').value = p.currency||'NGN';
+      showToast('Editing product — make changes and publish to save.');
+    }, 400);
+  } catch(e) { showToast('Could not load product for editing.'); }
+};
+
+window.sdDeleteProduct = async function(productId, productName) {
+  if (!confirm('Delete "' + productName + '"? This cannot be undone.')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.deleteDoc(fns.doc(db,'products',productId));
+    showToast('Product deleted.');
+    sdLoadProducts();
+  } catch(e) { showToast('Could not delete product.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// SELLER: PAYOUT REQUEST
+// ══════════════════════════════════════════════════════════════════
+window.sdRequestPayout = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var modal = document.getElementById('payout-modal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.sdSubmitPayout = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var amount = document.getElementById('payout-amount')?.value;
+  var bank = document.getElementById('payout-bank')?.value;
+  var acct = document.getElementById('payout-acct')?.value;
+  var name = document.getElementById('payout-name')?.value;
+  if (!amount || !bank || !acct || !name) { showToast('Please fill all fields.'); return; }
+  try {
+    await fns.addDoc(fns.collection(db,'payoutRequests'), {
+      sellerId: user.uid,
+      sellerName: (window._currentUser&&window._currentUser.fullName)||user.displayName||'Seller',
+      amount: Number(amount),
+      bankName: bank,
+      accountNumber: acct,
+      accountName: name,
+      status: 'pending',
+      createdAt: fns.serverTimestamp(),
+    });
+    document.getElementById('payout-modal').style.display = 'none';
+    showToast('Payout request submitted! We will process it within 1–3 business days.');
+  } catch(e) { showToast('Could not submit payout request.'); }
+};
+
+window.sdCancelPayout = function() {
+  var m = document.getElementById('payout-modal');
+  if (m) m.style.display = 'none';
+};
+
+window.sdAddBank = function() {
+  var m = document.getElementById('payout-modal');
+  if (m) m.style.display = 'flex';
+};
+
+// ══════════════════════════════════════════════════════════════════
+// SELLER: AFFILIATE EARNINGS — real data
+// ══════════════════════════════════════════════════════════════════
+window.sdLoadAffiliate = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'affiliateEarnings'), fns.where('affiliateId','==',user.uid), fns.orderBy('createdAt','desc')));
+    var total = 0; var clicks = 0; var refs = snap.size;
+    var rows = '';
+    snap.docs.forEach(function(d) {
+      var e = d.data();
+      total += Number(e.amount||0);
+      clicks += Number(e.clicks||0);
+      var date = e.createdAt&&e.createdAt.toDate ? e.createdAt.toDate().toLocaleDateString() : '—';
+      rows += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div>' + (e.productName||'—') + '</div><div style="font-weight:700;color:var(--gold);">₦' + Number(e.amount||0).toLocaleString() + '</div><div style="color:var(--text3);">' + date + '</div></div>';
+    });
+    var e = function(id){ return document.getElementById(id); };
+    var sec = document.getElementById('sd-sec-affiliate');
+    if (!sec) return;
+    sec.innerHTML = '<div class="sd-page-hd">Affiliate Earnings</div><div class="sd-page-sub">Commissions earned from promoting other sellers products</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">' +
+      '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + total.toLocaleString() + '</div><div class="sd-stat-lbl">Total earned</div></div>' +
+      '<div class="sd-stat-card"><div class="sd-stat-val">' + refs + '</div><div class="sd-stat-lbl">Referrals</div></div>' +
+      '<div class="sd-stat-card"><div class="sd-stat-val">' + clicks + '</div><div class="sd-stat-lbl">Clicks</div></div></div>' +
+      '<div class="dash-card">' + (rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No affiliate earnings yet. Share products to start earning!</div>') + '</div>';
+  } catch(e) { console.error(e); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN — wire all tabs to Firebase
+// ══════════════════════════════════════════════════════════════════
+var _adminAllUsers = [];
+
+// Extend adminTab to handle new tabs
+var _origAdminTab = window.adminTab;
+window.adminTab = function(name) {
+  _origAdminTab(name);
+  if (name === 'users')     adminLoadUsers();
+  if (name === 'orders')    adminLoadOrders();
+  if (name === 'viewings')  adminLoadViewings();
+  if (name === 'payouts')   adminLoadPayouts();
+  if (name === 'disputes')  adminLoadDisputes();
+  if (name === 'banned')    adminLoadBanned();
+};
+
+window.adminLoadUsers = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-users-table');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.orderBy('createdAt','desc')));
+    _adminAllUsers = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    adminRenderUsers(_adminAllUsers);
+    if (document.getElementById('astat-users')) document.getElementById('astat-users').textContent = _adminAllUsers.length;
+    var sellers = _adminAllUsers.filter(function(u){ return u.sellerVerified; }).length;
+    if (document.getElementById('astat-sellers')) document.getElementById('astat-sellers').textContent = sellers;
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Could not load users.</td></tr>'; }
+};
+
+function adminRenderUsers(users) {
+  var tbody = document.getElementById('a-users-table');
+  if (!tbody) return;
+  if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No users found.</td></tr>'; return; }
+  tbody.innerHTML = users.map(function(u) {
+    var joined = u.createdAt&&u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString() : '—';
+    var role = u.isAdmin ? '🛡 Admin' : u.sellerVerified ? '✅ Seller' : '👤 Buyer';
+    var status = u.banned ? '<span style="color:var(--red);font-weight:700;">Banned</span>' : '<span style="color:var(--green);">Active</span>';
+    var action = u.banned
+      ? '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + u._id + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button>'
+      : '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminBanUser(\'' + u._id + '\',\'' + (u.email||'').replace(/'/g,"\\'") + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Ban</button>';
+    return '<tr>' +
+      '<td>' + (u.fullName||u.firstName||'—') + '</td>' +
+      '<td style="font-size:12px;color:var(--text3);">' + (u.email||'—') + '</td>' +
+      '<td>' + role + '</td>' +
+      '<td style="font-size:12px;color:var(--text3);">' + joined + '</td>' +
+      '<td>' + status + '</td>' +
+      '<td>' + action + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+window.adminFilterUsers = function(search) {
+  var filter = document.getElementById('a-user-filter')?.value || 'all';
+  var q = (search||'').toLowerCase();
+  var filtered = _adminAllUsers.filter(function(u) {
+    var matchSearch = !q || (u.fullName||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    var matchFilter = filter==='all' || (filter==='seller'&&u.sellerVerified) || (filter==='banned'&&u.banned);
+    return matchSearch && matchFilter;
+  });
+  adminRenderUsers(filtered);
+};
+
+window.adminBanUser = async function(userId, email, name) {
+  var reason = prompt('Reason for banning ' + (name||email) + ':');
+  if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',userId), { banned:true, banReason:reason, bannedAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:userId, type:'system', title:'Account suspended', body:'Your account has been suspended. Reason: ' + reason + '. Contact support to appeal.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('User banned.');
+    adminLoadUsers();
+  } catch(e) { showToast('Could not ban user.'); }
+};
+
+window.adminUnbanUser = async function(userId, name) {
+  if (!confirm('Unban ' + name + '?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',userId), { banned:false, banReason:fns.deleteField(), bannedAt:fns.deleteField() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:userId, type:'system', title:'Account reinstated', body:'Your account ban has been lifted. You can now use Zula normally.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('User unbanned.');
+    adminLoadUsers();
+  } catch(e) { showToast('Could not unban user.'); }
+};
+
+window.adminLoadOrders = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-orders-table');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.orderBy('createdAt','desc')));
+    var orders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    var revenue = orders.filter(function(o){ return o.status==='paid'||o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
+    var escrow = orders.filter(function(o){ return o.status==='pending'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
+    var e = function(id){ return document.getElementById(id); };
+    if (e('astat-orders')) e('astat-orders').textContent = orders.length;
+    if (e('astat-revenue')) e('astat-revenue').textContent = '₦' + revenue.toLocaleString();
+    if (e('astat-escrow')) e('astat-escrow').textContent = '₦' + escrow.toLocaleString();
+    var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)' };
+    tbody.innerHTML = orders.length ? orders.map(function(o) {
+      var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+      var color = statusColor[o.status]||'var(--text3)';
+      return '<tr><td style="font-size:11px;font-family:monospace;color:var(--text3);">' + o._id.slice(0,8) + '</td><td>' + (o.buyerName||'—') + '</td><td>' + (o.productName||'—') + '</td><td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td><td style="color:' + color + ';font-weight:700;">' + (o.status||'—') + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminRefundOrder(\'' + o._id + '\',\'' + o.buyerId + '\',\'' + (o.productName||'').replace(/'/g,"\\'") + '\')">Refund</button>':'—') + '</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No orders yet.</td></tr>';
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red);padding:20px;">Error loading orders.</td></tr>'; }
+};
+
+window.adminRefundOrder = async function(orderId, buyerId, productName) {
+  if (!confirm('Issue refund for: ' + productName + '?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'refunded' });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:buyerId, type:'payment', title:'Refund issued', body:'Your refund for ' + productName + ' has been processed.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Refund issued and buyer notified.');
+    adminLoadOrders();
+  } catch(e) { showToast('Could not issue refund.'); }
+};
+
+window.adminLoadViewings = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-viewings-table');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.orderBy('createdAt','desc')));
+    var rows = snap.docs.map(function(d) {
+      var r = d.data();
+      var slot = r.slot ? r.slot.day + ' ' + r.slot.from + '-' + r.slot.to : '—';
+      var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--blue)', completed:'var(--green)' }[r.status]||'var(--text3)';
+      return '<tr><td>' + (r.productName||'—') + '</td><td>' + (r.buyerName||'—') + '</td><td>' + (r.sellerId||'—').slice(0,8) + '</td><td style="font-size:12px;">' + slot + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'—') + '</td><td>—</td></tr>';
+    });
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No viewings yet.</td></tr>';
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Error loading viewings.</td></tr>'; }
+};
+
+window.adminLoadPayouts = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-payouts-table');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.orderBy('createdAt','desc')));
+    var rows = snap.docs.map(function(d) {
+      var p = d.data(); var did = d.id;
+      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '—';
+      var statusColor = { pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)' }[p.status]||'var(--text3)';
+      var action = p.status==='pending'
+        ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;margin-right:4px;" onclick="adminApprovePayout(\'' + did + '\',\'' + p.sellerId + '\',\'' + p.amount + '\')">Approve</button>' +
+          '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminRejectPayout(\'' + did + '\',\'' + p.sellerId + '\')">Reject</button>'
+        : '<span style="color:' + statusColor + ';font-weight:700;">' + p.status + '</span>';
+      return '<tr><td>' + (p.sellerName||'—') + '</td><td style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</td><td>' + (p.bankName||'—') + ' •••• ' + (p.accountNumber||'').slice(-4) + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (p.status||'—') + '</td><td>' + action + '</td></tr>';
+    });
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>';
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Error loading payouts.</td></tr>'; }
+};
+
+window.adminApprovePayout = async function(payoutId, sellerId, amount) {
+  if (!confirm('Approve payout of ₦' + Number(amount).toLocaleString() + '?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'approved', approvedAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'Payout approved!', body:'Your payout of ₦' + Number(amount).toLocaleString() + ' has been approved and will be sent to your bank within 1 business day.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Payout approved and seller notified.');
+    adminLoadPayouts();
+  } catch(e) { showToast('Could not approve payout.'); }
+};
+
+window.adminRejectPayout = async function(payoutId, sellerId) {
+  var reason = prompt('Reason for rejection:');
+  if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'rejected', rejectReason:reason });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'Payout rejected', body:'Your payout request was not approved. Reason: ' + reason, read:false, createdAt:fns.serverTimestamp() });
+    showToast('Payout rejected.');
+    adminLoadPayouts();
+  } catch(e) { showToast('Could not reject payout.'); }
+};
+
+window.adminLoadDisputes = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-disputes-table');
+  if (!tbody) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'disputes'), fns.orderBy('createdAt','desc')));
+    var rows = snap.docs.map(function(d) {
+      var r = d.data(); var did = d.id;
+      var statusColor = { open:'var(--red)', resolved:'var(--green)', closed:'var(--text3)' }[r.status]||'var(--gold)';
+      var action = r.status==='open'
+        ? '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;font-size:11px;" onclick="adminResolveDispute(\'' + did + '\',\'' + r.buyerId + '\',\'' + r.sellerId + '\')">Resolve</button>'
+        : '—';
+      return '<tr><td style="font-size:11px;font-family:monospace;">' + did.slice(0,8) + '</td><td>' + (r.buyerName||'—') + '</td><td>' + (r.sellerName||'—') + '</td><td>' + (r.productName||'—') + '</td><td>' + (r.reason||'—') + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'open') + '</td><td>' + action + '</td></tr>';
+    });
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No disputes filed.</td></tr>';
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:var(--red);padding:20px;">Error loading disputes.</td></tr>'; }
+};
+
+window.adminResolveDispute = async function(disputeId, buyerId, sellerId) {
+  var action = prompt('Resolution: type "refund" to refund buyer or "release" to release funds to seller:');
+  if (!action) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'disputes',disputeId), { status:'resolved', resolution:action, resolvedAt:fns.serverTimestamp() });
+    var msg = action.toLowerCase()==='refund' ? 'Your refund has been approved by admin.' : 'The funds have been released to the seller.';
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:buyerId, type:'payment', title:'Dispute resolved', body:msg, read:false, createdAt:fns.serverTimestamp() });
+    showToast('Dispute resolved.');
+    adminLoadDisputes();
+  } catch(e) { showToast('Could not resolve dispute.'); }
+};
+
+window.adminLoadBanned = async function() {
+  var db = window._db, fns = window._fns;
+  var tbody = document.getElementById('a-banned-table');
+  if (!tbody) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('banned','==',true)));
+    var rows = snap.docs.map(function(d) {
+      var u = d.data(); var uid = d.id;
+      var date = u.bannedAt&&u.bannedAt.toDate ? u.bannedAt.toDate().toLocaleDateString() : '—';
+      return '<tr><td>' + (u.fullName||'—') + '</td><td style="font-size:12px;color:var(--text3);">' + (u.email||'—') + '</td><td style="color:var(--red);">' + (u.banReason||'—') + '</td><td style="font-size:12px;">' + date + '</td><td><button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + uid + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button></td></tr>';
+    });
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5" style="color:var(--text3);padding:20px;text-align:center;">No banned accounts.</td></tr>';
+  } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="color:var(--red);padding:20px;">Error loading banned list.</td></tr>'; }
+};
+
+window.adminSendBroadcast = async function() {
+  var db = window._db, fns = window._fns;
+  var target = document.getElementById('bc-target')?.value || 'all';
+  var title  = document.getElementById('bc-title')?.value.trim();
+  var body   = document.getElementById('bc-body')?.value.trim();
+  if (!title || !body) { showToast('Please fill title and message.'); return; }
+  try {
+    var usersSnap = await fns.getDocs(fns.collection(db,'users'));
+    var batch = fns.writeBatch(db);
+    var count = 0;
+    usersSnap.docs.forEach(function(d) {
+      var u = d.data();
+      if (u.banned) return;
+      if (target==='sellers' && !u.sellerVerified) return;
+      var ref = fns.doc(fns.collection(db,'notifications'));
+      batch.set(ref, { userId:d.id, type:'broadcast', title:title, body:body, read:false, createdAt:fns.serverTimestamp() });
+      count++;
+    });
+    await batch.commit();
+    showToast('Broadcast sent to ' + count + ' users!');
+    document.getElementById('bc-title').value = '';
+    document.getElementById('bc-body').value = '';
+  } catch(e) { console.error(e); showToast('Could not send broadcast.'); }
+};
+
+// Patch adminTab loading for overview
+var _origAdminOverview = window.adminLoadOverview;
+window.adminLoadOverview = async function() {
+  if (_origAdminOverview) _origAdminOverview();
+  var db = window._db, fns = window._fns;
+  if (!db || !fns) return;
+  try {
+    var usersSnap = await fns.getDocs(fns.collection(db,'users'));
+    var prodSnap  = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active')));
+    var sellers   = usersSnap.docs.filter(function(d){ return d.data().sellerVerified; }).length;
+    var verifSnap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('verifSubmitted','==',true), fns.where('sellerVerified','==',false)));
+    var e = function(id){ return document.getElementById(id); };
+    if (e('astat-users'))    e('astat-users').textContent    = usersSnap.size;
+    if (e('astat-products')) e('astat-products').textContent = prodSnap.size;
+    if (e('astat-sellers'))  e('astat-sellers').textContent  = sellers;
+    if (e('astat-verif'))    e('astat-verif').textContent    = verifSnap.size;
+  } catch(err) { console.error(err); }
+};
+
+// Also wire sdTab to load orders & affiliate
+var _origSdTab = window.sdTab;
+window.sdTab = function(name) {
+  _origSdTab(name);
+  if (name === 'orders')    sdLoadOrders();
+  if (name === 'affiliate') sdLoadAffiliate();
+  if (name === 'payout') sdLoadPayout();
+};
+
+</script>
+
+<!-- ================================================================
+     CHECKOUT MODAL
+     ================================================================ -->
+<div id="checkout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:440px;width:100%;padding:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;">Checkout</div>
+      <button onclick="coCancelCheckout()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:4px;">You are buying</div>
+      <div style="font-size:15px;font-weight:700;" id="co-product-name">—</div>
+      <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:6px;" id="co-product-price">—</div>
+    </div>
+    <div style="background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--green);margin-bottom:20px;display:flex;gap:8px;align-items:center;">
+      <span>🔒</span> Payment is held in escrow until you confirm receipt.
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" onclick="coSubmitOrder()">Pay now →</button>
+    <button class="btn btn-ghost" style="width:100%;font-size:13px;" onclick="coCancelCheckout()">Cancel</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAYOUT REQUEST MODAL
+     ================================================================ -->
+<div id="payout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;">💸 Request Payout</div>
+      <button onclick="sdCancelPayout()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Amount (NGN)</label>
+        <input id="payout-amount" type="number" placeholder="e.g. 50000" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Bank name</label>
+        <input id="payout-bank" placeholder="e.g. GTBank" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Account number</label>
+        <input id="payout-acct" placeholder="10-digit account number" maxlength="10" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;font-family:monospace;">
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Account name</label>
+        <input id="payout-name" placeholder="e.g. John Doe" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+      </div>
+    </div>
+    <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:20px;">
+      ⏱ Payouts are processed within 1–3 business days after admin approval.
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="sdSubmitPayout()">Submit payout request →</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: MY ORDERS (buyer)
+     ================================================================ -->
+<div class="page" id="page-my-orders">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">← Marketplace</a>
+        <div class="avatar-btn" id="nav-avatar-myorders" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:900px;">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">My Orders</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">All your purchases in one place</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="myOrdersFilter(this,'all')">All</button>
+      <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="myOrdersFilter(this,'pending')">Pending</button>
+      <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="myOrdersFilter(this,'paid')">Paid</button>
+      <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="myOrdersFilter(this,'completed')">Completed</button>
+    </div>
+    <div id="my-orders-list">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading your orders…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: WISHLIST (buyer)
+     ================================================================ -->
+<div class="page" id="page-wishlist">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">← Marketplace</a>
+        <div class="avatar-btn" id="nav-avatar-wish" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:900px;">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">❤️ Wishlist</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">Products you saved for later</p>
+    <div id="wishlist-grid" class="pgrid"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: CART (buyer)
+     ================================================================ -->
+<div class="page" id="page-cart">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">← Keep shopping</a>
+        <div class="avatar-btn" id="nav-avatar-cart" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:900px;">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:20px;">🛒 Cart</h1>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;" id="cart-layout">
+      <div id="cart-items-list"></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;position:sticky;top:80px;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Order summary</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;"><span style="color:var(--text3);">Subtotal</span><span id="cart-subtotal">₦0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:16px;"><span style="color:var(--text3);">Service fee (2%)</span><span id="cart-fee">₦0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding-top:12px;border-top:1px solid var(--border);margin-bottom:20px;"><span>Total</span><span id="cart-total" style="color:var(--accent);">₦0</span></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="cartCheckout()">Checkout →</button>
+        <button class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:13px;" onclick="showPage('marketplace')">Continue shopping</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: MY VIEWINGS (buyer)
+     ================================================================ -->
+<div class="page" id="page-my-viewings">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">← Marketplace</a>
+        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:700px;">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">🏠 My Viewings</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">Property viewings you have booked</p>
+    <div id="re-buyer-viewings-list">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: RAISE DISPUTE (buyer)
+     ================================================================ -->
+<div class="page" id="page-dispute">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('my-orders')">← My Orders</a>
+        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="dash-wrap" style="max-width:600px;">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">⚠️ Raise a Dispute</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:24px;">We will review your case and respond within 48 hours.</p>
+    <div class="dash-card" style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Order ID</label>
+        <input id="dispute-order-id" placeholder="Paste your order ID" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Product name</label>
+        <input id="dispute-product-name" placeholder="What did you order?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Reason</label>
+        <select id="dispute-reason" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <option>Item not received</option>
+          <option>Item not as described</option>
+          <option>Seller asked for payment outside app</option>
+          <option>Damaged or defective item</option>
+          <option>Unauthorised charge</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Details</label>
+        <textarea id="dispute-details" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:100px;resize:vertical;" placeholder="Describe what happened in detail…"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitDispute()">Submit dispute →</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Cart item rows */
+.cart-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.cart-item-img{width:60px;height:60px;border-radius:var(--radius-xs);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;}
+.cart-qty-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.cart-qty-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Order card */
+.my-order-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+.rv-star{color:var(--border2);transition:.1s;}
+.rv-star:hover{color:#f5c842;}
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CART PAGE
+// ══════════════════════════════════════════════════════════════════
+window.openCart = function() {
+  showPage('cart');
+  cartRender();
+};
+
+window.cartRender = function() {
+  var list = document.getElementById('cart-items-list');
+  if (!list) return;
+  if (!_cart.length) {
+    list.innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">🛒</div><div style="font-size:15px;font-weight:700;margin-bottom:8px;">Your cart is empty</div><button class="btn btn-primary" onclick="showPage('marketplace')">Browse products →</button></div>';
+    cartCalcTotals();
+    return;
+  }
+  list.innerHTML = _cart.map(function(item, i) {
+    var img = item.photo ? '<img src="'+item.photo+'">' : '<span>📦</span>';
+    return '<div class="cart-item">' +
+      '<div class="cart-item-img">' + img + '</div>' +
+      '<div style="flex:1;"><div style="font-size:14px;font-weight:700;margin-bottom:2px;">' + (item.name||'Product') + '</div>' +
+      '<div style="font-size:13px;color:var(--text3);">by ' + (item.sellerName||'Seller') + '</div>' +
+      '<div style="font-size:14px;font-weight:700;color:var(--accent);margin-top:4px;">' + (item.currency||'NGN') + ' ' + Number(item.price||0).toLocaleString() + '</div></div>' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<button class="cart-qty-btn" onclick="cartQty(' + i + ',-1)">−</button>' +
+      '<span style="font-size:14px;font-weight:700;min-width:20px;text-align:center;">' + (item.qty||1) + '</span>' +
+      '<button class="cart-qty-btn" onclick="cartQty(' + i + ',1)">+</button>' +
+      '</div>' +
+      '<button onclick="cartRemove(' + i + ')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0 4px;" title="Remove">🗑</button>' +
+      '</div>';
+  }).join('');
+  cartCalcTotals();
+};
+
+window.cartQty = function(idx, delta) {
+  if (!_cart[idx]) return;
+  _cart[idx].qty = Math.max(1, (_cart[idx].qty||1) + delta);
+  cartSave();
+  cartRender();
+};
+
+window.cartRemove = function(idx) {
+  _cart.splice(idx, 1);
+  cartSave();
+  cartRender();
+};
+
+window.cartCalcTotals = function() {
+  var sub = _cart.reduce(function(s,i){ return s + (Number(i.price||0) * (i.qty||1)); }, 0);
+  var fee = Math.round(sub * 0.02);
+  var total = sub + fee;
+  var e = function(id){ return document.getElementById(id); };
+  if (e('cart-subtotal')) e('cart-subtotal').textContent = '₦' + sub.toLocaleString();
+  if (e('cart-fee')) e('cart-fee').textContent = '₦' + fee.toLocaleString();
+  if (e('cart-total')) e('cart-total').textContent = '₦' + total.toLocaleString();
+};
+
+window.cartCheckout = function() {
+  if (!_cart.length) { showToast('Your cart is empty.'); return; }
+  var auth = window._auth;
+  if (!auth || !auth.currentUser) { showToast('Please sign in to checkout.'); showPage('login'); return; }
+  // Checkout each item individually for now
+  if (_cart.length === 1) {
+    window._checkoutProduct = _cart[0];
+    document.getElementById('co-product-name').textContent = _cart[0].name;
+    document.getElementById('co-product-price').textContent = (_cart[0].currency||'NGN') + ' ' + Number(_cart[0].price||0).toLocaleString();
+    document.getElementById('checkout-modal').style.display = 'flex';
+  } else {
+    showToast('Multi-item checkout coming soon. Please buy one at a time.');
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// MY ORDERS PAGE (buyer)
+// ══════════════════════════════════════════════════════════════════
+var _myAllOrders = [];
+
+window.openMyOrders = async function() {
+  showPage('my-orders');
+  myOrdersLoad();
+};
+
+window.myOrdersLoad = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var el = document.getElementById('my-orders-list');
+  if (!el || !user) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    _myAllOrders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    myOrdersRender(_myAllOrders);
+  } catch(e) { el.innerHTML = '<div style="color:var(--red);font-size:13px;text-align:center;padding:30px;">Could not load orders.</div>'; }
+};
+
+function myOrdersRender(orders) {
+  var el = document.getElementById('my-orders-list');
+  if (!el) return;
+  if (!orders.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">🛍</div><div style="font-size:15px;font-weight:700;margin-bottom:8px;">No orders yet</div><button class="btn btn-primary" onclick="showPage('marketplace')">Start shopping →</button></div>';
+    return;
+  }
+  var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)' };
+  el.innerHTML = orders.map(function(o) {
+    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+    var color = statusColor[o.status]||'var(--text3)';
+    var actions = '';
+    if (o.status==='paid'||o.status==='completed') {
+      if (o.productType==='course') actions += '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-right:6px;" onclick="watchCourse(''+o.productId+'')">▶ Watch</button>';
+    }
+    if (o.status==='paid') actions += '<button class="btn btn-sm btn-ghost" onclick="myOrderConfirmReceipt(''+o._id+'')">✓ Confirm received</button>';
+    actions += ' <button class="btn btn-sm btn-ghost" style="color:var(--red);" onclick="showPage('dispute');document.getElementById('dispute-order-id').value=''+o._id+'';document.getElementById('dispute-product-name').value=''+(o.productName||'').replace(/'/g,"\'")+''">⚠️ Dispute</button>';
+    return '<div class="my-order-card">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">' +
+      '<div><div style="font-size:14px;font-weight:700;">' + (o.productName||'—') + '</div>' +
+      '<div style="font-size:12px;color:var(--text3);">Order ' + o._id.slice(0,8) + ' · ' + date + '</div></div>' +
+      '<div style="font-size:15px;font-weight:800;color:var(--accent);">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div></div>' +
+      '<div style="font-size:12.5px;font-weight:700;color:' + color + ';margin-bottom:10px;">' + (o.status||'—') + '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + actions + '</div></div>';
+  }).join('');
+}
+
+window.myOrdersFilter = function(btn, status) {
+  document.querySelectorAll('.sd-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var filtered = status==='all' ? _myAllOrders : _myAllOrders.filter(function(o){ return o.status===status; });
+  myOrdersRender(filtered);
+};
+
+window.myOrderConfirmReceipt = async function(orderId) {
+  var db = window._db, fns = window._fns;
+  if (!confirm('Confirm you received this order?')) return;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'completed' });
+    showToast('Receipt confirmed! Funds released to seller.');
+    myOrdersLoad();
+  } catch(e) { showToast('Could not confirm receipt.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// WISHLIST PAGE
+// ══════════════════════════════════════════════════════════════════
+window.openWishlist = function() {
+  showPage('wishlist');
+  wishlistRender();
+};
+
+window.wishlistRender = function() {
+  var grid = document.getElementById('wishlist-grid');
+  if (!grid) return;
+  if (!_wishlist.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--text3);grid-column:1/-1;"><div style="font-size:48px;margin-bottom:12px;">❤️</div><div style="font-size:15px;font-weight:700;margin-bottom:8px;">Nothing saved yet</div><button class="btn btn-primary" onclick="showPage('marketplace')">Browse products →</button></div>';
+    return;
+  }
+  grid.innerHTML = _wishlist.map(function(item, i) {
+    return '<div class="pcard" onclick="openProduct('' + item.id + '')">' +
+      '<div class="pcard-img">' + (item.emoji||'📦') + '</div>' +
+      '<div class="pcard-body">' +
+      '<div class="pcard-name">' + (item.name||'Product') + '</div>' +
+      '<div class="pcard-price">' + (item.currency||'NGN') + ' ' + Number(item.price||0).toLocaleString() + '</div>' +
+      '</div>' +
+      '<button style="position:absolute;top:8px;right:8px;background:rgba(240,82,82,.15);border:none;border-radius:50%;width:28px;height:28px;color:var(--red);cursor:pointer;font-size:14px;" onclick="event.stopPropagation();wishRemove(' + i + ')">×</button>' +
+      '</div>';
+  }).join('');
+};
+
+window.wishRemove = function(idx) {
+  _wishlist.splice(idx, 1);
+  wishSave();
+  wishlistRender();
+};
+
+// ══════════════════════════════════════════════════════════════════
+// DISPUTE SUBMISSION
+// ══════════════════════════════════════════════════════════════════
+window.submitDispute = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in.'); return; }
+  var orderId = document.getElementById('dispute-order-id')?.value.trim();
+  var productName = document.getElementById('dispute-product-name')?.value.trim();
+  var reason = document.getElementById('dispute-reason')?.value;
+  var details = document.getElementById('dispute-details')?.value.trim();
+  if (!orderId || !reason || !details) { showToast('Please fill all fields.'); return; }
+  var profile = window._currentUser || {};
+  try {
+    // Find order to get sellerId
+    var ordSnap = await fns.getDoc(fns.doc(db,'orders',orderId));
+    var sellerId = ordSnap.exists() ? ordSnap.data().sellerId : '';
+    var sellerName = ordSnap.exists() ? ordSnap.data().sellerName : '';
+    await fns.addDoc(fns.collection(db,'disputes'), {
+      orderId, productName, reason, details,
+      buyerId: user.uid,
+      buyerName: profile.fullName||user.displayName||'Buyer',
+      buyerEmail: user.email,
+      sellerId, sellerName,
+      status: 'open',
+      createdAt: fns.serverTimestamp(),
+    });
+    showToast('Dispute submitted. We will review within 48 hours.');
+    showPage('my-orders');
+  } catch(e) { console.error(e); showToast('Could not submit dispute.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// WIRE BUYER LINKS IN NAV / PROFILE
+// ══════════════════════════════════════════════════════════════════
+// Add My Orders, Wishlist, Cart, Viewings to user dropdown
+document.addEventListener('DOMContentLoaded', function() {
+  var dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  var section = dd.querySelector('div[style*="padding:6px 0"]:first-of-type');
+  if (!section) return;
+  var links = document.createElement('div');
+  links.innerHTML =
+    '<div class="dd-item" onclick="openMyOrders();closeDropdown()">🛍 My Orders</div>' +
+    '<div class="dd-item" onclick="openWishlist();closeDropdown()">❤️ Wishlist</div>' +
+    '<div class="dd-item" onclick="openCart();closeDropdown()">🛒 Cart <span id="cart-badge" style="display:none;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:4px;"></span></div>' +
+    '<div class="dd-item" onclick="showPage('my-viewings');reLoadBuyerViewings();closeDropdown()">🏠 My Viewings</div>' +
+    '<div class="dd-item" onclick="notifOpen();closeDropdown()">🔔 Notifications</div>';
+  section.insertBefore(links, section.firstChild);
+  cartUpdateBadge();
 });
+</script>
+
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// SELLER OVERVIEW — real stats from Firebase
+// ══════════════════════════════════════════════════════════════════
+window.sdLoadOverview = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  try {
+    var e = function(id){ return document.getElementById(id); };
+    // Products
+    var pSnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid)));
+    if (e('sd-stat-products')) e('sd-stat-products').textContent = pSnap.size;
+    // Orders
+    var oSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
+    if (e('sd-stat-orders')) e('sd-stat-orders').textContent = oSnap.size;
+    // Revenue
+    var revenue = oSnap.docs.filter(function(d){ return d.data().status==='paid'||d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    if (e('sd-stat-revenue')) e('sd-stat-revenue').textContent = '₦' + revenue.toLocaleString();
+    // Pending orders
+    var pending = oSnap.docs.filter(function(d){ return d.data().status==='pending'; }).length;
+    if (e('sd-stat-pending')) e('sd-stat-pending').textContent = pending;
+    // Viewings pending
+    try {
+      var vSnap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.where('sellerId','==',user.uid), fns.where('status','==','pending')));
+      if (e('sd-stat-viewings')) e('sd-stat-viewings').textContent = vSnap.size;
+    } catch(ve) {}
+  } catch(e) { console.error(e); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// MARKETPLACE — search + category filter wired to real Firebase data
+// ══════════════════════════════════════════════════════════════════
+var _allProducts = [];
+
+// Override filterProducts to work with real data
+window.filterProducts = function(query) {
+  var q = (query||'').toLowerCase().trim();
+  var filtered = q
+    ? _allProducts.filter(function(p){ return (p.name||'').toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q) || (p.sellerName||'').toLowerCase().includes(q); })
+    : _allProducts;
+  applyActiveFilters(filtered);
+};
+
+window.applyFilters = function() {
+  applyActiveFilters(_allProducts);
+};
+
+function applyActiveFilters(products) {
+  // Category checkboxes
+  var catChecks = document.querySelectorAll('.filter-panel .filter-group:first-of-type .fcheck input:checked');
+  var cats = Array.from(catChecks).map(function(c){ return c.parentNode.textContent.trim().toLowerCase(); });
+  // Type checkboxes
+  var typeChecks = document.querySelectorAll('.filter-panel .filter-group:last-of-type .fcheck input:checked');
+  var types = Array.from(typeChecks).map(function(c){ return c.parentNode.textContent.trim().toLowerCase(); });
+  var filtered = products.filter(function(p) {
+    var catMatch = !cats.length || cats.some(function(c){ return (p.category||'').toLowerCase().includes(c); });
+    var typeMatch = !types.length || types.some(function(t){ return (p.type||p.productType||'').toLowerCase().includes(t); });
+    return catMatch && typeMatch;
+  });
+  renderProductGrid(filtered);
+}
+
+function renderProductGrid(products) {
+  var grid = document.getElementById('products-grid');
+  var empty = document.getElementById('empty-state');
+  var count = document.getElementById('result-count');
+  if (!grid) return;
+  if (count) count.textContent = products.length + ' product' + (products.length===1?'':'s');
+  if (!products.length) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  grid.innerHTML = products.map(function(p) {
+    var img = p.photos && p.photos.length ? '<img src="'+p.photos[0]+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
+    var badge = p.productType==='realestate' ? '<span style="position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;">🏠 Property</span>' : '';
+    return '<div class="pcard" onclick="openProduct('' + p._id + '')" style="position:relative;">' +
+      badge +
+      '<div class="pcard-img">' + img + '</div>' +
+      '<div class="pcard-body">' +
+      '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
+      '<div style="font-size:11.5px;color:var(--text3);margin-bottom:4px;">by ' + (p.sellerName||'Seller') + '</div>' +
+      '<div class="pcard-price">' + (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString() + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+// Load all products on marketplace open — patch the existing loadProducts
+var _origLoadProducts = window.loadProducts;
+window.loadProducts = async function() {
+  if (_origLoadProducts) { try { await _origLoadProducts(); } catch(e) {} }
+  var db = window._db, fns = window._fns;
+  if (!db || !fns) return;
+  var grid = document.getElementById('products-grid');
+  if (!grid) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active'), fns.orderBy('createdAt','desc')));
+    _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    renderProductGrid(_allProducts);
+  } catch(e) { console.error('loadProducts error', e); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// SELLER ANALYTICS — real chart data
+// ══════════════════════════════════════════════════════════════════
+window.sdLoadAnalytics = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var sec = document.getElementById('sd-sec-analytics');
+  if (!sec || !user) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','asc')));
+    // Build monthly revenue map
+    var monthly = {};
+    snap.docs.forEach(function(d) {
+      var o = d.data();
+      if (!o.createdAt || !o.createdAt.toDate) return;
+      var dt = o.createdAt.toDate();
+      var key = dt.toLocaleString('default',{month:'short',year:'numeric'});
+      monthly[key] = (monthly[key]||0) + Number(o.price||0);
+    });
+    var labels = Object.keys(monthly);
+    var values = labels.map(function(k){ return monthly[k]; });
+    var maxV = Math.max.apply(null, values.concat([1]));
+    // Simple bar chart using HTML
+    var bars = labels.map(function(l,i) {
+      var pct = Math.round((values[i]/maxV)*100);
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">' +
+        '<div style="font-size:11px;color:var(--accent);font-weight:700;">₦' + (values[i]/1000).toFixed(0) + 'k</div>' +
+        '<div style="width:100%;background:var(--bg3);border-radius:4px;height:120px;display:flex;align-items:flex-end;overflow:hidden;">' +
+        '<div style="width:100%;background:linear-gradient(180deg,var(--accent),var(--accent2));height:' + pct + '%;border-radius:4px 4px 0 0;transition:.4s;"></div></div>' +
+        '<div style="font-size:10px;color:var(--text3);">' + l + '</div></div>';
+    }).join('');
+    var total = values.reduce(function(s,v){ return s+v; },0);
+    sec.innerHTML = '<div class="sd-page-hd">Analytics</div><div class="sd-page-sub">Your sales performance over time</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">' +
+      '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + total.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
+      '<div class="sd-stat-card"><div class="sd-stat-val">' + snap.size + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
+      '<div class="sd-stat-card"><div class="sd-stat-val">₦' + (snap.size ? Math.round(total/snap.size).toLocaleString() : 0) + '</div><div class="sd-stat-lbl">Avg order value</div></div></div>' +
+      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">Monthly revenue</div>' +
+      (bars ? '<div style="display:flex;gap:8px;align-items:flex-end;min-height:160px;">' + bars + '</div>' : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No sales data yet.</div>') +
+      '</div>';
+  } catch(e) { console.error(e); }
+};
+
+// Wire analytics tab
+var _origSdTab2 = window.sdTab;
+window.sdTab = function(name) {
+  _origSdTab2(name);
+  if (name === 'analytics') sdLoadAnalytics();
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ALSO LOAD OVERVIEW ON SELLER DASHBOARD OPEN
+// ══════════════════════════════════════════════════════════════════
+var _origShowPage = window.showPage;
+window.showPage = function(name) {
+  _origShowPage(name);
+  if (name === 'marketplace') { setTimeout(loadProducts, 100); }
+  if (name === 'my-orders') { setTimeout(myOrdersLoad, 100); }
+  if (name === 'seller-dashboard') { setTimeout(sdLoadOverview, 200); }
+  if (name === 'notifications') { setTimeout(notifLoad, 100); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// PAYSTACK SCRIPT LOADER
+// ══════════════════════════════════════════════════════════════════
+(function() {
+  if (document.getElementById('paystack-script')) return;
+  var s = document.createElement('script');
+  s.id = 'paystack-script';
+  s.src = 'https://js.paystack.co/v1/inline.js';
+  document.head.appendChild(s);
+})();
 </script>
 
 </body>
