@@ -6072,7 +6072,7 @@ window.reLoadViewingRequests = async function() {
   if (!el || !user) return;
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db, 'viewingRequests'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
     if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No viewing requests yet.</div>'; return; }
     el.innerHTML = '';
     snap.docs.forEach(function(d) {
@@ -7343,8 +7343,9 @@ window.adminLoadOrders = async function() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.orderBy('createdAt','desc')));
+    var snap = await fns.getDocs(fns.collection(db,'orders'));
     var orders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    orders.sort(function(a,b){ return ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0); });
     var revenue = orders.filter(function(o){ return o.status==='paid'||o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
     var escrow = orders.filter(function(o){ return o.status==='pending'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
     var e = function(id){ return document.getElementById(id); };
@@ -7377,8 +7378,9 @@ window.adminLoadViewings = async function() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.orderBy('createdAt','desc')));
-    var rows = snap.docs.map(function(d) {
+    var snap = await fns.getDocs(fns.collection(db,'viewingRequests'));
+    var allDocs = snap.docs.sort(function(a,b){ return ((b.data().createdAt&&b.data().createdAt.seconds)||0)-((a.data().createdAt&&a.data().createdAt.seconds)||0); });
+    var rows = allDocs.map(function(d) {
       var r = d.data();
       var slot = r.slot ? r.slot.day + ' ' + r.slot.from + '-' + r.slot.to : '-';
       var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--blue)', completed:'var(--green)' }[r.status]||'var(--text3)';
@@ -7394,8 +7396,9 @@ window.adminLoadPayouts = async function() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.orderBy('createdAt','desc')));
-    var rows = snap.docs.map(function(d) {
+    var snap = await fns.getDocs(fns.collection(db,'payoutRequests'));
+    var sortedPay = snap.docs.sort(function(a,b){ return ((b.data().createdAt&&b.data().createdAt.seconds)||0)-((a.data().createdAt&&a.data().createdAt.seconds)||0); });
+    var rows = sortedPay.map(function(d) {
       var p = d.data(); var did = d.id;
       var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
       var statusColor = { pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)' }[p.status]||'var(--text3)';
@@ -7437,8 +7440,9 @@ window.adminLoadDisputes = async function() {
   var tbody = document.getElementById('a-disputes-table');
   if (!tbody) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'disputes'), fns.orderBy('createdAt','desc')));
-    var rows = snap.docs.map(function(d) {
+    var snap = await fns.getDocs(fns.collection(db,'disputes'));
+    var sortedDisp = snap.docs.sort(function(a,b){ return ((b.data().createdAt&&b.data().createdAt.seconds)||0)-((a.data().createdAt&&a.data().createdAt.seconds)||0); });
+    var rows = sortedDisp.map(function(d) {
       var r = d.data(); var did = d.id;
       var statusColor = { open:'var(--red)', resolved:'var(--green)', closed:'var(--text3)' }[r.status]||'var(--gold)';
       var action = r.status==='open'
@@ -8086,7 +8090,7 @@ window.sdLoadAnalytics = async function() {
   var sec = document.getElementById('sd-sec-analytics');
   if (!sec || !user) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','asc')));
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
     // Build monthly revenue map
     var monthly = {};
     snap.docs.forEach(function(d) {
