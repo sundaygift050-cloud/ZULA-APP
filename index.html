@@ -1568,15 +1568,27 @@ p{color:var(--text2);margin:0 0 1em;}
       <!-- MEDIA UPLOAD -->
       <div class="ap-card">
         <div class="ap-card-hd" id="ap-upload-card-title">📸 Product photos</div>
-        <div class="ap-card-sub" id="ap-upload-card-sub">Add up to 10 photos. The first photo is your cover image — buyers see it first.</div>
+        <div class="ap-card-sub" id="ap-upload-card-sub">Add up to 20 photos. The first photo is your cover image — buyers see it first.</div>
 
         <div id="ap-photo-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-bottom:12px;"></div>
 
-        <label id="ap-photo-add-btn" style="display:flex;align-items:center;gap:8px;padding:11px 16px;border:2px dashed var(--border2);border-radius:var(--radius-xs);cursor:pointer;color:var(--text3);font-size:13px;font-weight:600;font-family:var(--font-body);transition:.15s;margin-bottom:4px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">
-          <input type="file" accept="image/*" multiple style="display:none;" onchange="apHandlePhotoUpload(this)">
-          <span style="font-size:18px;">⬆️</span> Add photos (JPG, PNG, GIF · max 10 MB each)
-        </label>
-        <div style="font-size:11.5px;color:var(--text3);margin-bottom:4px;" id="ap-photo-count">0 / 20 photos added</div>
+        <!-- Hidden real file input — triggered by button click below -->
+        <input type="file" id="ap-photo-input" accept="image/*" multiple style="display:none;" onchange="apHandlePhotoUpload(this)">
+
+        <!-- Upload drop zone -->
+        <div id="ap-photo-add-btn"
+          onclick="document.getElementById('ap-photo-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(124,92,252,.07)'"
+          ondragleave="this.style.borderColor='var(--border2)';this.style.background=''"
+          ondrop="event.preventDefault();this.style.borderColor='var(--border2)';this.style.background='';apHandlePhotoDrop(event)"
+          style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:28px 16px;border:2px dashed var(--border2);border-radius:var(--radius-sm);cursor:pointer;color:var(--text3);font-family:var(--font-body);transition:.15s;margin-bottom:4px;text-align:center;user-select:none;">
+          <div style="font-size:36px;line-height:1;">📸</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text2);">Tap here to add photos</div>
+          <div style="font-size:12px;">JPG, PNG, GIF · max 10 MB each · up to 20 photos</div>
+          <div style="font-size:11.5px;margin-top:4px;padding:4px 12px;background:var(--accent);color:#fff;border-radius:999px;font-weight:600;">Choose photos</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:6px;margin-bottom:4px;" id="ap-photo-count">0 / 20 photos added</div>
+        <div id="ap-photo-upload-status" style="display:none;font-size:12.5px;color:var(--accent);margin-bottom:4px;"></div>
 
         <div id="ap-digital-file-section" style="display:none;margin-top:16px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📎 Your delivery file</div>
@@ -4053,21 +4065,29 @@ window.avatarApplyPhoto = function(url) {
 
 // ── VERIFICATION FILE UPLOADS (Cloudinary) ───────────────────────────
 const CLOUDINARY_CLOUD = 'dclahlchz';
-const CLOUDINARY_PRESET = 'zula_verif'; // unsigned preset — works for all upload types
+const CLOUDINARY_PRESET = 'zula_verif'; // unsigned preset
 
 async function uploadToCloudinary(file, folder) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_PRESET);
-  if (folder) formData.append('folder', folder);
+  // Generate a unique public_id so overwrite:false never blocks us
+  const uniqueId = (folder || 'zula') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  formData.append('public_id', uniqueId);
+  // Use image/upload (not auto/upload) for reliable unsigned preset support
+  const resourceType = file.type && file.type.startsWith('video/') ? 'video' : 'image';
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`,
     { method: 'POST', body: formData }
   );
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
-    throw new Error('Cloudinary upload failed: ' + (errData.error?.message || res.status));
+    const msg = (errData.error && errData.error.message) || res.status;
+    throw new Error('Cloudinary upload failed: ' + msg);
   }
+  const data = await res.json();
+  return data.secure_url;
+}
   const data = await res.json();
   return data.secure_url;
 }
@@ -5781,24 +5801,32 @@ window.submitProduct = async function() {
     let photoUrls = [];
     const localPhotos = window._apPhotos || [];
     if (localPhotos.length > 0) {
-      if (publishBtn) publishBtn.textContent = 'Uploading photos…';
+      if (publishBtn) publishBtn.textContent = 'Uploading photos (0/' + localPhotos.length + ')…';
       showToast('📸 Uploading ' + localPhotos.length + ' photo' + (localPhotos.length > 1 ? 's' : '') + '…');
 
       for (let i = 0; i < localPhotos.length; i++) {
         try {
-          // Convert dataUrl to Blob for upload
-          const dataUrl = localPhotos[i].dataUrl;
-          const res = await fetch(dataUrl);
-          const blob = await res.blob();
-          const file = new File([blob], localPhotos[i].name || ('photo_' + i + '.jpg'), { type: blob.type });
-          const url = await uploadToCloudinary(file, 'zula_products/' + user.uid);
+          if (publishBtn) publishBtn.textContent = 'Uploading photo ' + (i+1) + ' of ' + localPhotos.length + '…';
+          // Use the stored File object directly (fastest, no re-encoding)
+          const fileObj = localPhotos[i].file || await (async () => {
+            // Fallback: rebuild File from dataUrl if file object lost
+            const res2 = await fetch(localPhotos[i].dataUrl);
+            const blob = await res2.blob();
+            return new File([blob], localPhotos[i].name || ('photo_' + i + '.jpg'), { type: blob.type });
+          })();
+          const url = await uploadToCloudinary(fileObj, 'zula_products/' + user.uid);
           photoUrls.push(url);
-          if (publishBtn) publishBtn.textContent = 'Uploading… ' + (i+1) + '/' + localPhotos.length;
         } catch(uploadErr) {
-          console.error('Photo upload failed:', uploadErr);
-          // Fall back to dataUrl for this photo (not ideal but keeps the product)
-          photoUrls.push(localPhotos[i].dataUrl);
+          console.error('Photo ' + (i+1) + ' upload failed:', uploadErr);
+          showToast('⚠️ Photo ' + (i+1) + ' could not upload — skipped.');
         }
+      }
+
+      if (photoUrls.length === 0 && localPhotos.length > 0) {
+        // All uploads failed — likely a Cloudinary preset issue
+        if (publishBtn) { publishBtn.textContent = 'Publish now →'; publishBtn.disabled = false; }
+        showToast('❌ Photo upload failed. Check your Cloudinary preset is set to "Unsigned" and try again.');
+        return;
       }
     }
     if (publishBtn) publishBtn.textContent = 'Saving product…';
@@ -7081,25 +7109,54 @@ window.reVerifyPayment = async function(requestId, buyerId, productName) {
 };
 
 // - MULTI-PHOTO UPLOAD -
-var _apPhotos = []; // [{dataUrl, name}]
+var _apPhotos = []; // [{dataUrl, name, file}]
 var MAX_PHOTOS = 20;
+
+window.apHandlePhotoDrop = function(event) {
+  var files = Array.from(event.dataTransfer.files).filter(function(f){ return f.type.startsWith('image/'); });
+  apProcessPhotoFiles(files);
+};
 
 window.apHandlePhotoUpload = function(input) {
   var files = Array.from(input.files);
+  input.value = ''; // reset so same file can be re-selected
+  apProcessPhotoFiles(files);
+};
+
+window.apProcessPhotoFiles = function(files) {
   var remaining = MAX_PHOTOS - _apPhotos.length;
-  if (remaining <= 0) { showToast('Maximum 20 photos reached.'); return; }
+  if (remaining <= 0) { showToast('Maximum ' + MAX_PHOTOS + ' photos reached.'); return; }
+
+  // Filter oversized files
+  var tooBig = files.filter(function(f){ return f.size > 10 * 1024 * 1024; });
+  if (tooBig.length) {
+    showToast('⚠️ ' + tooBig.length + ' photo(s) skipped — each must be under 10 MB.');
+    files = files.filter(function(f){ return f.size <= 10 * 1024 * 1024; });
+  }
   files = files.slice(0, remaining);
+  if (!files.length) return;
+
+  var statusEl = document.getElementById('ap-photo-upload-status');
+  if (statusEl) { statusEl.textContent = 'Loading ' + files.length + ' photo' + (files.length > 1 ? 's' : '') + '…'; statusEl.style.display = ''; }
+
   var loaded = 0;
   files.forEach(function(file) {
     var reader = new FileReader();
     reader.onload = function(e) {
-      _apPhotos.push({ dataUrl: e.target.result, name: file.name });
+      _apPhotos.push({ dataUrl: e.target.result, name: file.name, file: file });
+      loaded++;
+      if (loaded === files.length) {
+        apRenderPhotoGrid();
+        if (statusEl) { statusEl.style.display = 'none'; }
+        showToast('✅ ' + loaded + ' photo' + (loaded > 1 ? 's' : '') + ' added!');
+      }
+    };
+    reader.onerror = function() {
       loaded++;
       if (loaded === files.length) apRenderPhotoGrid();
     };
     reader.readAsDataURL(file);
   });
-  input.value = ''; // reset so same file can be re-added if removed
 };
 
 window.apRemovePhoto = function(idx) {
@@ -7108,23 +7165,30 @@ window.apRemovePhoto = function(idx) {
 };
 
 window.apRenderPhotoGrid = function() {
-  var grid = document.getElementById('ap-photo-grid');
+  var grid    = document.getElementById('ap-photo-grid');
   var countEl = document.getElementById('ap-photo-count');
-  var addBtn = document.getElementById('ap-photo-add-btn');
+  var addBtn  = document.getElementById('ap-photo-add-btn');
   if (!grid) return;
   grid.innerHTML = '';
   _apPhotos.forEach(function(photo, i) {
     var tile = document.createElement('div');
     tile.className = 'ap-photo-tile';
     tile.innerHTML =
-      '<img src="' + photo.dataUrl + '" alt="photo ' + (i+1) + '">' +
+      '<img src="' + photo.dataUrl + '" alt="photo ' + (i+1) + '" style="width:100%;height:100%;object-fit:cover;">' +
       '<div class="ap-pt-num">' + (i+1) + '</div>' +
       (i === 0 ? '<div class="ap-pt-cover">Cover</div>' : '') +
       '<button class="ap-pt-rm" onclick="apRemovePhoto(' + i + ')" type="button" title="Remove">×</button>';
     grid.appendChild(tile);
   });
   if (countEl) countEl.textContent = _apPhotos.length + ' / ' + MAX_PHOTOS + ' photos added';
-  if (addBtn) addBtn.style.display = _apPhotos.length >= MAX_PHOTOS ? 'none' : '';
+  if (addBtn) {
+    addBtn.style.display = _apPhotos.length >= MAX_PHOTOS ? 'none' : '';
+    // shrink the zone once photos exist
+    if (_apPhotos.length > 0) {
+      addBtn.style.padding = '14px 16px';
+      addBtn.querySelector('div:first-child') && (addBtn.querySelector('div:first-child').style.fontSize = '24px');
+    }
+  }
 };
 
 // - LESSON BUILDER (Add Product form) -
