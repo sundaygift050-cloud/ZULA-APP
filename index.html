@@ -4067,7 +4067,7 @@ window.avatarApplyPhoto = function(url) {
 const CLOUDINARY_CLOUD = 'dclahlchz';
 const CLOUDINARY_PRESET = 'zula_verif'; // unsigned preset
 
-async function uploadToCloudinary(file, folder) {
+window.uploadToCloudinary = async function(file, folder) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_PRESET);
