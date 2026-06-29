@@ -3729,22 +3729,80 @@ window.clearAllFilters = function() {
 
 window.viewProduct = function(id) {
   const p = (window._allProducts||[]).find(x => x.id === id);
-  if (!p) return;
+  if (!p) { if (typeof openProduct === 'function') openProduct(id); return; }
   window._currentProduct = p;
-  document.getElementById('pd-img').textContent    = p.emoji || '📦';
-  document.getElementById('pd-title').textContent  = p.name;
-  document.getElementById('pd-seller').textContent = 'By ' + (p.sellerName || 'ZÚLA Seller');
-  document.getElementById('pd-price').textContent  = 'NGN ' + Number(p.price).toLocaleString();
-  document.getElementById('pd-desc').textContent   = p.description || '';
-  document.getElementById('pd-tags').innerHTML     =
-    `<span class="tag tag-gold">${p.type||'Physical'}</span>` +
-    (p.commission ? ` <span class="tag tag-green">Affiliate · ${p.commission}%</span>` : '');
-  const msgBtn = document.getElementById('pd-msg-seller-btn');
+
+  // ── PHOTO / EMOJI ──────────────────────────────────────────────
+  var imgEl = document.getElementById('pd-img');
+  if (imgEl) {
+    var photoSrc = (p.photos && p.photos.length > 0) ? p.photos[0] : (p.photo || '');
+    if (photoSrc) {
+      imgEl.innerHTML = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">';
+    } else {
+      imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦');
+      imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex';
+      imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center';
+    }
+  }
+  // Thumbnail strip
+  var thumbs = document.getElementById('pd-photo-thumbs');
+  if (thumbs) {
+    if (p.photos && p.photos.length > 1) {
+      thumbs.innerHTML = p.photos.map(function(ph, i) {
+        return '<img src="' + ph + '" onclick="pdSwapPhoto(\'' + ph + '\')" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ' + (i===0?'var(--accent)':'var(--border)') + '">';
+      }).join('');
+    } else {
+      thumbs.innerHTML = '';
+    }
+  }
+
+  // ── TEXT FIELDS ────────────────────────────────────────────────
+  var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  setText('pd-title',  p.name);
+  setText('pd-seller', 'By ' + (p.sellerName || 'ZÚLA Seller'));
+  setText('pd-price',  (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
+  setText('pd-desc',   p.description || '');
+
+  var tagsEl = document.getElementById('pd-tags');
+  if (tagsEl) tagsEl.innerHTML =
+    '<span class="tag tag-gold">' + (p.type||'Physical') + '</span>' +
+    (p.commission ? ' <span class="tag tag-green">Affiliate · ' + p.commission + '%</span>' : '') +
+    (p.sellerVerified ? ' <span class="tag" style="background:rgba(39,201,122,.1);color:var(--green);">🛡 Verified seller</span>' : '');
+
+  // ── SELLER MESSAGE BUTTON ──────────────────────────────────────
+  var msgBtn = document.getElementById('pd-msg-seller-btn');
   if (msgBtn) {
-    const user = window._auth && window._auth.currentUser;
+    var user = window._auth && window._auth.currentUser;
     msgBtn.style.display = (p.sellerId && (!user || p.sellerId !== user.uid)) ? 'inline-flex' : 'none';
   }
+
+  // ── AFFILIATE SECTION ──────────────────────────────────────────
+  var affWrap = document.getElementById('pd-affiliate-wrap');
+  var affLink = document.getElementById('pd-affiliate-link');
+  var affPct  = document.getElementById('pd-commission-pct');
+  if (affWrap) {
+    if (p.commission && p.commission > 0) {
+      affWrap.style.display = '';
+      if (affPct) affPct.textContent = p.commission;
+      var user2 = window._auth && window._auth.currentUser;
+      if (affLink && user2) affLink.value = window.location.origin + window.location.pathname + '?ref=' + user2.uid + '&p=' + p.id;
+    } else { affWrap.style.display = 'none'; }
+  }
+
+  // ── SOCIAL SHARE ROW ──────────────────────────────────────────
+  if (typeof pdRenderShareRow === 'function') pdRenderShareRow();
+
   showPage('product');
+};
+
+// Swap main product photo when thumbnail clicked
+window.pdSwapPhoto = function(src) {
+  var imgEl = document.getElementById('pd-img');
+  if (imgEl) imgEl.innerHTML = '<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">';
+  // Update thumbnail border
+  document.querySelectorAll('#pd-photo-thumbs img').forEach(function(img) {
+    img.style.borderColor = img.src === src ? 'var(--accent)' : 'var(--border)';
+  });
 };
 
 window.publishProduct = async function() {
