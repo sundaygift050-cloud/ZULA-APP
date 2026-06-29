@@ -774,6 +774,19 @@ p{color:var(--text2);margin:0 0 1em;}
 .sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
 .sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
 
+/* ── TABLET FILTER PANEL (760px–1024px) ── */
+@media(min-width:761px) and (max-width:1024px){
+  .filter-panel{display:none;}
+  .filter-panel.mobile-open{display:block;}
+  #filter-toggle-btn{display:inline-flex !important;}
+}
+/* ── SKELETON LOADERS ── */
+.skeleton-box,.skeleton-line{border-radius:6px;background:linear-gradient(90deg,var(--bg3) 25%,var(--border) 50%,var(--bg3) 75%);background-size:200% 100%;animation:skel-shimmer 1.4s infinite;}
+@keyframes skel-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.pcard-skeleton{pointer-events:none;opacity:.75;}
+.pcard-skeleton .pcard-img{background:var(--bg3)!important;height:180px;display:block;}
+.skeleton-line{display:block;height:13px;margin-bottom:7px;}
+
 </style>
 </head>
 <body>
@@ -976,15 +989,29 @@ p{color:var(--text2);margin:0 0 1em;}
   <div class="auth-shell">
     <div class="auth-card">
       <div class="auth-logo">ZÚ<span>LA</span></div>
-      <div style="text-align:center;font-size:42px;margin-bottom:12px;">🔑</div>
-      <div class="auth-h1">Reset your password</div>
-      <div class="auth-sub">Enter your email and we'll send a reset link.</div>
-      <div class="auth-field">
-        <label>Email address</label>
-        <input type="email" id="forgot-email" placeholder="you@example.com">
+      <!-- Step 1: Enter email -->
+      <div id="forgot-step1">
+        <div style="text-align:center;font-size:42px;margin-bottom:12px;">🔑</div>
+        <div class="auth-h1">Reset your password</div>
+        <div class="auth-sub">Enter your email and we'll send a reset link.</div>
+        <div class="auth-field">
+          <label>Email address</label>
+          <input type="email" id="forgot-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')sendResetLink()">
+        </div>
+        <div id="forgot-err" style="display:none;color:var(--red);font-size:13px;margin-bottom:10px;padding:8px 12px;background:rgba(240,82,82,.08);border-radius:var(--radius-xs);"></div>
+        <button class="btn btn-primary btn-block" id="forgot-send-btn" onclick="sendResetLink()" style="margin-bottom:12px;">Send reset link →</button>
+        <div class="auth-switch"><a onclick="showPage('login')">← Back to sign in</a></div>
       </div>
-      <button class="btn btn-primary btn-block" onclick="sendResetLink()" style="margin-bottom:12px;">Send reset link →</button>
-      <div class="auth-switch"><a onclick="showPage('login')">← Back to sign in</a></div>
+      <!-- Step 2: Success confirmation -->
+      <div id="forgot-step2" style="display:none;text-align:center;">
+        <div style="font-size:56px;margin-bottom:16px;">📬</div>
+        <div class="auth-h1" style="margin-bottom:8px;">Check your email</div>
+        <div class="auth-sub" style="margin-bottom:6px;">We sent a password reset link to</div>
+        <div style="font-weight:700;color:var(--accent);font-size:15px;margin-bottom:20px;" id="forgot-sent-email"></div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6;">Click the link in the email to set a new password. Check your spam folder if you don't see it within 2 minutes.</div>
+        <button class="btn btn-ghost btn-block" style="margin-bottom:10px;" onclick="sendResetLink(true)">Resend email</button>
+        <button class="btn btn-primary btn-block" onclick="showPage('login')">Back to sign in →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3302,10 +3329,12 @@ if (_kycOrigShowPage) {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
          sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
+         reauthenticateWithCredential, EmailAuthProvider,
          updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
          getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
-         updateDoc, arrayUnion, arrayRemove, increment, deleteDoc }
+         updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
+         writeBatch, deleteField }
          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -3338,10 +3367,13 @@ function updateLandingNav(user) {
 }
 
 window._db   = db;
+window._EmailAuthProvider = EmailAuthProvider;
+window._reauthenticateWithCredential = reauthenticateWithCredential;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
   doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
-  where, onSnapshot, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc };
+  where, onSnapshot, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
+  writeBatch, deleteField };
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
@@ -3499,12 +3531,32 @@ window.checkEmailVerified = function() {
   });
 };
 
-window.sendResetLink = function() {
-  const email = document.getElementById('forgot-email').value.trim();
-  if (!email) { showToast('⚠️ Enter your email address.'); return; }
-  sendPasswordResetEmail(auth, email)
-    .then(() => { showToast('📬 Reset link sent to ' + email); showPage('login'); })
-    .catch(() => showToast('❌ No account found with that email.'));
+window.sendResetLink = async function(resend) {
+  const email = document.getElementById('forgot-email') ? document.getElementById('forgot-email').value.trim() : document.getElementById('forgot-sent-email').textContent;
+  const errEl = document.getElementById('forgot-err');
+  const btn   = document.getElementById('forgot-send-btn');
+  if (errEl) errEl.style.display = 'none';
+  if (!email) { if (errEl) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = ''; } return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    // Show success screen
+    const step1 = document.getElementById('forgot-step1');
+    const step2 = document.getElementById('forgot-step2');
+    const sentEl = document.getElementById('forgot-sent-email');
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = '';
+    if (sentEl) sentEl.textContent = email;
+    if (resend) showToast('📬 Reset link resent!');
+  } catch(e) {
+    const msg = e.code === 'auth/user-not-found' ? 'No account found with that email.' :
+                e.code === 'auth/too-many-requests' ? 'Too many requests — please wait a moment.' :
+                'Could not send reset email. Try again.';
+    if (errEl) { errEl.textContent = msg; errEl.style.display = ''; }
+    else showToast('❌ ' + msg);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Send reset link →'; }
+  }
 };
 
 // ── PRODUCTS ────────────────────────────────────────────────────────
@@ -3513,7 +3565,13 @@ window.loadProducts = async function() {
   const empty = document.getElementById('empty-state');
   const count = document.getElementById('result-count');
   if (!grid) return;
-  grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">Loading products…</div>';
+  // Show skeleton cards while loading
+  grid.innerHTML = Array(6).fill(0).map(() =>
+    '<div class="pcard pcard-skeleton"><div class="pcard-img skeleton-box"></div>' +
+    '<div class="pcard-body"><div class="skeleton-line" style="width:70%;height:14px;margin-bottom:8px;"></div>' +
+    '<div class="skeleton-line" style="width:50%;height:12px;margin-bottom:12px;"></div>' +
+    '<div class="skeleton-line" style="width:40%;height:16px;"></div></div></div>'
+  ).join('');
   try {
     const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
@@ -3855,7 +3913,10 @@ window.secChangePassword = async function() {
 
   try {
     // Re-authenticate first
-    var credential = firebase.auth.EmailAuthProvider.credential(user.email, currPass);
+    // Use EmailAuthProvider from firebase/auth (imported in ES module block)
+    var EmailAuthProvider = window._EmailAuthProvider;
+    if (!EmailAuthProvider) { showErr('Auth provider not loaded. Please refresh and try again.'); return; }
+    var credential = EmailAuthProvider.credential(user.email, currPass);
     await user.reauthenticateWithCredential(credential);
     // Now update
     await user.updatePassword(newPass);
@@ -4692,7 +4753,7 @@ window.toggleMobileFilter = function() {
 // Show filter toggle only on mobile
 function _updateFilterToggleVisibility() {
   const btn = document.getElementById('filter-toggle-btn');
-  if (btn) btn.style.display = window.innerWidth <= 760 ? 'inline-flex' : 'none';
+  if (btn) btn.style.display = window.innerWidth <= 1024 ? 'inline-flex' : 'none';
 }
 window.addEventListener('resize', _updateFilterToggleVisibility);
 _updateFilterToggleVisibility();
@@ -7798,14 +7859,21 @@ window.reLoadBuyerViewings = async function() {
   if (!el || !user) return;
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;text-align:center;">Loading…</div>';
   try {
+    // Use simple where query (no orderBy) to avoid composite index requirement
+    // Sort client-side instead
     var snap = await fns.getDocs(fns.query(
       fns.collection(db,'viewingRequests'),
-      fns.where('buyerId','==',user.uid),
-      fns.orderBy('createdAt','desc')
+      fns.where('buyerId','==',user.uid)
     ));
     if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No viewings booked yet.</div>'; return; }
     el.innerHTML = '';
-    snap.docs.forEach(function(d) {
+    // Sort client-side by createdAt descending
+    var sortedDocs = snap.docs.slice().sort(function(a,b){
+      var at = a.data().createdAt, bt = b.data().createdAt;
+      if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
+      return 0;
+    });
+    sortedDocs.forEach(function(d) {
       var r = d.data();
       var statusLabel = { pending:'Awaiting confirmation', confirmed:'Confirmed - visit the property!', declined:'Declined by seller', done:'Viewing done', payment_submitted:'Payment submitted - awaiting verification', completed:'Completed!' }[r.status] || r.status;
       var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--green)', completed:'var(--green)' }[r.status] || 'var(--text3)';
@@ -7844,6 +7912,10 @@ window.reLoadBuyerViewings = async function() {
 // --------------------------------------------------
 var _cart = JSON.parse(localStorage.getItem('zula_cart') || '[]');
 var _wishlist = JSON.parse(localStorage.getItem('zula_wishlist') || '[]');
+// Update badge immediately on script load (handles refresh)
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(cartUpdateBadge, 200);
+});
 
 function cartSave() { localStorage.setItem('zula_cart', JSON.stringify(_cart)); cartUpdateBadge(); }
 function wishSave() { localStorage.setItem('zula_wishlist', JSON.stringify(_wishlist)); }
@@ -8233,7 +8305,14 @@ window.notifLoad = async function() {
 function notifRender(items) {
   var el = document.getElementById('notif-list');
   if (!el) return;
-  if (!items.length) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">No notifications yet.</div>'; return; }
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);">' +
+      '<div style="font-size:48px;margin-bottom:12px;">🔔</div>' +
+      '<div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px;">All caught up!</div>' +
+      '<div style="font-size:13px;">Order updates, messages, and seller alerts will appear here.</div>' +
+      '</div>';
+    return;
+  }
   var icons = { new_order:'🛍', review:'⭐', payment_received:'💰', payment_verified:'✅', viewing_request:'📅', viewing_confirmed:'✅', viewing_declined:'❌', viewing_not_interested:'🏠', payout:'💸', broadcast:'📢', system:'🛡' };
   el.innerHTML = items.map(function(n) {
     var icon = icons[n.type] || '🔔';
@@ -9912,6 +9991,7 @@ window.showPage = function(name) {
     }, 100);
   }
   if (name === 'product') { setTimeout(function(){ if (typeof pdRenderShareRow === 'function') pdRenderShareRow(); }, 100); }
+  if (name === 'course-player') { /* course player handled by openCoursePlayer() */ }
 };
 
 // --------------------------------------------------
