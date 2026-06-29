@@ -4088,9 +4088,6 @@ async function uploadToCloudinary(file, folder) {
   const data = await res.json();
   return data.secure_url;
 }
-  const data = await res.json();
-  return data.secure_url;
-}
 
 window.submitVerification = async function() {
   const user = auth.currentUser;
@@ -6958,6 +6955,24 @@ window.reCloseBookModal = function() {
 };
 
 // - SELLER: CONFIRM OR DECLINE VIEWING -
+
+// Helper fns for viewing buttons (avoid quote-in-onclick issues)
+window._reViewingData = {}; // keyed by doc id
+window.reRespondViewingBtn = function(btn, decision) {
+  var id = btn.id.replace(/^rbtn-[cd]-/, '');
+  var data = window._reViewingData[id];
+  if (data) reRespondViewing(id, decision, data.buyerId, data.productName);
+};
+window.reVerifyPaymentBtn = function(btn) {
+  var id = btn.id.replace(/^rbtn-v-/, '');
+  var data = window._reViewingData[id];
+  if (data) reVerifyPayment(id, data.buyerId, data.productName);
+};
+window.reMarkDoneBtn = function(btn) {
+  var id = btn.id.replace(/^rbi-/, '');
+  var data = window._reViewingData[id];
+  if (data) { window._reInterestProductId = data.productId; reShowInterestModal(id, data.productName, data.sellerId); }
+};
 window.reRespondViewing = async function(requestId, action, buyerId, productName) {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
@@ -7078,13 +7093,14 @@ window.reLoadViewingRequests = async function() {
         (r.note ? '<div style="font-size:12.5px;color:var(--text2);margin-bottom:10px;font-style:italic;">"' + r.note + '"</div>' : '') +
         (r.status === 'pending'
           ? '<div style="display:flex;gap:8px;">' +
-              '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" onclick="reRespondViewing('' + d.id + '','confirmed','' + r.buyerId + '','' + (r.productName||'') + '')">✓ Confirm</button>' +
-              '<button class="btn btn-sm btn-ghost" onclick="reRespondViewing('' + d.id + '','declined','' + r.buyerId + '','' + (r.productName||'') + '')">✗ Decline</button>' +
+              '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" id="rbtn-c-'+d.id+'" onclick="reRespondViewingBtn(this,\'confirmed\')">&#10003; Confirm</button>' +
+              '<button class="btn btn-sm btn-ghost" id="rbtn-d-'+d.id+'" onclick="reRespondViewingBtn(this,\'declined\')">&#10007; Decline</button>' +
             '</div>'
           : '') +
         (r.status === 'payment_submitted'
-          ? '<div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="reVerifyPayment('' + d.id + '','' + r.buyerId + '','' + (r.productName||'') + '')">Verify payment</button></div>'
+          ? '<div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" id="rbtn-v-'+d.id+'" onclick="reVerifyPaymentBtn(this)">Verify payment</button></div>'
           : '');
+      window._reViewingData[d.id] = { buyerId: r.buyerId, productId: r.productId, productName: r.productName||'', sellerId: r.sellerId };
       el.appendChild(card);
     });
   } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;">Could not load requests.</div>'; }
@@ -7720,7 +7736,7 @@ window.reRenderViewingCards = function(viewings, container) {
       actionBtns = '<div style="margin-top:12px;padding:10px 14px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
         '<div><div style="font-size:12.5px;font-weight:700;color:var(--green);">💰 Payment submitted by buyer</div>' +
         '<div style="font-size:12px;color:var(--text3);">Ref: ' + (r.paymentRef||'-') + '</div></div>' +
-        '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" onclick="reVerifyPayment(\''+r._id+'\',\''+r.buyerId+'\',\''+((r.productName||'').replace(/'/g,\' \'))+'\')">Verify & confirm</button>' +
+        '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;white-space:nowrap;" onclick="reVerifyPayment(\''+r._id+'\',\''+r.buyerId+'\',\''+(r.productName||'').replace(/['"]/g,' ')+'\')">Verify & confirm</button>' +
         '</div>';
     } else if (r.status === 'completed') {
       actionBtns = '<div style="margin-top:10px;padding:8px 12px;background:rgba(39,201,122,.08);border:1px solid var(--green);border-radius:var(--radius-xs);font-size:12.5px;color:var(--green);font-weight:700;">🎉 Sale completed!</div>';
@@ -7815,7 +7831,7 @@ window.reLoadBuyerViewings = async function() {
 
       var actionBtns = '';
       if (r.status === 'confirmed') {
-        actionBtns = '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-top:10px;" onclick="window._reInterestProductId='' + r.productId + '';reShowInterestModal('' + d.id + '','' + (r.productName||'').replace(/'/g,"\'") + '','' + r.sellerId + '')">Mark viewing as done →</button>';
+        actionBtns = '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;margin-top:10px;" id="rbi-'+d.id+'" onclick="reMarkDoneBtn(this)">Mark viewing as done &rarr;</button>';
       }
 
       card.innerHTML =
