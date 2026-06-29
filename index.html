@@ -4071,21 +4071,17 @@ async function uploadToCloudinary(file, folder) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_PRESET);
-  // Generate a unique public_id so overwrite:false never blocks us
-  const uniqueId = (folder || 'zula') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-  formData.append('public_id', uniqueId);
-  // Use image/upload (not auto/upload) for reliable unsigned preset support
-  const resourceType = file.type && file.type.startsWith('video/') ? 'video' : 'image';
+  // Do NOT send public_id or folder with unsigned presets —
+  // Cloudinary auto-generates a unique ID. Folder restrictions vary by plan.
+  const resourceType = (file.type && file.type.startsWith('video/')) ? 'video' : 'image';
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`,
+    'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/' + resourceType + '/upload',
     { method: 'POST', body: formData }
   );
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    const msg = (errData.error && errData.error.message) || res.status;
-    throw new Error('Cloudinary upload failed: ' + msg);
-  }
   const data = await res.json();
+  if (!res.ok || data.error) {
+    throw new Error((data.error && data.error.message) || ('HTTP ' + res.status));
+  }
   return data.secure_url;
 }
 
@@ -5798,32 +5794,29 @@ window.submitProduct = async function() {
     let photoUrls = [];
     const localPhotos = window._apPhotos || [];
     if (localPhotos.length > 0) {
-      if (publishBtn) publishBtn.textContent = 'Uploading photos (0/' + localPhotos.length + ')…';
-      showToast('📸 Uploading ' + localPhotos.length + ' photo' + (localPhotos.length > 1 ? 's' : '') + '…');
-
+      if (publishBtn) publishBtn.textContent = 'Uploading photo 1 of ' + localPhotos.length + '…';
       for (let i = 0; i < localPhotos.length; i++) {
         try {
           if (publishBtn) publishBtn.textContent = 'Uploading photo ' + (i+1) + ' of ' + localPhotos.length + '…';
-          // Use the stored File object directly (fastest, no re-encoding)
           const fileObj = localPhotos[i].file || await (async () => {
-            // Fallback: rebuild File from dataUrl if file object lost
             const res2 = await fetch(localPhotos[i].dataUrl);
             const blob = await res2.blob();
             return new File([blob], localPhotos[i].name || ('photo_' + i + '.jpg'), { type: blob.type });
           })();
-          const url = await uploadToCloudinary(fileObj, 'zula_products/' + user.uid);
+          const url = await uploadToCloudinary(fileObj, 'zula_products');
           photoUrls.push(url);
+          console.log('✅ Photo ' + (i+1) + ' uploaded:', url);
         } catch(uploadErr) {
-          console.error('Photo ' + (i+1) + ' upload failed:', uploadErr);
-          showToast('⚠️ Photo ' + (i+1) + ' could not upload — skipped.');
+          // Show the REAL Cloudinary error message in the console and toast
+          const realMsg = uploadErr.message || 'Unknown error';
+          console.error('Photo ' + (i+1) + ' upload error:', realMsg);
+          showToast('⚠️ Photo ' + (i+1) + ' failed: ' + realMsg);
+          // Don't block — continue uploading remaining photos
         }
       }
-
-      if (photoUrls.length === 0 && localPhotos.length > 0) {
-        // All uploads failed — likely a Cloudinary preset issue
-        if (publishBtn) { publishBtn.textContent = 'Publish now →'; publishBtn.disabled = false; }
-        showToast('❌ Photo upload failed. Check your Cloudinary preset is set to "Unsigned" and try again.');
-        return;
+      // If ALL photos failed, warn but still allow product to save without photos
+      if (photoUrls.length === 0) {
+        showToast('⚠️ Photos could not upload — product will be saved without images. You can add them later.');
       }
     }
     if (publishBtn) publishBtn.textContent = 'Saving product…';
