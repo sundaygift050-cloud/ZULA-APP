@@ -4053,29 +4053,21 @@ window.avatarApplyPhoto = function(url) {
 
 // ── VERIFICATION FILE UPLOADS (Cloudinary) ───────────────────────────
 const CLOUDINARY_CLOUD = 'dclahlchz';
-const CLOUDINARY_PRESET = 'zula_verif';
-const _verifFiles = {};
-
-window.handleVerifUpload = function(input, key, previewId, statusId) {
-  const file = input.files[0];
-  if (!file) return;
-  _verifFiles[key] = file;
-  const preview = document.getElementById(previewId);
-  const status  = document.getElementById(statusId);
-  if (status)  status.textContent = '✅ ' + file.name;
-  if (preview) { preview.style.display = 'block'; preview.textContent = file.name + ' ready — tap Submit to send.'; }
-};
+const CLOUDINARY_PRESET = 'zula_verif'; // unsigned preset — works for all upload types
 
 async function uploadToCloudinary(file, folder) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_PRESET);
-  formData.append('folder', folder);
+  if (folder) formData.append('folder', folder);
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`,
     { method: 'POST', body: formData }
   );
-  if (!res.ok) throw new Error('Cloudinary upload failed');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error('Cloudinary upload failed: ' + (errData.error?.message || res.status));
+  }
   const data = await res.json();
   return data.secure_url;
 }
@@ -5785,6 +5777,32 @@ window.submitProduct = async function() {
   if (publishBtn) { publishBtn.textContent = 'Publishing…'; publishBtn.disabled = true; }
 
   try {
+    // ── UPLOAD PHOTOS TO CLOUDINARY (all product types) ──────────
+    let photoUrls = [];
+    const localPhotos = window._apPhotos || [];
+    if (localPhotos.length > 0) {
+      if (publishBtn) publishBtn.textContent = 'Uploading photos…';
+      showToast('📸 Uploading ' + localPhotos.length + ' photo' + (localPhotos.length > 1 ? 's' : '') + '…');
+
+      for (let i = 0; i < localPhotos.length; i++) {
+        try {
+          // Convert dataUrl to Blob for upload
+          const dataUrl = localPhotos[i].dataUrl;
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], localPhotos[i].name || ('photo_' + i + '.jpg'), { type: blob.type });
+          const url = await uploadToCloudinary(file, 'zula_products/' + user.uid);
+          photoUrls.push(url);
+          if (publishBtn) publishBtn.textContent = 'Uploading… ' + (i+1) + '/' + localPhotos.length;
+        } catch(uploadErr) {
+          console.error('Photo upload failed:', uploadErr);
+          // Fall back to dataUrl for this photo (not ideal but keeps the product)
+          photoUrls.push(localPhotos[i].dataUrl);
+        }
+      }
+    }
+    if (publishBtn) publishBtn.textContent = 'Saving product…';
+
     const productData = {
       name,
       description: desc,
@@ -5798,9 +5816,15 @@ window.submitProduct = async function() {
       affiliateEnabled: hasAff,
       sellerId:     user.uid,
       sellerName:   profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
+      sellerVerified: profile.sellerVerified || false,
       createdAt:    fns.serverTimestamp(),
       status,
+      // ── PHOTOS saved for ALL product types ──────────────────────
+      photos: photoUrls,
+      photo:  photoUrls[0] || '',   // convenience alias for card display
+      emoji:  photoUrls.length === 0 ? (window._apSelectedEmoji || '📦') : '',
     };
+
     // Attach lessons if this is a course
     if (productType === 'course' && window._pendingLessons && window._pendingLessons.length > 0) {
       productData.lessons = window._pendingLessons;
@@ -5819,22 +5843,32 @@ window.submitProduct = async function() {
         features:      window.reGetFeatures ? window.reGetFeatures() : [],
         schedule:      window.reGetSchedule ? window.reGetSchedule() : [],
       };
-      productData.photos = window._apPhotos ? window._apPhotos.map(function(p){ return p.dataUrl; }) : [];
       productData.paymentPolicy = 'in_app_only';
     }
+
     var docRef = await fns.addDoc(fns.collection(db, 'products'), productData);
     showToast('🎉 Product published! It\'s now live in the marketplace.');
-    // Reset form fields
+
+    // Reset form
     ['ap-field-name','ap-field-desc','ap-field-price','ap-field-original'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    window._apPhotos = [];
+    window._pendingLessons = [];
+    const grid = document.getElementById('ap-photo-grid');
+    if (grid) grid.innerHTML = '';
+    const countEl = document.getElementById('ap-photo-count');
+    if (countEl) countEl.textContent = '0 / 20 photos added';
+    const addBtn = document.getElementById('ap-photo-add-btn');
+    if (addBtn) addBtn.style.display = '';
+
     // Reset step back to 1 for next time
     if (typeof apSetStep === 'function') apSetStep(1);
     setTimeout(() => { showPage('seller-dashboard'); if (typeof sdTab === 'function') sdTab('products'); }, 800);
   } catch(e) {
     console.error(e);
-    showToast('❌ Could not publish. Check your connection.');
+    showToast('❌ Could not publish. Check your connection and try again.');
     if (publishBtn) { publishBtn.textContent = 'Publish now →'; publishBtn.disabled = false; }
   }
 };
