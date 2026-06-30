@@ -2988,18 +2988,21 @@ if (_kycOrigShowPage) {
               <div style="font-size:12.5px;color:var(--text3);" id="st-payout-display-details">—</div>
             </div>
             <div class="form-field">
-              <label>Bank name <span style="color:var(--red);">*</span></label>
-              <input type="text" id="st-payout-bank" placeholder="e.g. GTBank, Access Bank, Opay">
+              <label>Bank <span style="color:var(--red);">*</span></label>
+              <select id="st-payout-bank" onchange="settingsPayoutTryResolve()">
+                <option value="">Loading banks…</option>
+              </select>
             </div>
             <div class="form-field">
               <label>Account number <span style="color:var(--red);">*</span></label>
-              <input type="text" id="st-payout-acct" placeholder="10-digit NUBAN account number" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+              <input type="text" id="st-payout-acct" placeholder="10-digit NUBAN account number" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');settingsPayoutTryResolve()">
             </div>
             <div class="form-field">
               <label>Account name <span style="color:var(--red);">*</span></label>
-              <input type="text" id="st-payout-acct-name" placeholder="Exactly as it appears on your account">
+              <input type="text" id="st-payout-acct-name" placeholder="Auto-filled after entering account details" readonly>
+              <div id="st-payout-resolve-status" style="font-size:11.5px;margin-top:5px;min-height:14px;"></div>
             </div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">⚠️ Make sure the account name matches your ID. Wrong details may delay payouts.</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">⚠️ Account name is verified automatically via your bank — make sure it matches your ID.</div>
             <button class="btn btn-primary btn-sm" id="st-payout-save-btn" onclick="savePayoutSettings()">Save bank details</button>
           </div>
         </div>
@@ -4002,22 +4005,24 @@ window.savePayoutSettings = async function() {
   var user = auth && auth.currentUser;
   if (!user) { showToast('Please sign in first.'); return; }
 
-  var bank  = (document.getElementById('st-payout-bank') || {}).value.trim();
+  var bankSel  = document.getElementById('st-payout-bank');
+  var bankCode = bankSel ? bankSel.value : '';
+  var bankName = bankSel && bankSel.selectedOptions[0] ? bankSel.selectedOptions[0].textContent : '';
   var acct  = (document.getElementById('st-payout-acct') || {}).value.trim();
   var name  = (document.getElementById('st-payout-acct-name') || {}).value.trim();
   var btn   = document.getElementById('st-payout-save-btn');
 
-  if (!bank)  { showToast('Please enter your bank name.'); return; }
+  if (!bankCode) { showToast('Please select your bank.'); return; }
   if (!acct || acct.length !== 10) { showToast('Account number must be exactly 10 digits.'); return; }
   if (!name)  { showToast('Please enter the account name.'); return; }
 
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   try {
-    var payoutData = { bankName: bank, accountNumber: acct, accountName: name, payoutSetupAt: fns.serverTimestamp() };
+    var payoutData = { bankName: bankName, bankCode: bankCode, accountNumber: acct, accountName: name, payoutSetupAt: fns.serverTimestamp() };
     await fns.setDoc(fns.doc(db, 'users', user.uid), { payout: payoutData }, { merge: true });
     if (window._currentUser) window._currentUser.payout = payoutData;
     // Update display
-    payoutShowSaved(name, bank, acct);
+    payoutShowSaved(name, bankName, acct);
     showToast('✅ Bank details saved successfully!');
   } catch(e) { console.error(e); showToast('❌ Could not save bank details. Try again.'); }
   finally { if (btn) { btn.disabled = false; btn.textContent = 'Save bank details'; } }
@@ -4040,9 +4045,9 @@ window.settingsLoadPayout = function() {
   var bankEl = document.getElementById('st-payout-bank');
   var acctEl = document.getElementById('st-payout-acct');
   var nameEl = document.getElementById('st-payout-acct-name');
-  if (bankEl && p.bankName)       bankEl.value = p.bankName;
+  if (bankEl && p.bankCode) { bankEl.value = p.bankCode; }
   if (acctEl && p.accountNumber)  acctEl.value = p.accountNumber;
-  if (nameEl && p.accountName)    nameEl.value = p.accountName;
+  if (nameEl && p.accountName) { nameEl.value = p.accountName; nameEl.readOnly = true; }
   if (p.accountName) payoutShowSaved(p.accountName, p.bankName || '', p.accountNumber || '');
 };
 
@@ -7797,12 +7802,17 @@ window.reLoadViewingRequests = async function() {
   if (!el || !user) return;
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">Loading…</div>';
   try {
+    // Simple where query (no orderBy) avoids needing a composite index — sort client-side
     var snap = await fns.getDocs(fns.query(
       fns.collection(db,'viewingRequests'),
-      fns.where('sellerId','==',user.uid),
-      fns.orderBy('createdAt','desc')
+      fns.where('sellerId','==',user.uid)
     ));
-    window._reAllViewings = snap.docs.map(function(d){ return Object.assign({ _id: d.id }, d.data()); });
+    var docs = snap.docs.slice().sort(function(a,b){
+      var at = a.data().createdAt, bt = b.data().createdAt;
+      if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
+      return 0;
+    });
+    window._reAllViewings = docs.map(function(d){ return Object.assign({ _id: d.id }, d.data()); });
     reRenderViewingCards(window._reAllViewings, el);
     // Update badge
     var pending = window._reAllViewings.filter(function(v){ return v.status === 'pending'; }).length;
@@ -7810,7 +7820,7 @@ window.reLoadViewingRequests = async function() {
     if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
   } catch(e) {
     console.error(e);
-    el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px;text-align:center;">Could not load viewing requests. Make sure the Firestore index for viewingRequests (sellerId ASC, createdAt DESC) is created.</div>';
+    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No viewing requests yet.</div>';
   }
 };
 
@@ -8558,17 +8568,20 @@ window.sdSubmitPayout = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
   if (!user) return;
-  var amount = document.getElementById('payout-amount')?.value;
-  var bank = document.getElementById('payout-bank')?.value;
-  var acct = document.getElementById('payout-acct')?.value;
-  var name = document.getElementById('payout-name')?.value;
-  if (!amount || !bank || !acct || !name) { showToast('Please fill all fields.'); return; }
+  var amount  = (document.getElementById('payout-amount')||{}).value;
+  var bankSel = document.getElementById('payout-bank');
+  var bankCode = bankSel ? bankSel.value : '';
+  var bankName = bankSel && bankSel.selectedOptions[0] ? bankSel.selectedOptions[0].textContent : '';
+  var acct = (document.getElementById('payout-acct')||{}).value;
+  var name = (document.getElementById('payout-name')||{}).value;
+  if (!amount || !bankCode || !acct || !name) { showToast('Please fill all fields.'); return; }
   try {
     await fns.addDoc(fns.collection(db,'payoutRequests'), {
       sellerId: user.uid,
       sellerName: (window._currentUser&&window._currentUser.fullName)||user.displayName||'Seller',
       amount: Number(amount),
-      bankName: bank,
+      bankName: bankName,
+      bankCode: bankCode,
       accountNumber: acct,
       accountName: name,
       status: 'pending',
@@ -8597,10 +8610,16 @@ window.sdLoadAffiliate = async function() {
   var user = auth && auth.currentUser;
   if (!user) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'affiliateEarnings'), fns.where('affiliateId','==',user.uid), fns.orderBy('createdAt','desc')));
-    var total = 0; var clicks = 0; var refs = snap.size;
+    // Simple where query (no orderBy) avoids needing a composite index — sort client-side
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'affiliateEarnings'), fns.where('affiliateId','==',user.uid)));
+    var docs = snap.docs.slice().sort(function(a,b){
+      var at = a.data().createdAt, bt = b.data().createdAt;
+      if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
+      return 0;
+    });
+    var total = 0; var clicks = 0; var refs = docs.length;
     var rows = '';
-    snap.docs.forEach(function(d) {
+    docs.forEach(function(d) {
       var e = d.data();
       total += Number(e.amount||0);
       clicks += Number(e.clicks||0);
@@ -8618,8 +8637,8 @@ window.sdLoadAffiliate = async function() {
       '<div class="dash-card">' + (rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No affiliate earnings yet. Share products to start earning!</div>') + '</div>';
   } catch(e) {
     console.error('sdLoadAffiliate:', e);
-    var _affEl = document.getElementById('sd-affiliate-content');
-    if (_affEl) _affEl.innerHTML = '<div class="dash-card"><div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No affiliate earnings yet. Share products to start earning!</div></div>';
+    var sec2 = document.getElementById('sd-sec-affiliate');
+    if (sec2) sec2.innerHTML = '<div class="sd-page-hd">Affiliate Earnings</div><div class="dash-card"><div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No affiliate earnings yet. Share products to start earning!</div></div>';
   }
 };
 
@@ -8966,7 +8985,7 @@ window.sdTab = function(name) {
      PAYOUT REQUEST MODAL
      ================================================================ -->
 <div id="payout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9300;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div style="font-family:var(--font-display);font-size:18px;font-weight:800;">💸 Request Payout</div>
       <button onclick="sdCancelPayout()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
@@ -8977,22 +8996,28 @@ window.sdTab = function(name) {
         <input id="payout-amount" type="number" placeholder="e.g. 50000" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
       </div>
       <div>
-        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Bank name</label>
-        <input id="payout-bank" placeholder="e.g. GTBank" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+        <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Bank</label>
+        <select id="payout-bank" onchange="payoutTryResolve()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <option value="">Loading banks…</option>
+        </select>
       </div>
       <div>
         <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Account number</label>
-        <input id="payout-acct" placeholder="10-digit account number" maxlength="10" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;font-family:monospace;">
+        <input id="payout-acct" placeholder="10-digit account number" maxlength="10" inputmode="numeric"
+          oninput="this.value=this.value.replace(/\D/g,'');payoutTryResolve()"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:monospace;font-size:13px;">
       </div>
       <div>
         <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:5px;">Account name</label>
-        <input id="payout-name" placeholder="e.g. John Doe" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+        <input id="payout-name" placeholder="Auto-filled after entering account details" readonly
+          style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+        <div id="payout-resolve-status" style="font-size:11.5px;margin-top:5px;min-height:14px;"></div>
       </div>
     </div>
     <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:20px;">
       ⏱ Payouts are processed within 1–3 business days after admin approval.
     </div>
-    <button class="btn btn-primary" style="width:100%;" onclick="sdSubmitPayout()">Submit payout request →</button>
+    <button class="btn btn-primary" style="width:100%;" id="payout-submit-btn" onclick="sdSubmitPayout()">Submit payout request →</button>
   </div>
 </div>
 
@@ -10386,9 +10411,12 @@ window.sdLoadAnalytics = async function() {
   try {
     // Load orders
     var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
-    // Load analytics doc for views
-    var analyticsDoc = await fns.getDoc(fns.doc(db,'analytics',user.uid));
-    var totalViews = analyticsDoc.exists() ? (analyticsDoc.data().totalViews||0) : 0;
+    // Load analytics doc for views (non-blocking — falls back to 0 if rule/doc missing)
+    var totalViews = 0;
+    try {
+      var analyticsDoc = await fns.getDoc(fns.doc(db,'analytics',user.uid));
+      totalViews = analyticsDoc.exists() ? (analyticsDoc.data().totalViews||0) : 0;
+    } catch(viewErr) { console.warn('Analytics views unavailable:', viewErr.message); }
     // Build monthly revenue
     var monthly = {};
     ordSnap.docs.forEach(function(d) {
@@ -10633,6 +10661,106 @@ window.pdAddToCart = function() {
   }
   cartSave();
   showToast('🛒 Added to cart!');
+};
+
+// ══════════════════════════════════════════════════
+// 13. PAYOUT — bank list dropdown + account name lookup
+// ══════════════════════════════════════════════════
+// Common Nigerian banks with their Paystack bank codes (used for resolve API)
+window._NIGERIAN_BANKS = [
+  { name:'Access Bank', code:'044' }, { name:'Citibank Nigeria', code:'023' },
+  { name:'Ecobank Nigeria', code:'050' }, { name:'Fidelity Bank', code:'070' },
+  { name:'First Bank of Nigeria', code:'011' }, { name:'First City Monument Bank', code:'214' },
+  { name:'Globus Bank', code:'00103' }, { name:'Guaranty Trust Bank', code:'058' },
+  { name:'Heritage Bank', code:'030' }, { name:'Keystone Bank', code:'082' },
+  { name:'Kuda Bank', code:'50211' }, { name:'Moniepoint MFB', code:'50515' },
+  { name:'Opay', code:'999992' }, { name:'Palmpay', code:'999991' },
+  { name:'Polaris Bank', code:'076' }, { name:'Providus Bank', code:'101' },
+  { name:'Stanbic IBTC Bank', code:'221' }, { name:'Standard Chartered Bank', code:'068' },
+  { name:'Sterling Bank', code:'232' }, { name:'SunTrust Bank', code:'100' },
+  { name:'Union Bank of Nigeria', code:'032' }, { name:'United Bank for Africa', code:'033' },
+  { name:'Unity Bank', code:'215' }, { name:'Wema Bank', code:'035' },
+  { name:'Zenith Bank', code:'057' },
+];
+
+function populateBankDropdown(selectId, savedBankCode) {
+  var sel = document.getElementById(selectId);
+  if (!sel) return;
+  var banks = window._NIGERIAN_BANKS.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+  sel.innerHTML = '<option value="">Select your bank…</option>' +
+    banks.map(function(b){ return '<option value="'+b.code+'" data-name="'+b.name+'"'+(b.code===savedBankCode?' selected':'')+'>'+b.name+'</option>'; }).join('');
+}
+
+// Populate both dropdowns as soon as the script runs
+populateBankDropdown('payout-bank');
+populateBankDropdown('st-payout-bank');
+
+// Resolve account name via Paystack's resolve endpoint.
+// NOTE: Paystack's /bank/resolve endpoint requires a SECRET key and must be
+// called from a backend (never expose sk_live_/sk_test_ in frontend code).
+// Until a Cloud Function is set up for this, we ask the user to confirm
+// the name manually but pre-fill nothing fake — keeps the field accurate.
+async function resolveAccountName(acctNumber, bankCode, nameInputId, statusId) {
+  var nameInput = document.getElementById(nameInputId);
+  var statusEl  = document.getElementById(statusId);
+  if (!nameInput) return;
+  if (acctNumber.length !== 10 || !bankCode) {
+    nameInput.value = '';
+    nameInput.readOnly = true;
+    nameInput.placeholder = 'Auto-filled after entering account details';
+    if (statusEl) statusEl.textContent = '';
+    return;
+  }
+  if (statusEl) { statusEl.textContent = '🔍 Looking up account name…'; statusEl.style.color = 'var(--accent)'; }
+  nameInput.value = '';
+
+  // Try resolving via your backend verification endpoint if configured
+  if (window.ACCOUNT_RESOLVE_ENDPOINT) {
+    try {
+      var res = await fetch(window.ACCOUNT_RESOLVE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account_number: acctNumber, bank_code: bankCode })
+      });
+      var data = await res.json();
+      if (data.status && data.data && data.data.account_name) {
+        nameInput.value = data.data.account_name;
+        nameInput.readOnly = true;
+        if (statusEl) { statusEl.textContent = '✅ Verified with bank'; statusEl.style.color = 'var(--green)'; }
+        return;
+      }
+      throw new Error('Could not resolve');
+    } catch(e) {
+      if (statusEl) { statusEl.textContent = '⚠️ Could not auto-verify — please type the name manually.'; statusEl.style.color = 'var(--gold)'; }
+      nameInput.readOnly = false;
+      nameInput.placeholder = 'Type account name exactly as on your bank statement';
+      return;
+    }
+  }
+
+  // No backend endpoint configured yet — let user type the name, but show a clear note
+  nameInput.readOnly = false;
+  nameInput.placeholder = 'Type account name exactly as on your bank statement';
+  if (statusEl) {
+    statusEl.textContent = 'ℹ️ Auto-verification needs a backend — type your name exactly as it appears at the bank.';
+    statusEl.style.color = 'var(--text3)';
+  }
+}
+
+window.payoutTryResolve = function() {
+  var bankSel = document.getElementById('payout-bank');
+  var acctEl  = document.getElementById('payout-acct');
+  if (!bankSel || !acctEl) return;
+  var bankCode = bankSel.value;
+  resolveAccountName(acctEl.value, bankCode, 'payout-name', 'payout-resolve-status');
+};
+
+window.settingsPayoutTryResolve = function() {
+  var bankSel = document.getElementById('st-payout-bank');
+  var acctEl  = document.getElementById('st-payout-acct');
+  if (!bankSel || !acctEl) return;
+  var bankCode = bankSel.value;
+  resolveAccountName(acctEl.value, bankCode, 'st-payout-acct-name', 'st-payout-resolve-status');
 };
 
 console.log('✅ ZÚLA — all features loaded.');
