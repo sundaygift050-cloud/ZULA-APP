@@ -10053,15 +10053,37 @@ window.showPage = function(name) {
 };
 
 // --------------------------------------------------
-// PAYSTACK SCRIPT LOADER
+// PAYSTACK SCRIPT LOADER (with readiness tracking)
 // --------------------------------------------------
+window._paystackReady = false;
 (function() {
+  if (typeof PaystackPop !== 'undefined') { window._paystackReady = true; return; }
   if (document.getElementById('paystack-script')) return;
   var s = document.createElement('script');
   s.id = 'paystack-script';
   s.src = 'https://js.paystack.co/v1/inline.js';
+  s.onload = function() { window._paystackReady = true; console.log('✅ Paystack script loaded'); };
+  s.onerror = function() { console.error('❌ Paystack script failed to load — check internet connection or ad-blocker'); };
   document.head.appendChild(s);
 })();
+
+// Helper: wait for Paystack to be ready (max 5 seconds)
+function waitForPaystack(maxMs) {
+  return new Promise(function(resolve) {
+    if (typeof PaystackPop !== 'undefined') { resolve(true); return; }
+    var waited = 0;
+    var interval = setInterval(function() {
+      waited += 100;
+      if (typeof PaystackPop !== 'undefined') {
+        clearInterval(interval);
+        resolve(true);
+      } else if (waited >= (maxMs || 5000)) {
+        clearInterval(interval);
+        resolve(false);
+      }
+    }, 100);
+  });
+}
 
 // ══════════════════════════════════════════════════
 // 1. CHECKOUT — collect delivery details + Paystack
@@ -10084,12 +10106,22 @@ window.coSubmitOrder = async function() {
   if (!isDigital && !phone)   { showToast('⚠️ Please enter your phone number.'); return; }
 
   var delivery = isDigital ? null : { fullname, phone, address, note };
-  document.getElementById('checkout-modal').style.display = 'none';
+
+  // Show a brief loading state on the Pay Now button while we confirm Paystack is ready
+  var payBtn = document.querySelector('#checkout-modal .btn-primary');
+  if (payBtn) { payBtn.disabled = true; payBtn.textContent = 'Loading payment…'; }
+
+  var paystackOk = typeof PaystackPop !== 'undefined' ? true : await waitForPaystack(5000);
+
+  if (payBtn) { payBtn.disabled = false; payBtn.textContent = 'Pay now →'; }
+
+  var keyOk = window.PAYSTACK_PUBLIC_KEY && window.PAYSTACK_PUBLIC_KEY.indexOf('pk_') === 0 && window.PAYSTACK_PUBLIC_KEY.indexOf('YOUR_PAYSTACK') === -1;
 
   var amountKobo = Math.round(Number(p.price) * 100);
   var ref = 'ZULA_' + Date.now() + '_' + user.uid.slice(0,6);
 
-  if (typeof PaystackPop !== 'undefined' && window.PAYSTACK_PUBLIC_KEY && window.PAYSTACK_PUBLIC_KEY.indexOf('pk_') === 0 && window.PAYSTACK_PUBLIC_KEY.indexOf('YOUR_PAYSTACK') === -1) {
+  if (paystackOk && keyOk) {
+    document.getElementById('checkout-modal').style.display = 'none';
     var handler = PaystackPop.setup({
       key:      window.PAYSTACK_PUBLIC_KEY,
       email:    user.email,
@@ -10097,14 +10129,17 @@ window.coSubmitOrder = async function() {
       currency: p.currency === 'USD' ? 'USD' : 'NGN',
       ref:      ref,
       metadata: { productId: p.id, sellerId: p.sellerId, buyerId: user.uid },
-      callback: async function(response) {
-        await coSaveOrder(p, user, profile, response.reference, 'paid', delivery);
+      callback: function(response) {
+        coSaveOrder(p, user, profile, response.reference, 'paid', delivery);
       },
       onClose: function() { showToast('Payment cancelled.'); }
     });
     handler.openIframe();
+  } else if (!paystackOk) {
+    showToast('⚠️ Payment system is still loading — please check your internet connection and try again in a moment.');
   } else {
-    // No Paystack key configured — save as pending and remind admin to set key
+    // Key not configured — save as pending
+    document.getElementById('checkout-modal').style.display = 'none';
     await coSaveOrder(p, user, profile, ref, 'pending', delivery);
     showToast('📋 Order placed! Add your Paystack key to enable live payments.');
   }
