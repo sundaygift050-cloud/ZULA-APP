@@ -3030,11 +3030,17 @@ if (_kycOrigShowPage) {
           <div class="settings-card">
             <h3>Currency display</h3>
             <div class="sc-sub">How prices are shown across the app</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="currency-btn-row">
               <button class="btn btn-primary btn-sm" id="curr-btn-ngn" onclick="setCurrency('NGN','₦')">NGN ₦</button>
               <button class="btn btn-ghost btn-sm" id="curr-btn-usd" onclick="setCurrency('USD','$')">USD $</button>
               <button class="btn btn-ghost btn-sm" id="curr-btn-gbp" onclick="setCurrency('GBP','£')">GBP £</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-eur" onclick="setCurrency('EUR','€')">EUR €</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-cad" onclick="setCurrency('CAD','C$')">CAD C$</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-ghs" onclick="setCurrency('GHS','₵')">GHS ₵</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-kes" onclick="setCurrency('KES','KSh')">KES KSh</button>
+              <button class="btn btn-ghost btn-sm" id="curr-btn-zar" onclick="setCurrency('ZAR','R')">ZAR R</button>
             </div>
+            <div style="font-size:11.5px;color:var(--text3);margin-top:10px;">Display only — products are still listed in the seller's original currency, converted at the latest rate for your view.</div>
           </div>
           <div class="settings-card">
             <h3>Language</h3>
@@ -3072,7 +3078,7 @@ if (_kycOrigShowPage) {
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="history.back?history.back():showPage('settings')">← Back</a>
+        <a onclick="goBackSmart()">← Back</a>
       </nav>
     </div>
   </header>
@@ -3084,15 +3090,20 @@ if (_kycOrigShowPage) {
     </div>
     <div id="lang-list" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
       <div class="lang-option selected" onclick="selectLang(this,'English','🇬🇧')"><span class="lang-flag">🇬🇧</span><div><div class="lang-name">English</div><div class="lang-native">English</div></div><span class="lang-check">✓</span></div>
-      <div class="lang-option" onclick="selectLang(this,'Yoruba','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Yoruba</div><div class="lang-native">Yorùbá</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Igbo','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Igbo</div><div class="lang-native">Igbo</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Hausa','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Hausa</div><div class="lang-native">Hausa</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Pidgin','🇳🇬')"><span class="lang-flag">🇳🇬</span><div><div class="lang-name">Nigerian Pidgin</div><div class="lang-native">Naija</div></div></div>
       <div class="lang-option" onclick="selectLang(this,'French','🇫🇷')"><span class="lang-flag">🇫🇷</span><div><div class="lang-name">French</div><div class="lang-native">Français</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Arabic','🇸🇦')"><span class="lang-flag">🇸🇦</span><div><div class="lang-name">Arabic</div><div class="lang-native">العربية</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Portuguese','🇵🇹')"><span class="lang-flag">🇵🇹</span><div><div class="lang-name">Portuguese</div><div class="lang-native">Português</div></div></div>
-      <div class="lang-option" onclick="selectLang(this,'Swahili','🇰🇪')"><span class="lang-flag">🇰🇪</span><div><div class="lang-name">Swahili</div><div class="lang-native">Kiswahili</div></div></div>
       <div class="lang-option" onclick="selectLang(this,'Spanish','🇪🇸')"><span class="lang-flag">🇪🇸</span><div><div class="lang-name">Spanish</div><div class="lang-native">Español</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Portuguese','🇵🇹')"><span class="lang-flag">🇵🇹</span><div><div class="lang-name">Portuguese</div><div class="lang-native">Português</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'German','🇩🇪')"><span class="lang-flag">🇩🇪</span><div><div class="lang-name">German</div><div class="lang-native">Deutsch</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Italian','🇮🇹')"><span class="lang-flag">🇮🇹</span><div><div class="lang-name">Italian</div><div class="lang-native">Italiano</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Arabic','🇸🇦')"><span class="lang-flag">🇸🇦</span><div><div class="lang-name">Arabic</div><div class="lang-native">العربية</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Swahili','🇰🇪')"><span class="lang-flag">🇰🇪</span><div><div class="lang-name">Swahili</div><div class="lang-native">Kiswahili</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Chinese','🇨🇳')"><span class="lang-flag">🇨🇳</span><div><div class="lang-name">Chinese</div><div class="lang-native">中文</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Hindi','🇮🇳')"><span class="lang-flag">🇮🇳</span><div><div class="lang-name">Hindi</div><div class="lang-native">हिन्दी</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Japanese','🇯🇵')"><span class="lang-flag">🇯🇵</span><div><div class="lang-name">Japanese</div><div class="lang-native">日本語</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Russian','🇷🇺')"><span class="lang-flag">🇷🇺</span><div><div class="lang-name">Russian</div><div class="lang-native">Русский</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Turkish','🇹🇷')"><span class="lang-flag">🇹🇷</span><div><div class="lang-name">Turkish</div><div class="lang-native">Türkçe</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Dutch','🇳🇱')"><span class="lang-flag">🇳🇱</span><div><div class="lang-name">Dutch</div><div class="lang-native">Nederlands</div></div></div>
+      <div class="lang-option" onclick="selectLang(this,'Korean','🇰🇷')"><span class="lang-flag">🇰🇷</span><div><div class="lang-name">Korean</div><div class="lang-native">한국어</div></div></div>
     </div>
   </div>
 </div>
@@ -3166,22 +3177,22 @@ if (_kycOrigShowPage) {
 </div>
 
 <!-- ================================================================
-     PAGE: LOCATION VERIFICATION
+     PAGE: LOCATION VERIFICATION (GPS-only, auto-detected)
      ================================================================ -->
 <div class="page" id="page-locationverif">
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('settings')">← Settings</a>
+        <a onclick="goBackSmart('settings')">← Back</a>
       </nav>
     </div>
   </header>
   <div class="dash-wrap" style="max-width:560px;">
     <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">📍 Location</h1>
-    <p style="margin-bottom:24px;">Verifying your location builds buyer trust and enables accurate delivery estimates.</p>
+    <p style="margin-bottom:24px;">Your location is detected automatically using your device's GPS — this builds buyer trust and enables accurate delivery estimates.</p>
 
-    <!-- CURRENT LOCATION -->
+    <!-- CURRENT LOCATION (auto-detected) -->
     <div class="settings-card" style="margin-bottom:16px;">
       <h3>Current location</h3>
       <div class="sc-sub">Your verified delivery / seller location</div>
@@ -3189,40 +3200,44 @@ if (_kycOrigShowPage) {
         <div class="map-grid"></div>
         <div class="map-pulse"></div>
         <div class="map-pin">📍</div>
-        <div class="map-label" id="loc-map-label">📍 Lagos, Nigeria</div>
+        <div class="map-label" id="loc-map-label">📍 Detecting…</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <div style="font-size:17px;font-weight:700;" id="loc-city-display">Lagos, Nigeria</div>
-        <span class="location-badge">📍 GPS verified</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="font-size:17px;font-weight:700;" id="loc-city-display">Detecting your location…</div>
+        <span class="location-badge" id="loc-verified-badge" style="display:none;">📍 GPS verified</span>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="detectGPSLocation()">🔄 Update with GPS</button>
-    </div>
-
-    <!-- MANUAL ENTRY -->
-    <div class="settings-card" id="update-location-card">
-      <h3>Set location manually</h3>
-      <div class="sc-sub">Enter your city and country</div>
-      <div class="form-field">
-        <label>Country</label>
-        <select id="loc-country" style="width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;">
-          <option value="Nigeria" selected>🇳🇬 Nigeria</option>
-          <option value="Ghana">🇬🇭 Ghana</option>
-          <option value="Kenya">🇰🇪 Kenya</option>
-          <option value="South Africa">🇿🇦 South Africa</option>
-          <option value="United Kingdom">🇬🇧 United Kingdom</option>
-          <option value="United States">🇺🇸 United States</option>
-          <option value="Canada">🇨🇦 Canada</option>
-          <option value="Other">🌍 Other</option>
-        </select>
+      <button class="btn btn-primary btn-sm" id="loc-detect-btn" onclick="detectGPSLocation()">🔄 Refresh location</button>
+      <div id="loc-denied-help" style="display:none;margin-top:14px;padding:12px 14px;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:var(--radius-xs);font-size:12.5px;color:var(--gold);">
+        ⚠️ Location access was denied. Please enable location permissions for this site in your browser settings, then tap "Refresh location" again.
       </div>
-      <div class="form-field">
-        <label>City</label>
-        <input type="text" id="loc-city-input" placeholder="e.g. Lagos" value="Lagos">
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="saveManualLocation()">Save location</button>
     </div>
   </div>
 </div>
+
+<script>
+// Auto-detect location the moment this page is opened
+var _origShowPageLocation = window.showPage;
+window.showPage = function(name) {
+  _origShowPageLocation(name);
+  if (name === 'locationverif') {
+    setTimeout(function() {
+      var u = window._currentUser || {};
+      if (u.location && u.locationVerified) {
+        // Already have a verified location saved — show it, but still offer refresh
+        var display = document.getElementById('loc-city-display');
+        var label   = document.getElementById('loc-map-label');
+        var badge   = document.getElementById('loc-verified-badge');
+        if (display) display.textContent = u.location;
+        if (label)   label.textContent   = '📍 ' + u.location;
+        if (badge)   badge.style.display = '';
+      } else {
+        // No location yet — auto-trigger GPS detection immediately
+        if (typeof detectGPSLocation === 'function') detectGPSLocation();
+      }
+    }, 150);
+  }
+};
+</script>
 
 <!-- ================================================================
      PAGE: VERIFICATION STATUS (real data from Firebase)
@@ -3631,7 +3646,7 @@ function renderProducts(products) {
         <div class="pcard-seller" style="display:flex;align-items:center;">By ${p.sellerName || 'ZÚLA Seller'}${verifiedBadge}</div>
         ${ratingHtml}
         <div class="pcard-foot">
-          <div class="pcard-price">${p.currency||'NGN'} ${Number(p.price).toLocaleString()}</div>
+          <div class="pcard-price">${typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString()}</div>
           <div class="pcard-type">${p.type || 'Physical'}</div>
         </div>
       </div>
@@ -3780,7 +3795,7 @@ window.viewProduct = function(id) {
   var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
   setText('pd-title',  p.name);
   setText('pd-seller', 'By ' + (p.sellerName || 'ZÚLA Seller'));
-  setText('pd-price',  (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
+  setText('pd-price',  typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
   setText('pd-desc',   p.description || '');
 
   var tagsEl = document.getElementById('pd-tags');
@@ -3886,18 +3901,25 @@ window.loadMyListings = async function() {
         <button class="btn btn-primary btn-sm" onclick="goAddProduct()">List a product</button></div>`;
       return;
     }
-    container.innerHTML = mine.map(p => `
-      <div class="listing-row">
-        <div class="listing-thumb">${p.emoji||'📦'}</div>
-        <div class="listing-info">
-          <div class="listing-name">${p.name}</div>
-          <div class="listing-meta">${p.category} · ${p.type}</div>
+    container.className = 'pgrid';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
+    container.style.gap = '14px';
+    container.innerHTML = mine.map(p => {
+      const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+      const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
+      const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : 'NGN ' + Number(p.price).toLocaleString();
+      return `<div class="pcard" onclick="viewProduct('${p.id}')" style="cursor:pointer;">
+        <div class="pcard-img" style="overflow:hidden;height:130px;">${imgHtml}</div>
+        <div class="pcard-body" style="padding:10px 12px;">
+          <div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+          <div class="pcard-foot" style="margin-top:6px;">
+            <div class="pcard-price" style="font-size:13px;">${priceDisplay}</div>
+            <span class="tag tag-green">Live</span>
+          </div>
         </div>
-        <div class="listing-price">NGN ${Number(p.price).toLocaleString()}</div>
-        <div class="listing-actions">
-          <span class="tag tag-green">Live</span>
-        </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   } catch(e) {
     container.innerHTML = '<p style="color:var(--text3);font-size:13px;">Could not load listings.</p>';
   }
@@ -4926,21 +4948,31 @@ window.loadProfileV2 = async function() {
     const lq = query(collection(db, 'products'), where('sellerId','==', user.uid));
     const lsnap = await getDocs(lq);
     if (el('pv2-stat-listings')) el('pv2-stat-listings').textContent = lsnap.size;
-    // Also render them
+    // Render as a grid of product cards (like the marketplace), with real photos
     const listEl = document.getElementById('pv2-listings-list');
     if (listEl) {
       if (lsnap.empty) {
-        listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first →</a></div>';
+        listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first →</a></div>';
       } else {
+        listEl.className = 'pgrid';
+        listEl.style.display = 'grid';
+        listEl.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
+        listEl.style.gap = '14px';
         listEl.innerHTML = lsnap.docs.map(d => {
           const p = d.data();
-          return `<div class="listing-row">
-            <div class="listing-thumb">${p.emoji||'📦'}</div>
-            <div class="listing-info">
-              <div class="listing-name">${p.name}</div>
-              <div class="listing-meta">NGN ${Number(p.price).toLocaleString()} · ${p.type}</div>
+          const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+          const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
+          const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString();
+          const statusTag = p.status === 'draft' ? '<span class="tag" style="background:var(--bg3);color:var(--text3);">Draft</span>' : '<span class="tag tag-green">Live</span>';
+          return `<div class="pcard" onclick="viewProduct('${d.id}')" style="cursor:pointer;">
+            <div class="pcard-img" style="overflow:hidden;height:130px;">${imgHtml}</div>
+            <div class="pcard-body" style="padding:10px 12px;">
+              <div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+              <div class="pcard-foot" style="margin-top:6px;">
+                <div class="pcard-price" style="font-size:13px;">${priceDisplay}</div>
+                ${statusTag}
+              </div>
             </div>
-            <span class="tag tag-green">Live</span>
           </div>`;
         }).join('');
       }
@@ -5035,6 +5067,17 @@ function escapeHtml(t) {
 function showPage(name) {
   // Redirect aliases
   if (name === 'messages') name = 'messaging';
+
+  // Track navigation history so "Back" buttons can return to the actual previous page
+  if (!window._pageHistory) window._pageHistory = [];
+  var currentActive = document.querySelector('.page.active');
+  if (currentActive) {
+    var currentName = currentActive.id.replace('page-', '');
+    if (currentName !== name && window._pageHistory[window._pageHistory.length - 1] !== currentName) {
+      window._pageHistory.push(currentName);
+      if (window._pageHistory.length > 20) window._pageHistory.shift(); // cap history size
+    }
+  }
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + name);
@@ -5158,18 +5201,17 @@ window.loadSellerDashboard = async function() {
     if (prodRevEl) {
       prodRevEl.innerHTML = mine.length === 0
         ? '<div style="color:var(--text3);font-size:13px;">No products listed yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
-        : mine.map(p => `
-          <div class="listing-row">
-            <div class="listing-thumb">${p.emoji||'📦'}<\/div>
-            <div class="listing-info">
-              <div class="listing-name">${p.name}<\/div>
-              <div class="listing-meta">${p.category} · NGN ${Number(p.price).toLocaleString()}<\/div>
-            <\/div>
-            <div style="text-align:right;">
-              <div style="font-size:13px;color:var(--text3);">0 sales<\/div>
-              <div style="font-size:13px;font-weight:600;color:var(--green);">NGN 0<\/div>
-            <\/div>
-          <\/div>`).join('');
+        : '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:14px;">' + mine.map(p => {
+            const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+            const imgHtml = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
+            const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : 'NGN ' + Number(p.price).toLocaleString();
+            return '<div class="pcard" onclick="viewProduct(\''+p.id+'\')" style="cursor:pointer;">' +
+              '<div class="pcard-img" style="overflow:hidden;height:130px;">'+imgHtml+'</div>' +
+              '<div class="pcard-body" style="padding:10px 12px;">' +
+              '<div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>' +
+              '<div class="pcard-foot" style="margin-top:6px;"><div class="pcard-price" style="font-size:13px;">'+priceDisplay+'</div></div>' +
+              '</div></div>';
+          }).join('') + '</div>';
     }
   } catch(e) { console.error(e); }
 };
@@ -10596,47 +10638,56 @@ window.verify2FA = async function() {
 // 8. LOCATION — save to Firestore via GPS or manual
 // ══════════════════════════════════════════════════
 window.detectGPSLocation = function() {
-  if (!navigator.geolocation) { showToast('GPS not supported on this device.'); return; }
-  var btn = document.querySelector('[onclick="detectGPSLocation()"]');
+  var btn = document.getElementById('loc-detect-btn');
+  var deniedHelp = document.getElementById('loc-denied-help');
+  var display = document.getElementById('loc-city-display');
+  var label   = document.getElementById('loc-map-label');
+  var badge   = document.getElementById('loc-verified-badge');
+
+  if (deniedHelp) deniedHelp.style.display = 'none';
+
+  if (!navigator.geolocation) {
+    showToast('GPS not supported on this device.');
+    if (display) display.textContent = 'Location detection not supported on this device.';
+    return;
+  }
   if (btn) { btn.textContent = '⏳ Detecting…'; btn.disabled = true; }
+  if (display) display.textContent = 'Detecting your location…';
+  if (label)   label.textContent   = '📍 Detecting…';
+
   navigator.geolocation.getCurrentPosition(
     async function(pos) {
       try {
         var lat = pos.coords.latitude, lng = pos.coords.longitude;
-        // Reverse geocode using open API
         var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng);
         var data = await res.json();
-        var city    = data.address.city || data.address.town || data.address.state || 'Unknown city';
+        var city    = data.address.city || data.address.town || data.address.state || data.address.county || 'Unknown city';
         var country = data.address.country || 'Unknown country';
         var locText = city + ', ' + country;
         await saveLocationToFirestore(locText, lat, lng);
-        var display = document.getElementById('loc-city-display');
-        var label   = document.getElementById('loc-map-label');
         if (display) display.textContent = locText;
         if (label)   label.textContent   = '📍 ' + locText;
-        showToast('📍 Location saved: ' + locText);
-      } catch(e) { showToast('Could not determine your city. Use manual entry.'); }
-      finally { if (btn) { btn.textContent = '🔄 Update with GPS'; btn.disabled = false; } }
+        if (badge)   badge.style.display = '';
+        showToast('📍 Location detected: ' + locText);
+      } catch(e) {
+        showToast('Could not determine your city — please check your connection and try again.');
+        if (display) display.textContent = 'Could not detect location.';
+      }
+      finally { if (btn) { btn.textContent = '🔄 Refresh location'; btn.disabled = false; } }
     },
-    function() {
-      showToast('⚠️ GPS access denied. Use manual entry below.');
-      if (btn) { btn.textContent = '🔄 Update with GPS'; btn.disabled = false; }
+    function(err) {
+      if (btn) { btn.textContent = '🔄 Refresh location'; btn.disabled = false; }
+      if (err.code === err.PERMISSION_DENIED) {
+        if (deniedHelp) deniedHelp.style.display = '';
+        if (display) display.textContent = 'Location access denied.';
+        showToast('⚠️ Location access denied.');
+      } else {
+        showToast('⚠️ Could not get your location. Please try again.');
+        if (display) display.textContent = 'Could not detect location.';
+      }
     },
-    { timeout: 10000 }
+    { timeout: 10000, enableHighAccuracy: true }
   );
-};
-
-window.saveManualLocation = async function() {
-  var city    = (document.getElementById('loc-city-input')||{}).value.trim();
-  var country = (document.getElementById('loc-country')||{}).value || 'Nigeria';
-  if (!city) { showToast('⚠️ Please enter your city.'); return; }
-  var locText = city + ', ' + country;
-  await saveLocationToFirestore(locText, null, null);
-  var display = document.getElementById('loc-city-display');
-  var label   = document.getElementById('loc-map-label');
-  if (display) display.textContent = locText;
-  if (label)   label.textContent   = '📍 ' + locText;
-  showToast('📍 Location saved: ' + locText);
 };
 
 async function saveLocationToFirestore(locText, lat, lng) {
@@ -10649,24 +10700,7 @@ async function saveLocationToFirestore(locText, lat, lng) {
   if (window._currentUser) Object.assign(window._currentUser, data);
 }
 
-// Load saved location when page opens
-var _origShowPageFinal = window.showPage;
-window.showPage = function(name) {
-  _origShowPageFinal(name);
-  if (name === 'locationverif') {
-    setTimeout(function() {
-      var u = window._currentUser;
-      if (u && u.location) {
-        var display = document.getElementById('loc-city-display');
-        var label   = document.getElementById('loc-map-label');
-        var input   = document.getElementById('loc-city-input');
-        if (display) display.textContent = u.location;
-        if (label)   label.textContent   = '📍 ' + u.location;
-        if (input)   input.value         = u.location.split(',')[0].trim();
-      }
-    }, 100);
-  }
-};
+// (locationverif page load logic now handled directly in its own <script> block above)
 
 // ══════════════════════════════════════════════════
 // 10. PAYSTACK KEY — set your key here
@@ -10830,6 +10864,98 @@ window.settingsPayoutTryResolve = function() {
   if (!bankSel || !acctEl) return;
   var bankCode = bankSel.value;
   resolveAccountName(acctEl.value, bankCode, 'st-payout-acct-name', 'st-payout-resolve-status');
+};
+
+// ══════════════════════════════════════════════════
+// 14. CURRENCY SYSTEM — display conversion across the app
+// ══════════════════════════════════════════════════
+// Approximate exchange rates relative to NGN (Nigerian Naira is the base/seller currency)
+// These should ideally be fetched live, but fixed rates avoid extra API dependency/cost.
+window._CURRENCY_RATES = {
+  NGN: 1,
+  USD: 1 / 1600,   // ~₦1600 = $1
+  GBP: 1 / 2000,   // ~₦2000 = £1
+  EUR: 1 / 1750,   // ~₦1750 = €1
+  CAD: 1 / 1180,   // ~₦1180 = C$1
+  GHS: 1 / 105,    // ~₦105 = ₵1
+  KES: 1 / 12.3,   // ~₦12.3 = KSh1
+  ZAR: 1 / 88,     // ~₦88 = R1
+};
+window._CURRENCY_SYMBOLS = { NGN:'₦', USD:'$', GBP:'£', EUR:'€', CAD:'C$', GHS:'₵', KES:'KSh', ZAR:'R' };
+
+window._displayCurrency = localStorage.getItem('zula_display_currency') || 'NGN';
+window._displaySymbol   = window._CURRENCY_SYMBOLS[window._displayCurrency] || '₦';
+
+// Convert an NGN amount to the user's chosen display currency
+window.convertPrice = function(ngnAmount) {
+  var rate = window._CURRENCY_RATES[window._displayCurrency] || 1;
+  return Math.round(Number(ngnAmount || 0) * rate * 100) / 100;
+};
+
+// Format a price for display: converts + adds the right symbol
+window.formatPrice = function(ngnAmount) {
+  var converted = window.convertPrice(ngnAmount);
+  var symbol = window._displaySymbol;
+  // Whole numbers for most currencies, 2dp only if there's a meaningful fraction
+  var formatted = converted % 1 === 0 ? converted.toLocaleString() : converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return symbol + formatted;
+};
+
+window.setCurrency = function(code, symbol) {
+  window._displayCurrency = code;
+  window._displaySymbol = symbol;
+  localStorage.setItem('zula_display_currency', code);
+  // Update button highlight states
+  document.querySelectorAll('#currency-btn-row button').forEach(function(b) { b.className = 'btn btn-ghost btn-sm'; });
+  var activeBtn = document.getElementById('curr-btn-' + code.toLowerCase());
+  if (activeBtn) activeBtn.className = 'btn btn-primary btn-sm';
+  showToast('💱 Prices now shown in ' + code + ' (' + symbol + ')');
+  // Re-render whatever is currently visible so prices update immediately
+  if (typeof loadProducts === 'function' && document.getElementById('page-marketplace') && document.getElementById('page-marketplace').classList.contains('active')) {
+    loadProducts();
+  }
+  if (window._currentProduct && typeof viewProduct === 'function') {
+    viewProduct(window._currentProduct.id);
+  }
+  if (typeof cartRender === 'function') cartRender();
+  if (typeof wishlistRender === 'function') wishlistRender();
+};
+
+// Sync currency button highlight on settings page load
+var _origShowPageCurrency = window.showPage;
+window.showPage = function(name) {
+  _origShowPageCurrency(name);
+  if (name === 'settings') {
+    setTimeout(function() {
+      document.querySelectorAll('#currency-btn-row button').forEach(function(b) { b.className = 'btn btn-ghost btn-sm'; });
+      var activeBtn = document.getElementById('curr-btn-' + window._displayCurrency.toLowerCase());
+      if (activeBtn) activeBtn.className = 'btn btn-primary btn-sm';
+    }, 100);
+  }
+};
+
+// ══════════════════════════════════════════════════
+// 15. SMART BACK NAVIGATION — returns to actual previous page
+// ══════════════════════════════════════════════════
+window.goBackSmart = function(fallback) {
+  if (window._pageHistory && window._pageHistory.length > 0) {
+    var prev = window._pageHistory.pop();
+    // Remove the page we're leaving from history top if it duplicated
+    if (typeof showPage === 'function') {
+      // Call original page-swap logic without re-pushing this navigation
+      document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+      var target = document.getElementById('page-' + prev);
+      if (target) { target.classList.add('active'); window.scrollTo(0,0); }
+      // Re-run page-specific loaders for the page we're returning to
+      if (prev === 'marketplace' && typeof loadProducts === 'function') loadProducts();
+      if (prev === 'settings' && typeof settingsLoadPayout === 'function') settingsLoadPayout();
+      if (prev === 'profile-v2' && typeof loadProfileV2 === 'function') loadProfileV2();
+      if (prev === 'seller-dashboard' && typeof sdLoadOverview === 'function') sdLoadOverview();
+      if (prev === 'product' && window._currentProduct && typeof viewProduct === 'function') viewProduct(window._currentProduct.id);
+    }
+  } else {
+    showPage(fallback || 'settings');
+  }
 };
 
 console.log('✅ ZÚLA — all features loaded.');
