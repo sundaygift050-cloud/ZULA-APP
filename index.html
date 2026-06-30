@@ -8035,7 +8035,7 @@ window.coSubmitOrder = async function() {
 
   if (typeof PaystackPop !== 'undefined') {
     var handler = PaystackPop.setup({
-      key: 'pk_test_YOUR_PAYSTACK_PUBLIC_KEY', // ← replace with your key
+      key: window.PAYSTACK_PUBLIC_KEY || 'pk_live_3cc9b244f07fdc339e9f8ee873e9b1786e58d201',
       email: email,
       amount: amountKobo,
       currency: p.currency === 'USD' ? 'USD' : 'NGN',
@@ -10089,7 +10089,7 @@ window.coSubmitOrder = async function() {
   var amountKobo = Math.round(Number(p.price) * 100);
   var ref = 'ZULA_' + Date.now() + '_' + user.uid.slice(0,6);
 
-  if (typeof PaystackPop !== 'undefined' && window.PAYSTACK_PUBLIC_KEY && window.PAYSTACK_PUBLIC_KEY !== 'pk_test_YOUR_PAYSTACK_PUBLIC_KEY') {
+  if (typeof PaystackPop !== 'undefined' && window.PAYSTACK_PUBLIC_KEY && window.PAYSTACK_PUBLIC_KEY.indexOf('pk_') === 0 && window.PAYSTACK_PUBLIC_KEY.indexOf('YOUR_PAYSTACK') === -1) {
     var handler = PaystackPop.setup({
       key:      window.PAYSTACK_PUBLIC_KEY,
       email:    user.email,
@@ -10539,7 +10539,7 @@ window.showPage = function(name) {
 // ══════════════════════════════════════════════════
 // 10. PAYSTACK KEY — set your key here
 // ══════════════════════════════════════════════════
-window.PAYSTACK_PUBLIC_KEY = 'pk_live_3cc9b244f07fdc339e9f8ee873e9b1786e58d201'; // ← REPLACE with your key from dashboard.paystack.com
+window.PAYSTACK_PUBLIC_KEY = 'pk_live_3cc9b244f07fdc339e9f8ee873e9b1786e58d201';
 
 // ══════════════════════════════════════════════════
 // 11. ADMIN — approve/reject verif sends notification
