@@ -3397,8 +3397,18 @@ onAuthStateChanged(auth, async (user) => {
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
     const adminLink = document.getElementById('admin-nav-link');
-    if (adminLink && ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase())) {
+    const isAdminUser = ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase());
+    if (adminLink && isAdminUser) {
       adminLink.style.display = 'inline';
+    }
+    // If an admin refreshes the page while it's showing the default home/landing page,
+    // send them straight to the Admin Panel instead of the buyer-facing homepage
+    if (isAdminUser) {
+      const homeEl = document.getElementById('page-home');
+      const isOnHome = homeEl && homeEl.classList.contains('active');
+      if (isOnHome) {
+        setTimeout(function(){ if (typeof goAdmin === 'function') goAdmin(); }, 300);
+      }
     }
     // Start notification badge polling
     notifPollBadge();
@@ -3445,15 +3455,22 @@ window.doLogin = function() {
   if (!pass)  { document.getElementById('login-pass-err').classList.add('show'); return; }
   const btn = document.getElementById('login-btn');
   btn.disabled = true; btn.textContent = 'Signing in…';
+  const ADMIN_EMAILS_LOGIN = ['sundaygift050@gmail.com', 'okoroaugustine050@gmail.com'];
   signInWithEmailAndPassword(auth, email, pass)
     .then(r => {
       if (!r.user.emailVerified) {
         document.getElementById('verify-email-addr').textContent = r.user.email;
         showPage('verify-email');
       } else {
-        showToast('✅ Welcome back!');
-        showPage('marketplace');
-        loadProducts();
+        const isAdminLogin = ADMIN_EMAILS_LOGIN.includes(r.user.email.toLowerCase());
+        if (isAdminLogin) {
+          showToast('✅ Welcome back, Admin!');
+          setTimeout(function(){ if (typeof goAdmin === 'function') goAdmin(); }, 300);
+        } else {
+          showToast('✅ Welcome back!');
+          showPage('marketplace');
+          loadProducts();
+        }
       }
     })
     .catch(err => {
@@ -6159,7 +6176,7 @@ window.sdLoadPayout = async function() {
     var totEl = document.getElementById('sd-payout-total');
     if (totEl) totEl.textContent = '₦' + total.toLocaleString();
     // Revenue = completed orders
-    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.where('status','in',['paid','completed'])));
+    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.where('status','==','completed')));
     var revenue = ordSnap.docs.reduce(function(s,d){ return s + Number(d.data().price||0); }, 0);
     var avail = document.getElementById('sd-payout-available');
     if (avail) avail.textContent = '₦' + (revenue - total).toLocaleString();
@@ -6414,8 +6431,12 @@ window.saveManualLocation = function() {
         <div class="sd-stat-grid">
           <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
           <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-stat-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-stat-revenue">₦0</div><div class="sd-stat-lbl">Available revenue</div></div>
+          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-escrow">₦0</div><div class="sd-stat-lbl">🔒 In escrow</div></div>
           <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-aff">₦0</div><div class="sd-stat-lbl">Aff. earned</div></div>
+        </div>
+        <div id="sd-escrow-note" style="display:none;font-size:12px;color:var(--text3);margin:-8px 0 16px;padding:10px 14px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);">
+          🔒 Funds in escrow are held until the buyer confirms they've received their order. You can only withdraw <strong>Available revenue</strong> — escrowed funds aren't withdrawable yet.
         </div>
 
         <!-- Verification prompt -->
@@ -8360,14 +8381,23 @@ window.notifLoad = async function() {
   if (!el || !user) return;
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">Loading…</div>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid), fns.orderBy('createdAt','desc')));
-    _notifAll = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    // Simple where query (no orderBy) avoids needing a composite index — sort client-side
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid)));
+    var docs = snap.docs.slice().sort(function(a,b){
+      var at = a.data().createdAt, bt = b.data().createdAt;
+      if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
+      return 0;
+    });
+    _notifAll = docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
     notifRender(_notifAll);
     // Update nav badge
     var unread = _notifAll.filter(function(n){ return !n.read; }).length;
     var badge = document.getElementById('nav-notif-badge');
     if (badge) { badge.textContent = unread; badge.style.display = unread ? 'inline-block' : 'none'; }
-  } catch(e) { if (el) el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load notifications.</div>'; }
+  } catch(e) {
+    console.error('notifLoad:', e);
+    if (el) el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">🔔</div><div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px;">All caught up!</div><div style="font-size:13px;">Order updates, messages, and seller alerts will appear here.</div></div>';
+  }
 };
 
 function notifRender(items) {
@@ -8397,18 +8427,18 @@ window.notifPollBadge = async function() {
   var user = auth && auth.currentUser;
   if (!user || !db || !fns) return;
   try {
+    // Single where clause only (no composite index needed) — filter unread client-side
     var snap = await fns.getDocs(fns.query(
       fns.collection(db, 'notifications'),
-      fns.where('userId', '==', user.uid),
-      fns.where('read', '==', false)
+      fns.where('userId', '==', user.uid)
     ));
-    var unread = snap.size;
+    var unread = snap.docs.filter(function(d){ return d.data().read === false; }).length;
     var badge = document.getElementById('nav-notif-badge');
     if (badge) {
       badge.textContent = unread > 9 ? '9+' : unread;
       badge.style.display = unread > 0 ? 'inline-block' : 'none';
     }
-  } catch(e) { /* silent fail — badge is best-effort */ }
+  } catch(e) { console.warn('notifPollBadge:', e.message); }
 };
 
 
@@ -8433,16 +8463,18 @@ window.notifMarkAllRead = async function() {
   var user = auth && auth.currentUser;
   if (!user) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid), fns.where('read','==',false)));
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'notifications'), fns.where('userId','==',user.uid)));
+    var unreadDocs = snap.docs.filter(function(d){ return d.data().read === false; });
+    if (unreadDocs.length === 0) { showToast('Nothing to mark — all caught up!'); return; }
     var batch = fns.writeBatch(db);
-    snap.docs.forEach(function(d){ batch.update(d.ref, { read:true }); });
+    unreadDocs.forEach(function(d){ batch.update(d.ref, { read:true }); });
     await batch.commit();
     showToast('All marked as read');
     notifLoad();
     // Clear badge
     var badge = document.getElementById('nav-notif-badge');
     if (badge) { badge.textContent = '0'; badge.style.display = 'none'; }
-  } catch(e) { showToast('Could not mark all read.'); }
+  } catch(e) { console.error('notifMarkAllRead:', e); showToast('Could not mark all read.'); }
 };
 
 window.filterNotifs = function(type, btn) {
@@ -8470,7 +8502,7 @@ window.sdLoadOrders = async function() {
     // Stats
     var total = _sdAllOrders.length;
     var pending = _sdAllOrders.filter(function(o){ return o.status==='pending'; }).length;
-    var revenue = _sdAllOrders.filter(function(o){ return o.status==='paid'||o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); }, 0);
+    var revenue = _sdAllOrders.filter(function(o){ return o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); }, 0);
     var e = function(id){ return document.getElementById(id); };
     if (e('sd-ord-total')) e('sd-ord-total').textContent = total;
     if (e('sd-ord-pending')) e('sd-ord-pending').textContent = pending;
@@ -8575,11 +8607,37 @@ window.sdSubmitPayout = async function() {
   var acct = (document.getElementById('payout-acct')||{}).value;
   var name = (document.getElementById('payout-name')||{}).value;
   if (!amount || !bankCode || !acct || !name) { showToast('Please fill all fields.'); return; }
+
+  var amountNum = Number(amount);
+  if (amountNum <= 0) { showToast('Enter a valid amount.'); return; }
+
+  var submitBtn = document.getElementById('payout-submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Checking balance…'; }
+
   try {
+    // ── BALANCE CHECK: only allow withdrawing from COMPLETED (released) orders,
+    // minus any payouts already requested (pending or paid) ──
+    var oSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.where('status','==','completed')));
+    var availableRevenue = oSnap.docs.reduce(function(s,d){ return s + Number(d.data().price||0); }, 0);
+
+    var prSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid)));
+    var alreadyRequested = prSnap.docs
+      .filter(function(d){ return d.data().status === 'pending' || d.data().status === 'approved' || d.data().status === 'paid'; })
+      .reduce(function(s,d){ return s + Number(d.data().amount||0); }, 0);
+
+    var actuallyAvailable = availableRevenue - alreadyRequested;
+
+    if (amountNum > actuallyAvailable) {
+      showToast('⚠️ You can only withdraw up to ₦' + actuallyAvailable.toLocaleString() + ' (your available, non-escrowed revenue).');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit payout request →'; }
+      return;
+    }
+
+    if (submitBtn) submitBtn.textContent = 'Submitting…';
     await fns.addDoc(fns.collection(db,'payoutRequests'), {
       sellerId: user.uid,
       sellerName: (window._currentUser&&window._currentUser.fullName)||user.displayName||'Seller',
-      amount: Number(amount),
+      amount: amountNum,
       bankName: bankName,
       bankCode: bankCode,
       accountNumber: acct,
@@ -8588,8 +8646,14 @@ window.sdSubmitPayout = async function() {
       createdAt: fns.serverTimestamp(),
     });
     document.getElementById('payout-modal').style.display = 'none';
-    showToast('Payout request submitted! We will process it within 1–3 business days.');
-  } catch(e) { showToast('Could not submit payout request.'); }
+    showToast('✅ Payout request submitted! We will process it within 1–3 business days.');
+    if (typeof sdLoadOverview === 'function') sdLoadOverview();
+  } catch(e) {
+    console.error(e);
+    showToast('Could not submit payout request.');
+  } finally {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit payout request →'; }
+  }
 };
 
 window.sdCancelPayout = function() {
@@ -8739,7 +8803,7 @@ window.adminLoadOrders = async function() {
     var snap = await fns.getDocs(fns.collection(db,'orders'));
     var orders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
     orders.sort(function(a,b){ return ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0); });
-    var revenue = orders.filter(function(o){ return o.status==='paid'||o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
+    var revenue = orders.filter(function(o){ return o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
     var escrow = orders.filter(function(o){ return o.status==='pending'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
     var e = function(id){ return document.getElementById(id); };
     if (e('astat-orders')) e('astat-orders').textContent = orders.length;
@@ -9883,11 +9947,16 @@ window.sdLoadOverview = async function() {
     var oSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
     if (e('sd-stat-orders')) e('sd-stat-orders').textContent = oSnap.size;
     // Revenue
-    var revenue = oSnap.docs.filter(function(d){ return d.data().status==='paid'||d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    var revenue = oSnap.docs.filter(function(d){ return d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    var inEscrow = oSnap.docs.filter(function(d){ return d.data().status==='paid'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    if (e('sd-stat-escrow')) e('sd-stat-escrow').textContent = '₦' + inEscrow.toLocaleString();
     if (e('sd-stat-revenue')) e('sd-stat-revenue').textContent = '₦' + revenue.toLocaleString();
     // Pending orders
     var pending = oSnap.docs.filter(function(d){ return d.data().status==='pending'; }).length;
     if (e('sd-stat-pending')) e('sd-stat-pending').textContent = pending;
+    // Show escrow note if there are funds held
+    var escrowNote = e('sd-escrow-note');
+    if (escrowNote) escrowNote.style.display = inEscrow > 0 ? '' : 'none';
     // Viewings pending
     try {
       var vSnap = await fns.getDocs(fns.query(fns.collection(db,'viewingRequests'), fns.where('sellerId','==',user.uid), fns.where('status','==','pending')));
