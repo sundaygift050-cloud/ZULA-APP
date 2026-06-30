@@ -1916,7 +1916,7 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
 
-      <!-- Payout section -->
+      <!-- Payout section (legacy — superseded by payout-modal, IDs prefixed to avoid collisions) -->
       <div class="dash-card" style="margin-top:4px;">
         <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">💳 Payout</h3>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:14px;">
@@ -1925,17 +1925,17 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
         <div class="form-field">
           <label>Bank name</label>
-          <input type="text" id="payout-bank" placeholder="e.g. GTBank">
+          <input type="text" id="legacy-payout-bank" placeholder="e.g. GTBank">
         </div>
         <div class="form-field">
           <label>Account number</label>
-          <input type="text" id="payout-acct" placeholder="0123456789">
+          <input type="text" id="legacy-payout-acct" placeholder="0123456789">
         </div>
         <div class="form-field">
           <label>Account name</label>
-          <input type="text" id="payout-name" placeholder="Your full name">
+          <input type="text" id="legacy-payout-name" placeholder="Your full name">
         </div>
-        <button class="btn btn-primary" onclick="requestPayout()">Request payout →</button>
+        <button class="btn btn-primary" onclick="sdRequestPayout()">Request payout →</button>
       </div>
     </div>
 
