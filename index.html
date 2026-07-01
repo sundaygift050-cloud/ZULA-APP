@@ -8561,19 +8561,47 @@ function sdRenderOrders(orders) {
   var tbody = document.getElementById('sd-orders-list');
   if (!tbody) return;
   if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:30px;text-align:center;">No orders yet.</td></tr>'; return; }
-  var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)' };
+  var statusColor = { pending:'var(--gold)', paid:'var(--green)', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)', disputed:'var(--red)' };
   tbody.innerHTML = orders.map(function(o) {
-    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '-';
+    var date = o.createdAt&&o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
     var color = statusColor[o.status]||'var(--text3)';
-    return '<tr>' +
-      '<td style="font-size:11px;color:var(--text3);font-family:monospace;">' + o._id.slice(0,8) + '</td>' +
-      '<td>' + (o.buyerName||'-') + '</td>' +
+    var d = o.delivery || {};
+    // Build delivery details row (shown inline under the order for instant visibility)
+    var deliveryHtml = '';
+    if (d.address || d.phone) {
+      var mapsLink = d.lat && d.lng
+        ? 'https://www.google.com/maps?q=' + d.lat + ',' + d.lng
+        : 'https://www.google.com/maps/search/' + encodeURIComponent(d.address || '');
+      deliveryHtml =
+        '<tr style="background:rgba(124,92,252,.04);border-top:none;">' +
+        '<td colspan="7" style="padding:0 12px 12px 32px;">' +
+        '<div style="font-size:12px;color:var(--text3);border-left:3px solid var(--accent);padding-left:10px;">' +
+          '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:4px;">' +
+            (d.address ? '<span>📍 <strong>Address:</strong> ' + d.address + '</span>' : '') +
+            (d.phone   ? '<span>📞 <strong>Phone:</strong> <a href="tel:' + d.phone + '" style="color:var(--accent);">' + d.phone + '</a></span>' : '') +
+            (d.fullname ? '<span>👤 ' + d.fullname + '</span>' : '') +
+          '</div>' +
+          (d.note ? '<div>📝 <em>' + d.note + '</em></div>' : '') +
+          (d.address ? '<a href="' + mapsLink + '" target="_blank" style="font-size:11.5px;color:var(--accent);display:inline-flex;align-items:center;gap:4px;margin-top:4px;">🗺 View on map →</a>' : '') +
+        '</div>' +
+        '</td></tr>';
+    }
+    var fulfillBtn = (o.status === 'paid' || o.status === 'pending')
+      ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;" onclick="sdFulfillOrder(\'' + o._id + '\')">Mark shipped</button>'
+      : '-';
+    return '<tr style="cursor:pointer;" onclick="this.nextElementSibling&&this.nextElementSibling.style.display===\'none\'?this.nextElementSibling.style.display=\'table-row\':this.nextElementSibling&&(this.nextElementSibling.style.display=\'none\')">' +
+      '<td style="font-size:11px;color:var(--text3);font-family:monospace;">#' + o._id.slice(0,8).toUpperCase() + '</td>' +
+      '<td><div style="font-weight:600;">' + (o.buyerName||'-') + '</div>' +
+        (d.phone ? '<div style="font-size:11px;color:var(--text3);">' + d.phone + '</div>' : '') + '</td>' +
       '<td>' + (o.productName||'-') + '</td>' +
-      '<td style="font-weight:700;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</td>' +
+      '<td style="font-weight:700;color:var(--accent);">' + (o.currency||'₦') + ' ' + Number(o.price||0).toLocaleString() + '</td>' +
       '<td><span style="color:' + color + ';font-weight:700;font-size:12px;">' + (o.status||'-') + '</span></td>' +
       '<td style="font-size:12px;color:var(--text3);">' + date + '</td>' +
-      '<td>' + (o.status==='pending'?'<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;" onclick="sdFulfillOrder(\'' + o._id + '\')">Mark fulfilled</button>':'-') + '</td>' +
-      '</tr>';
+      '<td>' + fulfillBtn + '</td>' +
+      '</tr>' +
+      (deliveryHtml
+        ? deliveryHtml.replace('<tr ', '<tr style="display:none;" ')
+        : '');
   }).join('');
 }
 
@@ -9071,10 +9099,16 @@ window.sdTab = function(name) {
         <div>
           <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Delivery address</label>
           <input id="co-address" placeholder="Street, City, State" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <!-- Live location button -->
+          <button type="button" id="co-location-btn" onclick="coDetectLocation()"
+            style="margin-top:7px;display:flex;align-items:center;gap:6px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:7px 12px;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;width:100%;">
+            📍 Use my live location
+          </button>
+          <div id="co-location-status" style="font-size:11.5px;margin-top:4px;min-height:14px;color:var(--text3);"></div>
         </div>
         <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Note to seller <span style="color:var(--text3);font-weight:400;">(optional)</span></label>
-          <input id="co-note" placeholder="e.g. Leave at gate" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Note to seller <span style="font-weight:400;">(optional)</span></label>
+          <input id="co-note" placeholder="e.g. Leave at gate, call when nearby" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
         </div>
       </div>
     </div>
@@ -10241,7 +10275,18 @@ window.coSubmitOrder = async function() {
   if (!isDigital && !address) { showToast('⚠️ Please enter your delivery address.'); return; }
   if (!isDigital && !phone)   { showToast('⚠️ Please enter your phone number.'); return; }
 
-  var delivery = isDigital ? null : { fullname, phone, address, note };
+  var delivery = isDigital ? null : {
+    fullname, phone, address, note,
+    lat: window._coLocationLatLng ? window._coLocationLatLng.lat : null,
+    lng: window._coLocationLatLng ? window._coLocationLatLng.lng : null,
+  };
+  window._coLocationLatLng = null; // reset after use
+  // Attach GPS coordinates if buyer used live location
+  if (delivery && window._coLocationLatLng) {
+    delivery.lat = window._coLocationLatLng.lat;
+    delivery.lng = window._coLocationLatLng.lng;
+    window._coLocationLatLng = null; // reset after use
+  }
 
   // Show a brief loading state on the Pay Now button while we confirm Paystack is ready
   var payBtn = document.querySelector('#checkout-modal .btn-primary');
@@ -10344,6 +10389,15 @@ window.coOpenCheckout = function(product) {
   var u = window._currentUser || {};
   var nameI = document.getElementById('co-fullname'); if (nameI && u.fullName) nameI.value = u.fullName;
   var phoneI = document.getElementById('co-phone');   if (phoneI && u.phone)   phoneI.value = u.phone;
+  // Reset location button state
+  window._coLocationLatLng = null;
+  var locBtn = document.getElementById('co-location-btn');
+  var locSts = document.getElementById('co-location-status');
+  var addrI  = document.getElementById('co-address');
+  if (locBtn) { locBtn.textContent = '📍 Use my live location'; locBtn.disabled = false; locBtn.style.background = 'rgba(124,92,252,.1)'; locBtn.style.borderColor = 'rgba(124,92,252,.3)'; locBtn.style.color = 'var(--accent)'; }
+  if (locSts) locSts.textContent = '';
+  if (addrI)  addrI.value = '';
+  var noteI = document.getElementById('co-note'); if (noteI) noteI.value = '';
   document.getElementById('checkout-modal').style.display = 'flex';
 };
 
@@ -10956,6 +11010,59 @@ window.goBackSmart = function(fallback) {
   } else {
     showPage(fallback || 'settings');
   }
+};
+
+// ── LIVE LOCATION DETECTION FOR CHECKOUT ────────────────────────
+window._coLocationLatLng = null; // {lat, lng} from GPS
+
+window.coDetectLocation = function() {
+  var btn    = document.getElementById('co-location-btn');
+  var status = document.getElementById('co-location-status');
+  var addr   = document.getElementById('co-address');
+
+  if (!navigator.geolocation) {
+    if (status) { status.textContent = '❌ GPS not supported on this device.'; status.style.color = 'var(--red)'; }
+    return;
+  }
+  if (btn) { btn.textContent = '⏳ Detecting your location…'; btn.disabled = true; }
+  if (status) { status.textContent = ''; }
+
+  navigator.geolocation.getCurrentPosition(
+    async function(pos) {
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      window._coLocationLatLng = { lat: lat, lng: lng };
+      try {
+        var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng);
+        var data = await res.json();
+        var a = data.address || {};
+        // Build a human-readable address
+        var parts = [
+          a.house_number && a.road ? a.house_number + ' ' + a.road : (a.road || a.pedestrian || a.footway),
+          a.suburb || a.neighbourhood || a.village,
+          a.city || a.town || a.county,
+          a.state,
+          a.country
+        ].filter(Boolean);
+        var fullAddr = parts.join(', ');
+        if (addr) addr.value = fullAddr;
+        if (status) { status.textContent = '✅ Location detected — you can edit the address above if needed.'; status.style.color = 'var(--green)'; }
+        if (btn) { btn.textContent = '📍 Location set — tap to refresh'; btn.style.background = 'rgba(39,201,122,.1)'; btn.style.borderColor = 'rgba(39,201,122,.3)'; btn.style.color = 'var(--green)'; }
+      } catch(e) {
+        // GPS worked but reverse geocode failed — save coordinates at least
+        if (addr && !addr.value) addr.value = 'GPS: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+        if (status) { status.textContent = '📍 GPS coordinates captured. Add your full street address above.'; status.style.color = 'var(--text3)'; }
+      }
+      if (btn) btn.disabled = false;
+    },
+    function(err) {
+      if (btn) { btn.textContent = '📍 Use my live location'; btn.disabled = false; }
+      var msg = err.code === 1
+        ? '⚠️ Location access denied. Please enable it in your browser settings.'
+        : '⚠️ Could not get your location. Please type your address manually.';
+      if (status) { status.textContent = msg; status.style.color = 'var(--gold)'; }
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
 };
 
 console.log('✅ ZÚLA — all features loaded.');
