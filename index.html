@@ -774,6 +774,38 @@ p{color:var(--text2);margin:0 0 1em;}
 .sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
 .sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
 
+/* ── ORDER FULFILLMENT (seller) ── */
+.sdf-tabs-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.sdf-tab{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sdf-tab span{margin-left:5px;background:var(--bg3);color:var(--text3);border-radius:999px;padding:1px 7px;font-size:11px;}
+.sdf-tab:hover{border-color:var(--border2);color:var(--text);}
+.sdf-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sdf-tab.active span{background:rgba(255,255,255,.2);color:#fff;}
+.sdf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:14px;}
+.sdf-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.sdf-order-id{font-size:14.5px;font-weight:800;font-family:var(--font-display);}
+.sdf-order-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.sdf-order-buyer{font-size:12.5px;color:var(--text2);margin-top:4px;}
+.sdf-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.sdf-badge-new{background:rgba(240,82,82,.15);color:var(--red);}
+.sdf-badge-packed{background:rgba(245,200,66,.15);color:var(--gold);}
+.sdf-badge-shipped{background:rgba(91,163,245,.15);color:#5ba8f5;}
+.sdf-badge-completed{background:rgba(39,201,122,.15);color:var(--green);}
+.sdf-product-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.sdf-product-thumb{width:44px;height:44px;border-radius:var(--radius-xs);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;}
+.sdf-product-thumb img{width:100%;height:100%;object-fit:cover;}
+.sdf-product-name{font-size:13.5px;font-weight:700;}
+.sdf-product-qty{font-size:12px;color:var(--text3);margin-top:2px;}
+.sdf-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.sdf-btn-primary{background:var(--accent);color:#fff;border:none;font-weight:700;}
+.sdf-btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
+.sdf-ship-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.sdf-carrier{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 10px;color:var(--text);font-family:var(--font-body);font-size:12.5px;min-width:140px;}
+.sdf-tracking{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:12.5px;}
+.sdf-tracking:focus,.sdf-carrier:focus{outline:none;border-color:var(--accent);}
+.sdf-tracking-info{font-size:12.5px;color:var(--text2);background:var(--bg3);border-radius:var(--radius-xs);padding:9px 12px;margin-bottom:10px;}
+.sdf-proof-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);}
+
 /* ── TABLET FILTER PANEL (760px–1024px) ── */
 @media(min-width:761px) and (max-width:1024px){
   .filter-panel{display:none;}
@@ -6550,26 +6582,21 @@ window.saveManualLocation = function() {
         </div>
       </div>
 
-      <!-- ── ORDERS ── -->
+      <!-- ── ORDERS TO FULFIL ── -->
       <div class="sd-section" id="sd-sec-orders">
-        <div class="sd-page-hd">Orders</div>
-        <div class="sd-page-sub">Track purchases made on your listings</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-ord-total">0</div><div class="sd-stat-lbl">Total orders</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-ord-pending">0</div><div class="sd-stat-lbl">Pending</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--accent);" id="sd-ord-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+        <div class="sd-page-hd">Orders to fulfil</div>
+        <div class="sd-page-sub">Mark items as shipped and add tracking — buyer is notified automatically.</div>
+
+        <div class="sdf-tabs-bar">
+          <button class="sdf-tab active" onclick="sdFilterFulfillOrders(this,'all')">All orders <span id="sdf-count-all">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'new')">New <span id="sdf-count-new">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'packed')">Packed <span id="sdf-count-packed">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'shipped')">Shipped <span id="sdf-count-shipped">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'completed')">Completed <span id="sdf-count-completed">0</span></button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="sdFilterOrders(this,'all')">All</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'pending')">Pending</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'completed')">Completed</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'refunded')">Refunded</button>
-        </div>
-        <div class="dash-card" style="padding:0;">
-          <table class="dtable">
-            <thead><tr><th>Order</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
-            <tbody id="sd-orders-list"><tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">Loading orders…</td></tr></tbody>
-          </table>
+
+        <div id="sd-fulfill-list">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading orders…</div>
         </div>
       </div>
 
@@ -9062,7 +9089,7 @@ window.adminLoadOverview = async function() {
 var _origSdTab = window.sdTab;
 window.sdTab = function(name) {
   _origSdTab(name);
-  if (name === 'orders')    sdLoadOrders();
+  if (name === 'orders')    sdLoadFulfillOrders();
   if (name === 'affiliate') sdLoadAffiliate();
   if (name === 'payout') sdLoadPayout();
 };
@@ -11063,6 +11090,259 @@ window.coDetectLocation = function() {
     },
     { timeout: 10000, enableHighAccuracy: true }
   );
+};
+
+// ── SELLER: REAL ORDER FULFILLMENT ──────────────────────────────
+window._sdFulfillOrders = [];
+window._sdFulfillFilter = 'all';
+
+window.sdLoadFulfillOrders = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var wrap = document.getElementById('sd-fulfill-list');
+  if (!wrap || !user) return;
+  wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading orders…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
+    var docs = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    docs.sort(function(a,b){
+      var at = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      var bt = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return bt - at;
+    });
+    // Digital/service/property orders don't need shipping — leave them off this list
+    var digitalTypes = ['course','ebook','template','software','audio','coaching','realestate'];
+    window._sdFulfillOrders = docs.filter(function(o) {
+      return digitalTypes.indexOf(o.productType) === -1 && o.status !== 'refunded' && o.status !== 'disputed' && o.status !== 'cancelled';
+    });
+    sdUpdateFulfillTabs();
+    sdRenderFulfillOrders();
+  } catch(e) {
+    console.error('sdLoadFulfillOrders:', e);
+    wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">No orders to fulfil yet.</div>';
+  }
+};
+
+function sdFulfillBucket(status) {
+  if (status === 'paid' || status === 'pending') return 'new';
+  if (status === 'packed') return 'packed';
+  if (status === 'shipped' || status === 'in-transit') return 'shipped';
+  if (status === 'completed' || status === 'delivered') return 'completed';
+  return 'other';
+}
+
+window.sdUpdateFulfillTabs = function() {
+  var counts = { all:0, new:0, packed:0, shipped:0, completed:0 };
+  window._sdFulfillOrders.forEach(function(o) {
+    counts.all++;
+    var b = sdFulfillBucket(o.status);
+    if (counts[b] !== undefined) counts[b]++;
+  });
+  var e = function(id){ return document.getElementById(id); };
+  if (e('sdf-count-all'))       e('sdf-count-all').textContent = counts.all;
+  if (e('sdf-count-new'))       e('sdf-count-new').textContent = counts.new;
+  if (e('sdf-count-packed'))    e('sdf-count-packed').textContent = counts.packed;
+  if (e('sdf-count-shipped'))   e('sdf-count-shipped').textContent = counts.shipped;
+  if (e('sdf-count-completed')) e('sdf-count-completed').textContent = counts.completed;
+};
+
+window.sdFilterFulfillOrders = function(btn, filter) {
+  window._sdFulfillFilter = filter;
+  document.querySelectorAll('#sd-sec-orders .sdf-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  sdRenderFulfillOrders();
+};
+
+window.sdRenderFulfillOrders = function() {
+  var wrap = document.getElementById('sd-fulfill-list');
+  if (!wrap) return;
+  var filter = window._sdFulfillFilter;
+  var list = filter === 'all' ? window._sdFulfillOrders : window._sdFulfillOrders.filter(function(o){ return sdFulfillBucket(o.status) === filter; });
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);"><div style="font-size:44px;margin-bottom:10px;">📦</div><div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:4px;">Nothing here yet</div><div style="font-size:12.5px;">Orders will show up as buyers purchase your physical products.</div></div>';
+    return;
+  }
+  wrap.innerHTML = list.map(sdFulfillCardHtml).join('');
+};
+
+function sdFulfillCardHtml(o) {
+  var bucket = sdFulfillBucket(o.status);
+  var date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : null;
+  var dateStr = date ? date.toLocaleDateString('en-GB',{month:'short',day:'numeric',year:'numeric'}) : '-';
+  var ago = date ? timeSince(date) : '';
+  var d = o.delivery || {};
+  var location = d.address ? d.address.split(',').slice(-2).join(',').trim() : '-';
+  var orderCode = 'ZL-' + (date ? date.getFullYear() : '2026') + '-' + o._id.slice(0,5).toUpperCase();
+
+  var badgeMeta = {
+    new:       { label:'New',       cls:'sdf-badge-new' },
+    packed:    { label:'Packed',    cls:'sdf-badge-packed' },
+    shipped:   { label:o.status==='in-transit' ? 'In transit' : 'Shipped', cls:'sdf-badge-shipped' },
+    completed: { label:'Completed', cls:'sdf-badge-completed' },
+    other:     { label:o.status||'-', cls:'sdf-badge-new' },
+  }[bucket];
+
+  var thumb = o.productPhoto ? ('<img src="'+o.productPhoto+'">') : ('<span>'+(o.productEmoji||'📦')+'</span>');
+  var buyerNameSafe = (o.buyerName||'Buyer').replace(/'/g, "\\'");
+
+  var actionsHtml = '';
+  if (bucket === 'new') {
+    actionsHtml =
+      '<div class="sdf-actions">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdConfirmPackOrder(\''+o._id+'\')">✓ Confirm &amp; pack order</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdMessageBuyerFromOrder(\''+o.buyerId+'\',\''+buyerNameSafe+'\')">💬 Message buyer</button>' +
+        '<button class="btn btn-sm sdf-btn-danger" onclick="sdCancelOrder(\''+o._id+'\',\''+o.buyerId+'\')">✕ Cancel</button>' +
+      '</div>';
+  } else if (bucket === 'packed') {
+    actionsHtml =
+      '<div class="sdf-ship-row">' +
+        '<select class="sdf-carrier" id="sdf-carrier-'+o._id+'">' +
+          '<option>GIG Logistics</option><option>DHL</option><option>UPS</option><option>Speedaf</option><option>Kwik</option><option>NIPOST</option><option>Other</option>' +
+        '</select>' +
+        '<input type="text" class="sdf-tracking" id="sdf-tracking-'+o._id+'" placeholder="Tracking number e.g. GIG123456789">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdMarkShipped(\''+o._id+'\',\''+o.buyerId+'\')">Mark as shipped →</button>' +
+      '</div>' +
+      '<div class="sdf-actions" style="margin-top:8px;">' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdUploadProof(\''+o._id+'\')">📎 Upload proof</button>' +
+      '</div>';
+  } else if (bucket === 'shipped') {
+    var trackLine = o.trackingCarrier ? (o.trackingCarrier + ' · ' + (o.trackingNumber||'')) : '';
+    actionsHtml =
+      (trackLine ? ('<div class="sdf-tracking-info">🚚 ' + trackLine + '</div>') : '') +
+      '<div class="sdf-actions">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdShowDeliveryCode(\''+o._id+'\')">🔑 Delivery code</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdUploadProof(\''+o._id+'\')">📎 Upload proof</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdMessageBuyerFromOrder(\''+o.buyerId+'\',\''+buyerNameSafe+'\')">💬 Message buyer</button>' +
+      '</div>';
+  } else if (bucket === 'completed') {
+    actionsHtml = '<div class="sdf-tracking-info" style="color:var(--green);">✅ Delivered &amp; confirmed by buyer</div>';
+  }
+
+  var proofHtml = o.proofUrl ? ('<a href="'+o.proofUrl+'" target="_blank" class="sdf-proof-link">📷 View delivery proof</a>') : '';
+
+  return '<div class="sdf-card">' +
+    '<div class="sdf-card-top">' +
+      '<div><div class="sdf-order-id">Order #' + orderCode + '</div>' +
+      '<div class="sdf-order-meta">Placed ' + dateStr + ' · ' + ago + '</div>' +
+      '<div class="sdf-order-buyer">Buyer: ' + (o.buyerName||'Buyer') + (location!=='-' ? (' · ' + location) : '') + '</div></div>' +
+      '<span class="sdf-badge ' + badgeMeta.cls + '">' + badgeMeta.label + '</span>' +
+    '</div>' +
+    '<div class="sdf-product-row">' +
+      '<div class="sdf-product-thumb">' + thumb + '</div>' +
+      '<div style="flex:1;"><div class="sdf-product-name">' + (o.productName||'Product') + '</div>' +
+      '<div class="sdf-product-qty">Qty: ' + (o.qty||1) + ' · ' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div></div>' +
+    '</div>' +
+    actionsHtml + proofHtml +
+    '</div>';
+}
+
+window.sdConfirmPackOrder = async function(orderId) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'packed', packedAt:fns.serverTimestamp() });
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    if (o) {
+      o.status = 'packed';
+      await fns.addDoc(fns.collection(db,'notifications'), {
+        userId:o.buyerId, type:'order_update', title:'Your order is being packed 📦',
+        body:'Your order for '+(o.productName||'your item')+' has been confirmed and is being packed for shipping.',
+        read:false, createdAt:fns.serverTimestamp(),
+      });
+    }
+    showToast('✅ Order confirmed & packed.');
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not update order.'); }
+};
+
+window.sdCancelOrder = async function(orderId, buyerId) {
+  var reason = prompt('Reason for cancelling this order (buyer will see this):');
+  if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'cancelled', cancelReason:reason, cancelledAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId:buyerId, type:'order_update', title:'Order cancelled',
+      body:'Your order' + (o ? (' for '+(o.productName||'your item')) : '') + ' was cancelled by the seller. Reason: ' + reason + '. A refund will be processed to your escrow balance.',
+      read:false, createdAt:fns.serverTimestamp(),
+    });
+    showToast('Order cancelled — buyer notified.');
+    window._sdFulfillOrders = window._sdFulfillOrders.filter(function(x){ return x._id!==orderId; });
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not cancel order.'); }
+};
+
+window.sdMarkShipped = async function(orderId, buyerId) {
+  var carrierEl = document.getElementById('sdf-carrier-'+orderId);
+  var trackEl = document.getElementById('sdf-tracking-'+orderId);
+  var carrier = carrierEl ? carrierEl.value : '';
+  var tracking = trackEl ? trackEl.value.trim() : '';
+  if (!tracking) { showToast('⚠️ Enter a tracking number first.'); return; }
+  var db = window._db, fns = window._fns;
+  var deliveryCode = Math.floor(1000 + Math.random()*9000).toString();
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), {
+      status:'shipped', trackingCarrier:carrier, trackingNumber:tracking,
+      deliveryCode:deliveryCode, shippedAt:fns.serverTimestamp(),
+    });
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    if (o) { o.status='shipped'; o.trackingCarrier=carrier; o.trackingNumber=tracking; o.deliveryCode=deliveryCode; }
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId:buyerId, type:'order_update', title:'Your order has shipped! 🚚',
+      body:(carrier?carrier+' — ':'')+'Tracking: '+tracking+'. Share your delivery code with the courier when it arrives: '+deliveryCode,
+      read:false, createdAt:fns.serverTimestamp(),
+    });
+    showToast('🚚 Marked as shipped — buyer notified with tracking.');
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not mark as shipped.'); }
+};
+
+window.sdShowDeliveryCode = async function(orderId) {
+  var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+  var code = o && o.deliveryCode;
+  if (!code) {
+    var db = window._db, fns = window._fns;
+    try { var snap = await fns.getDoc(fns.doc(db,'orders',orderId)); code = snap.exists() ? snap.data().deliveryCode : null; } catch(e) {}
+  }
+  if (code) showToast('🔑 Delivery code: ' + code + ' — buyer confirms this on delivery.');
+  else showToast('No delivery code generated yet.');
+};
+
+window.sdUploadProof = function(orderId) {
+  var input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async function() {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 10*1024*1024) { showToast('Max 10MB.'); return; }
+    showToast('⏳ Uploading proof…');
+    try {
+      var url = await uploadToCloudinary(file, 'zula_delivery_proof');
+      var db = window._db, fns = window._fns;
+      await fns.updateDoc(fns.doc(db,'orders',orderId), { proofUrl:url });
+      var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+      if (o) {
+        o.proofUrl = url;
+        await fns.addDoc(fns.collection(db,'notifications'), {
+          userId:o.buyerId, type:'order_update', title:'Delivery proof uploaded',
+          body:'The seller uploaded proof of delivery for '+(o.productName||'your order')+'.',
+          read:false, createdAt:fns.serverTimestamp(),
+        });
+      }
+      showToast('✅ Proof uploaded.');
+      sdRenderFulfillOrders();
+    } catch(e) { console.error(e); showToast('Could not upload proof.'); }
+  };
+  input.click();
+};
+
+window.sdMessageBuyerFromOrder = function(buyerId, buyerName) {
+  showPage('messaging');
+  setTimeout(function() {
+    var cid = [window._auth.currentUser.uid, buyerId].sort().join('_');
+    openConversation(cid, buyerId, buyerName);
+    window._activeConvId = cid; window._activePeerId = buyerId; window._activePeerName = buyerName;
+  }, 300);
 };
 
 console.log('✅ ZÚLA — all features loaded.');
