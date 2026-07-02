@@ -838,7 +838,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <span id="lp-nav-links" style="display:none;gap:10px;align-items:center;">
           <a onclick="showPage('home')">Home</a>
           <a onclick="showPage('marketplace')">Browse</a>
-          <a onclick="showPage('affiliate-info')">Affiliate</a>
+          <a onclick="showPage('affiliate-signin')">Affiliate</a>
           <a onclick="goAddProduct()">Sell</a>
         </span>
         <span id="lp-nav-guest" style="display:flex;gap:10px;align-items:center;">
@@ -857,7 +857,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <p class="lede">Physical goods, digital downloads, online courses — all in one place, in your currency. Real sellers, real products, escrow-protected payments.</p>
       <div class="hero-cta">
         <button class="btn btn-primary" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
-        <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-info')">Become an affiliate</button>
+        <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-signin')">Become an affiliate</button>
       </div>
       <div class="hero-stats">
         <div><div class="hstat-num">Free</div><div class="hstat-lbl">To join</div></div>
@@ -908,7 +908,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <div class="footer-links">
           <a onclick="showPage('home')" style="color:var(--text3);cursor:pointer;">Home</a>
           <a onclick="requireAuth('marketplace')" style="color:var(--text3);cursor:pointer;">Browse</a>
-          <a onclick="showPage('affiliate-info')" style="color:var(--text3);cursor:pointer;">Affiliate</a>
+          <a onclick="showPage('affiliate-signin')" style="color:var(--text3);cursor:pointer;">Affiliate</a>
           <a onclick="showPage('signup')" style="color:var(--text3);cursor:pointer;">Sign up</a>
         </div>
         <div class="footer-copy">© 2026 ZÚLA Marketplace Ltd.</div>
@@ -1067,6 +1067,7 @@ p{color:var(--text2);margin:0 0 1em;}
         <a onclick="notifOpen()" style="position:relative;" title="Notifications" class="hide-mobile">🔔 <span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="openWishlist()" style="position:relative;" title="Wishlist" class="hide-mobile">❤️</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒 <span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
+        <a onclick="affNavClick()" id="aff-nav-link" style="display:none;">Referral</a>
         <a onclick="goAdmin()" id="admin-nav-link" style="display:none;color:var(--gold);">⚙️ Admin</a>
         <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
         <!-- Admin/user dropdown -->
@@ -2366,9 +2367,266 @@ if (_kycOrigShowPage) {
 </div>
 
 <!-- ================================================================
+     AFFILIATE SYSTEM — Sign in/Sign up, Hub, Referral
+     ================================================================ -->
+<style>
+.aff-shell{min-height:100vh;background:var(--bg);padding:40px 20px 80px;}
+.aff-shell-inner{max-width:640px;margin:0 auto;}
+.aff-shell-hd{text-align:center;margin-bottom:28px;}
+.aff-shell-hd h1{font-size:22px;font-weight:800;margin-bottom:6px;}
+.aff-shell-hd p{font-size:13.5px;color:var(--text3);}
+.aff-tabbar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px;margin-bottom:22px;}
+.aff-tabbar button{flex:1;padding:10px;border:none;border-radius:var(--radius-xs);background:transparent;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.aff-tabbar button.active{background:var(--accent);color:#fff;}
+.aff-tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+@media(max-width:520px){.aff-tier-grid{grid-template-columns:1fr;}}
+.aff-tier-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 14px;text-align:center;position:relative;}
+.aff-tier-card.gold{border-color:var(--gold);}
+.aff-tier-medal{font-size:26px;margin-bottom:8px;}
+.aff-tier-name{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.aff-tier-pct{font-size:19px;font-weight:800;color:var(--accent);margin-bottom:4px;}
+.aff-tier-card.gold .aff-tier-pct{color:var(--gold);}
+.aff-tier-sub{font-size:11px;color:var(--text3);line-height:1.5;}
+.aff-tier-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:9.5px;font-weight:800;padding:2px 10px;border-radius:999px;}
+.aff-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:16px;}
+.aff-card h3{font-size:14px;font-weight:700;margin-bottom:4px;}
+.aff-how-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.aff-how-step:last-child{border-bottom:none;}
+.aff-how-num{width:28px;height:28px;border-radius:50%;background:rgba(124,92,252,.15);color:var(--accent);font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aff-how-title{font-size:13.5px;font-weight:700;margin-bottom:3px;}
+.aff-how-desc{font-size:12px;color:var(--text3);line-height:1.5;}
+.aff-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:420px){.aff-field-row{grid-template-columns:1fr;}}
+.aff-field{margin-bottom:14px;}
+.aff-field label{display:block;font-size:12px;color:var(--text3);margin-bottom:6px;}
+.aff-field input,.aff-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;}
+.aff-field input:focus,.aff-field select:focus{outline:none;border-color:var(--accent);}
+.aff-switch-line{text-align:center;font-size:12.5px;color:var(--text3);margin-top:14px;}
+.aff-switch-line a{color:var(--accent);cursor:pointer;}
+
+/* Affiliate Hub */
+.affhub-wrap{max-width:900px;margin:0 auto;padding:28px 20px 70px;}
+.affhub-tier-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.affhub-tier-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);color:var(--gold);padding:6px 14px;border-radius:999px;font-size:12.5px;font-weight:800;}
+.affhub-tier-pill.silver{background:rgba(160,160,176,.12);border-color:rgba(160,160,176,.3);color:#c4c4d0;}
+.affhub-tier-pill.starter{background:rgba(124,92,252,.12);border-color:rgba(124,92,252,.3);color:var(--accent);}
+.affhub-next{font-size:12px;color:var(--text3);}
+.affhub-stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:760px){.affhub-stat-grid{grid-template-columns:repeat(2,1fr);}}
+.affhub-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.affhub-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.affhub-stat-val{font-size:17px;font-weight:800;font-family:var(--font-display);}
+.affhub-link-row{display:flex;gap:8px;flex-wrap:wrap;}
+.affhub-link-input{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-size:12.5px;font-family:monospace;}
+.affhub-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+.affhub-pcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
+.affhub-pcard-thumb{width:100%;height:80px;border-radius:var(--radius-xs);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;overflow:hidden;}
+.affhub-pcard-thumb img{width:100%;height:100%;object-fit:cover;}
+.affhub-pcard-name{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.affhub-pcard-comm{font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px;}
+.affhub-pcard-actions{display:flex;gap:6px;}
+
+/* Referral page */
+.ref-wrap{max-width:480px;margin:0 auto;padding:36px 20px 70px;}
+.ref-hero{background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(91,63,219,.06));border:1px solid rgba(124,92,252,.3);border-radius:var(--radius);padding:32px 24px;text-align:center;margin-bottom:16px;}
+.ref-hero-icon{font-size:40px;margin-bottom:12px;}
+.ref-hero h2{font-size:19px;font-weight:800;margin-bottom:8px;}
+.ref-hero p{font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:20px;}
+.ref-link-row{display:flex;gap:8px;margin-bottom:14px;}
+.ref-link-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-size:12px;font-family:monospace;}
+.ref-share-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.ref-getgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.ref-get-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;}
+.ref-get-icon{font-size:22px;margin-bottom:6px;}
+.ref-get-lbl{font-size:11px;color:var(--text3);margin-bottom:6px;}
+.ref-get-val{font-size:19px;font-weight:800;color:var(--accent);}
+.ref-get-sub{font-size:10.5px;color:var(--text3);margin-top:4px;}
+.ref-stats-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;}
+.ref-stats-row{display:flex;justify-content:space-around;text-align:center;margin-bottom:14px;}
+.ref-stats-val{font-size:20px;font-weight:800;font-family:var(--font-display);}
+.ref-stats-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+.ref-credit-banner{background:rgba(39,201,122,.1);border:1px solid rgba(39,201,122,.3);color:var(--green);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;font-weight:600;text-align:center;}
+</style>
+
+<!-- ── AFFILIATE SIGN IN / SIGN UP ── -->
+<div class="page" id="page-affiliate-signin">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('home')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav"><a onclick="showPage('home')">← Back to ZÚLA</a></nav>
+    </div>
+  </header>
+  <div class="aff-shell">
+    <div class="aff-shell-inner">
+      <div class="aff-shell-hd">
+        <h1>💰 ZÚLA Affiliate Program</h1>
+        <p>Share products you love and earn 5–20% commission on every sale. Free to join. No investment required.</p>
+      </div>
+
+      <div class="aff-tier-grid">
+        <div class="aff-tier-card"><div class="aff-tier-medal">🥉</div><div class="aff-tier-name">Starter</div><div class="aff-tier-pct">5–10%</div><div class="aff-tier-sub">0–10 sales/month<br>All products</div></div>
+        <div class="aff-tier-card"><div class="aff-tier-medal">🥈</div><div class="aff-tier-name">Silver</div><div class="aff-tier-pct">12%</div><div class="aff-tier-sub">11–50 sales/month<br>Priority access</div></div>
+        <div class="aff-tier-card gold"><div class="aff-tier-badge">Most earned</div><div class="aff-tier-medal">🥇</div><div class="aff-tier-name">Gold</div><div class="aff-tier-pct">15–20%</div><div class="aff-tier-sub">51+ sales/month<br>Exclusive promos + bonus</div></div>
+      </div>
+
+      <div class="aff-card">
+        <h3 style="margin-bottom:14px;">How it works</h3>
+        <div class="aff-how-step"><div class="aff-how-num">1</div><div><div class="aff-how-title">Sign up (free, instant)</div><div class="aff-how-desc">Create a free ZÚLA account. Your affiliate dashboard is ready immediately — no approval needed.</div></div></div>
+        <div class="aff-how-step"><div class="aff-how-num">2</div><div><div class="aff-how-title">Get your unique link</div><div class="aff-how-desc">Every product has a "Copy affiliate link" button. Share anywhere — Instagram, WhatsApp, Twitter, YouTube, email.</div></div></div>
+        <div class="aff-how-step"><div class="aff-how-num">3</div><div><div class="aff-how-title">Earn when someone buys</div><div class="aff-how-desc">When anyone clicks your link and purchases within 30 days, you earn commission automatically. Withdraw anytime above NGN 5,000.</div></div></div>
+      </div>
+
+      <!-- Tabs: existing user vs new user -->
+      <div class="aff-tabbar">
+        <button class="active" id="aff-tab-signin" onclick="affSwitchTab('signin')">Sign in with ZÚLA</button>
+        <button id="aff-tab-signup" onclick="affSwitchTab('signup')">Create free account</button>
+      </div>
+
+      <!-- SIGN IN (existing ZULA users) -->
+      <div id="aff-panel-signin">
+        <div class="aff-card">
+          <h3>Sign in to your ZÚLA account</h3>
+          <p style="font-size:12px;color:var(--text3);margin-bottom:16px;">We'll check if you're already an affiliate — if not, you'll complete a quick application right after.</p>
+          <div class="aff-field"><label>Email address</label><input type="email" id="aff-si-email" placeholder="you@example.com"></div>
+          <div class="aff-field" style="margin-bottom:8px;"><label>Password</label><input type="password" id="aff-si-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')affSignIn()"></div>
+          <div id="aff-si-err" style="display:none;color:var(--red);font-size:12.5px;margin-bottom:12px;"></div>
+          <button class="btn btn-primary btn-block" id="aff-si-btn" onclick="affSignIn()">Sign in →</button>
+        </div>
+      </div>
+
+      <!-- APPLICATION FORM (shown for new signups + existing users who aren't affiliates yet) -->
+      <div id="aff-panel-apply" style="display:none;">
+        <div class="aff-card">
+          <h3 id="aff-apply-hd">Create your free affiliate account</h3>
+          <p id="aff-apply-sub" style="font-size:12px;color:var(--text3);margin-bottom:16px;">This creates your ZÚLA account and affiliate profile together.</p>
+          <div class="aff-field-row">
+            <div class="aff-field"><label>First name</label><input id="aff-fname" placeholder="Ada"></div>
+            <div class="aff-field"><label>Last name</label><input id="aff-lname" placeholder="Okafor"></div>
+          </div>
+          <div class="aff-field" id="aff-email-field"><label>Email address</label><input type="email" id="aff-email" placeholder="ada@example.com"></div>
+          <div class="aff-field" id="aff-pass-field"><label>Password</label><input type="password" id="aff-pass" placeholder="Min. 8 characters"></div>
+          <div class="aff-field"><label>How will you promote products?</label>
+            <select id="aff-channel">
+              <option>Instagram / TikTok</option><option>WhatsApp / Telegram</option><option>YouTube</option>
+              <option>Blog / Website</option><option>Twitter / X</option><option>Facebook</option><option>Other</option>
+            </select>
+          </div>
+          <div id="aff-apply-err" style="display:none;color:var(--red);font-size:12.5px;margin-bottom:12px;"></div>
+          <button class="btn btn-primary btn-block" id="aff-apply-btn" onclick="affSubmitApplication()">Create affiliate account (free) →</button>
+        </div>
+      </div>
+
+      <div class="aff-switch-line">Not an affiliate but want to shop or sell? <a onclick="showPage('home')">Go to ZÚLA marketplace →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AFFILIATE HUB ── -->
+<div class="page" id="page-affiliate-hub">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="showPage('referral')">🎁 Referral</a>
+        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="affhub-wrap">
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">Your Affiliate Hub</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">Share products and earn commission on every sale.</p>
+
+    <div class="affhub-tier-row">
+      <span class="affhub-tier-pill" id="affhub-tier-pill">⭐ Starter Affiliate</span>
+      <span class="affhub-next" id="affhub-next-tier">Next tier at NGN 50,000 earned</span>
+    </div>
+
+    <div class="affhub-stat-grid">
+      <div class="affhub-stat-card"><div class="affhub-stat-lbl">Earned this month</div><div class="affhub-stat-val" style="color:var(--gold);" id="affhub-stat-month">NGN 0</div></div>
+      <div class="affhub-stat-card"><div class="affhub-stat-lbl">Total earned</div><div class="affhub-stat-val" id="affhub-stat-total">NGN 0</div></div>
+      <div class="affhub-stat-card"><div class="affhub-stat-lbl">Clicks this month</div><div class="affhub-stat-val" id="affhub-stat-clicks">0</div></div>
+      <div class="affhub-stat-card"><div class="affhub-stat-lbl">Conversions</div><div class="affhub-stat-val" id="affhub-stat-conv">0</div></div>
+      <div class="affhub-stat-card"><div class="affhub-stat-lbl">Conversion rate</div><div class="affhub-stat-val" id="affhub-stat-rate">0%</div></div>
+    </div>
+
+    <div class="aff-card">
+      <h3 style="margin-bottom:10px;">Your store affiliate link</h3>
+      <div class="affhub-link-row">
+        <input class="affhub-link-input" id="affhub-link" readonly value="">
+        <button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="affCopyLink()">Copy link</button>
+        <button class="btn btn-sm btn-ghost" onclick="affShareLink('whatsapp')">Share on WhatsApp</button>
+        <button class="btn btn-sm btn-ghost" onclick="affShareLink('ig')">Share on IG</button>
+      </div>
+    </div>
+
+    <div class="aff-card">
+      <h3 style="display:flex;justify-content:space-between;align-items:center;">Top products to promote <span style="font-size:11px;color:var(--text3);font-weight:400;">Sorted by commission rate</span></h3>
+      <div class="affhub-products-grid" id="affhub-products" style="margin-top:12px;">
+        <div style="color:var(--text3);font-size:13px;grid-column:1/-1;">Loading products…</div>
+      </div>
+    </div>
+
+    <div class="aff-card">
+      <h3 style="margin-bottom:10px;">Payout — <span id="affhub-payout-pending">NGN 0</span> pending</h3>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Earnings paid every Friday to your bank account.</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span id="affhub-bank-display" style="font-size:12.5px;color:var(--text2);">No bank account on file.</span>
+        <button class="btn btn-sm btn-ghost" onclick="showPage('settings');settingsTab('payout',document.querySelector('.settings-nav a[onclick*=payout]'))">Change bank</button>
+        <button class="btn btn-sm btn-primary" onclick="affRequestPayout()">Request payout now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REFERRAL PAGE ── -->
+<div class="page" id="page-referral">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="ref-wrap">
+    <div class="ref-hero">
+      <div class="ref-hero-icon">🎁</div>
+      <h2>Give NGN 1,000. Get NGN 1,000.</h2>
+      <p>Invite friends to ZÚLA. When they sign up and make their first purchase, you both get NGN 1,000 credit instantly.</p>
+      <div class="ref-link-row"><input class="ref-link-input" id="ref-link" readonly value=""><button class="btn btn-sm" style="background:var(--gold);color:#000;font-weight:700;" onclick="refCopyLink()">Copy link</button></div>
+      <div class="ref-share-row">
+        <button class="btn btn-sm btn-ghost" onclick="refShare('whatsapp')">📱 WhatsApp</button>
+        <button class="btn btn-sm btn-ghost" onclick="refShare('twitter')">𝕏 Twitter</button>
+        <button class="btn btn-sm btn-ghost" onclick="refCopyLink()">📋 Copy link</button>
+      </div>
+    </div>
+
+    <div class="ref-getgrid">
+      <div class="ref-get-card"><div class="ref-get-icon">🙋</div><div class="ref-get-lbl">You get</div><div class="ref-get-val">NGN 1,000</div><div class="ref-get-sub">Credit to use on any purchase</div></div>
+      <div class="ref-get-card"><div class="ref-get-icon">🎁</div><div class="ref-get-lbl">Your friend gets</div><div class="ref-get-val">NGN 1,000</div><div class="ref-get-sub">Off their first purchase</div></div>
+    </div>
+
+    <div class="ref-stats-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Your referral stats</div>
+      <div class="ref-stats-row">
+        <div><div class="ref-stats-val" id="ref-stat-invited">0</div><div class="ref-stats-lbl">Friends invited</div></div>
+        <div><div class="ref-stats-val" id="ref-stat-signedup">0</div><div class="ref-stats-lbl">Signed up</div></div>
+        <div><div class="ref-stats-val" style="color:var(--green);" id="ref-stat-credit">NGN 0</div><div class="ref-stats-lbl">Credit earned</div></div>
+      </div>
+      <div class="ref-credit-banner" id="ref-credit-banner" style="display:none;"></div>
+    </div>
+
+    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:14px;">Credits expire 12 months from earning date. Cannot be withdrawn as cash. Qualifying purchase minimum: NGN 3,000.</p>
+  </div>
+</div>
+
+<!-- ================================================================
      PAGE: ADMIN PANEL (sundaygift050 & okoroaugustine050 only)
      ================================================================ -->
 <div class="page" id="page-admin">
+
 
   <!-- ACCESS DENIED (non-admins) -->
   <div class="admin-denied" id="admin-denied" style="display:none;">
@@ -2392,6 +2650,7 @@ if (_kycOrigShowPage) {
         <a id="anav-viewings"   onclick="adminTab('viewings')">🏠 Viewings</a>
         <a id="anav-payouts"    onclick="adminTab('payouts')">💸 Payouts</a>
         <a id="anav-disputes"   onclick="adminTab('disputes')">⚠️ Disputes</a>
+        <a id="anav-affiliates" onclick="adminTab('affiliates')">🤝 Affiliates</a>
         <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
         <a id="anav-broadcast"  onclick="adminTab('broadcast')">📢 Broadcast</a>
         <a id="anav-banned"     onclick="adminTab('banned')">🚫 Banned</a>
@@ -2504,6 +2763,146 @@ if (_kycOrigShowPage) {
             <thead><tr><th>Dispute ID</th><th>Buyer</th><th>Seller</th><th>Product</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="a-disputes-table"><tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- AFFILIATE MANAGEMENT (admin) -->
+      <div class="admin-section" id="asec-affiliates">
+        <div class="dash-h1">🤝 Affiliate Management</div>
+        <div class="dash-sub">Full visibility and control over the ZÚLA Affiliate Program</div>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-lbl">Total affiliates</div><div class="stat-val" id="aaf-stat-total">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Gold tier</div><div class="stat-val" id="aaf-stat-gold">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Total commissions paid</div><div class="stat-val" id="aaf-stat-paid">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Pending payouts</div><div class="stat-val" id="aaf-stat-pending">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Flagged (suspicious)</div><div class="stat-val" style="color:var(--red);" id="aaf-stat-flagged">—</div></div>
+        </div>
+
+        <div class="analytics-tabs" style="margin-bottom:16px;">
+          <button class="active" onclick="aafTab('users',this)">👥 Affiliates</button>
+          <button onclick="aafTab('earnings',this)">💰 Earnings & Commissions</button>
+          <button onclick="aafTab('payouts',this)">💸 Payouts</button>
+          <button onclick="aafTab('referrals',this)">🎁 Referral Tracking</button>
+          <button onclick="aafTab('links',this)">🔗 Link Activity</button>
+          <button onclick="aafTab('fraud',this)">🚩 Fraud & Monitoring</button>
+          <button onclick="aafTab('settings',this)">⚙️ Settings</button>
+        </div>
+
+        <!-- USERS / APPLICATIONS -->
+        <div id="aaf-panel-users" class="aaf-panel">
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+            <input id="aaf-user-search" placeholder="Search affiliates by name or email…" style="flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;" oninput="aafRenderUsers()">
+            <select id="aaf-user-filter" onchange="aafRenderUsers()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              <option value="all">All affiliates</option>
+              <option value="starter">Starter</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="aafExportCsv('users')">⬇ Export CSV</button>
+          </div>
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Affiliate</th><th>Email</th><th>Tier</th><th>Total earned</th><th>Clicks</th><th>Conversions</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="aaf-users-table"><tr><td colspan="9" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- EARNINGS & COMMISSIONS -->
+        <div id="aaf-panel-earnings" class="aaf-panel" style="display:none;">
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Affiliate</th><th>Product</th><th>Buyer</th><th>Order amount</th><th>Commission</th><th>Date</th></tr></thead>
+              <tbody id="aaf-earnings-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAYOUTS -->
+        <div id="aaf-panel-payouts" class="aaf-panel" style="display:none;">
+          <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm aaf-payout-filter active" onclick="aafFilterPayouts(this,'all')">All</button>
+            <button class="btn btn-ghost btn-sm aaf-payout-filter" onclick="aafFilterPayouts(this,'pending')">Pending</button>
+            <button class="btn btn-ghost btn-sm aaf-payout-filter" onclick="aafFilterPayouts(this,'approved')">Approved</button>
+            <button class="btn btn-ghost btn-sm aaf-payout-filter" onclick="aafFilterPayouts(this,'rejected')">Rejected</button>
+          </div>
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Affiliate</th><th>Amount</th><th>Bank</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="aaf-payouts-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REFERRAL TRACKING -->
+        <div id="aaf-panel-referrals" class="aaf-panel" style="display:none;">
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Referrer</th><th>Referred user</th><th>Signed up</th><th>Qualifying purchase</th><th>Credit awarded</th><th>Date</th></tr></thead>
+              <tbody id="aaf-referrals-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LINK / BUYER ACTIVITY -->
+        <div id="aaf-panel-links" class="aaf-panel" style="display:none;">
+          <div class="dash-sub" style="margin-bottom:10px;">Buyers who purchased through an affiliate link, and click volume per affiliate.</div>
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Affiliate</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Order status</th><th>Date</th></tr></thead>
+              <tbody id="aaf-links-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FRAUD / MONITORING -->
+        <div id="aaf-panel-fraud" class="aaf-panel" style="display:none;">
+          <div class="dash-sub" style="margin-bottom:10px;">Self-referrals (affiliate buying through their own link) and other suspicious patterns are flagged automatically.</div>
+          <div class="dash-card" style="padding:0;">
+            <table class="dtable">
+              <thead><tr><th>Affiliate</th><th>Flag reason</th><th>Order / Detail</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="aaf-fraud-table"><tr><td colspan="5" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="aaf-panel-settings" class="aaf-panel" style="display:none;">
+          <div class="dash-card" style="max-width:520px;">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Commission rate management</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+              <div>
+                <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Starter tier (%)</label>
+                <input type="number" id="aaf-rate-starter" min="1" max="50" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Silver tier (%)</label>
+                <input type="number" id="aaf-rate-silver" min="1" max="50" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Gold tier (%)</label>
+                <input type="number" id="aaf-rate-gold" min="1" max="50" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Silver tier threshold (sales/mo)</label>
+                <input type="number" id="aaf-thresh-silver" min="1" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:5px;">Gold tier threshold (sales/mo)</label>
+                <input type="number" id="aaf-thresh-gold" min="1" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="aafSaveSettings()">Save settings</button>
+          </div>
+          <div class="dash-card" style="max-width:520px;">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:6px;">Message affiliates</h3>
+            <p style="font-size:12.5px;color:var(--text3);margin-bottom:14px;">Sends a real notification to every current affiliate.</p>
+            <input id="aaf-msg-title" placeholder="Title e.g. New commission rates!" style="width:100%;margin-bottom:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+            <textarea id="aaf-msg-body" placeholder="Message…" style="width:100%;min-height:80px;margin-bottom:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;"></textarea>
+            <button class="btn btn-primary btn-sm" onclick="aafBroadcast()">📢 Send to all affiliates</button>
+          </div>
         </div>
       </div>
 
@@ -3444,6 +3843,7 @@ onAuthStateChanged(auth, async (user) => {
     updateNavAvatar();
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
+    setTimeout(function(){ if (typeof affUpdateNav === 'function') affUpdateNav(); }, 600);
     const adminLink = document.getElementById('admin-nav-link');
     const isAdminUser = ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase());
     if (adminLink && isAdminUser) {
@@ -3542,6 +3942,7 @@ window.doSignup = function() {
   if (!agree)     { showToast('⚠️ Please agree to the Terms of Service.'); return; }
   const btn = document.getElementById('signup-btn');
   btn.disabled = true; btn.textContent = 'Creating account…';
+  const inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
   createUserWithEmailAndPassword(auth, email, pass)
     .then(r => {
       const user = r.user;
@@ -3552,11 +3953,27 @@ window.doSignup = function() {
         setDoc(doc(db, 'users', user.uid), {
           uid: user.uid, firstName, lastName, fullName, email,
           joinedAt: serverTimestamp(), role: 'buyer', sellerVerified: false,
-          followersCount: 0, followingCount: 0
+          followersCount: 0, followingCount: 0,
+          isAffiliate: false, affiliateStatus: 'none',
+          referralCredit: 0,
+          referredBy: (inviteRef && inviteRef !== user.uid) ? inviteRef : null,
         })
-      ]);
+      ]).then(() => {
+        if (inviteRef && inviteRef !== user.uid) {
+          return addDoc(collection(db, 'referrals'), {
+            referrerId: inviteRef,
+            referredUid: user.uid,
+            referredName: fullName,
+            referredEmail: email,
+            signedUp: true, signedUpAt: serverTimestamp(),
+            qualifyingPurchase: false, creditAwarded: false,
+            createdAt: serverTimestamp(),
+          }).catch(function(){});
+        }
+      });
     })
     .then(() => {
+      try { localStorage.removeItem('zula_invite_ref'); } catch(e) {}
       showToast('📧 Verification email sent! Check your inbox.');
       document.getElementById('verify-email-addr').textContent = document.getElementById('su-email').value.trim();
       showPage('verify-email');
@@ -3588,11 +4005,20 @@ window.resendVerificationEmail = function() {
 
 window.checkEmailVerified = function() {
   if (!auth.currentUser) { showPage('login'); return; }
-  auth.currentUser.reload().then(() => {
+  auth.currentUser.reload().then(async () => {
     if (auth.currentUser.emailVerified) {
       showToast('✅ Email verified! Welcome to ZÚLA!');
-      showPage('marketplace');
-      loadProducts();
+      try {
+        var snap = await getDoc(doc(db, 'users', auth.currentUser.uid));
+        if (snap.exists()) window._currentUser = snap.data();
+      } catch(e) {}
+      if (window._currentUser && window._currentUser.isAffiliate) {
+        showPage('affiliate-hub');
+        if (typeof affLoadHub === 'function') affLoadHub();
+      } else {
+        showPage('marketplace');
+        loadProducts();
+      }
     } else {
       showToast('⏳ Not verified yet — click the link in your email.');
     }
@@ -8814,12 +9240,13 @@ var _adminAllUsers = [];
 var _origAdminTab = window.adminTab;
 window.adminTab = function(name) {
   _origAdminTab(name);
-  if (name === 'users')     adminLoadUsers();
-  if (name === 'orders')    adminLoadOrders();
-  if (name === 'viewings')  adminLoadViewings();
-  if (name === 'payouts')   adminLoadPayouts();
-  if (name === 'disputes')  adminLoadDisputes();
-  if (name === 'banned')    adminLoadBanned();
+  if (name === 'users')      adminLoadUsers();
+  if (name === 'orders')     adminLoadOrders();
+  if (name === 'viewings')   adminLoadViewings();
+  if (name === 'payouts')    adminLoadPayouts();
+  if (name === 'disputes')   adminLoadDisputes();
+  if (name === 'banned')     adminLoadBanned();
+  if (name === 'affiliates') aafLoadAll();
 };
 
 window.adminLoadUsers = async function() {
@@ -10421,7 +10848,10 @@ window.co2RenderSummary = function() {
   var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
   var subtotal = items.reduce(function(s,i){ return s + Number(i.price||0) * (i.qty||1); }, 0);
   var deliveryFee = hasPhysical ? window.CO2_DELIVERY_FEE_NGN : 0;
-  var total = subtotal + deliveryFee;
+  var u = window._currentUser || {};
+  var availableCredit = Number(u.referralCredit || 0);
+  var creditApplied = Math.min(availableCredit, subtotal + deliveryFee);
+  var total = Math.max(0, subtotal + deliveryFee - creditApplied);
   var currency = (items[0] && items[0].currency) || 'NGN';
 
   if (wrap) {
@@ -10439,11 +10869,23 @@ window.co2RenderSummary = function() {
   var e = function(id){ return document.getElementById(id); };
   if (e('co2-subtotal'))      e('co2-subtotal').textContent = currency + ' ' + subtotal.toLocaleString();
   if (e('co2-delivery-fee'))  e('co2-delivery-fee').textContent = deliveryFee ? (currency + ' ' + deliveryFee.toLocaleString()) : 'Free';
+  var creditRow = document.getElementById('co2-credit-row');
+  if (creditApplied > 0) {
+    if (!creditRow) {
+      var totalRowEl = document.querySelector('#co2-total').closest('.co2-total-row');
+      creditRow = document.createElement('div');
+      creditRow.className = 'co-summary-row'; creditRow.id = 'co2-credit-row';
+      creditRow.innerHTML = '<span>Referral credit</span><span style="color:var(--green);" id="co2-credit-val"></span>';
+      if (totalRowEl) totalRowEl.parentNode.insertBefore(creditRow, totalRowEl);
+    }
+    var cv = document.getElementById('co2-credit-val'); if (cv) cv.textContent = '-' + currency + ' ' + creditApplied.toLocaleString();
+  } else if (creditRow) { creditRow.remove(); }
   if (e('co2-total'))         e('co2-total').textContent = currency + ' ' + total.toLocaleString();
   var payBtn = e('co2-pay-btn');
   if (payBtn) payBtn.textContent = 'Pay ' + currency + ' ' + total.toLocaleString() + ' →';
   window._co2Total = total;
   window._co2DeliveryFee = deliveryFee;
+  window._co2CreditApplied = creditApplied;
 };
 
 window.co2SubmitOrder = async function() {
@@ -10526,6 +10968,11 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
   try {
     var deliveryFee = window._co2DeliveryFee || 0;
     var feeSplit = items.length ? deliveryFee / items.length : 0;
+    var creditApplied = window._co2CreditApplied || 0;
+    var affRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
+    if (affRef === user.uid) affRef = null; // no self-referral commission
+    var orderSubtotal = items.reduce(function(s,i){ return s + Number(i.price||0)*(i.qty||1); }, 0) + deliveryFee;
+
     for (var i = 0; i < items.length; i++) {
       var p = items[i];
       var deliveryType = p.productType || p.type || 'physical';
@@ -10549,6 +10996,7 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
         createdAt:    fns.serverTimestamp(),
       };
       if (delivery && isPhysical) orderData.delivery = delivery;
+      if (affRef && p.affiliateEnabled && p.commission > 0) orderData.affiliateRef = affRef;
       var orderRef = await fns.addDoc(fns.collection(db, 'orders'), orderData);
 
       if (p.id && p.stock > 0) {
@@ -10561,7 +11009,54 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
         title: '🛍 New order!', body: body,
         orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
       });
+
+      // Real affiliate commission — credited on the product's own configured rate
+      if (orderData.affiliateRef) {
+        var commissionAmt = Math.round(orderData.price * (p.commission / 100));
+        if (commissionAmt > 0) {
+          await fns.addDoc(fns.collection(db,'affiliateEarnings'), {
+            affiliateId: orderData.affiliateRef,
+            productId: p.id || null, productName: p.name,
+            buyerName: orderData.buyerName, orderAmount: orderData.price,
+            amount: commissionAmt, orderId: orderRef.id,
+            createdAt: fns.serverTimestamp(),
+          });
+          await fns.addDoc(fns.collection(db,'notifications'), {
+            userId: orderData.affiliateRef, type:'affiliate_earning',
+            title: '💰 You earned a commission!',
+            body: 'NGN ' + commissionAmt.toLocaleString() + ' from a sale of ' + p.name,
+            read:false, createdAt: fns.serverTimestamp(),
+          });
+        }
+      }
     }
+
+    // Redeem applied referral credit
+    if (creditApplied > 0) {
+      await fns.updateDoc(fns.doc(db,'users',user.uid), { referralCredit: fns.increment(-creditApplied) });
+      if (window._currentUser) window._currentUser.referralCredit = Math.max(0, Number(window._currentUser.referralCredit||0) - creditApplied);
+    }
+
+    // First qualifying purchase (>= NGN 3,000) awards referral bonus to both sides
+    if (profile.referredBy && orderSubtotal >= 3000) {
+      try {
+        var refQ = await fns.getDocs(fns.query(fns.collection(db,'referrals'), fns.where('referredUid','==',user.uid), fns.where('creditAwarded','==',false)));
+        if (!refQ.empty) {
+          var refDoc = refQ.docs[0];
+          await fns.updateDoc(refDoc.ref, { qualifyingPurchase:true, creditAwarded:true, awardedAt: fns.serverTimestamp() });
+          await fns.updateDoc(fns.doc(db,'users', profile.referredBy), { referralCredit: fns.increment(1000) });
+          await fns.updateDoc(fns.doc(db,'users', user.uid), { referralCredit: fns.increment(1000) });
+          if (window._currentUser) window._currentUser.referralCredit = Number(window._currentUser.referralCredit||0) + 1000;
+          await fns.addDoc(fns.collection(db,'notifications'), {
+            userId: profile.referredBy, type:'referral_credit',
+            title: '🎁 You earned NGN 1,000 referral credit!',
+            body: 'A friend you invited made their first purchase.',
+            read:false, createdAt: fns.serverTimestamp(),
+          });
+        }
+      } catch(refErr) { console.error('referral credit award:', refErr); }
+    }
+
     showToast('🎉 Order confirmed! Check My Orders for updates.');
     if (_cart && _cart.length) {
       var boughtIds = items.map(function(i){ return i.id; }).filter(Boolean);
@@ -11480,6 +11975,680 @@ window.sdMessageBuyerFromOrder = function(buyerId, buyerName) {
     openConversation(cid, buyerId, buyerName);
     window._activeConvId = cid; window._activePeerId = buyerId; window._activePeerName = buyerName;
   }, 300);
+};
+
+// ══════════════════════════════════════════════════════════════════
+// AFFILIATE + REFERRAL SYSTEM — real, Firebase-backed
+// ══════════════════════════════════════════════════════════════════
+
+// ── Ref/invite capture (30-day affiliate window, 60-day invite window) ──
+function zulaGetStoredRef(key, maxDays) {
+  try {
+    var raw = localStorage.getItem(key);
+    if (!raw) return null;
+    var obj = JSON.parse(raw);
+    if (!obj || !obj.ts) return null;
+    if (Date.now() - obj.ts > maxDays * 86400000) { localStorage.removeItem(key); return null; }
+    return obj.val;
+  } catch(e) { return null; }
+}
+function zulaCaptureRefParams() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    var invite = params.get('invite');
+    if (ref)    localStorage.setItem('zula_aff_ref', JSON.stringify({ val: ref, ts: Date.now() }));
+    if (invite) localStorage.setItem('zula_invite_ref', JSON.stringify({ val: invite, ts: Date.now() }));
+  } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', zulaCaptureRefParams);
+zulaCaptureRefParams();
+
+// ── Nav label: Referral → Affiliate ──────────────────────────────
+window.affUpdateNav = function() {
+  var link = document.getElementById('aff-nav-link');
+  if (!link) return;
+  var user = window._auth && window._auth.currentUser;
+  if (!user) { link.style.display = 'none'; return; }
+  var u = window._currentUser || {};
+  link.style.display = 'inline';
+  if (u.isAffiliate) { link.textContent = '💰 Affiliate'; link.style.color = 'var(--gold)'; }
+  else { link.textContent = '🎁 Referral'; link.style.color = ''; }
+};
+window.affNavClick = function() {
+  var u = window._currentUser || {};
+  if (u.isAffiliate) { showPage('affiliate-hub'); affLoadHub(); }
+  else { showPage('referral'); referralLoadStats(); }
+};
+
+// ── Affiliate sign-in / sign-up page ─────────────────────────────
+window.affSwitchTab = function(tab) {
+  document.getElementById('aff-tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('aff-tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('aff-panel-signin').style.display = tab === 'signin' ? '' : 'none';
+  document.getElementById('aff-panel-apply').style.display  = tab === 'signup' ? '' : 'none';
+  if (tab === 'signup') {
+    document.getElementById('aff-apply-hd').textContent  = 'Create your free affiliate account';
+    document.getElementById('aff-apply-sub').textContent = 'This creates your ZÚLA account and affiliate profile together.';
+    document.getElementById('aff-email-field').style.display = '';
+    document.getElementById('aff-pass-field').style.display  = '';
+    window._affApplyMode = 'new';
+  }
+};
+
+window.affSignIn = function() {
+  var email = (document.getElementById('aff-si-email')||{}).value.trim();
+  var pass  = (document.getElementById('aff-si-pass')||{}).value;
+  var errEl = document.getElementById('aff-si-err');
+  if (errEl) errEl.style.display = 'none';
+  if (!email || !pass) { if (errEl) { errEl.textContent = 'Enter your email and password.'; errEl.style.display=''; } return; }
+  var btn = document.getElementById('aff-si-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+  var auth = window._auth, db = window._db, fns = window._fns;
+  signInWithEmailAndPassword(auth, email, pass)
+    .then(async function(r) {
+      var u = r.user;
+      if (!u.emailVerified) { showToast('Please verify your email first.'); showPage('verify-email'); return; }
+      var snap = await fns.getDoc(fns.doc(db, 'users', u.uid));
+      var data = snap.exists() ? snap.data() : {};
+      window._currentUser = data;
+      affUpdateNav();
+      if (data.isAffiliate) {
+        showToast('✅ Welcome back, affiliate!');
+        showPage('affiliate-hub'); affLoadHub();
+      } else {
+        // Existing marketplace user, not yet an affiliate — show the application form
+        window._affApplyMode = 'existing';
+        var nameParts = (data.fullName || '').split(' ');
+        var fEl = document.getElementById('aff-fname'); if (fEl) fEl.value = nameParts[0] || '';
+        var lEl = document.getElementById('aff-lname'); if (lEl) lEl.value = nameParts.slice(1).join(' ') || '';
+        document.getElementById('aff-apply-hd').textContent  = 'One more step — become an affiliate';
+        document.getElementById('aff-apply-sub').textContent = "You're signed in as " + (data.fullName || u.email) + ". Complete this quick application to unlock your Affiliate Hub.";
+        document.getElementById('aff-email-field').style.display = 'none';
+        document.getElementById('aff-pass-field').style.display  = 'none';
+        document.getElementById('aff-panel-signin').style.display = 'none';
+        document.getElementById('aff-panel-apply').style.display  = '';
+        document.getElementById('aff-tab-signin').classList.remove('active');
+        document.getElementById('aff-tab-signup').classList.remove('active');
+      }
+    })
+    .catch(function(err) {
+      var msg = 'Wrong email or password.';
+      if (errEl) { errEl.textContent = msg; errEl.style.display = ''; }
+    })
+    .finally(function() { if (btn) { btn.disabled = false; btn.textContent = 'Sign in →'; } });
+};
+
+window.affSubmitApplication = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var fname = (document.getElementById('aff-fname')||{}).value.trim();
+  var lname = (document.getElementById('aff-lname')||{}).value.trim();
+  var channel = (document.getElementById('aff-channel')||{}).value || 'Other';
+  var errEl = document.getElementById('aff-apply-err');
+  if (errEl) errEl.style.display = 'none';
+  var btn = document.getElementById('aff-apply-btn');
+  if (!fname) { if(errEl){errEl.textContent='Enter your first name.';errEl.style.display='';} return; }
+
+  var mode = window._affApplyMode || 'new';
+
+  if (mode === 'existing') {
+    var user = auth.currentUser;
+    if (!user) { showPage('affiliate-signin'); return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Setting up your hub…'; }
+    try {
+      var affiliateCode = user.uid;
+      await fns.updateDoc(fns.doc(db, 'users', user.uid), {
+        isAffiliate: true, affiliateStatus: 'approved', affiliateTier: 'starter',
+        affiliatePromoChannel: channel, affiliateCode: affiliateCode,
+        affiliateAppliedAt: fns.serverTimestamp(), affiliateApprovedAt: fns.serverTimestamp(),
+      });
+      window._currentUser = Object.assign({}, window._currentUser, { isAffiliate:true, affiliateStatus:'approved', affiliateTier:'starter', affiliateCode: affiliateCode });
+      affUpdateNav();
+      showToast('🎉 Welcome to the ZÚLA Affiliate Program!');
+      showPage('affiliate-hub'); affLoadHub();
+    } catch(e) { console.error(e); if(errEl){errEl.textContent='Could not set up your affiliate account. Try again.';errEl.style.display='';} }
+    finally { if (btn) { btn.disabled = false; btn.textContent = 'Create affiliate account (free) →'; } }
+    return;
+  }
+
+  // New user — create the ZULA account + affiliate profile together
+  var email = (document.getElementById('aff-email')||{}).value.trim();
+  var pass  = (document.getElementById('aff-pass')||{}).value;
+  if (!email)      { if(errEl){errEl.textContent='Enter your email address.';errEl.style.display='';} return; }
+  if (pass.length < 8) { if(errEl){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='';} return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
+  var inviteRef = zulaGetStoredRef('zula_invite_ref', 60);
+  try {
+    var cred = await createUserWithEmailAndPassword(auth, email, pass);
+    var newUser = cred.user;
+    var fullName = fname + (lname ? ' ' + lname : '');
+    await updateProfile(newUser, { displayName: fullName });
+    await sendEmailVerification(newUser);
+    await setDoc(doc(db, 'users', newUser.uid), {
+      uid: newUser.uid, firstName: fname, lastName: lname, fullName, email,
+      joinedAt: fns.serverTimestamp(), role: 'buyer', sellerVerified: false,
+      followersCount: 0, followingCount: 0,
+      isAffiliate: true, affiliateStatus: 'approved', affiliateTier: 'starter',
+      affiliatePromoChannel: channel, affiliateCode: newUser.uid,
+      affiliateAppliedAt: fns.serverTimestamp(), affiliateApprovedAt: fns.serverTimestamp(),
+      referralCredit: 0, referredBy: (inviteRef && inviteRef !== newUser.uid) ? inviteRef : null,
+    });
+    if (inviteRef && inviteRef !== newUser.uid) {
+      await fns.addDoc(fns.collection(db, 'referrals'), {
+        referrerId: inviteRef, referredUid: newUser.uid, referredName: fullName, referredEmail: email,
+        signedUp: true, signedUpAt: fns.serverTimestamp(), qualifyingPurchase: false, creditAwarded: false,
+        createdAt: fns.serverTimestamp(),
+      }).catch(function(){});
+      try { localStorage.removeItem('zula_invite_ref'); } catch(e) {}
+    }
+    showToast('📧 Verification email sent! Verify to unlock your Affiliate Hub.');
+    document.getElementById('verify-email-addr').textContent = email;
+    showPage('verify-email');
+  } catch(e) {
+    var msg = 'Could not create account.';
+    if (e.code === 'auth/email-already-in-use') msg = 'This email is already registered — try signing in instead.';
+    if (e.code === 'auth/weak-password') msg = 'Password too weak.';
+    if (errEl) { errEl.textContent = msg; errEl.style.display = ''; }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Create affiliate account (free) →'; }
+  }
+};
+
+// Pull admin-configured tier rates into the sign-in page's tier cards
+window.affLoadTierDisplay = async function() {
+  var db = window._db, fns = window._fns;
+  if (!db || !fns) return;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'settings', 'affiliate'));
+    if (!snap.exists()) return;
+    var s = snap.data();
+    var cards = document.querySelectorAll('#page-affiliate-signin .aff-tier-card');
+    if (cards[0] && s.starterRate) cards[0].querySelector('.aff-tier-pct').textContent = s.starterRate;
+    if (cards[1] && s.silverRate)  cards[1].querySelector('.aff-tier-pct').textContent = s.silverRate + '%';
+    if (cards[2] && s.goldRate)    cards[2].querySelector('.aff-tier-pct').textContent = s.goldRate;
+    if (cards[1] && s.silverThreshold) cards[1].querySelector('.aff-tier-sub').innerHTML = (s.silverThreshold) + '+ sales/month<br>Priority access';
+    if (cards[2] && s.goldThreshold)   cards[2].querySelector('.aff-tier-sub').innerHTML = (s.goldThreshold) + '+ sales/month<br>Exclusive promos + bonus';
+  } catch(e) {}
+};
+
+// ── Affiliate Hub ─────────────────────────────────────────────────
+window.affLoadHub = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) { showPage('affiliate-signin'); return; }
+  var u = window._currentUser || {};
+  if (!u.isAffiliate) { showPage('affiliate-signin'); return; }
+
+  var affCode = u.affiliateCode || user.uid;
+  var link = window.location.origin + window.location.pathname + '?ref=' + affCode;
+  var linkEl = document.getElementById('affhub-link'); if (linkEl) linkEl.value = link;
+
+  var tier = u.affiliateTier || 'starter';
+  var tierMeta = { starter: {label:'⭐ Starter Affiliate', cls:'starter'}, silver: {label:'🥈 Silver Affiliate', cls:'silver'}, gold: {label:'🥇 Gold Affiliate', cls:'gold'} }[tier] || {label:'⭐ Starter Affiliate', cls:'starter'};
+  var pill = document.getElementById('affhub-tier-pill');
+  if (pill) { pill.textContent = tierMeta.label; pill.className = 'affhub-tier-pill ' + tierMeta.cls; }
+
+  try {
+    var esnap = await fns.getDocs(fns.query(fns.collection(db,'affiliateEarnings'), fns.where('affiliateId','==',user.uid)));
+    var earnings = esnap.docs.map(function(d){ return d.data(); });
+    var now = new Date();
+    var monthTotal = 0, allTotal = 0, monthConv = 0;
+    earnings.forEach(function(e) {
+      var amt = Number(e.amount || 0);
+      allTotal += amt;
+      var d = e.createdAt && e.createdAt.toDate ? e.createdAt.toDate() : null;
+      if (d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) { monthTotal += amt; monthConv++; }
+    });
+    var e2 = function(id){ return document.getElementById(id); };
+    if (e2('affhub-stat-month')) e2('affhub-stat-month').textContent = 'NGN ' + monthTotal.toLocaleString();
+    if (e2('affhub-stat-total')) e2('affhub-stat-total').textContent = 'NGN ' + allTotal.toLocaleString();
+    if (e2('affhub-stat-conv'))  e2('affhub-stat-conv').textContent  = earnings.length;
+
+    // Clicks (real click log)
+    var csnap = await fns.getDocs(fns.query(fns.collection(db,'affiliateClicks'), fns.where('affiliateId','==',user.uid)));
+    var clicksThisMonth = 0;
+    csnap.forEach(function(d) {
+      var c = d.data();
+      var d2 = c.createdAt && c.createdAt.toDate ? c.createdAt.toDate() : null;
+      if (d2 && d2.getMonth() === now.getMonth() && d2.getFullYear() === now.getFullYear()) clicksThisMonth++;
+    });
+    if (e2('affhub-stat-clicks')) e2('affhub-stat-clicks').textContent = clicksThisMonth;
+    var rate = clicksThisMonth > 0 ? ((monthConv / clicksThisMonth) * 100).toFixed(1) : '0.0';
+    if (e2('affhub-stat-rate')) e2('affhub-stat-rate').textContent = rate + '%';
+
+    // Next tier hint
+    var nextEl = document.getElementById('affhub-next-tier');
+    if (nextEl) {
+      if (tier === 'starter') nextEl.textContent = 'Reach Silver at 11+ sales this month';
+      else if (tier === 'silver') nextEl.textContent = 'Reach Gold at 51+ sales this month';
+      else nextEl.textContent = "You've reached the top tier 🎉";
+    }
+
+    // Payout balance
+    var prSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid), fns.where('sourceType','==','affiliate')));
+    var alreadyRequested = prSnap.docs
+      .filter(function(d){ var s=d.data().status; return s==='pending'||s==='approved'||s==='paid'; })
+      .reduce(function(s,d){ return s + Number(d.data().amount||0); }, 0);
+    var pendingBalance = Math.max(0, allTotal - alreadyRequested);
+    var pEl = document.getElementById('affhub-payout-pending'); if (pEl) pEl.textContent = 'NGN ' + pendingBalance.toLocaleString();
+    window._affPendingBalance = pendingBalance;
+
+    if (u.payout && u.payout.accountName) {
+      var bEl = document.getElementById('affhub-bank-display');
+      if (bEl) bEl.textContent = u.payout.bankName + ' · ****' + (u.payout.accountNumber||'').slice(-4) + ' · ' + u.payout.accountName;
+    }
+  } catch(e) { console.error('affLoadHub earnings:', e); }
+
+  // Top products to promote — real, sorted by commission
+  try {
+    var psnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active')));
+    var products = psnap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); })
+      .filter(function(p){ return p.affiliateEnabled && p.commission > 0; })
+      .sort(function(a,b){ return (b.commission||0) - (a.commission||0); })
+      .slice(0, 8);
+    var grid = document.getElementById('affhub-products');
+    if (grid) {
+      grid.innerHTML = products.length ? products.map(function(p) {
+        var img = (p.photos && p.photos[0]) ? ('<img src="'+p.photos[0]+'">') : (p.emoji || '📦');
+        var earn = Math.round(Number(p.price||0) * (p.commission||0) / 100);
+        return '<div class="affhub-pcard">' +
+          '<div class="affhub-pcard-thumb">' + img + '</div>' +
+          '<div class="affhub-pcard-name">' + p.name + '</div>' +
+          '<div class="affhub-pcard-comm">' + p.commission + '% commission · NGN ' + earn.toLocaleString() + '/sale</div>' +
+          '<div class="affhub-pcard-actions">' +
+            '<button class="btn btn-sm btn-primary" style="flex:1;" onclick="affGetProductLink(\''+p.id+'\')">Get link</button>' +
+            '<button class="btn btn-sm btn-ghost" onclick="viewProduct(\''+p.id+'\')">View</button>' +
+          '</div></div>';
+      }).join('') : '<div style="color:var(--text3);font-size:13px;grid-column:1/-1;">No affiliate-enabled products yet — check back soon.</div>';
+    }
+  } catch(e) { console.error('affLoadHub products:', e); }
+};
+
+window.affGetProductLink = function(productId) {
+  var u = window._currentUser || {};
+  var auth = window._auth;
+  var code = u.affiliateCode || (auth.currentUser && auth.currentUser.uid);
+  var link = window.location.origin + window.location.pathname + '?ref=' + code + '&product=' + productId;
+  navigator.clipboard.writeText(link).then(function(){ showToast('🔗 Affiliate link copied!'); }).catch(function(){ showToast(link); });
+};
+
+window.affCopyLink = function() {
+  var el = document.getElementById('affhub-link');
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(function(){ showToast('🔗 Link copied!'); }).catch(function(){});
+};
+
+window.affShareLink = function(channel) {
+  var el = document.getElementById('affhub-link');
+  var link = el ? el.value : '';
+  var text = encodeURIComponent('Check out ZÚLA — buy anything, sell everything: ' + link);
+  if (channel === 'whatsapp') window.open('https://wa.me/?text=' + text, '_blank');
+  else { affCopyLink(); showToast('📋 Link copied — paste it into your Instagram bio or story!'); }
+};
+
+window.affRequestPayout = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var u = window._currentUser || {};
+  var balance = window._affPendingBalance || 0;
+  if (balance <= 0) { showToast('No affiliate earnings available to withdraw yet.'); return; }
+  if (!u.payout || !u.payout.accountNumber) { showToast('Add a bank account in Settings → Payout first.'); return; }
+  try {
+    await fns.addDoc(fns.collection(db,'payoutRequests'), {
+      sellerId: user.uid, sellerName: u.fullName || 'Affiliate',
+      amount: balance, sourceType: 'affiliate',
+      bankName: u.payout.bankName, bankCode: u.payout.bankCode,
+      accountNumber: u.payout.accountNumber, accountName: u.payout.accountName,
+      status: 'pending', createdAt: fns.serverTimestamp(),
+    });
+    showToast('✅ Payout request submitted! Processed weekly on Fridays.');
+    affLoadHub();
+  } catch(e) { console.error(e); showToast('Could not submit payout request.'); }
+};
+
+// ── Referral page ────────────────────────────────────────────────
+window.referralLoadStats = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  if (!user) { showPage('login'); return; }
+  var link = window.location.origin + window.location.pathname + '?invite=' + user.uid;
+  var el = document.getElementById('ref-link'); if (el) el.value = link;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'referrals'), fns.where('referrerId','==',user.uid)));
+    var refs = snap.docs.map(function(d){ return d.data(); });
+    var invited = refs.length;
+    var signedUp = refs.filter(function(r){ return r.signedUp; }).length;
+    var creditEarned = refs.filter(function(r){ return r.creditAwarded; }).length * 1000;
+    var e = function(id){ return document.getElementById(id); };
+    if (e('ref-stat-invited'))  e('ref-stat-invited').textContent  = invited;
+    if (e('ref-stat-signedup')) e('ref-stat-signedup').textContent = signedUp;
+    if (e('ref-stat-credit'))   e('ref-stat-credit').textContent   = 'NGN ' + creditEarned.toLocaleString();
+
+    var u = window._currentUser || {};
+    var banner = document.getElementById('ref-credit-banner');
+    if (banner) {
+      if (u.referralCredit > 0) {
+        banner.style.display = '';
+        banner.textContent = '✅ You have NGN ' + Number(u.referralCredit).toLocaleString() + ' referral credit — used automatically at checkout!';
+      } else banner.style.display = 'none';
+    }
+  } catch(e) { console.error('referralLoadStats:', e); }
+};
+
+window.refCopyLink = function() {
+  var el = document.getElementById('ref-link');
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(function(){ showToast('🔗 Invite link copied!'); }).catch(function(){});
+};
+window.refShare = function(channel) {
+  var el = document.getElementById('ref-link');
+  var link = el ? el.value : '';
+  var text = encodeURIComponent('Join me on ZÚLA! Sign up with my link and we both get NGN 1,000: ' + link);
+  if (channel === 'whatsapp') window.open('https://wa.me/?text=' + text, '_blank');
+  else if (channel === 'twitter') window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
+  else refCopyLink();
+};
+
+// ── Real affiliate click tracking (fires when a product page loads with ?ref=) ──
+window.zulaTrackAffiliateClick = async function(affId, productId) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  if (!db || !fns || !affId) return;
+  var user = auth && auth.currentUser;
+  if (user && user.uid === affId) return; // ignore self-clicks
+  try {
+    await fns.addDoc(fns.collection(db,'affiliateClicks'), {
+      affiliateId: affId, productId: productId || null, createdAt: fns.serverTimestamp(),
+    });
+  } catch(e) {}
+};
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    if (ref) setTimeout(function(){ zulaTrackAffiliateClick(ref, params.get('product')); }, 1200);
+  } catch(e) {}
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: AFFILIATE MANAGEMENT
+// ══════════════════════════════════════════════════════════════════
+window._aafData = { users: [], earnings: [], payouts: [], referrals: [], links: [], fraud: [] };
+window._aafPayoutFilter = 'all';
+
+window.aafTab = function(name, btn) {
+  document.querySelectorAll('#asec-affiliates .analytics-tabs button').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('#asec-affiliates .aaf-panel').forEach(function(p){ p.style.display = 'none'; });
+  var panel = document.getElementById('aaf-panel-' + name);
+  if (panel) panel.style.display = '';
+};
+
+window.aafLoadAll = async function() {
+  if (!isAdmin()) return;
+  var db = window._db, fns = window._fns;
+  try {
+    var usersSnap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('isAffiliate','==',true)));
+    var users = usersSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    var earnSnap = await fns.getDocs(fns.collection(db,'affiliateEarnings'));
+    var earnings = earnSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    var payoutSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sourceType','==','affiliate')));
+    var payouts = payoutSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    var refSnap = await fns.getDocs(fns.collection(db,'referrals'));
+    var referrals = refSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    var ordersSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('affiliateRef','!=', null)));
+    var links = ordersSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    // Fraud heuristic: self-referral (affiliateRef === buyerId)
+    var fraud = links.filter(function(o){ return o.affiliateRef === o.buyerId; }).map(function(o) {
+      return { affiliateId:o.affiliateRef, reason:'Self-referral: bought through own affiliate link', detail:o.productName||'-', createdAt:o.createdAt, orderId:o._id };
+    });
+
+    window._aafData = { users:users, earnings:earnings, payouts:payouts, referrals:referrals, links:links, fraud:fraud };
+
+    var e = function(id){ return document.getElementById(id); };
+    if (e('aaf-stat-total'))   e('aaf-stat-total').textContent   = users.length;
+    if (e('aaf-stat-gold'))    e('aaf-stat-gold').textContent    = users.filter(function(u){ return u.affiliateTier==='gold'; }).length;
+    var paidTotal = payouts.filter(function(p){ return p.status==='approved'||p.status==='paid'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+    if (e('aaf-stat-paid'))    e('aaf-stat-paid').textContent    = 'NGN ' + paidTotal.toLocaleString();
+    var pendingTotal = payouts.filter(function(p){ return p.status==='pending'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+    if (e('aaf-stat-pending')) e('aaf-stat-pending').textContent = 'NGN ' + pendingTotal.toLocaleString();
+    if (e('aaf-stat-flagged')) e('aaf-stat-flagged').textContent = fraud.length;
+
+    aafRenderUsers();
+    aafRenderEarnings();
+    aafRenderPayouts();
+    aafRenderReferrals();
+    aafRenderLinks();
+    aafRenderFraud();
+    aafLoadSettingsIntoForm();
+  } catch(e) { console.error('aafLoadAll:', e); showToast('Could not load affiliate data — check Firestore rules/indexes.'); }
+};
+
+window.aafRenderUsers = function() {
+  var tbody = document.getElementById('aaf-users-table');
+  if (!tbody) return;
+  var q = (document.getElementById('aaf-user-search')||{}).value || '';
+  q = q.toLowerCase();
+  var filter = (document.getElementById('aaf-user-filter')||{}).value || 'all';
+  var earnings = window._aafData.earnings;
+  var list = window._aafData.users.filter(function(u) {
+    var matchQ = !q || (u.fullName||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    var matchF = filter==='all' || (filter==='suspended' ? u.affiliateStatus==='suspended' : u.affiliateTier===filter);
+    return matchQ && matchF;
+  });
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" style="color:var(--text3);padding:20px;text-align:center;">No affiliates found.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(u) {
+    var mine = earnings.filter(function(e){ return e.affiliateId===u._id; });
+    var total = mine.reduce(function(s,e){ return s+Number(e.amount||0); },0);
+    var clicks = window._aafData.links.filter(function(l){ return l.affiliateRef===u._id; }).length;
+    var joined = u.joinedAt && u.joinedAt.toDate ? u.joinedAt.toDate().toLocaleDateString() : '-';
+    var suspended = u.affiliateStatus === 'suspended';
+    var statusTag = suspended ? '<span class="tag tag-red">Suspended</span>' : '<span class="tag tag-green">Active</span>';
+    var tierLabel = { starter:'🥉 Starter', silver:'🥈 Silver', gold:'🥇 Gold' }[u.affiliateTier] || '🥉 Starter';
+    var action = suspended
+      ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;" onclick="aafReinstateAffiliate(\''+u._id+'\')">Reinstate</button>'
+      : '<button class="btn btn-sm" style="background:var(--gold);color:#000;border:none;margin-right:4px;" onclick="aafSuspendAffiliate(\''+u._id+'\')">Suspend</button>' +
+        '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="aafRemoveAffiliate(\''+u._id+'\')">Remove</button>';
+    return '<tr><td>' + (u.fullName||'-') + '</td><td style="font-size:12px;color:var(--text3);">' + (u.email||'-') + '</td>' +
+      '<td>' + tierLabel + '</td><td style="font-weight:700;color:var(--gold);">NGN ' + total.toLocaleString() + '</td>' +
+      '<td>' + clicks + '</td><td>' + mine.length + '</td><td style="font-size:12px;">' + joined + '</td>' +
+      '<td>' + statusTag + '</td><td>' + action + '</td></tr>';
+  }).join('');
+};
+
+window.aafSuspendAffiliate = async function(uid) {
+  if (!confirm('Suspend this affiliate? They will lose access to the Affiliate Hub.')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { affiliateStatus:'suspended' });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:uid, type:'system', title:'Affiliate account suspended', body:'Your affiliate account has been suspended by an administrator.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Affiliate suspended.'); aafLoadAll();
+  } catch(e) { showToast('Could not suspend.'); }
+};
+window.aafReinstateAffiliate = async function(uid) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { affiliateStatus:'approved' });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:uid, type:'system', title:'Affiliate account reinstated', body:'Your affiliate account is active again — welcome back!', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Affiliate reinstated.'); aafLoadAll();
+  } catch(e) { showToast('Could not reinstate.'); }
+};
+window.aafRemoveAffiliate = async function(uid) {
+  if (!confirm('Permanently remove this affiliate? Their earnings history is kept, but they lose affiliate status.')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { isAffiliate:false, affiliateStatus:'none' });
+    showToast('Affiliate removed.'); aafLoadAll();
+  } catch(e) { showToast('Could not remove.'); }
+};
+
+window.aafRenderEarnings = function() {
+  var tbody = document.getElementById('aaf-earnings-table');
+  if (!tbody) return;
+  var list = window._aafData.earnings.slice().sort(function(a,b){
+    var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0;
+    return bt-at;
+  });
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No commissions recorded yet.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(e) {
+    var date = e.createdAt && e.createdAt.toDate ? e.createdAt.toDate().toLocaleDateString() : '-';
+    var affUser = window._aafData.users.find(function(u){ return u._id===e.affiliateId; });
+    return '<tr><td>' + (affUser?affUser.fullName:(e.affiliateId||'-').slice(0,8)) + '</td><td>' + (e.productName||'-') + '</td><td>' + (e.buyerName||'-') + '</td>' +
+      '<td>NGN ' + Number(e.orderAmount||0).toLocaleString() + '</td><td style="color:var(--gold);font-weight:700;">NGN ' + Number(e.amount||0).toLocaleString() + '</td>' +
+      '<td style="font-size:12px;color:var(--text3);">' + date + '</td></tr>';
+  }).join('');
+};
+
+window.aafFilterPayouts = function(btn, filter) {
+  window._aafPayoutFilter = filter;
+  document.querySelectorAll('.aaf-payout-filter').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  aafRenderPayouts();
+};
+window.aafRenderPayouts = function() {
+  var tbody = document.getElementById('aaf-payouts-table');
+  if (!tbody) return;
+  var filter = window._aafPayoutFilter;
+  var list = filter==='all' ? window._aafData.payouts : window._aafData.payouts.filter(function(p){ return p.status===filter; });
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No payout requests.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(p) {
+    var date = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
+    var color = { pending:'var(--gold)', approved:'var(--green)', paid:'var(--green)', rejected:'var(--red)' }[p.status] || 'var(--text3)';
+    var action = p.status==='pending'
+      ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;margin-right:4px;" onclick="aafApprovePayout(\''+p._id+'\',\''+p.sellerId+'\',\''+p.amount+'\')">Approve</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="aafRejectPayout(\''+p._id+'\',\''+p.sellerId+'\')">Reject</button>'
+      : '<span style="color:'+color+';font-weight:700;">'+p.status+'</span>';
+    return '<tr><td>' + (p.sellerName||'-') + '</td><td style="font-weight:700;">NGN ' + Number(p.amount||0).toLocaleString() + '</td>' +
+      '<td>' + (p.bankName||'-') + ' ····' + (p.accountNumber||'').slice(-4) + '</td><td style="font-size:12px;">' + date + '</td>' +
+      '<td style="color:'+color+';font-weight:700;">' + p.status + '</td><td>' + action + '</td></tr>';
+  }).join('');
+};
+window.aafApprovePayout = async function(id, affId, amount) {
+  if (!confirm('Approve affiliate payout of NGN ' + Number(amount).toLocaleString() + '?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',id), { status:'approved', approvedAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:affId, type:'payout', title:'Affiliate payout approved!', body:'Your payout of NGN '+Number(amount).toLocaleString()+' has been approved.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Payout approved.'); aafLoadAll();
+  } catch(e) { showToast('Could not approve.'); }
+};
+window.aafRejectPayout = async function(id, affId) {
+  var reason = prompt('Reason for rejection:'); if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',id), { status:'rejected', rejectReason:reason });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:affId, type:'payout', title:'Affiliate payout rejected', body:'Reason: '+reason, read:false, createdAt:fns.serverTimestamp() });
+    showToast('Payout rejected.'); aafLoadAll();
+  } catch(e) { showToast('Could not reject.'); }
+};
+
+window.aafRenderReferrals = function() {
+  var tbody = document.getElementById('aaf-referrals-table');
+  if (!tbody) return;
+  var list = window._aafData.referrals;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No referrals yet.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(r) {
+    var date = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '-';
+    return '<tr><td style="font-size:12px;">' + (r.referrerId||'-').slice(0,8) + '</td><td>' + (r.referredName||'-') + '</td>' +
+      '<td>' + (r.signedUp ? '✅' : '—') + '</td><td>' + (r.qualifyingPurchase ? '✅' : '—') + '</td>' +
+      '<td>' + (r.creditAwarded ? 'NGN 1,000' : '—') + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td></tr>';
+  }).join('');
+};
+
+window.aafRenderLinks = function() {
+  var tbody = document.getElementById('aaf-links-table');
+  if (!tbody) return;
+  var list = window._aafData.links;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No affiliate-attributed orders yet.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(o) {
+    var date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString() : '-';
+    return '<tr><td style="font-size:12px;">' + (o.affiliateRef||'-').slice(0,8) + '</td><td>' + (o.buyerName||'-') + '</td>' +
+      '<td>' + (o.productName||'-') + '</td><td>NGN ' + Number(o.price||0).toLocaleString() + '</td>' +
+      '<td>' + (o.status||'-') + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td></tr>';
+  }).join('');
+};
+
+window.aafRenderFraud = function() {
+  var tbody = document.getElementById('aaf-fraud-table');
+  if (!tbody) return;
+  var list = window._aafData.fraud;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:20px;text-align:center;">No flags — nothing suspicious detected.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(f) {
+    var date = f.createdAt && f.createdAt.toDate ? f.createdAt.toDate().toLocaleDateString() : '-';
+    return '<tr><td style="font-size:12px;">' + (f.affiliateId||'-').slice(0,8) + '</td><td style="color:var(--red);">' + f.reason + '</td>' +
+      '<td>' + f.detail + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td>' +
+      '<td><button class="btn btn-sm" style="background:var(--gold);color:#000;border:none;" onclick="aafSuspendAffiliate(\''+f.affiliateId+'\')">Suspend</button></td></tr>';
+  }).join('');
+};
+
+window.aafLoadSettingsIntoForm = async function() {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'settings', 'affiliate'));
+    var s = snap.exists() ? snap.data() : { starterRate:'5–10', silverRate:12, goldRate:'15–20', silverThreshold:11, goldThreshold:51 };
+    var e = function(id){ return document.getElementById(id); };
+    if (e('aaf-rate-starter'))   e('aaf-rate-starter').value = s.starterRate || '';
+    if (e('aaf-rate-silver'))    e('aaf-rate-silver').value  = s.silverRate  || '';
+    if (e('aaf-rate-gold'))      e('aaf-rate-gold').value    = s.goldRate    || '';
+    if (e('aaf-thresh-silver'))  e('aaf-thresh-silver').value = s.silverThreshold || '';
+    if (e('aaf-thresh-gold'))    e('aaf-thresh-gold').value   = s.goldThreshold   || '';
+  } catch(e) {}
+};
+window.aafSaveSettings = async function() {
+  var db = window._db, fns = window._fns;
+  var e = function(id){ return document.getElementById(id); };
+  try {
+    await fns.setDoc(fns.doc(db,'settings','affiliate'), {
+      starterRate: (e('aaf-rate-starter')||{}).value || '5-10',
+      silverRate:  Number((e('aaf-rate-silver')||{}).value) || 12,
+      goldRate:    (e('aaf-rate-gold')||{}).value || '15-20',
+      silverThreshold: Number((e('aaf-thresh-silver')||{}).value) || 11,
+      goldThreshold:   Number((e('aaf-thresh-gold')||{}).value) || 51,
+      updatedAt: fns.serverTimestamp(),
+    }, { merge:true });
+    showToast('✅ Affiliate settings saved.');
+  } catch(e) { showToast('Could not save settings.'); }
+};
+window.aafBroadcast = async function() {
+  var db = window._db, fns = window._fns;
+  var title = (document.getElementById('aaf-msg-title')||{}).value.trim();
+  var body  = (document.getElementById('aaf-msg-body')||{}).value.trim();
+  if (!title || !body) { showToast('Fill in title and message.'); return; }
+  try {
+    var users = window._aafData.users;
+    var batch = fns.writeBatch(db);
+    users.forEach(function(u) {
+      var ref = fns.doc(fns.collection(db,'notifications'));
+      batch.set(ref, { userId:u._id, type:'broadcast', title:title, body:body, read:false, createdAt:fns.serverTimestamp() });
+    });
+    await batch.commit();
+    showToast('📢 Sent to ' + users.length + ' affiliates.');
+    document.getElementById('aaf-msg-title').value = ''; document.getElementById('aaf-msg-body').value = '';
+  } catch(e) { showToast('Could not send broadcast.'); }
+};
+window.aafExportCsv = function(kind) {
+  var rows = window._aafData[kind] || [];
+  if (!rows.length) { showToast('Nothing to export.'); return; }
+  var keys = Object.keys(rows[0]).filter(function(k){ return k !== 'createdAt' && typeof rows[0][k] !== 'object'; });
+  var csv = keys.join(',') + '\n' + rows.map(function(r){ return keys.map(function(k){ return JSON.stringify(r[k]||''); }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type:'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'zula-affiliate-' + kind + '.csv'; a.click();
+};
+
+// Load tier display when the affiliate sign-in page opens
+var _origShowPageAff = window.showPage;
+window.showPage = function(name) {
+  _origShowPageAff(name);
+  if (name === 'affiliate-signin') { setTimeout(function(){ affLoadTierDisplay(); affSwitchTab('signin'); }, 50); }
+  if (name === 'affiliate-hub')    { setTimeout(affLoadHub, 50); }
+  if (name === 'referral')         { setTimeout(referralLoadStats, 50); }
 };
 
 console.log('✅ ZÚLA — all features loaded.');
