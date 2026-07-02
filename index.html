@@ -774,6 +774,38 @@ p{color:var(--text2);margin:0 0 1em;}
 .sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
 .sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
 
+/* ── ORDER FULFILLMENT (seller) ── */
+.sdf-tabs-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.sdf-tab{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sdf-tab span{margin-left:5px;background:var(--bg3);color:var(--text3);border-radius:999px;padding:1px 7px;font-size:11px;}
+.sdf-tab:hover{border-color:var(--border2);color:var(--text);}
+.sdf-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sdf-tab.active span{background:rgba(255,255,255,.2);color:#fff;}
+.sdf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:14px;}
+.sdf-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.sdf-order-id{font-size:14.5px;font-weight:800;font-family:var(--font-display);}
+.sdf-order-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.sdf-order-buyer{font-size:12.5px;color:var(--text2);margin-top:4px;}
+.sdf-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.sdf-badge-new{background:rgba(240,82,82,.15);color:var(--red);}
+.sdf-badge-packed{background:rgba(245,200,66,.15);color:var(--gold);}
+.sdf-badge-shipped{background:rgba(91,163,245,.15);color:#5ba8f5;}
+.sdf-badge-completed{background:rgba(39,201,122,.15);color:var(--green);}
+.sdf-product-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.sdf-product-thumb{width:44px;height:44px;border-radius:var(--radius-xs);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;}
+.sdf-product-thumb img{width:100%;height:100%;object-fit:cover;}
+.sdf-product-name{font-size:13.5px;font-weight:700;}
+.sdf-product-qty{font-size:12px;color:var(--text3);margin-top:2px;}
+.sdf-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.sdf-btn-primary{background:var(--accent);color:#fff;border:none;font-weight:700;}
+.sdf-btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
+.sdf-ship-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.sdf-carrier{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 10px;color:var(--text);font-family:var(--font-body);font-size:12.5px;min-width:140px;}
+.sdf-tracking{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:12.5px;}
+.sdf-tracking:focus,.sdf-carrier:focus{outline:none;border-color:var(--accent);}
+.sdf-tracking-info{font-size:12.5px;color:var(--text2);background:var(--bg3);border-radius:var(--radius-xs);padding:9px 12px;margin-bottom:10px;}
+.sdf-proof-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);}
+
 /* ── TABLET FILTER PANEL (760px–1024px) ── */
 @media(min-width:761px) and (max-width:1024px){
   .filter-panel{display:none;}
@@ -1068,20 +1100,20 @@ p{color:var(--text2);margin:0 0 1em;}
         <h4>Price range</h4>
         <div style="display:flex;gap:8px;margin-bottom:10px;">
           <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-price-min-label">Min</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Min (₦)</div>
             <input type="number" id="filter-price-min" placeholder="0" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
           </div>
           <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-price-max-label">Max</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Max (₦)</div>
             <input type="number" id="filter-price-max" placeholder="Any" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
           </div>
         </div>
-        <!-- Quick price presets (in NGN, labels update with setCurrency) -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="fp-presets-row">
-          <button class="fp-preset" onclick="setFilterPreset(0,5000)"><span class="fp-sym">₦</span>Under 5k</button>
-          <button class="fp-preset" onclick="setFilterPreset(5000,20000)"><span class="fp-sym">₦</span>5k–20k</button>
-          <button class="fp-preset" onclick="setFilterPreset(20000,100000)"><span class="fp-sym">₦</span>20k–100k</button>
-          <button class="fp-preset" onclick="setFilterPreset(100000,0)"><span class="fp-sym">₦</span>100k+</button>
+        <!-- Quick price presets -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="fp-preset" onclick="setFilterPreset(0,5000)">Under ₦5k</button>
+          <button class="fp-preset" onclick="setFilterPreset(5000,20000)">₦5k–20k</button>
+          <button class="fp-preset" onclick="setFilterPreset(20000,100000)">₦20k–100k</button>
+          <button class="fp-preset" onclick="setFilterPreset(100000,0)">₦100k+</button>
         </div>
       </div>
 
@@ -1800,7 +1832,7 @@ p{color:var(--text2);margin:0 0 1em;}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-ghost btn-sm" id="btn-get-verified" onclick="showPage('verification')" style="display:none;">🛡 Get seller verified</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
         <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
@@ -2874,11 +2906,10 @@ if (_kycOrigShowPage) {
           <div class="settings-card">
             <h3>Email address</h3>
             <div class="sc-sub">Your login email</div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
               <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;font-size:14px;color:var(--text2);" id="st-email-display">loading…</div>
               <span class="tag tag-green">✅ Verified</span>
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="changeEmailStart()">✏️ Change email address</button>
           </div>
           <div class="settings-card">
             <h3>Quick links</h3>
@@ -6551,26 +6582,21 @@ window.saveManualLocation = function() {
         </div>
       </div>
 
-      <!-- ── ORDERS ── -->
+      <!-- ── ORDERS TO FULFIL ── -->
       <div class="sd-section" id="sd-sec-orders">
-        <div class="sd-page-hd">Orders</div>
-        <div class="sd-page-sub">Track purchases made on your listings</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-ord-total">0</div><div class="sd-stat-lbl">Total orders</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-ord-pending">0</div><div class="sd-stat-lbl">Pending</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--accent);" id="sd-ord-revenue">₦0</div><div class="sd-stat-lbl">Revenue</div></div>
+        <div class="sd-page-hd">Orders to fulfil</div>
+        <div class="sd-page-sub">Mark items as shipped and add tracking — buyer is notified automatically.</div>
+
+        <div class="sdf-tabs-bar">
+          <button class="sdf-tab active" onclick="sdFilterFulfillOrders(this,'all')">All orders <span id="sdf-count-all">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'new')">New <span id="sdf-count-new">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'packed')">Packed <span id="sdf-count-packed">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'shipped')">Shipped <span id="sdf-count-shipped">0</span></button>
+          <button class="sdf-tab" onclick="sdFilterFulfillOrders(this,'completed')">Completed <span id="sdf-count-completed">0</span></button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm sd-filter-btn active" onclick="sdFilterOrders(this,'all')">All</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'pending')">Pending</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'completed')">Completed</button>
-          <button class="btn btn-ghost btn-sm sd-filter-btn" onclick="sdFilterOrders(this,'refunded')">Refunded</button>
-        </div>
-        <div class="dash-card" style="padding:0;">
-          <table class="dtable">
-            <thead><tr><th>Order</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
-            <tbody id="sd-orders-list"><tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">Loading orders…</td></tr></tbody>
-          </table>
+
+        <div id="sd-fulfill-list">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading orders…</div>
         </div>
       </div>
 
@@ -6615,18 +6641,6 @@ window.saveManualLocation = function() {
             <div class="sd-payout-balance" style="color:var(--text);" id="sd-payout-total">₦0.00</div>
             <div class="sd-payout-pending">All time earnings</div>
             <div style="margin-top:14px;font-size:12px;color:var(--text3);">Payouts processed within 1–3 business days</div>
-          </div>
-        </div>
-
-        <!-- Balance summary -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-          <div class="sd-stat-card">
-            <div class="sd-stat-val" style="color:var(--green);" id="sd-payout-balance">₦0</div>
-            <div class="sd-stat-lbl">Available to withdraw</div>
-          </div>
-          <div class="sd-stat-card">
-            <div class="sd-stat-val" style="color:var(--gold);" id="sd-payout-escrow">₦0</div>
-            <div class="sd-stat-lbl">🔒 In escrow</div>
           </div>
         </div>
 
@@ -9075,7 +9089,7 @@ window.adminLoadOverview = async function() {
 var _origSdTab = window.sdTab;
 window.sdTab = function(name) {
   _origSdTab(name);
-  if (name === 'orders')    sdLoadOrders();
+  if (name === 'orders')    sdLoadFulfillOrders();
   if (name === 'affiliate') sdLoadAffiliate();
   if (name === 'payout') sdLoadPayout();
 };
@@ -9083,54 +9097,131 @@ window.sdTab = function(name) {
 </script>
 
 <!-- ================================================================
-     CHECKOUT MODAL
+     PAGE: CHECKOUT — real delivery address, payment method, order summary
      ================================================================ -->
-<div id="checkout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9300;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:460px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;">🛒 Checkout</div>
-      <button onclick="coCancelCheckout()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>
+<style>
+.checkout-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;}
+@media(max-width:820px){.checkout-grid{grid-template-columns:1fr;}}
+.co-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:18px;}
+.co-card-hd{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.co-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:420px){.co-field-row{grid-template-columns:1fr;}}
+.co-field{margin-bottom:12px;}
+.co-field:last-child{margin-bottom:0;}
+.co-field label{display:block;font-size:11.5px;color:var(--text3);margin-bottom:5px;}
+.co-field input,.co-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13.5px;}
+.co-field input:focus,.co-field select:focus{outline:none;border-color:var(--accent);}
+.co-field select option{background:var(--bg2);}
+.co-pay-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;margin-bottom:10px;transition:.15s;}
+.co-pay-opt:last-child{margin-bottom:0;}
+.co-pay-opt:hover{border-color:var(--border2);}
+.co-pay-opt.selected{border-color:var(--accent);background:rgba(124,92,252,.06);}
+.co-pay-radio{width:17px;height:17px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;position:relative;}
+.co-pay-opt.selected .co-pay-radio{border-color:var(--accent);}
+.co-pay-opt.selected .co-pay-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent);}
+.co-pay-icon{width:36px;height:36px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.co-pay-name{font-size:13.5px;font-weight:700;}
+.co-pay-sub{font-size:11.5px;color:var(--text3);margin-top:1px;}
+.co-escrow-note{background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:12px 16px;font-size:12.5px;color:var(--green);line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
+.co-summary-card{position:sticky;top:80px;}
+.co-summary-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.co-summary-item:last-child{border-bottom:none;}
+.co-summary-thumb{width:38px;height:38px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;overflow:hidden;flex-shrink:0;}
+.co-summary-thumb img{width:100%;height:100%;object-fit:cover;}
+.co-summary-name{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}
+.co-summary-meta{font-size:10.5px;color:var(--text3);margin-top:1px;}
+.co-summary-price{font-size:12.5px;font-weight:700;color:var(--accent);flex-shrink:0;white-space:nowrap;}
+.co-summary-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text2);padding:8px 0;}
+.co2-total-row{border-top:1px solid var(--border);margin-top:6px;padding-top:14px;font-size:15px;font-weight:800;color:var(--text);}
+.co-location-btn{margin-top:7px;display:flex;align-items:center;gap:6px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:7px 12px;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;width:100%;justify-content:center;}
+</style>
+<div class="page" id="page-checkout">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('cart')">← Keep shopping</a>
+        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+      </nav>
     </div>
-    <!-- Product summary -->
-    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">You are buying</div>
-      <div style="font-size:15px;font-weight:700;" id="co-product-name">—</div>
-      <div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:6px;" id="co-product-price">—</div>
-    </div>
-    <!-- Delivery details (shown for physical products) -->
-    <div id="co-delivery-section">
-      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📦 Delivery details</div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Full name</label>
-          <input id="co-fullname" placeholder="e.g. Ada Okafor" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+  </header>
+  <div class="wrap" style="padding:32px 24px 80px;max-width:980px;">
+    <h1 style="font-family:var(--font-display);font-size:24px;font-weight:800;margin-bottom:24px;">Checkout</h1>
+    <div class="checkout-grid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <div class="co-card" id="co2-delivery-card">
+          <div class="co-card-hd">📦 Delivery address</div>
+          <div class="co-field-row">
+            <div class="co-field"><label>First name</label><input id="co2-fname" placeholder="Ada"></div>
+            <div class="co-field"><label>Last name</label><input id="co2-lname" placeholder="Okafor"></div>
+          </div>
+          <div class="co-field"><label>Street address</label><input id="co2-street" placeholder="14 Awolowo Road, Ikoyi"></div>
+          <div class="co-field-row">
+            <div class="co-field"><label>City</label><input id="co2-city" placeholder="Lagos"></div>
+            <div class="co-field">
+              <label>State</label>
+              <select id="co2-state">
+                <option value="">Select state</option>
+                <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option>
+                <option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option>
+                <option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option>
+                <option>Ekiti</option><option>Enugu</option><option>FCT</option><option>Gombe</option>
+                <option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option>
+                <option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+                <option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option>
+                <option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option>
+                <option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+                <option>Zamfara</option>
+              </select>
+            </div>
+          </div>
+          <div class="co-field">
+            <label>Phone number</label>
+            <input id="co2-phone" type="tel" placeholder="080xxxxxxxx">
+            <button type="button" class="co-location-btn" id="co2-location-btn" onclick="co2DetectLocation()">📍 Use my live location</button>
+            <div id="co2-location-status" style="font-size:11.5px;margin-top:4px;min-height:14px;color:var(--text3);"></div>
+          </div>
         </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Phone number</label>
-          <input id="co-phone" type="tel" placeholder="+234 800 000 0000" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+
+        <div class="co-card">
+          <div class="co-card-hd">💳 Payment method</div>
+          <div class="co-pay-opt selected" data-method="all" onclick="co2SelectPayMethod(this,'all')">
+            <div class="co-pay-radio"></div>
+            <div class="co-pay-icon">🟡</div>
+            <div><div class="co-pay-name">Paystack</div><div class="co-pay-sub">Card, bank transfer, USSD, mobile money</div></div>
+          </div>
+          <div class="co-pay-opt" data-method="bank_transfer" onclick="co2SelectPayMethod(this,'bank_transfer')">
+            <div class="co-pay-radio"></div>
+            <div class="co-pay-icon">🏦</div>
+            <div><div class="co-pay-name">Bank Transfer</div><div class="co-pay-sub">Instant dedicated account · auto-confirmed</div></div>
+          </div>
+          <div class="co-pay-opt" data-method="ussd" onclick="co2SelectPayMethod(this,'ussd')">
+            <div class="co-pay-radio"></div>
+            <div class="co-pay-icon">📟</div>
+            <div><div class="co-pay-name">USSD</div><div class="co-pay-sub">Works on any phone, no internet needed</div></div>
+          </div>
         </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Delivery address</label>
-          <input id="co-address" placeholder="Street, City, State" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
-          <!-- Live location button -->
-          <button type="button" id="co-location-btn" onclick="coDetectLocation()"
-            style="margin-top:7px;display:flex;align-items:center;gap:6px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius-xs);padding:7px 12px;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;width:100%;">
-            📍 Use my live location
-          </button>
-          <div id="co-location-status" style="font-size:11.5px;margin-top:4px;min-height:14px;color:var(--text3);"></div>
-        </div>
-        <div>
-          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Note to seller <span style="font-weight:400;">(optional)</span></label>
-          <input id="co-note" placeholder="e.g. Leave at gate, call when nearby" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+
+        <div class="co-escrow-note">
+          🔒 <div><strong>Escrow protected.</strong> Your money is held safely until you confirm physical items are received. Digital products &amp; courses unlock immediately after payment.</div>
         </div>
       </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+        <div class="co-card co-summary-card">
+          <div class="co-card-hd">Order summary</div>
+          <div id="co2-summary-items"></div>
+          <div class="co-summary-row"><span>Subtotal</span><span id="co2-subtotal">NGN 0</span></div>
+          <div class="co-summary-row"><span>Delivery</span><span id="co2-delivery-fee">Free</span></div>
+          <div class="co-summary-row co2-total-row"><span>Total</span><span id="co2-total">NGN 0</span></div>
+          <button class="btn btn-primary" style="width:100%;padding:13px;margin-top:16px;" id="co2-pay-btn" onclick="co2SubmitOrder()">Pay →</button>
+        </div>
+      </div>
+
     </div>
-    <!-- Escrow notice -->
-    <div style="background:rgba(39,201,122,.07);border:1px solid rgba(39,201,122,.2);border-radius:var(--radius-xs);padding:10px 14px;font-size:12.5px;color:var(--green);margin-bottom:20px;display:flex;gap:8px;align-items:center;">
-      🔒 Payment is held in escrow until you confirm receipt.
-    </div>
-    <button class="btn btn-primary" style="width:100%;padding:13px;margin-bottom:10px;" onclick="coSubmitOrder()">Pay now →</button>
-    <button class="btn btn-ghost" style="width:100%;font-size:13px;" onclick="coCancelCheckout()">Cancel</button>
   </div>
 </div>
 
@@ -10269,62 +10360,153 @@ function waitForPaystack(maxMs) {
 }
 
 // ══════════════════════════════════════════════════
-// 1. CHECKOUT — collect delivery details + Paystack
+// 1. CHECKOUT PAGE — real multi-item order summary + Paystack channels
 // ══════════════════════════════════════════════════
-window.coSubmitOrder = async function() {
-  var auth = window._auth, db = window._db, fns = window._fns;
+window._co2Items = [];
+window._co2PayMethod = 'all';
+window._co2DeliveryFee = 0;
+window._co2Total = 0;
+window.CO2_DELIVERY_FEE_NGN = 1500;
+
+window.openCheckoutPage = function(items) {
+  var auth = window._auth;
+  if (!auth || !auth.currentUser) { showToast('Please sign in to checkout.'); showPage('login'); return; }
+  if (!items || !items.length) { showToast('Nothing to check out.'); return; }
+  window._co2Items = items;
+  window._co2PayMethod = 'all';
+  document.querySelectorAll('.co-pay-opt').forEach(function(o){ o.classList.remove('selected'); });
+  var first = document.querySelector('.co-pay-opt[data-method="all"]');
+  if (first) first.classList.add('selected');
+  window._coLocationLatLng = null;
+
+  var u = window._currentUser || {};
+  var nameParts = (u.fullName||'').trim().split(' ');
+  var e = function(id){ return document.getElementById(id); };
+  if (e('co2-fname')) e('co2-fname').value = nameParts[0] || '';
+  if (e('co2-lname')) e('co2-lname').value = nameParts.slice(1).join(' ') || '';
+  if (e('co2-street')) e('co2-street').value = '';
+  if (e('co2-city')) e('co2-city').value = '';
+  if (e('co2-state')) e('co2-state').value = '';
+  if (e('co2-phone')) e('co2-phone').value = u.phone || '';
+  if (e('co2-location-status')) e('co2-location-status').textContent = '';
+
+  var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
+  var delivSec = e('co2-delivery-card');
+  if (delivSec) delivSec.style.display = hasPhysical ? '' : 'none';
+
+  co2RenderSummary();
+  showPage('checkout');
+};
+
+window.co2SelectPayMethod = function(el, method) {
+  window._co2PayMethod = method;
+  document.querySelectorAll('.co-pay-opt').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+};
+
+function co2TypeLabel(item) {
+  var t = item.productType || item.type || 'physical';
+  if (t === 'physical' || t === 'vehicle') return '×' + (item.qty||1) + ' · Physical';
+  if (t === 'course') return 'Course · Lifetime';
+  if (t === 'realestate') return 'Property';
+  if (['ebook','template','software','audio','coaching'].indexOf(t) !== -1) return 'Digital · Instant';
+  return 'Physical';
+}
+
+window.co2RenderSummary = function() {
+  var items = window._co2Items || [];
+  var wrap = document.getElementById('co2-summary-items');
+  var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
+  var subtotal = items.reduce(function(s,i){ return s + Number(i.price||0) * (i.qty||1); }, 0);
+  var deliveryFee = hasPhysical ? window.CO2_DELIVERY_FEE_NGN : 0;
+  var total = subtotal + deliveryFee;
+  var currency = (items[0] && items[0].currency) || 'NGN';
+
+  if (wrap) {
+    wrap.innerHTML = items.map(function(item) {
+      var img = item.photo ? ('<img src="'+item.photo+'">') : ('<span>'+(item.emoji||'📦')+'</span>');
+      var lineTotal = Number(item.price||0) * (item.qty||1);
+      return '<div class="co-summary-item">' +
+        '<div class="co-summary-thumb">'+img+'</div>' +
+        '<div style="flex:1;min-width:0;"><div class="co-summary-name">'+(item.name||'Product')+'</div>' +
+        '<div class="co-summary-meta">'+co2TypeLabel(item)+'</div></div>' +
+        '<div class="co-summary-price">'+(item.currency||'NGN')+' '+lineTotal.toLocaleString()+'</div>' +
+        '</div>';
+    }).join('');
+  }
+  var e = function(id){ return document.getElementById(id); };
+  if (e('co2-subtotal'))      e('co2-subtotal').textContent = currency + ' ' + subtotal.toLocaleString();
+  if (e('co2-delivery-fee'))  e('co2-delivery-fee').textContent = deliveryFee ? (currency + ' ' + deliveryFee.toLocaleString()) : 'Free';
+  if (e('co2-total'))         e('co2-total').textContent = currency + ' ' + total.toLocaleString();
+  var payBtn = e('co2-pay-btn');
+  if (payBtn) payBtn.textContent = 'Pay ' + currency + ' ' + total.toLocaleString() + ' →';
+  window._co2Total = total;
+  window._co2DeliveryFee = deliveryFee;
+};
+
+window.co2SubmitOrder = async function() {
+  var auth = window._auth;
   var user = auth && auth.currentUser;
-  var p = window._checkoutProduct;
-  if (!user || !p) return;
+  if (!user) { showToast('Please sign in.'); showPage('login'); return; }
+  var items = window._co2Items || [];
+  if (!items.length) { showToast('Your cart is empty.'); return; }
   var profile = window._currentUser || {};
+  var e = function(id){ return document.getElementById(id); };
 
-  // Collect delivery fields (for physical products)
-  var isDigital = ['ebook','course','template','software','audio','coaching'].includes(p.productType||'');
-  var fullname = (document.getElementById('co-fullname')||{}).value || profile.fullName || '';
-  var phone    = (document.getElementById('co-phone')||{}).value || profile.phone || '';
-  var address  = (document.getElementById('co-address')||{}).value || '';
-  var note     = (document.getElementById('co-note')||{}).value || '';
+  var fname  = (e('co2-fname')||{}).value ? e('co2-fname').value.trim() : '';
+  var lname  = (e('co2-lname')||{}).value ? e('co2-lname').value.trim() : '';
+  var street = (e('co2-street')||{}).value ? e('co2-street').value.trim() : '';
+  var city   = (e('co2-city')||{}).value ? e('co2-city').value.trim() : '';
+  var state  = (e('co2-state')||{}).value || '';
+  var phone  = (e('co2-phone')||{}).value ? e('co2-phone').value.trim() : '';
 
-  if (!isDigital && !address) { showToast('⚠️ Please enter your delivery address.'); return; }
-  if (!isDigital && !phone)   { showToast('⚠️ Please enter your phone number.'); return; }
-
-  var delivery = isDigital ? null : {
-    fullname, phone, address, note,
-    lat: window._coLocationLatLng ? window._coLocationLatLng.lat : null,
-    lng: window._coLocationLatLng ? window._coLocationLatLng.lng : null,
-  };
-  window._coLocationLatLng = null; // reset after use
-  // Attach GPS coordinates if buyer used live location
-  if (delivery && window._coLocationLatLng) {
-    delivery.lat = window._coLocationLatLng.lat;
-    delivery.lng = window._coLocationLatLng.lng;
-    window._coLocationLatLng = null; // reset after use
+  var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
+  if (hasPhysical) {
+    if (!fname || !lname) { showToast('⚠️ Enter your first and last name.'); return; }
+    if (!street)          { showToast('⚠️ Enter your street address.'); return; }
+    if (!city || !state)  { showToast('⚠️ Enter your city and state.'); return; }
+    if (!phone)           { showToast('⚠️ Enter your phone number.'); return; }
   }
 
-  // Show a brief loading state on the Pay Now button while we confirm Paystack is ready
-  var payBtn = document.querySelector('#checkout-modal .btn-primary');
+  var delivery = hasPhysical ? {
+    fullname: (fname + ' ' + lname).trim(),
+    phone: phone,
+    address: [street, city, state].filter(Boolean).join(', '),
+    note: '',
+    lat: window._coLocationLatLng ? window._coLocationLatLng.lat : null,
+    lng: window._coLocationLatLng ? window._coLocationLatLng.lng : null,
+  } : null;
+
+  var payBtn = document.getElementById('co2-pay-btn');
   if (payBtn) { payBtn.disabled = true; payBtn.textContent = 'Loading payment…'; }
-
   var paystackOk = typeof PaystackPop !== 'undefined' ? true : await waitForPaystack(5000);
-
-  if (payBtn) { payBtn.disabled = false; payBtn.textContent = 'Pay now →'; }
-
   var keyOk = window.PAYSTACK_PUBLIC_KEY && window.PAYSTACK_PUBLIC_KEY.indexOf('pk_') === 0 && window.PAYSTACK_PUBLIC_KEY.indexOf('YOUR_PAYSTACK') === -1;
+  if (payBtn) { payBtn.disabled = false; }
+  co2RenderSummary();
 
-  var amountKobo = Math.round(Number(p.price) * 100);
+  var total = window._co2Total || 0;
+  var amountKobo = Math.round(total * 100);
   var ref = 'ZULA_' + Date.now() + '_' + user.uid.slice(0,6);
 
+  // Paystack channel restriction — real feature, matches the chosen payment method
+  var channelsMap = {
+    all:           ['card','bank','ussd','mobile_money','qr','bank_transfer'],
+    bank_transfer: ['bank_transfer'],
+    ussd:          ['ussd'],
+  };
+  var channels = channelsMap[window._co2PayMethod] || channelsMap.all;
+
   if (paystackOk && keyOk) {
-    document.getElementById('checkout-modal').style.display = 'none';
     var handler = PaystackPop.setup({
       key:      window.PAYSTACK_PUBLIC_KEY,
       email:    user.email,
       amount:   amountKobo,
-      currency: p.currency === 'USD' ? 'USD' : 'NGN',
+      currency: (items[0] && items[0].currency === 'USD') ? 'USD' : 'NGN',
       ref:      ref,
-      metadata: { productId: p.id, sellerId: p.sellerId, buyerId: user.uid },
+      channels: channels,
+      metadata: { buyerId: user.uid, itemCount: items.length },
       callback: function(response) {
-        coSaveOrder(p, user, profile, response.reference, 'paid', delivery);
+        co2SaveOrders(items, user, profile, response.reference, 'paid', delivery);
       },
       onClose: function() { showToast('Payment cancelled.'); }
     });
@@ -10332,89 +10514,64 @@ window.coSubmitOrder = async function() {
   } else if (!paystackOk) {
     showToast('⚠️ Payment system is still loading — please check your internet connection and try again in a moment.');
   } else {
-    // Key not configured — save as pending
-    document.getElementById('checkout-modal').style.display = 'none';
-    await coSaveOrder(p, user, profile, ref, 'pending', delivery);
+    await co2SaveOrders(items, user, profile, ref, 'pending', delivery);
     showToast('📋 Order placed! Add your Paystack key to enable live payments.');
   }
 };
 
-async function coSaveOrder(p, user, profile, payRef, status, delivery) {
+async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
   var db = window._db, fns = window._fns;
   try {
-    var orderData = {
-      productId:    p.id,
-      productName:  p.name,
-      productPhoto: (p.photos&&p.photos[0]) || p.photo || '',
-      productEmoji: p.emoji || '',
-      productType:  p.productType || p.type || 'physical',
-      price:        Number(p.price),
-      currency:     p.currency || 'NGN',
-      sellerId:     p.sellerId,
-      sellerName:   p.sellerName || '',
-      buyerId:      user.uid,
-      buyerName:    profile.fullName || user.displayName || 'Buyer',
-      buyerEmail:   user.email,
-      paymentRef:   payRef,
-      status:       status,
-      createdAt:    fns.serverTimestamp(),
-    };
-    if (delivery) orderData.delivery = delivery;
-    var orderRef = await fns.addDoc(fns.collection(db, 'orders'), orderData);
+    var deliveryFee = window._co2DeliveryFee || 0;
+    var feeSplit = items.length ? deliveryFee / items.length : 0;
+    for (var i = 0; i < items.length; i++) {
+      var p = items[i];
+      var deliveryType = p.productType || p.type || 'physical';
+      var isPhysical = (deliveryType === 'physical' || deliveryType === 'vehicle');
+      var orderData = {
+        productId:    p.id || null,
+        productName:  p.name,
+        productPhoto: (p.photos && p.photos[0]) || p.photo || '',
+        productEmoji: p.emoji || '',
+        productType:  deliveryType,
+        price:        Number(p.price) * (p.qty || 1) + (isPhysical ? feeSplit : 0),
+        qty:          p.qty || 1,
+        currency:     p.currency || 'NGN',
+        sellerId:     p.sellerId,
+        sellerName:   p.sellerName || '',
+        buyerId:      user.uid,
+        buyerName:    profile.fullName || user.displayName || 'Buyer',
+        buyerEmail:   user.email,
+        paymentRef:   payRef,
+        status:       status,
+        createdAt:    fns.serverTimestamp(),
+      };
+      if (delivery && isPhysical) orderData.delivery = delivery;
+      var orderRef = await fns.addDoc(fns.collection(db, 'orders'), orderData);
 
-    // Decrement stock if tracked
-    if (p.id && p.stock > 0) {
-      await fns.updateDoc(fns.doc(db,'products',p.id), { stock: Math.max(0, (p.stock||1) - 1) });
+      if (p.id && p.stock > 0) {
+        await fns.updateDoc(fns.doc(db,'products',p.id), { stock: Math.max(0, (p.stock||1) - (p.qty||1)) });
+      }
+      var body = (profile.fullName||'A buyer') + ' purchased ' + p.name + ' for ' + (p.currency||'NGN') + ' ' + Number(orderData.price).toLocaleString();
+      if (orderData.delivery) body += '. Deliver to: ' + orderData.delivery.address + ' · ' + orderData.delivery.phone;
+      await fns.addDoc(fns.collection(db,'notifications'), {
+        userId: p.sellerId, type:'new_order',
+        title: '🛍 New order!', body: body,
+        orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
+      });
     }
-    // Notify seller with delivery details
-    var body = (profile.fullName||'A buyer') + ' purchased ' + p.name + ' for ' + (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString();
-    if (delivery) body += '. Deliver to: ' + delivery.address + ' · ' + delivery.phone;
-    await fns.addDoc(fns.collection(db,'notifications'), {
-      userId: p.sellerId, type:'new_order',
-      title: '🛍 New order!', body: body,
-      orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
-    });
     showToast('🎉 Order confirmed! Check My Orders for updates.');
-    // Clear cart item if bought from cart
     if (_cart && _cart.length) {
-      _cart = _cart.filter(function(c){ return c.id !== p.id; });
+      var boughtIds = items.map(function(i){ return i.id; }).filter(Boolean);
+      _cart = _cart.filter(function(c){ return boughtIds.indexOf(c.id) === -1; });
       cartSave();
     }
+    showPage('my-orders');
   } catch(e) { console.error(e); showToast('❌ Could not save order. Contact support.'); }
 }
 
-window.coCancelCheckout = function() {
-  var m = document.getElementById('checkout-modal');
-  if (m) m.style.display = 'none';
-};
-
-// Show/hide delivery section based on product type
-window.coOpenCheckout = function(product) {
-  window._checkoutProduct = product;
-  var nameEl  = document.getElementById('co-product-name');
-  var priceEl = document.getElementById('co-product-price');
-  if (nameEl)  nameEl.textContent  = product.name || 'Product';
-  if (priceEl) priceEl.textContent = (product.currency||'NGN') + ' ' + Number(product.price||0).toLocaleString();
-  var isDigital = ['ebook','course','template','software','audio','coaching'].includes(product.productType||'');
-  var delivSec = document.getElementById('co-delivery-section');
-  if (delivSec) delivSec.style.display = isDigital ? 'none' : '';
-  // Pre-fill from profile
-  var u = window._currentUser || {};
-  var nameI = document.getElementById('co-fullname'); if (nameI && u.fullName) nameI.value = u.fullName;
-  var phoneI = document.getElementById('co-phone');   if (phoneI && u.phone)   phoneI.value = u.phone;
-  // Reset location button state
-  window._coLocationLatLng = null;
-  var locBtn = document.getElementById('co-location-btn');
-  var locSts = document.getElementById('co-location-status');
-  var addrI  = document.getElementById('co-address');
-  if (locBtn) { locBtn.textContent = '📍 Use my live location'; locBtn.disabled = false; locBtn.style.background = 'rgba(124,92,252,.1)'; locBtn.style.borderColor = 'rgba(124,92,252,.3)'; locBtn.style.color = 'var(--accent)'; }
-  if (locSts) locSts.textContent = '';
-  if (addrI)  addrI.value = '';
-  var noteI = document.getElementById('co-note'); if (noteI) noteI.value = '';
-  document.getElementById('checkout-modal').style.display = 'flex';
-};
-
 // Stock field has id="ap-field-stock" — read via window._pendingStock before submit
+
 
 // ══════════════════════════════════════════════════
 // 3. SAVE DRAFT — actually saves to Firestore
@@ -10459,21 +10616,7 @@ window.cartCheckout = function() {
   if (!_cart.length) { showToast('Your cart is empty.'); return; }
   var auth = window._auth;
   if (!auth || !auth.currentUser) { showToast('Please sign in to checkout.'); showPage('login'); return; }
-  // Build a combined product from cart items for multi-checkout
-  if (_cart.length === 1) {
-    coOpenCheckout(_cart[0]);
-  } else {
-    // Multi-item: show summary modal then process each
-    var total = _cart.reduce(function(s,i){ return s + Number(i.price||0) * (i.qty||1); }, 0);
-    var names = _cart.map(function(i){ return (i.qty>1?i.qty+'× ':'')+i.name; }).join(', ');
-    var combinedProduct = {
-      id: null, name: names,
-      price: total, currency: _cart[0].currency||'NGN',
-      sellerId: _cart[0].sellerId, sellerName: _cart[0].sellerName||'',
-      productType: 'physical', _isMultiCart: true, _cartItems: _cart.slice()
-    };
-    coOpenCheckout(combinedProduct);
-  }
+  openCheckoutPage(_cart.slice());
 };
 
 // ══════════════════════════════════════════════════
@@ -10806,14 +10949,18 @@ window.adminRejectVerif = async function(userId) {
 };
 
 // ══════════════════════════════════════════════════
-// 12. FIX pdBuyNow to use coOpenCheckout
+// 12. FIX pdBuyNow to use the real checkout page
 // ══════════════════════════════════════════════════
 window.pdBuyNow = function() {
   var p = window._currentProduct;
   if (!p) return;
   var auth = window._auth;
   if (!auth || !auth.currentUser) { showToast('Please sign in to buy.'); showPage('login'); return; }
-  coOpenCheckout(p);
+  var item = Object.assign({}, p, {
+    qty: 1,
+    photo: (p.photos && p.photos[0]) || p.photo || '',
+  });
+  openCheckoutPage([item]);
 };
 
 // Also fix "Add to Cart" to store full product data including type
@@ -11028,10 +11175,12 @@ window.goBackSmart = function(fallback) {
 // ── LIVE LOCATION DETECTION FOR CHECKOUT ────────────────────────
 window._coLocationLatLng = null; // {lat, lng} from GPS
 
-window.coDetectLocation = function() {
-  var btn    = document.getElementById('co-location-btn');
-  var status = document.getElementById('co-location-status');
-  var addr   = document.getElementById('co-address');
+window.co2DetectLocation = function() {
+  var btn    = document.getElementById('co2-location-btn');
+  var status = document.getElementById('co2-location-status');
+  var streetEl = document.getElementById('co2-street');
+  var cityEl   = document.getElementById('co2-city');
+  var stateEl  = document.getElementById('co2-state');
 
   if (!navigator.geolocation) {
     if (status) { status.textContent = '❌ GPS not supported on this device.'; status.style.color = 'var(--red)'; }
@@ -11048,21 +11197,21 @@ window.coDetectLocation = function() {
         var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng);
         var data = await res.json();
         var a = data.address || {};
-        // Build a human-readable address
-        var parts = [
+        var streetParts = [
           a.house_number && a.road ? a.house_number + ' ' + a.road : (a.road || a.pedestrian || a.footway),
           a.suburb || a.neighbourhood || a.village,
-          a.city || a.town || a.county,
-          a.state,
-          a.country
         ].filter(Boolean);
-        var fullAddr = parts.join(', ');
-        if (addr) addr.value = fullAddr;
-        if (status) { status.textContent = '✅ Location detected — you can edit the address above if needed.'; status.style.color = 'var(--green)'; }
+        if (streetEl) streetEl.value = streetParts.join(', ');
+        if (cityEl) cityEl.value = a.city || a.town || a.county || '';
+        if (stateEl && a.state) {
+          var stateName = a.state.replace(/\s*State$/i, '').trim();
+          var matched = Array.from(stateEl.options).find(function(o){ return o.value.toLowerCase() === stateName.toLowerCase(); });
+          if (matched) stateEl.value = matched.value;
+        }
+        if (status) { status.textContent = '✅ Location detected — you can edit the fields above if needed.'; status.style.color = 'var(--green)'; }
         if (btn) { btn.textContent = '📍 Location set — tap to refresh'; btn.style.background = 'rgba(39,201,122,.1)'; btn.style.borderColor = 'rgba(39,201,122,.3)'; btn.style.color = 'var(--green)'; }
       } catch(e) {
-        // GPS worked but reverse geocode failed — save coordinates at least
-        if (addr && !addr.value) addr.value = 'GPS: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+        if (streetEl && !streetEl.value) streetEl.value = 'GPS: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
         if (status) { status.textContent = '📍 GPS coordinates captured. Add your full street address above.'; status.style.color = 'var(--text3)'; }
       }
       if (btn) btn.disabled = false;
@@ -11078,281 +11227,260 @@ window.coDetectLocation = function() {
   );
 };
 
-// ══════════════════════════════════════════════════
-// FIXES BATCH — all remaining items
-// ══════════════════════════════════════════════════
+// ── SELLER: REAL ORDER FULFILLMENT ──────────────────────────────
+window._sdFulfillOrders = [];
+window._sdFulfillFilter = 'all';
 
-// ── 1. SELLER VERIFICATION SECTION (was stuck on "Loading…") ──────
-window.sdLoadVerification = function() {
-  var el = document.getElementById('sd-verif-content');
-  if (!el) return;
-  var u = window._currentUser || {};
-  if (u.sellerVerified) {
-    el.innerHTML =
-      '<div style="text-align:center;padding:30px 20px;">' +
-      '<div style="font-size:56px;margin-bottom:12px;">🏅</div>' +
-      '<div style="font-size:18px;font-weight:800;color:var(--green);margin-bottom:6px;">You are a Verified Seller!</div>' +
-      '<div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Your identity has been confirmed. You can list products and receive payouts.</div>' +
-      '<button class="btn btn-primary" onclick="goAddProduct()">+ Add a product →</button>' +
-      '</div>';
-  } else if (u.verifSubmitted) {
-    el.innerHTML =
-      '<div style="text-align:center;padding:30px 20px;">' +
-      '<div style="font-size:56px;margin-bottom:12px;">⏳</div>' +
-      '<div style="font-size:16px;font-weight:700;color:var(--gold);margin-bottom-6px;">Documents submitted — under review</div>' +
-      '<div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Our team reviews applications within 24–48 hours. You will get a notification once approved.</div>' +
-      '<button class="btn btn-ghost btn-sm" onclick="kycResubmit();showPage(\'verification\')">Resubmit documents →</button>' +
-      '</div>';
-  } else {
-    el.innerHTML =
-      '<div style="text-align:center;padding:24px 20px;">' +
-      '<div style="font-size:48px;margin-bottom:12px;">🛡</div>' +
-      '<div style="font-size:16px;font-weight:700;margin-bottom:6px;">Complete seller verification</div>' +
-      '<div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Upload your ID and documents to start selling and receiving payouts. Takes about 5 minutes.</div>' +
-      '<button class="btn btn-primary" onclick="showPage(\'verification\')">Start verification →</button>' +
-      '</div>';
-  }
-};
-
-// ── 2. PAYOUT HISTORY — show pending/completed requests ───────────
-window.sdLoadPayout = async function() {
+window.sdLoadFulfillOrders = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
-  if (!user) return;
-  // Load balance
+  var wrap = document.getElementById('sd-fulfill-list');
+  if (!wrap || !user) return;
+  wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading orders…</div>';
   try {
-    var oSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
-    var released = oSnap.docs.filter(function(d){ return d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
-    var inEscrow = oSnap.docs.filter(function(d){ return d.data().status==='paid'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
-    var balEl = document.getElementById('sd-payout-balance');
-    var escrowEl = document.getElementById('sd-payout-escrow');
-    if (balEl) balEl.textContent = '₦' + released.toLocaleString();
-    if (escrowEl) escrowEl.textContent = '₦' + inEscrow.toLocaleString();
-  } catch(e) {}
-  // Load payout history
-  var hist = document.getElementById('sd-payout-history');
-  if (!hist) return;
-  try {
-    var prSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid)));
-    if (prSnap.empty) {
-      hist.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout requests yet.</div>';
-      return;
-    }
-    var docs = prSnap.docs.slice().sort(function(a,b){
-      var at=a.data().createdAt,bt=b.data().createdAt;
-      if(at&&bt&&at.toMillis) return bt.toMillis()-at.toMillis();
-      return 0;
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
+    var docs = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    docs.sort(function(a,b){
+      var at = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      var bt = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return bt - at;
     });
-    var statusColor = { pending:'var(--gold)', approved:'#60b4ff', paid:'var(--green)', rejected:'var(--red)' };
-    var statusIcon  = { pending:'⏳', approved:'✅', paid:'💰', rejected:'❌' };
-    hist.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">' +
-      docs.map(function(d) {
-        var p = d.data();
-        var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
-        var sc = statusColor[p.status]||'var(--text3)';
-        var si = statusIcon[p.status]||'•';
-        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-xs);border:1px solid var(--border);">' +
-          '<div>' +
-            '<div style="font-size:13.5px;font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div>' +
-            '<div style="font-size:12px;color:var(--text3);">' + (p.bankName||'') + ' · ' + (p.accountNumber ? '****'+p.accountNumber.slice(-4) : '') + ' · ' + date + '</div>' +
-          '</div>' +
-          '<span style="font-size:12px;font-weight:700;color:'+sc+';background:rgba(0,0,0,.15);padding:4px 10px;border-radius:999px;">' + si + ' ' + (p.status||'pending') + '</span>' +
-          '</div>';
-      }).join('') + '</div>';
+    // Digital/service/property orders don't need shipping — leave them off this list
+    var digitalTypes = ['course','ebook','template','software','audio','coaching','realestate'];
+    window._sdFulfillOrders = docs.filter(function(o) {
+      return digitalTypes.indexOf(o.productType) === -1 && o.status !== 'refunded' && o.status !== 'disputed' && o.status !== 'cancelled';
+    });
+    sdUpdateFulfillTabs();
+    sdRenderFulfillOrders();
   } catch(e) {
-    if (hist) hist.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout history yet.</div>';
+    console.error('sdLoadFulfillOrders:', e);
+    wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">No orders to fulfil yet.</div>';
   }
 };
 
-// ── 3. EMAIL CHANGE — wired to Firebase Auth ──────────────────────
-window.changeEmailStart = function() {
-  // Show email change modal
-  var modal = document.getElementById('email-change-modal');
-  if (!modal) {
-    // Create modal dynamically if not in HTML
-    var div = document.createElement('div');
-    div.id = 'email-change-modal';
-    div.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9400;align-items:center;justify-content:center;padding:20px;';
-    div.innerHTML =
-      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:420px;width:100%;padding:28px;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">' +
-          '<div style="font-size:17px;font-weight:800;">📧 Change email address</div>' +
-          '<button onclick="document.getElementById(\'email-change-modal\').remove()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">×</button>' +
-        '</div>' +
-        '<div style="font-size:13px;color:var(--text3);margin-bottom:16px;">For security, we need to verify your current password before changing your email.</div>' +
-        '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">' +
-          '<div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">Current password</label>' +
-          '<input type="password" id="email-chg-pass" placeholder="Your current password" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;"></div>' +
-          '<div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px;">New email address</label>' +
-          '<input type="email" id="email-chg-new" placeholder="your@newemail.com" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;"></div>' +
-        '</div>' +
-        '<div id="email-chg-err" style="display:none;color:var(--red);font-size:12.5px;margin-bottom:12px;padding:8px 12px;background:rgba(240,82,82,.08);border-radius:var(--radius-xs);"></div>' +
-        '<button class="btn btn-primary" style="width:100%;" id="email-chg-btn" onclick="changeEmailSubmit()">Update email →</button>' +
+function sdFulfillBucket(status) {
+  if (status === 'paid' || status === 'pending') return 'new';
+  if (status === 'packed') return 'packed';
+  if (status === 'shipped' || status === 'in-transit') return 'shipped';
+  if (status === 'completed' || status === 'delivered') return 'completed';
+  return 'other';
+}
+
+window.sdUpdateFulfillTabs = function() {
+  var counts = { all:0, new:0, packed:0, shipped:0, completed:0 };
+  window._sdFulfillOrders.forEach(function(o) {
+    counts.all++;
+    var b = sdFulfillBucket(o.status);
+    if (counts[b] !== undefined) counts[b]++;
+  });
+  var e = function(id){ return document.getElementById(id); };
+  if (e('sdf-count-all'))       e('sdf-count-all').textContent = counts.all;
+  if (e('sdf-count-new'))       e('sdf-count-new').textContent = counts.new;
+  if (e('sdf-count-packed'))    e('sdf-count-packed').textContent = counts.packed;
+  if (e('sdf-count-shipped'))   e('sdf-count-shipped').textContent = counts.shipped;
+  if (e('sdf-count-completed')) e('sdf-count-completed').textContent = counts.completed;
+};
+
+window.sdFilterFulfillOrders = function(btn, filter) {
+  window._sdFulfillFilter = filter;
+  document.querySelectorAll('#sd-sec-orders .sdf-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  sdRenderFulfillOrders();
+};
+
+window.sdRenderFulfillOrders = function() {
+  var wrap = document.getElementById('sd-fulfill-list');
+  if (!wrap) return;
+  var filter = window._sdFulfillFilter;
+  var list = filter === 'all' ? window._sdFulfillOrders : window._sdFulfillOrders.filter(function(o){ return sdFulfillBucket(o.status) === filter; });
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);"><div style="font-size:44px;margin-bottom:10px;">📦</div><div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:4px;">Nothing here yet</div><div style="font-size:12.5px;">Orders will show up as buyers purchase your physical products.</div></div>';
+    return;
+  }
+  wrap.innerHTML = list.map(sdFulfillCardHtml).join('');
+};
+
+function sdFulfillCardHtml(o) {
+  var bucket = sdFulfillBucket(o.status);
+  var date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : null;
+  var dateStr = date ? date.toLocaleDateString('en-GB',{month:'short',day:'numeric',year:'numeric'}) : '-';
+  var ago = date ? timeSince(date) : '';
+  var d = o.delivery || {};
+  var location = d.address ? d.address.split(',').slice(-2).join(',').trim() : '-';
+  var orderCode = 'ZL-' + (date ? date.getFullYear() : '2026') + '-' + o._id.slice(0,5).toUpperCase();
+
+  var badgeMeta = {
+    new:       { label:'New',       cls:'sdf-badge-new' },
+    packed:    { label:'Packed',    cls:'sdf-badge-packed' },
+    shipped:   { label:o.status==='in-transit' ? 'In transit' : 'Shipped', cls:'sdf-badge-shipped' },
+    completed: { label:'Completed', cls:'sdf-badge-completed' },
+    other:     { label:o.status||'-', cls:'sdf-badge-new' },
+  }[bucket];
+
+  var thumb = o.productPhoto ? ('<img src="'+o.productPhoto+'">') : ('<span>'+(o.productEmoji||'📦')+'</span>');
+  var buyerNameSafe = (o.buyerName||'Buyer').replace(/'/g, "\\'");
+
+  var actionsHtml = '';
+  if (bucket === 'new') {
+    actionsHtml =
+      '<div class="sdf-actions">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdConfirmPackOrder(\''+o._id+'\')">✓ Confirm &amp; pack order</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdMessageBuyerFromOrder(\''+o.buyerId+'\',\''+buyerNameSafe+'\')">💬 Message buyer</button>' +
+        '<button class="btn btn-sm sdf-btn-danger" onclick="sdCancelOrder(\''+o._id+'\',\''+o.buyerId+'\')">✕ Cancel</button>' +
       '</div>';
-    document.body.appendChild(div);
-  } else {
-    modal.style.display = 'flex';
+  } else if (bucket === 'packed') {
+    actionsHtml =
+      '<div class="sdf-ship-row">' +
+        '<select class="sdf-carrier" id="sdf-carrier-'+o._id+'">' +
+          '<option>GIG Logistics</option><option>DHL</option><option>UPS</option><option>Speedaf</option><option>Kwik</option><option>NIPOST</option><option>Other</option>' +
+        '</select>' +
+        '<input type="text" class="sdf-tracking" id="sdf-tracking-'+o._id+'" placeholder="Tracking number e.g. GIG123456789">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdMarkShipped(\''+o._id+'\',\''+o.buyerId+'\')">Mark as shipped →</button>' +
+      '</div>' +
+      '<div class="sdf-actions" style="margin-top:8px;">' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdUploadProof(\''+o._id+'\')">📎 Upload proof</button>' +
+      '</div>';
+  } else if (bucket === 'shipped') {
+    var trackLine = o.trackingCarrier ? (o.trackingCarrier + ' · ' + (o.trackingNumber||'')) : '';
+    actionsHtml =
+      (trackLine ? ('<div class="sdf-tracking-info">🚚 ' + trackLine + '</div>') : '') +
+      '<div class="sdf-actions">' +
+        '<button class="btn btn-sm sdf-btn-primary" onclick="sdShowDeliveryCode(\''+o._id+'\')">🔑 Delivery code</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdUploadProof(\''+o._id+'\')">📎 Upload proof</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="sdMessageBuyerFromOrder(\''+o.buyerId+'\',\''+buyerNameSafe+'\')">💬 Message buyer</button>' +
+      '</div>';
+  } else if (bucket === 'completed') {
+    actionsHtml = '<div class="sdf-tracking-info" style="color:var(--green);">✅ Delivered &amp; confirmed by buyer</div>';
   }
-};
 
-window.changeEmailSubmit = async function() {
-  var pass   = (document.getElementById('email-chg-pass')||{}).value;
-  var newEmail = (document.getElementById('email-chg-new')||{}).value.trim();
-  var errEl  = document.getElementById('email-chg-err');
-  var btn    = document.getElementById('email-chg-btn');
-  var showErr = function(m) { if(errEl){ errEl.textContent=m; errEl.style.display=''; } };
-  if (errEl) errEl.style.display = 'none';
-  if (!pass)     { showErr('Please enter your current password.'); return; }
-  if (!newEmail || !newEmail.includes('@')) { showErr('Please enter a valid new email.'); return; }
-  var auth = window._auth;
-  var user = auth && auth.currentUser;
-  if (!user) return;
-  if (btn) { btn.disabled=true; btn.textContent='Updating…'; }
+  var proofHtml = o.proofUrl ? ('<a href="'+o.proofUrl+'" target="_blank" class="sdf-proof-link">📷 View delivery proof</a>') : '';
+
+  return '<div class="sdf-card">' +
+    '<div class="sdf-card-top">' +
+      '<div><div class="sdf-order-id">Order #' + orderCode + '</div>' +
+      '<div class="sdf-order-meta">Placed ' + dateStr + ' · ' + ago + '</div>' +
+      '<div class="sdf-order-buyer">Buyer: ' + (o.buyerName||'Buyer') + (location!=='-' ? (' · ' + location) : '') + '</div></div>' +
+      '<span class="sdf-badge ' + badgeMeta.cls + '">' + badgeMeta.label + '</span>' +
+    '</div>' +
+    '<div class="sdf-product-row">' +
+      '<div class="sdf-product-thumb">' + thumb + '</div>' +
+      '<div style="flex:1;"><div class="sdf-product-name">' + (o.productName||'Product') + '</div>' +
+      '<div class="sdf-product-qty">Qty: ' + (o.qty||1) + ' · ' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div></div>' +
+    '</div>' +
+    actionsHtml + proofHtml +
+    '</div>';
+}
+
+window.sdConfirmPackOrder = async function(orderId) {
+  var db = window._db, fns = window._fns;
   try {
-    var EmailAuthProvider = window._EmailAuthProvider;
-    var cred = EmailAuthProvider.credential(user.email, pass);
-    await user.reauthenticateWithCredential(cred);
-    await user.verifyBeforeUpdateEmail(newEmail);
-    showToast('📧 Verification email sent to ' + newEmail + '. Click the link to confirm the change.');
-    var modal = document.getElementById('email-change-modal');
-    if (modal) modal.remove();
-  } catch(e) {
-    var msg = e.code==='auth/wrong-password'||e.code==='auth/invalid-credential' ? 'Current password is incorrect.'
-            : e.code==='auth/email-already-in-use' ? 'That email is already used by another account.'
-            : e.code==='auth/too-many-requests' ? 'Too many attempts. Wait a moment.'
-            : 'Could not update email. Try again.';
-    showErr(msg);
-  } finally {
-    if (btn) { btn.disabled=false; btn.textContent='Update email →'; }
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'packed', packedAt:fns.serverTimestamp() });
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    if (o) {
+      o.status = 'packed';
+      await fns.addDoc(fns.collection(db,'notifications'), {
+        userId:o.buyerId, type:'order_update', title:'Your order is being packed 📦',
+        body:'Your order for '+(o.productName||'your item')+' has been confirmed and is being packed for shipping.',
+        read:false, createdAt:fns.serverTimestamp(),
+      });
+    }
+    showToast('✅ Order confirmed & packed.');
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not update order.'); }
+};
+
+window.sdCancelOrder = async function(orderId, buyerId) {
+  var reason = prompt('Reason for cancelling this order (buyer will see this):');
+  if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'cancelled', cancelReason:reason, cancelledAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId:buyerId, type:'order_update', title:'Order cancelled',
+      body:'Your order' + (o ? (' for '+(o.productName||'your item')) : '') + ' was cancelled by the seller. Reason: ' + reason + '. A refund will be processed to your escrow balance.',
+      read:false, createdAt:fns.serverTimestamp(),
+    });
+    showToast('Order cancelled — buyer notified.');
+    window._sdFulfillOrders = window._sdFulfillOrders.filter(function(x){ return x._id!==orderId; });
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not cancel order.'); }
+};
+
+window.sdMarkShipped = async function(orderId, buyerId) {
+  var carrierEl = document.getElementById('sdf-carrier-'+orderId);
+  var trackEl = document.getElementById('sdf-tracking-'+orderId);
+  var carrier = carrierEl ? carrierEl.value : '';
+  var tracking = trackEl ? trackEl.value.trim() : '';
+  if (!tracking) { showToast('⚠️ Enter a tracking number first.'); return; }
+  var db = window._db, fns = window._fns;
+  var deliveryCode = Math.floor(1000 + Math.random()*9000).toString();
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',orderId), {
+      status:'shipped', trackingCarrier:carrier, trackingNumber:tracking,
+      deliveryCode:deliveryCode, shippedAt:fns.serverTimestamp(),
+    });
+    var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+    if (o) { o.status='shipped'; o.trackingCarrier=carrier; o.trackingNumber=tracking; o.deliveryCode=deliveryCode; }
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId:buyerId, type:'order_update', title:'Your order has shipped! 🚚',
+      body:(carrier?carrier+' — ':'')+'Tracking: '+tracking+'. Share your delivery code with the courier when it arrives: '+deliveryCode,
+      read:false, createdAt:fns.serverTimestamp(),
+    });
+    showToast('🚚 Marked as shipped — buyer notified with tracking.');
+    sdUpdateFulfillTabs(); sdRenderFulfillOrders();
+  } catch(e) { console.error(e); showToast('Could not mark as shipped.'); }
+};
+
+window.sdShowDeliveryCode = async function(orderId) {
+  var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+  var code = o && o.deliveryCode;
+  if (!code) {
+    var db = window._db, fns = window._fns;
+    try { var snap = await fns.getDoc(fns.doc(db,'orders',orderId)); code = snap.exists() ? snap.data().deliveryCode : null; } catch(e) {}
   }
+  if (code) showToast('🔑 Delivery code: ' + code + ' — buyer confirms this on delivery.');
+  else showToast('No delivery code generated yet.');
 };
 
-// (Change Email button is now hardcoded in Settings HTML above)
-
-// ── 4. MERGED PROFILE — redirect myprofile → profile-v2 ──────────
-// page-myprofile is the "public view" — wire Profile nav to profile-v2
-// and redirect anyone going to 'myprofile' to 'profile-v2'
-var _origShowPageForProfile = window.showPage;
-window.showPage = function(name) {
-  if (name === 'myprofile') name = 'profile-v2'; // merge into one profile
-  _origShowPageForProfile(name);
+window.sdUploadProof = function(orderId) {
+  var input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async function() {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 10*1024*1024) { showToast('Max 10MB.'); return; }
+    showToast('⏳ Uploading proof…');
+    try {
+      var url = await uploadToCloudinary(file, 'zula_delivery_proof');
+      var db = window._db, fns = window._fns;
+      await fns.updateDoc(fns.doc(db,'orders',orderId), { proofUrl:url });
+      var o = window._sdFulfillOrders.find(function(x){ return x._id===orderId; });
+      if (o) {
+        o.proofUrl = url;
+        await fns.addDoc(fns.collection(db,'notifications'), {
+          userId:o.buyerId, type:'order_update', title:'Delivery proof uploaded',
+          body:'The seller uploaded proof of delivery for '+(o.productName||'your order')+'.',
+          read:false, createdAt:fns.serverTimestamp(),
+        });
+      }
+      showToast('✅ Proof uploaded.');
+      sdRenderFulfillOrders();
+    } catch(e) { console.error(e); showToast('Could not upload proof.'); }
+  };
+  input.click();
 };
 
-// ── 5. GET SELLER VERIFIED — hide when already verified ───────────
-// Called whenever profile-v2 or seller dashboard loads
-window.updateVerifiedButtonVisibility = function() {
-  var u = window._currentUser || {};
-  var btn = document.getElementById('btn-get-verified');
-  if (btn) btn.style.display = u.sellerVerified ? 'none' : '';
-  // Also update dashboard verif prompt
-  var prompt = document.getElementById('sd-verif-prompt');
-  if (prompt) prompt.style.display = u.sellerVerified ? 'none' : '';
-};
-
-// ── 6. PRICE FILTER LABELS — update when currency changes ─────────
-var _origSetCurrency = window.setCurrency;
-window.setCurrency = function(code, symbol) {
-  _origSetCurrency(code, symbol);
-  // Update filter panel labels and preset buttons
-  var minLbl = document.getElementById('filter-price-min-label');
-  var maxLbl = document.getElementById('filter-price-max-label');
-  if (minLbl) minLbl.textContent = 'Min (' + symbol + ')';
-  if (maxLbl) maxLbl.textContent = 'Max (' + symbol + ')';
-  // Update preset button symbols
-  document.querySelectorAll('#fp-presets-row .fp-sym').forEach(function(s){ s.textContent = symbol; });
-};
-
-// Apply currency labels on page load
-(function() {
-  var saved = localStorage.getItem('zula_display_currency') || 'NGN';
-  var symMap = { NGN:'₦', USD:'$', GBP:'£', EUR:'€', CAD:'C$', GHS:'₵', KES:'KSh', ZAR:'R' };
-  var sym = symMap[saved] || '₦';
+window.sdMessageBuyerFromOrder = function(buyerId, buyerName) {
+  showPage('messaging');
   setTimeout(function() {
-    var minLbl = document.getElementById('filter-price-min-label');
-    var maxLbl = document.getElementById('filter-price-max-label');
-    if (minLbl) minLbl.textContent = 'Min (' + sym + ')';
-    if (maxLbl) maxLbl.textContent = 'Max (' + sym + ')';
-    document.querySelectorAll('#fp-presets-row .fp-sym').forEach(function(s){ s.textContent = sym; });
-  }, 500);
-})();
-
-// ── 7. LOCATION ACCURACY — use better geocoding with more detail ──
-// The issue with wrong city (Warri vs Lagos) is Nominatim returning
-// county/region instead of actual city. We now try multiple address fields.
-// Already improved in detectGPSLocation above — this adds a fallback API.
-window.detectGPSLocation = function() {
-  var btn      = document.getElementById('loc-detect-btn');
-  var deniedHelp = document.getElementById('loc-denied-help');
-  var display  = document.getElementById('loc-city-display');
-  var label    = document.getElementById('loc-map-label');
-  var badge    = document.getElementById('loc-verified-badge');
-  if (deniedHelp) deniedHelp.style.display = 'none';
-  if (!navigator.geolocation) { showToast('GPS not supported on this device.'); return; }
-  if (btn) { btn.textContent = '⏳ Detecting…'; btn.disabled = true; }
-  if (display) display.textContent = 'Detecting your location…';
-  if (label)   label.textContent   = '📍 Detecting…';
-  navigator.geolocation.getCurrentPosition(
-    async function(pos) {
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      try {
-        // Use Nominatim with zoom=16 for more accurate city-level result
-        var res = await fetch(
-          'https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=16&addressdetails=1',
-          { headers: { 'Accept-Language': 'en' } }
-        );
-        var data = await res.json();
-        var a = data.address || {};
-        // Priority order: city > town > suburb > county — avoids picking far-away admin region
-        var city = a.city || a.town || a.municipality || a.suburb || a.quarter || a.village || a.county || '';
-        var state = a.state || '';
-        var country = a.country || '';
-        // Build readable string: "Lagos, Lagos State, Nigeria"
-        var parts = [city, state, country].filter(function(p){ return p && p !== city || p === city; });
-        // Deduplicate if city === state
-        var uniqueParts = parts.filter(function(p,i){ return parts.indexOf(p) === i && p; });
-        var locText = uniqueParts.slice(0,3).join(', ');
-        if (!locText) locText = data.display_name ? data.display_name.split(',').slice(0,3).join(',').trim() : lat.toFixed(4)+', '+lng.toFixed(4);
-        await saveLocationToFirestore(locText, lat, lng);
-        if (display) display.textContent = locText;
-        if (label)   label.textContent   = '📍 ' + locText;
-        if (badge)   badge.style.display = '';
-        showToast('📍 Location detected: ' + locText);
-      } catch(e) {
-        var fallback = lat.toFixed(4) + ', ' + lng.toFixed(4);
-        await saveLocationToFirestore(fallback, lat, lng);
-        if (display) display.textContent = fallback;
-        if (label)   label.textContent   = '📍 ' + fallback;
-        showToast('📍 GPS saved (street name unavailable — check connection).');
-      }
-      if (btn) { btn.textContent = '🔄 Refresh location'; btn.disabled = false; }
-    },
-    function(err) {
-      if (btn) { btn.textContent = '🔄 Refresh location'; btn.disabled = false; }
-      if (err.code === 1) {
-        if (deniedHelp) deniedHelp.style.display = '';
-        if (display) display.textContent = 'Location access denied.';
-      } else {
-        if (display) display.textContent = 'Could not detect location.';
-        showToast('⚠️ Could not get your location. Try again.');
-      }
-    },
-    { timeout: 12000, enableHighAccuracy: true, maximumAge: 0 }
-  );
+    var cid = [window._auth.currentUser.uid, buyerId].sort().join('_');
+    openConversation(cid, buyerId, buyerName);
+    window._activeConvId = cid; window._activePeerId = buyerId; window._activePeerName = buyerName;
+  }, 300);
 };
 
-// ── 8. HOOK updateVerifiedButtonVisibility into profile/dashboard load ──
-var _origLoadProfileV2 = window.loadProfileV2;
-window.loadProfileV2 = async function() {
-  if (_origLoadProfileV2) await _origLoadProfileV2.apply(this, arguments);
-  window.updateVerifiedButtonVisibility();
-};
-var _origSdLoadOverview = window.sdLoadOverview;
-window.sdLoadOverview = async function() {
-  if (_origSdLoadOverview) await _origSdLoadOverview.apply(this, arguments);
-  window.updateVerifiedButtonVisibility();
-};
-
-console.log('✅ ZÚLA — all features loaded v2.');
+console.log('✅ ZÚLA — all features loaded.');
 
 </script>
 
