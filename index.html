@@ -1062,7 +1062,7 @@ p{color:var(--text2);margin:0 0 1em;}
       </div>
       <nav class="hdr-nav">
         <a onclick="showPage('seller-dashboard')" title="Seller dashboard"><span class="hide-mobile">Seller</span><span style="display:none;" class="show-mobile">📊</span></a>
-        <a onclick="showPage('profile')"><span class="hide-mobile">Profile</span><span style="display:none;" class="show-mobile">👤</span></a>
+        <a onclick="showPage('profile-v2')"><span class="hide-mobile">Profile</span><span style="display:none;" class="show-mobile">👤</span></a>
         <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬 <span id="nav-msg-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="notifOpen()" style="position:relative;" title="Notifications" class="hide-mobile">🔔 <span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="openWishlist()" style="position:relative;" title="Wishlist" class="hide-mobile">❤️</a>
@@ -1102,20 +1102,20 @@ p{color:var(--text2);margin:0 0 1em;}
         <h4>Price range</h4>
         <div style="display:flex;gap:8px;margin-bottom:10px;">
           <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Min (₦)</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-min-lbl">Min (₦)</div>
             <input type="number" id="filter-price-min" placeholder="0" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
           </div>
           <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Max (₦)</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-max-lbl">Max (₦)</div>
             <input type="number" id="filter-price-max" placeholder="Any" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
           </div>
         </div>
         <!-- Quick price presets -->
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="fp-preset" onclick="setFilterPreset(0,5000)">Under ₦5k</button>
-          <button class="fp-preset" onclick="setFilterPreset(5000,20000)">₦5k–20k</button>
-          <button class="fp-preset" onclick="setFilterPreset(20000,100000)">₦20k–100k</button>
-          <button class="fp-preset" onclick="setFilterPreset(100000,0)">₦100k+</button>
+          <button class="fp-preset" id="fp-preset-1" onclick="setFilterPreset(0,5000)">Under ₦5k</button>
+          <button class="fp-preset" id="fp-preset-2" onclick="setFilterPreset(5000,20000)">₦5k–20k</button>
+          <button class="fp-preset" id="fp-preset-3" onclick="setFilterPreset(20000,100000)">₦20k–100k</button>
+          <button class="fp-preset" id="fp-preset-4" onclick="setFilterPreset(100000,0)">₦100k+</button>
         </div>
       </div>
 
@@ -1200,7 +1200,7 @@ p{color:var(--text2);margin:0 0 1em;}
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">← Back to marketplace</a>
-        <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -2024,7 +2024,7 @@ p{color:var(--text2);margin:0 0 1em;}
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('profile')">← Back to profile</a>
+        <a onclick="showPage('profile-v2')">← Back to profile</a>
       </nav>
     </div>
   </header>
@@ -2529,7 +2529,7 @@ if (_kycOrigShowPage) {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('referral')">🎁 Referral</a>
-        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -2586,7 +2586,7 @@ if (_kycOrigShowPage) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3023,6 +3023,7 @@ if (_kycOrigShowPage) {
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;">
+          <button class="btn btn-ghost btn-sm" id="pv2-verify-btn" style="display:none;" onclick="showPage('verification')">🛡 Get seller verified</button>
           <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
           <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
         </div>
@@ -3060,7 +3061,7 @@ if (_kycOrigShowPage) {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('profile-v2')">My Account</a>
-        <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3143,7 +3144,7 @@ if (_kycOrigShowPage) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <div class="avatar-btn" id="nav-avatar-chat" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-chat" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3220,8 +3221,8 @@ if (_kycOrigShowPage) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('profile')">Profile</a>
-        <div class="avatar-btn" id="nav-avatar-notif" onclick="showPage('profile')">?</div>
+        <a onclick="showPage('profile-v2')">Profile</a>
+        <div class="avatar-btn" id="nav-avatar-notif" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3253,8 +3254,8 @@ if (_kycOrigShowPage) {
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('profile')">← Profile</a>
-        <div class="avatar-btn" id="nav-avatar-settings" onclick="showPage('profile')">?</div>
+        <a onclick="showPage('profile-v2')">← Profile</a>
+        <div class="avatar-btn" id="nav-avatar-settings" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3306,10 +3307,26 @@ if (_kycOrigShowPage) {
           <div class="settings-card">
             <h3>Email address</h3>
             <div class="sc-sub">Your login email</div>
-            <div style="display:flex;align-items:center;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
               <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:11px 14px;font-size:14px;color:var(--text2);" id="st-email-display">loading…</div>
               <span class="tag tag-green">✅ Verified</span>
             </div>
+            <div id="st-change-email-form" style="display:none;">
+              <div class="form-field">
+                <label>New email address</label>
+                <input type="email" id="st-new-email" placeholder="new@example.com">
+              </div>
+              <div class="form-field">
+                <label>Current password (to confirm it's you)</label>
+                <input type="password" id="st-email-pass" placeholder="Your current password">
+              </div>
+              <div id="st-email-err" style="display:none;font-size:12.5px;color:var(--red);margin-bottom:10px;padding:8px 12px;background:rgba(240,82,82,.08);border-radius:var(--radius-xs);"></div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" id="st-email-save-btn" onclick="stChangeEmail()">Send verification link</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('st-change-email-form').style.display='none';document.getElementById('st-change-email-btn').style.display=''">Cancel</button>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="st-change-email-btn" onclick="document.getElementById('st-change-email-form').style.display='';this.style.display='none'">✉️ Change email</button>
           </div>
           <div class="settings-card">
             <h3>Quick links</h3>
@@ -3639,9 +3656,21 @@ if (_kycOrigShowPage) {
         <span class="location-badge" id="loc-verified-badge" style="display:none;">📍 GPS verified</span>
       </div>
       <button class="btn btn-primary btn-sm" id="loc-detect-btn" onclick="detectGPSLocation()">🔄 Refresh location</button>
+      <div id="loc-accuracy-note" style="display:none;margin-top:10px;font-size:12px;color:var(--text3);"></div>
       <div id="loc-denied-help" style="display:none;margin-top:14px;padding:12px 14px;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:var(--radius-xs);font-size:12.5px;color:var(--gold);">
         ⚠️ Location access was denied. Please enable location permissions for this site in your browser settings, then tap "Refresh location" again.
       </div>
+    </div>
+
+    <!-- MANUAL OVERRIDE — GPS/IP-based detection isn't always accurate -->
+    <div class="settings-card" style="margin-bottom:16px;">
+      <h3>Not showing the right city?</h3>
+      <div class="sc-sub">GPS and network-based detection can be off, especially on desktop or VPN connections. Set it manually to be sure.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <input type="text" id="loc-city-input" placeholder="City e.g. Lagos" style="flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+        <input type="text" id="loc-country" placeholder="Country e.g. Nigeria" style="flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="saveManualLocation()">💾 Save this location</button>
     </div>
   </div>
 </div>
@@ -3679,8 +3708,8 @@ window.showPage = function(name) {
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
-        <a onclick="showPage('profile')">← Profile</a>
-        <div class="avatar-btn" id="nav-avatar-verif" onclick="showPage('profile')">?</div>
+        <a onclick="showPage('profile-v2')">← Profile</a>
+        <div class="avatar-btn" id="nav-avatar-verif" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -3779,7 +3808,7 @@ window.showPage = function(name) {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
          sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
-         reauthenticateWithCredential, EmailAuthProvider,
+         reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, updatePassword,
          updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
          getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
@@ -3819,6 +3848,8 @@ function updateLandingNav(user) {
 window._db   = db;
 window._EmailAuthProvider = EmailAuthProvider;
 window._reauthenticateWithCredential = reauthenticateWithCredential;
+window._verifyBeforeUpdateEmail = verifyBeforeUpdateEmail;
+window._updatePassword = updatePassword;
 window._fns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, signOut, sendPasswordResetEmail, updateProfile,
   doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp,
@@ -4125,8 +4156,12 @@ window.applyFilters = function() {
   if (!window._allProducts) return;
 
   const q = (window._searchQuery || '').toLowerCase().trim();
-  const priceMin = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
-  const priceMax = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
+  const _rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  const priceMinRaw = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
+  const priceMaxRaw = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
+  // Filter inputs are typed in the user's chosen display currency — convert back to NGN (product.price is always stored in NGN)
+  const priceMin = priceMinRaw > 0 ? priceMinRaw / _rate : 0;
+  const priceMax = priceMaxRaw !== Infinity ? priceMaxRaw / _rate : Infinity;
   const minRating = parseFloat(document.querySelector('input[name="filter-rating"]:checked')?.value || '0');
   const verifiedOnly = document.getElementById('filter-verified-only')?.checked;
   const hasAffiliate = document.getElementById('filter-has-affiliate')?.checked;
@@ -4191,12 +4226,28 @@ window.applyFilters = function() {
 window.setFilterPreset = function(min, max) {
   const minEl = document.getElementById('filter-price-min');
   const maxEl = document.getElementById('filter-price-max');
-  if (minEl) minEl.value = min > 0 ? min : '';
-  if (maxEl) maxEl.value = max > 0 ? max : '';
+  const rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  const minDisp = min > 0 ? Math.round(min * rate) : 0;
+  const maxDisp = max > 0 ? Math.round(max * rate) : 0;
+  if (minEl) minEl.value = minDisp > 0 ? minDisp : '';
+  if (maxEl) maxEl.value = maxDisp > 0 ? maxDisp : '';
   // Highlight active preset
   document.querySelectorAll('.fp-preset').forEach(function(b) { b.classList.remove('active'); });
   event && event.target && event.target.classList.add('active');
   applyFilters();
+};
+
+// Keep the price filter labels/presets in sync with the chosen display currency
+window.updateFilterCurrencyLabels = function() {
+  const sym = window._displaySymbol || '₦';
+  const rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  const fmt = function(ngn) { const v = Math.round(ngn * rate); return v >= 1000 ? Math.round(v/1000) + 'k' : v; };
+  const minLbl = document.getElementById('filter-min-lbl'); if (minLbl) minLbl.textContent = 'Min (' + sym + ')';
+  const maxLbl = document.getElementById('filter-max-lbl'); if (maxLbl) maxLbl.textContent = 'Max (' + sym + ')';
+  const p1 = document.getElementById('fp-preset-1'); if (p1) p1.textContent = 'Under ' + sym + fmt(5000);
+  const p2 = document.getElementById('fp-preset-2'); if (p2) p2.textContent = sym + fmt(5000) + '–' + sym + fmt(20000);
+  const p3 = document.getElementById('fp-preset-3'); if (p3) p3.textContent = sym + fmt(20000) + '–' + sym + fmt(100000);
+  const p4 = document.getElementById('fp-preset-4'); if (p4) p4.textContent = sym + fmt(100000) + '+';
 };
 
 window.clearAllFilters = function() {
@@ -4472,13 +4523,12 @@ window.secChangePassword = async function() {
 
   try {
     // Re-authenticate first
-    // Use EmailAuthProvider from firebase/auth (imported in ES module block)
     var EmailAuthProvider = window._EmailAuthProvider;
     if (!EmailAuthProvider) { showErr('Auth provider not loaded. Please refresh and try again.'); return; }
     var credential = EmailAuthProvider.credential(user.email, currPass);
-    await user.reauthenticateWithCredential(credential);
+    await window._reauthenticateWithCredential(user, credential);
     // Now update
-    await user.updatePassword(newPass);
+    await window._updatePassword(user, newPass);
     hideErr();
     ['sec-curr-pass','sec-new-pass','sec-confirm-pass'].forEach(function(id) {
       var el = document.getElementById(id); if (el) el.value = '';
@@ -4494,6 +4544,42 @@ window.secChangePassword = async function() {
     showErr(msg);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Update password'; }
+  }
+};
+
+// ── CHANGE EMAIL — reauthenticate, then send a verify-then-update link ──
+window.stChangeEmail = async function() {
+  var newEmail = (document.getElementById('st-new-email') || {}).value.trim();
+  var pass     = (document.getElementById('st-email-pass') || {}).value;
+  var errEl    = document.getElementById('st-email-err');
+  var btn      = document.getElementById('st-email-save-btn');
+  var showErr  = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = ''; } };
+  if (errEl) errEl.style.display = 'none';
+
+  var user = auth.currentUser;
+  if (!user) { showErr('You must be signed in.'); return; }
+  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showErr('Enter a valid email address.'); return; }
+  if (newEmail.toLowerCase() === (user.email||'').toLowerCase()) { showErr('That is already your current email.'); return; }
+  if (!pass) { showErr('Enter your current password to confirm.'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  try {
+    var credential = window._EmailAuthProvider.credential(user.email, pass);
+    await window._reauthenticateWithCredential(user, credential);
+    await window._verifyBeforeUpdateEmail(user, newEmail);
+    showToast('📧 Verification link sent to ' + newEmail + ' — click it to finish changing your email.');
+    document.getElementById('st-change-email-form').style.display = 'none';
+    document.getElementById('st-change-email-btn').style.display = '';
+    document.getElementById('st-new-email').value = '';
+    document.getElementById('st-email-pass').value = '';
+  } catch(e) {
+    var msg = 'Could not change email.';
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Current password is incorrect.';
+    else if (e.code === 'auth/email-already-in-use') msg = 'That email is already in use by another account.';
+    else if (e.code === 'auth/requires-recent-login') msg = 'Session expired. Please sign out and sign in again, then retry.';
+    showErr(msg);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Send verification link'; }
   }
 };
 
@@ -4739,7 +4825,7 @@ window.submitVerification = async function() {
       window._currentUser.sellerVerified = false;
     }
     showToast('📋 Documents submitted! We will review and approve within 24–48 hours.');
-    showPage('profile');
+    showPage('profile-v2');
   } catch (e) {
     console.error('Verif upload error:', e);
     showToast('❌ Upload failed: ' + (e.message || e));
@@ -5393,6 +5479,7 @@ window.loadProfileV2 = async function() {
   if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
 
   if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
+  if (el('pv2-verify-btn')) el('pv2-verify-btn').style.display = profile.sellerVerified ? 'none' : '';
 
   // Counts
   try {
@@ -6656,7 +6743,45 @@ window.sdDeleteProduct = async function(id, btn) {
   } catch(e) { console.error(e); showToast('❌ Could not delete product.'); }
 };
 
-// sdLoadVerification defined above
+window.sdLoadVerification = function() {
+  var wrap = document.getElementById('sd-verif-content');
+  if (!wrap) return;
+  var u = window._currentUser || {};
+  var user = window._auth && window._auth.currentUser;
+  var email = user ? user.email : '';
+
+  if (u.sellerVerified) {
+    wrap.innerHTML =
+      '<div style="background:rgba(39,201,122,.08);border:1px solid rgba(39,201,122,.25);border-radius:var(--radius-sm);padding:28px 24px;text-align:center;">' +
+      '<div style="font-size:44px;margin-bottom:10px;">🏅</div>' +
+      '<div style="font-size:17px;font-weight:800;color:var(--green);margin-bottom:6px;">You are a Verified Seller</div>' +
+      '<div style="font-size:13px;color:var(--text2);">Your identity is confirmed. You can list products and receive payouts.</div>' +
+      '</div>';
+  } else if (u.verifSubmitted) {
+    wrap.innerHTML =
+      '<div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:var(--radius-sm);padding:28px 24px;text-align:center;">' +
+      '<div style="font-size:44px;margin-bottom:10px;">⏳</div>' +
+      '<div style="font-size:16px;font-weight:800;color:var(--gold);margin-bottom:6px;">Documents submitted — under review</div>' +
+      '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">We\'ll review your application within 24–48 hours.</div>' +
+      '<button class="btn btn-ghost btn-sm" onclick="showPage(\'verification\')">Resubmit documents →</button>' +
+      '</div>';
+  } else if (u.verifRejected) {
+    wrap.innerHTML =
+      '<div style="background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.25);border-radius:var(--radius-sm);padding:24px;">' +
+      '<div style="font-size:15px;font-weight:800;color:var(--red);margin-bottom:6px;">❌ Verification rejected</div>' +
+      '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Reason: ' + (u.verifRejectedReason || 'See email for details.') + '</div>' +
+      '<button class="btn btn-primary btn-sm" onclick="showPage(\'verification\')">Correct &amp; resubmit →</button>' +
+      '</div>';
+  } else {
+    wrap.innerHTML =
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:28px 24px;text-align:center;">' +
+      '<div style="font-size:44px;margin-bottom:10px;">🛡</div>' +
+      '<div style="font-size:16px;font-weight:800;margin-bottom:6px;">Get verified to start selling</div>' +
+      '<div style="font-size:13px;color:var(--text2);margin-bottom:18px;">ID, selfie, proof of address, and proof of ownership — takes about 5 minutes.</div>' +
+      '<button class="btn btn-primary" onclick="showPage(\'verification\')">Start verification →</button>' +
+      '</div>';
+  }
+};
 
 window.sdLoadPayout = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
@@ -6841,7 +6966,7 @@ window.saveManualLocation = function() {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('messaging')">💬</a>
-        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9570,7 +9695,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('cart')">← Keep shopping</a>
-        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9703,7 +9828,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">← Marketplace</a>
-        <div class="avatar-btn" id="nav-avatar-myorders" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-myorders" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9768,7 +9893,7 @@ window.sdTab = function(name) {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">← Marketplace</a>
         <a onclick="openCart()" style="position:relative;">🛒 <span id="cart-badge-wish" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-        <div class="avatar-btn" id="nav-avatar-wish" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-wish" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9806,7 +9931,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">← Keep shopping</a>
-        <div class="avatar-btn" id="nav-avatar-cart" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" id="nav-avatar-cart" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9871,7 +9996,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">← Marketplace</a>
-        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -9896,7 +10021,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('my-orders')">← My Orders</a>
-        <div class="avatar-btn" onclick="showPage('profile')">?</div>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
@@ -11596,6 +11721,7 @@ window._CURRENCY_SYMBOLS = { NGN:'₦', USD:'$', GBP:'£', EUR:'€', CAD:'C$', 
 
 window._displayCurrency = localStorage.getItem('zula_display_currency') || 'NGN';
 window._displaySymbol   = window._CURRENCY_SYMBOLS[window._displayCurrency] || '₦';
+document.addEventListener('DOMContentLoaded', function() { if (typeof updateFilterCurrencyLabels === 'function') updateFilterCurrencyLabels(); });
 
 // Convert an NGN amount to the user's chosen display currency
 window.convertPrice = function(ngnAmount) {
@@ -11630,6 +11756,7 @@ window.setCurrency = function(code, symbol) {
   }
   if (typeof cartRender === 'function') cartRender();
   if (typeof wishlistRender === 'function') wishlistRender();
+  if (typeof updateFilterCurrencyLabels === 'function') updateFilterCurrencyLabels();
 };
 
 // Sync currency button highlight on settings page load
