@@ -145,22 +145,24 @@ p{color:var(--text2);margin:0 0 1em;}
 .filter-group h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);}
 .fcheck{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:7px;cursor:pointer;}
 .fcheck input{accent-color:var(--accent);}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
-.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:border-color .15s;}
-.pcard:hover{border-color:var(--border2);}
-.pcard-img{width:100%;height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;}
-.pcard-body{padding:13px 14px;}
-.pcard-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.pcard-seller{font-size:11.5px;color:var(--text3);margin-bottom:8px;}
-.pcard-foot{display:flex;align-items:center;justify-content:space-between;}
-.pcard-price{font-size:14px;font-weight:700;color:var(--accent);}
-.pcard-type{font-size:10.5px;color:var(--text3);}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 1px 2px rgba(0,0,0,.16);}
+.pcard:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.28);}
+.pcard-img{width:100%;height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden;}
+.pcard-img img{transition:transform .3s ease;}
+.pcard:hover .pcard-img img{transform:scale(1.05);}
+.pcard-body{padding:14px 15px 15px;}
+.pcard-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.35;}
+.pcard-seller{font-size:11.5px;color:var(--text3);margin-bottom:9px;}
+.pcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:9px;margin-top:2px;border-top:1px solid var(--border);}
+.pcard-price{font-size:14.5px;font-weight:800;color:var(--accent);}
+.pcard-type{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--bg3);padding:2px 7px;border-radius:999px;}
 .empty-state{text-align:center;padding:80px 20px;color:var(--text3);}
 .empty-state .es-icon{font-size:52px;margin-bottom:16px;}
 .empty-state h3{font-size:18px;font-weight:700;color:var(--text2);margin-bottom:8px;}
 .empty-state p{font-size:14px;max-width:340px;margin:0 auto 20px;}
-.mkt-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.mkt-topbar h2{font-size:18px;font-weight:700;}
+.mkt-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.mkt-topbar h2{font-size:19px;font-weight:800;letter-spacing:-.01em;}
 .result-count{font-size:13px;color:var(--text3);}
 
 /* PROFILE / DASHBOARD */
@@ -6793,10 +6795,13 @@ window.sdLoadPayout = async function() {
     var rows = '';
     snap.docs.forEach(function(d) {
       var p = d.data();
-      if (p.status === 'approved') total += Number(p.amount||0);
-      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
-      var color = {pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)'}[p.status]||'var(--text3)';
-      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + '</div></div><span style="color:' + color + ';font-weight:700;">' + (p.status||'-') + '</span></div>';
+      if (p.status === 'approved' || p.status === 'paid') total += Number(p.amount||0);
+      var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
+      var labelMap = { pending:'⏳ Pending', approved:'✅ Successful', paid:'✅ Successful', rejected:'❌ Rejected' };
+      var colorMap = { pending:'var(--gold)', approved:'var(--green)', paid:'var(--green)', rejected:'var(--red)' };
+      var label = labelMap[p.status] || p.status || '-';
+      var color = colorMap[p.status] || 'var(--text3)';
+      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + (p.bankName ? (' · ' + p.bankName + ' ····' + (p.accountNumber||'').slice(-4)) : '') + '</div></div><span style="color:' + color + ';font-weight:700;">' + label + '</span></div>';
     });
     var hist = document.getElementById('sd-payout-history');
     if (hist) hist.innerHTML = rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout history yet.</div>';
@@ -6922,15 +6927,25 @@ window.confirmGPSLocation = function() {
   showToast('📍 Location saved: ' + loc);
 };
 
-window.saveManualLocation = function() {
+window.saveManualLocation = async function() {
   const city    = document.getElementById('loc-city-input');
   const country = document.getElementById('loc-country');
-  const locText = (city ? city.value : '') + ', ' + (country ? country.value : '');
-  const locDisplay = document.getElementById('loc-city-display');
-  const locLabel   = document.getElementById('loc-map-label');
-  if (locDisplay) locDisplay.textContent = locText;
-  if (locLabel)   locLabel.textContent   = '📍 ' + locText;
-  showToast('📍 Location saved: ' + locText);
+  const cityVal = city ? city.value.trim() : '';
+  const countryVal = country ? country.value.trim() : '';
+  if (!cityVal || !countryVal) { showToast('⚠️ Enter both city and country.'); return; }
+  const locText = cityVal + ', ' + countryVal;
+  try {
+    await saveLocationToFirestore(locText, null, null);
+    const locDisplay = document.getElementById('loc-city-display');
+    const locLabel   = document.getElementById('loc-map-label');
+    const badge      = document.getElementById('loc-verified-badge');
+    const accNote    = document.getElementById('loc-accuracy-note');
+    if (locDisplay) locDisplay.textContent = locText;
+    if (locLabel)   locLabel.textContent   = '📍 ' + locText;
+    if (badge)      badge.style.display    = '';
+    if (accNote)    accNote.style.display  = 'none';
+    showToast('📍 Location saved: ' + locText);
+  } catch(e) { showToast('❌ Could not save location.'); }
 };
 
 </script>
@@ -9852,6 +9867,99 @@ window.sdTab = function(name) {
   </div>
 </div>
 
+<!-- ================================================================
+     PAGE: ORDER DETAIL — escrow tracking + release payment
+     ================================================================ -->
+<style>
+.od-wrap{max-width:640px;margin:0 auto;padding:28px 20px 70px;}
+.od-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:16px;}
+.od-track-step{display:flex;gap:14px;position:relative;padding-bottom:22px;}
+.od-track-step:last-child{padding-bottom:0;}
+.od-track-step::before{content:'';position:absolute;left:9px;top:22px;bottom:0;width:2px;background:var(--border);}
+.od-track-step:last-child::before{display:none;}
+.od-track-step.done::before{background:var(--accent);}
+.od-track-dot{width:20px;height:20px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);flex-shrink:0;z-index:1;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;}
+.od-track-step.done .od-track-dot{background:var(--accent);border-color:var(--accent);color:#fff;}
+.od-track-step.active .od-track-dot{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.18);}
+.od-track-title{font-size:13.5px;font-weight:700;color:var(--text3);}
+.od-track-step.done .od-track-title,.od-track-step.active .od-track-title{color:var(--text);}
+.od-track-time{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.od-escrow-card{background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.25);border-radius:var(--radius);padding:26px 22px;text-align:center;margin-bottom:16px;}
+.od-escrow-icon{font-size:34px;margin-bottom:8px;}
+.od-escrow-amt{font-size:19px;font-weight:800;margin-bottom:6px;}
+.od-escrow-sub{font-size:12.5px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
+.od-confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:460px){.od-confirm-grid{grid-template-columns:1fr;}}
+.od-confirm-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 14px;text-align:left;}
+.od-confirm-icon{width:34px;height:34px;border-radius:50%;background:rgba(39,201,122,.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
+.od-confirm-opt:nth-child(2) .od-confirm-icon{background:rgba(245,200,66,.15);color:var(--gold);}
+.od-confirm-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.od-confirm-desc{font-size:11.5px;color:var(--text3);margin-bottom:12px;line-height:1.5;}
+.od-code-input-row{display:none;gap:8px;margin-top:10px;}
+.od-code-input-row input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 10px;color:var(--text);font-family:var(--font-display);font-size:15px;text-align:center;letter-spacing:.15em;}
+.od-note{font-size:11.5px;color:var(--text3);text-align:center;}
+.od-item-row{display:flex;align-items:center;gap:12px;}
+.od-item-thumb{width:46px;height:46px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;}
+.od-item-thumb img{width:100%;height:100%;object-fit:cover;}
+</style>
+<div class="page" id="page-order-detail">
+  <header class="hdr">
+    <div class="wrap hdr-inner">
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <nav class="hdr-nav">
+        <a onclick="showPage('my-orders')">← My Orders</a>
+        <div class="avatar-btn" onclick="showPage('profile-v2')">?</div>
+      </nav>
+    </div>
+  </header>
+  <div class="od-wrap">
+    <h1 style="font-size:20px;font-weight:800;margin-bottom:2px;" id="od-title">Order #—</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:20px;">Track your delivery and release payment when ready.</p>
+
+    <!-- DELIVERY TRACKING -->
+    <div class="od-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;">📦 Delivery tracking</div>
+      <div id="od-track-steps"></div>
+    </div>
+
+    <!-- ESCROW CARD -->
+    <div class="od-escrow-card" id="od-escrow-card">
+      <div class="od-escrow-icon">🔒</div>
+      <div class="od-escrow-amt" id="od-escrow-amt">NGN 0 held in escrow</div>
+      <div class="od-escrow-sub">Your money is safe. The seller will NOT receive payment until you confirm delivery. Two ways to confirm:</div>
+      <div class="od-confirm-grid">
+        <div class="od-confirm-opt">
+          <div class="od-confirm-icon">✅</div>
+          <div class="od-confirm-name">I received my item</div>
+          <div class="od-confirm-desc">Tap when your package arrives at your door.</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;" onclick="odConfirmReceipt()">Confirm receipt</button>
+        </div>
+        <div class="od-confirm-opt">
+          <div class="od-confirm-icon">🔑</div>
+          <div class="od-confirm-name">Enter delivery code</div>
+          <div class="od-confirm-desc">Seller gives you a code on delivery — enter it here to confirm.</div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="odToggleCodeInput()">Enter code</button>
+          <div class="od-code-input-row" id="od-code-row">
+            <input type="text" id="od-code-input" maxlength="6" placeholder="······" inputmode="numeric">
+            <button class="btn btn-sm btn-primary" onclick="odSubmitCode()">✓</button>
+          </div>
+        </div>
+      </div>
+      <div class="od-note">If your item doesn't arrive within 7 days, you can open a dispute and get a full refund.</div>
+    </div>
+
+    <!-- ITEMS -->
+    <div class="od-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Items in this order</div>
+      <div class="od-item-row" id="od-item-row"></div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-ghost btn-sm" onclick="odContactSeller()">Contact seller</button>
+        <button class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="odOpenDispute()">Open dispute</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
 /* ── ORDER TRACKING CARD ── */
 .order-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:16px;}
@@ -10326,14 +10434,14 @@ function myOrdersRender(orders) {
     }
     var actions = '';
     if ((o.status==='paid'||o.status==='completed') && o.productType==='course') {
-      actions += '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="watchCourse(\'' + o.productId + '\')">▶ Watch course</button>';
+      actions += '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="event.stopPropagation();watchCourse(\'' + o.productId + '\')">▶ Watch course</button>';
     }
     if (o.status==='paid' || o.status==='shipped' || o.status==='in-transit') {
-      actions += '<button class="btn btn-sm btn-ghost" onclick="myOrderConfirmReceipt(\'' + o._id + '\')">✓ Confirm received</button>';
+      actions += '<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openOrderDetail(\'' + o._id + '\')">✓ Confirm received</button>';
     }
-    actions += '<button class="btn btn-sm btn-ghost" style="color:var(--red);" onclick="showPage(\'dispute\');document.getElementById(\'dispute-order-id\').value=\'' + o._id + '\';document.getElementById(\'dispute-product-name\').value=\'' + (o.productName||'').replace(/\'/g, "\'") + '\'">⚠️ Dispute</button>';
+    actions += '<button class="btn btn-sm btn-ghost" style="color:var(--red);" onclick="event.stopPropagation();showPage(\'dispute\');document.getElementById(\'dispute-order-id\').value=\'' + o._id + '\';document.getElementById(\'dispute-product-name\').value=\'' + (o.productName||'').replace(/\'/g, "\'") + '\'">⚠️ Dispute</button>';
     var thumb = o.productPhoto ? '<img src="'+o.productPhoto+'">' : '<span>'+(o.productEmoji||'📦')+'</span>';
-    return '<div class="order-card">' +
+    return '<div class="order-card" style="cursor:pointer;" onclick="openOrderDetail(\'' + o._id + '\')">' +
       '<div class="order-card-head">' +
         '<div class="order-card-product">' +
           '<div class="order-card-thumb">' + thumb + '</div>' +
@@ -10366,10 +10474,142 @@ window.myOrderConfirmReceipt = async function(orderId) {
   var db = window._db, fns = window._fns;
   if (!confirm('Confirm you have received this order? This will release funds to the seller.')) return;
   try {
-    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'completed' });
+    await fns.updateDoc(fns.doc(db,'orders',orderId), { status:'completed', deliveredAt: fns.serverTimestamp() });
     showToast('✅ Receipt confirmed! Funds released to seller.');
     myOrdersLoad();
   } catch(e) { showToast('Could not confirm receipt.'); }
+};
+
+// ── ORDER DETAIL / ESCROW PAGE ───────────────────────────────────
+window._odCurrentOrder = null;
+
+window.openOrderDetail = async function(orderId) {
+  var db = window._db, fns = window._fns;
+  showPage('order-detail');
+  var e = function(id){ return document.getElementById(id); };
+  try {
+    var o = (window._myAllOrders || []).find(function(x){ return x._id === orderId; });
+    if (!o) {
+      var snap = await fns.getDoc(fns.doc(db,'orders',orderId));
+      if (!snap.exists()) { showToast('Order not found.'); showPage('my-orders'); return; }
+      o = Object.assign({ _id: orderId }, snap.data());
+    }
+    window._odCurrentOrder = o;
+
+    var date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : null;
+    var orderCode = 'ZL-' + (date ? date.getFullYear() : '2026') + '-' + orderId.slice(0,5).toUpperCase();
+    if (e('od-title')) e('od-title').textContent = 'Order #' + orderCode;
+
+    // Escrow amount
+    if (e('od-escrow-amt')) e('od-escrow-amt').textContent = (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + ' held in escrow';
+    var escrowCard = e('od-escrow-card');
+    if (escrowCard) escrowCard.style.display = (o.status === 'completed' || o.status === 'refunded') ? 'none' : '';
+
+    // Item row
+    var thumb = o.productPhoto ? ('<img src="'+o.productPhoto+'">') : ('<span>'+(o.productEmoji||'📦')+'</span>');
+    if (e('od-item-row')) e('od-item-row').innerHTML =
+      '<div class="od-item-thumb">' + thumb + '</div>' +
+      '<div style="flex:1;"><div style="font-size:13.5px;font-weight:700;">' + (o.productName||'Product') + '</div>' +
+      '<div style="font-size:12px;color:var(--text3);">' + (o.sellerName||'Seller') + ' · Qty ' + (o.qty||1) + '</div></div>' +
+      '<div style="font-size:13.5px;font-weight:800;color:var(--accent);">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div>';
+
+    // Tracking timeline — built from real order fields set by the seller's fulfillment flow
+    var fmtDate = function(ts) { return ts && ts.toDate ? ts.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' · ' + ts.toDate().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : 'Pending'; };
+    var isDigital = ['course','ebook','template','software','audio','coaching'].indexOf(o.productType) !== -1;
+    var packed = o.status==='packed' || o.status==='shipped' || o.status==='in-transit' || o.status==='completed';
+    var shippedDone = o.status==='shipped' || o.status==='in-transit' || o.status==='completed';
+    var delivered = o.status === 'completed';
+
+    var steps = [
+      { title: 'Order placed & payment held in escrow', done: true, time: fmtDate(o.createdAt) },
+      { title: isDigital ? 'Seller confirmed your order' : 'Seller confirmed & packed your order', done: packed, time: packed ? fmtDate(o.packedAt) : 'Pending' },
+    ];
+    if (!isDigital) {
+      var shipLabel = 'Out for delivery';
+      if (shippedDone && o.trackingCarrier) shipLabel += ' — ' + o.trackingCarrier + (o.trackingNumber ? (' · ' + o.trackingNumber) : '');
+      steps.push({ title: shipLabel, done: shippedDone, time: shippedDone ? fmtDate(o.shippedAt) : 'Pending' });
+      steps.push({ title: 'Delivered — awaiting your confirmation', done: delivered, time: delivered ? fmtDate(o.deliveredAt) : 'Pending' });
+    } else {
+      steps.push({ title: 'Available in My Orders — download / access anytime', done: packed, time: packed ? 'Ready' : 'Pending' });
+    }
+    steps.push({ title: 'Payment released to seller', done: delivered, time: delivered ? fmtDate(o.deliveredAt) : 'Pending' });
+
+    var active = steps.findIndex(function(s){ return !s.done; });
+    if (e('od-track-steps')) {
+      e('od-track-steps').innerHTML = steps.map(function(s, i) {
+        var cls = s.done ? 'done' : (i === active ? 'active' : '');
+        return '<div class="od-track-step ' + cls + '">' +
+          '<div class="od-track-dot">' + (s.done ? '✓' : '') + '</div>' +
+          '<div><div class="od-track-title">' + s.title + '</div><div class="od-track-time">' + s.time + '</div></div>' +
+          '</div>';
+      }).join('');
+    }
+
+    // Escrow confirm section disabled once already completed
+    if (delivered && escrowCard) escrowCard.innerHTML =
+      '<div class="od-escrow-icon">✅</div><div class="od-escrow-amt" style="color:var(--green);">Payment released to seller</div>' +
+      '<div class="od-escrow-sub">You confirmed receipt of this order. Thanks for shopping on ZÚLA!</div>';
+
+  } catch(e2) { console.error(e2); showToast('Could not load order.'); }
+};
+
+window.odConfirmReceipt = async function() {
+  var o = window._odCurrentOrder;
+  if (!o) return;
+  if (!confirm('Confirm you have received this order? This releases payment to the seller.')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',o._id), { status:'completed', deliveredAt: fns.serverTimestamp() });
+    showToast('✅ Receipt confirmed! Funds released to seller.');
+    openOrderDetail(o._id);
+  } catch(e) { showToast('Could not confirm receipt.'); }
+};
+
+window.odToggleCodeInput = function() {
+  var row = document.getElementById('od-code-row');
+  if (!row) return;
+  row.style.display = row.style.display === 'flex' ? 'none' : 'flex';
+  if (row.style.display === 'flex') document.getElementById('od-code-input').focus();
+};
+
+window.odSubmitCode = async function() {
+  var o = window._odCurrentOrder;
+  if (!o) return;
+  var input = document.getElementById('od-code-input');
+  var code = input ? input.value.trim() : '';
+  if (!code) { showToast('Enter the code the seller gave you.'); return; }
+  if (!o.deliveryCode) { showToast('No delivery code has been set for this order yet.'); return; }
+  if (code !== o.deliveryCode) { showToast('❌ That code doesn\'t match. Ask your seller for the correct delivery code.'); return; }
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'orders',o._id), { status:'completed', deliveredAt: fns.serverTimestamp() });
+    showToast('✅ Code confirmed! Funds released to seller.');
+    openOrderDetail(o._id);
+  } catch(e) { showToast('Could not confirm delivery.'); }
+};
+
+window.odContactSeller = function() {
+  var o = window._odCurrentOrder;
+  if (!o || !o.sellerId) return;
+  showPage('messaging');
+  setTimeout(function() {
+    var user = window._auth && window._auth.currentUser;
+    if (!user) return;
+    var cid = [user.uid, o.sellerId].sort().join('_');
+    openConversation(cid, o.sellerId, o.sellerName || 'Seller');
+    window._activeConvId = cid; window._activePeerId = o.sellerId; window._activePeerName = o.sellerName || 'Seller';
+  }, 300);
+};
+
+window.odOpenDispute = function() {
+  var o = window._odCurrentOrder;
+  if (!o) return;
+  showPage('dispute');
+  setTimeout(function() {
+    var idEl = document.getElementById('dispute-order-id'); if (idEl) idEl.value = o._id;
+    var nameEl = document.getElementById('dispute-product-name'); if (nameEl) nameEl.value = o.productName || '';
+    if (typeof disputeLookupOrder === 'function') disputeLookupOrder();
+  }, 100);
 };
 
 // --------------------------------------------------
@@ -11475,8 +11715,10 @@ window.detectGPSLocation = function() {
   var display = document.getElementById('loc-city-display');
   var label   = document.getElementById('loc-map-label');
   var badge   = document.getElementById('loc-verified-badge');
+  var accNote = document.getElementById('loc-accuracy-note');
 
   if (deniedHelp) deniedHelp.style.display = 'none';
+  if (accNote) accNote.style.display = 'none';
 
   if (!navigator.geolocation) {
     showToast('GPS not supported on this device.');
@@ -11490,17 +11732,36 @@ window.detectGPSLocation = function() {
   navigator.geolocation.getCurrentPosition(
     async function(pos) {
       try {
-        var lat = pos.coords.latitude, lng = pos.coords.longitude;
-        var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng);
+        var lat = pos.coords.latitude, lng = pos.coords.longitude, accuracy = pos.coords.accuracy;
+        var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=12');
         var data = await res.json();
-        var city    = data.address.city || data.address.town || data.address.state || data.address.county || 'Unknown city';
+        var city    = data.address.city || data.address.town || data.address.county || data.address.state || 'Unknown city';
         var country = data.address.country || 'Unknown country';
         var locText = city + ', ' + country;
-        await saveLocationToFirestore(locText, lat, lng);
+
         if (display) display.textContent = locText;
         if (label)   label.textContent   = '📍 ' + locText;
-        if (badge)   badge.style.display = '';
-        showToast('📍 Location detected: ' + locText);
+
+        // Low-accuracy fixes (common on desktop / VPNs using WiFi or IP positioning) can land
+        // in the wrong city entirely — surface the confidence instead of silently trusting it.
+        if (accuracy && accuracy > 20000) {
+          if (accNote) {
+            accNote.style.display = '';
+            accNote.innerHTML = '⚠️ Low-confidence fix (~' + Math.round(accuracy/1000) + 'km accuracy) — this can happen on desktop/VPN connections. ' +
+              'If this isn\'t ' + city + ', use "Not showing the right city?" below to set it manually instead.';
+            accNote.style.color = 'var(--gold)';
+          }
+          showToast('📍 Detected ' + locText + ' — but accuracy is low, please double-check below.');
+        } else {
+          await saveLocationToFirestore(locText, lat, lng);
+          if (badge) badge.style.display = '';
+          if (accNote) {
+            accNote.style.display = '';
+            accNote.textContent = '✅ Saved · accuracy ~' + Math.round(accuracy||0) + 'm';
+            accNote.style.color = 'var(--green)';
+          }
+          showToast('📍 Location saved: ' + locText);
+        }
       } catch(e) {
         showToast('Could not determine your city — please check your connection and try again.');
         if (display) display.textContent = 'Could not detect location.';
@@ -11518,7 +11779,7 @@ window.detectGPSLocation = function() {
         if (display) display.textContent = 'Could not detect location.';
       }
     },
-    { timeout: 10000, enableHighAccuracy: true }
+    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
   );
 };
 
@@ -11815,10 +12076,10 @@ window.co2DetectLocation = function() {
 
   navigator.geolocation.getCurrentPosition(
     async function(pos) {
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      var lat = pos.coords.latitude, lng = pos.coords.longitude, accuracy = pos.coords.accuracy;
       window._coLocationLatLng = { lat: lat, lng: lng };
       try {
-        var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng);
+        var res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=12');
         var data = await res.json();
         var a = data.address || {};
         var streetParts = [
@@ -11832,7 +12093,11 @@ window.co2DetectLocation = function() {
           var matched = Array.from(stateEl.options).find(function(o){ return o.value.toLowerCase() === stateName.toLowerCase(); });
           if (matched) stateEl.value = matched.value;
         }
-        if (status) { status.textContent = '✅ Location detected — you can edit the fields above if needed.'; status.style.color = 'var(--green)'; }
+        if (accuracy && accuracy > 20000) {
+          if (status) { status.textContent = '⚠️ Low-confidence location (~' + Math.round(accuracy/1000) + 'km accuracy) — please check the city/state fields are correct before continuing.'; status.style.color = 'var(--gold)'; }
+        } else {
+          if (status) { status.textContent = '✅ Location detected — you can edit the fields above if needed.'; status.style.color = 'var(--green)'; }
+        }
         if (btn) { btn.textContent = '📍 Location set — tap to refresh'; btn.style.background = 'rgba(39,201,122,.1)'; btn.style.borderColor = 'rgba(39,201,122,.3)'; btn.style.color = 'var(--green)'; }
       } catch(e) {
         if (streetEl && !streetEl.value) streetEl.value = 'GPS: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
@@ -11847,7 +12112,7 @@ window.co2DetectLocation = function() {
         : '⚠️ Could not get your location. Please type your address manually.';
       if (status) { status.textContent = msg; status.style.color = 'var(--gold)'; }
     },
-    { timeout: 10000, enableHighAccuracy: true }
+    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
   );
 };
 
@@ -12038,7 +12303,7 @@ window.sdMarkShipped = async function(orderId, buyerId) {
   var tracking = trackEl ? trackEl.value.trim() : '';
   if (!tracking) { showToast('⚠️ Enter a tracking number first.'); return; }
   var db = window._db, fns = window._fns;
-  var deliveryCode = Math.floor(1000 + Math.random()*9000).toString();
+  var deliveryCode = Math.floor(100000 + Math.random()*900000).toString();
   try {
     await fns.updateDoc(fns.doc(db,'orders',orderId), {
       status:'shipped', trackingCarrier:carrier, trackingNumber:tracking,
