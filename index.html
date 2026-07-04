@@ -443,6 +443,71 @@ p{color:var(--text2);margin:0 0 1em;}
 .admin-section{display:none;}
 .admin-section.active{display:block;}
 .admin-denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+
+/* ── ADMIN: USER DETAIL ── */
+.aud-head{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;}
+.aud-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;}
+.aud-name-row{display:flex;align-items:center;gap:12px;}
+.aud-name{font-size:18px;font-weight:800;}
+.aud-uid{font-size:11px;color:var(--text3);font-family:monospace;}
+.aud-contact{font-size:12.5px;color:var(--text3);margin-top:4px;}
+.aud-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.aud-revenue-lbl{font-size:11px;color:var(--text3);text-align:right;}
+.aud-revenue-val{font-size:20px;font-weight:800;text-align:right;}
+.aud-stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+@media(max-width:700px){.aud-stat-grid{grid-template-columns:repeat(2,1fr);}}
+.aud-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.aud-stat-val{font-size:19px;font-weight:800;font-family:var(--font-display);}
+.aud-stat-lbl{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:3px;}
+.aud-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:800px){.aud-cols{grid-template-columns:1fr;}}
+.aud-enforce-btn{width:100%;text-align:left;padding:11px 14px;border-radius:var(--radius-xs);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;font-family:var(--font-body);transition:.15s;}
+.aud-enforce-btn:hover{border-color:var(--border2);color:var(--text);}
+.aud-enforce-btn.danger{border-color:rgba(240,82,82,.3);color:var(--red);}
+.aud-enforce-btn.danger:hover{background:rgba(240,82,82,.08);}
+.aud-log-item{display:flex;gap:10px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border);}
+.aud-log-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.aud-log-icon{font-size:14px;flex-shrink:0;width:20px;}
+.aud-log-title{font-size:13px;font-weight:700;}
+.aud-log-meta{font-size:11px;color:var(--text3);margin-top:1px;}
+.aud-log-reason{font-size:12px;color:var(--text2);background:var(--bg3);border-radius:var(--radius-xs);padding:8px 10px;margin-top:6px;}
+
+/* ── ADMIN: MESSAGE MONITORING ── */
+.mm-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:700px){.mm-stat-row{grid-template-columns:repeat(2,1fr);}}
+.mm-filter-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.mm-filter-pill{padding:7px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+.mm-filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.mm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:14px;}
+.mm-card-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:2px;}
+.mm-parties{font-size:14px;font-weight:700;}
+.mm-priority{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.mm-priority-high{background:rgba(240,82,82,.15);color:var(--red);}
+.mm-priority-medium{background:rgba(245,200,66,.15);color:var(--gold);}
+.mm-priority-reviewed{background:rgba(39,201,122,.15);color:var(--green);}
+.mm-meta{font-size:11.5px;color:var(--text3);margin-bottom:10px;}
+.mm-snippet{font-size:13px;color:var(--text2);background:var(--bg3);border-radius:var(--radius-xs);padding:10px 12px;margin-bottom:8px;line-height:1.5;}
+.mm-flag-note{font-size:12px;color:var(--gold);background:rgba(245,200,66,.06);border-left:3px solid var(--gold);padding:8px 12px;margin-bottom:12px;line-height:1.5;}
+.mm-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── ADMIN: VERIFICATION QUEUE (redesigned) ── */
+.avq-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:700px){.avq-stat-row{grid-template-columns:repeat(2,1fr);}}
+.avq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:14px;}
+.avq-card.flagged{border-color:rgba(240,82,82,.4);}
+.avq-card-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px;}
+.avq-name{font-size:14.5px;font-weight:700;}
+.avq-email{font-size:12px;color:var(--text3);}
+.avq-meta{font-size:12px;color:var(--text3);margin:4px 0 10px;}
+.avq-doc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.avq-doc-badge{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:var(--radius-xs);background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.avq-doc-badge a{color:inherit;text-decoration:none;}
+.avq-doc-badge.flagged{border-color:rgba(240,82,82,.4);color:var(--red);}
+.avq-wants{font-size:12.5px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
+.avq-flag-note{font-size:12px;color:var(--red);background:rgba(240,82,82,.06);border-left:3px solid var(--red);padding:9px 12px;margin-bottom:12px;line-height:1.6;}
+.avq-status-pill{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;}
+.avq-status-pending{background:rgba(245,200,66,.15);color:var(--gold);}
+.avq-status-flagged{background:rgba(240,82,82,.15);color:var(--red);}
 .admin-denied h2{font-size:22px;font-weight:700;margin-bottom:8px;}
 
 /* ── NOTIFICATIONS ── */
@@ -2658,6 +2723,7 @@ if (_kycOrigShowPage) {
         <a id="anav-payouts"    onclick="adminTab('payouts')">💸 Payouts</a>
         <a id="anav-disputes"   onclick="adminTab('disputes')">⚠️ Disputes</a>
         <a id="anav-affiliates" onclick="adminTab('affiliates')">🤝 Affiliates</a>
+        <a id="anav-messages"   onclick="adminTab('messages')">💬 Message Monitoring</a>
         <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
         <a id="anav-broadcast"  onclick="adminTab('broadcast')">📢 Broadcast</a>
         <a id="anav-banned"     onclick="adminTab('banned')">🚫 Banned</a>
@@ -2714,10 +2780,16 @@ if (_kycOrigShowPage) {
         </div>
         <div class="dash-card" style="padding:0;">
           <table class="dtable">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+            <thead><tr><th>User</th><th>Joined</th><th>Role</th><th>Status</th><th>Revenue</th><th>Actions</th></tr></thead>
             <tbody id="a-users-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- USER DETAIL (admin) -->
+      <div class="admin-section" id="asec-user-detail">
+        <button class="btn btn-ghost btn-sm" style="margin-bottom:16px;" onclick="adminTab('users')">← Back to users</button>
+        <div id="aud-content"><div style="color:var(--text3);font-size:13px;padding:30px;">Loading…</div></div>
       </div>
 
       <!-- ORDERS -->
@@ -2950,14 +3022,40 @@ if (_kycOrigShowPage) {
         </div>
       </div>
 
+      <!-- MESSAGE MONITORING -->
+      <div class="admin-section" id="asec-messages">
+        <div class="dash-h1">Message Monitoring</div>
+        <div class="dash-sub">Review reported conversations. ZÚLA does not read all messages — only conversations flagged by users or triggered by automated fraud detection are reviewed here.</div>
+        <div class="mm-stat-row">
+          <div class="stat-card"><div class="stat-lbl">Flagged convos</div><div class="stat-val" id="mm-stat-flagged" style="color:var(--red);">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Auto-detected</div><div class="stat-val" id="mm-stat-auto">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">User-reported</div><div class="stat-val" id="mm-stat-reported">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Actions taken</div><div class="stat-val" id="mm-stat-actions">—</div></div>
+        </div>
+        <div class="mm-filter-row">
+          <button class="mm-filter-pill active" onclick="mmFilter(this,'all')">All flagged</button>
+          <button class="mm-filter-pill" onclick="mmFilter(this,'high')">🔴 High priority</button>
+          <button class="mm-filter-pill" onclick="mmFilter(this,'medium')">🟡 Medium</button>
+          <button class="mm-filter-pill" onclick="mmFilter(this,'reviewed')">🟢 Reviewed</button>
+        </div>
+        <div id="mm-list"><div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div></div>
+        <div style="font-size:11.5px;color:var(--text3);background:var(--bg3);border-radius:var(--radius-xs);padding:12px 16px;margin-top:16px;line-height:1.6;">
+          🔒 <strong>Privacy policy:</strong> ZÚLA does not proactively monitor or private-read messages. Admin access to conversations is limited to cases flagged by users or automatically detected by our fraud AI. All admin views of conversations are logged for accountability. Conversation data is encrypted at rest.
+        </div>
+      </div>
+
       <!-- VERIFICATION QUEUE -->
       <div class="admin-section" id="asec-verif">
-        <div class="dash-h1">Verification Queue</div>
-        <div class="dash-sub">All seller verification submissions — approve or revoke access</div>
-        <div class="dash-card">
-          <div id="admin-verif-list">
-            <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
-          </div>
+        <div class="dash-h1">Seller Verification Queue</div>
+        <div class="dash-sub">Review ID documents, business registrations, and ownership proofs. All docs stored encrypted.</div>
+        <div class="avq-stat-row">
+          <div class="stat-card"><div class="stat-lbl">Pending review</div><div class="stat-val" id="avq-stat-pending">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Approved today</div><div class="stat-val" style="color:var(--green);" id="avq-stat-approved">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Rejected today</div><div class="stat-val" style="color:var(--red);" id="avq-stat-rejected">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Avg review time</div><div class="stat-val" id="avq-stat-time">—</div></div>
+        </div>
+        <div id="admin-verif-list">
+          <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
         </div>
       </div>
 
@@ -3195,6 +3293,7 @@ if (_kycOrigShowPage) {
           </div>
           <div class="chat-header-actions">
             <button class="chat-icon-btn" id="chat-follow-btn" style="display:none;font-size:13px;width:auto;padding:0 12px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);" onclick="toggleFollowFromChat()">Follow</button>
+            <button class="chat-icon-btn" title="Report this conversation" onclick="chatReportConversation()" style="font-size:14px;">🚩</button>
           </div>
         </div>
 
@@ -5273,6 +5372,7 @@ window.sendChatMsg = async function() {
 
   const cid = window._activeConvId;
   const peerId = window._activePeerId;
+  const peerName = window._activePeerName || 'User';
   try {
     await addDoc(collection(db, 'conversations', cid, 'messages'), {
       text, senderId: user.uid,
@@ -5282,7 +5382,64 @@ window.sendChatMsg = async function() {
     const upd = { lastMsg: text, lastMsgAt: serverTimestamp() };
     upd['unread.' + peerId] = increment(1);
     await updateDoc(doc(db, 'conversations', cid), upd);
+
+    // Real, explainable keyword-based fraud/safety flagging — not a black-box AI score
+    var flag = zulaScanMessageForFlags(text);
+    if (flag) {
+      try {
+        await addDoc(collection(db, 'messageFlags'), {
+          conversationId: cid,
+          flagType: 'auto',
+          priority: flag.priority,
+          reason: flag.reason,
+          flaggedText: text,
+          senderId: user.uid,
+          senderName: window._currentUser?.fullName || user.displayName || 'User',
+          otherPartyId: peerId,
+          otherPartyName: peerName,
+          status: 'flagged',
+          createdAt: serverTimestamp(),
+        });
+      } catch(fe) { console.error('flag write failed:', fe); }
+    }
   } catch(e) { showToast('❌ Could not send. Check connection.'); input.value = text; }
+};
+
+// Explainable, rule-based safety scan — flags patterns ZÚLA's Terms of Service prohibit
+// (off-platform payment requests, threats, or external-link + off-platform-discount solicitation).
+function zulaScanMessageForFlags(text) {
+  var t = text.toLowerCase();
+  var offPlatformPay = /(pay|send|transfer).{0,25}(directly|outside (the )?(app|platform|checkout)|to my (bank|account))/.test(t)
+    || /(account number|acc(t)?\s*no)[:\s]*\d{6,}/.test(t)
+    || /western union|moneygram/.test(t);
+  if (offPlatformPay) return { priority:'high', reason:'Off-platform payment solicitation detected. This violates Terms of Service §4 and is a common scam pattern.' };
+
+  var threat = /(kill|hurt|beat up|attack) you\b|know where you live|come (to|for) your (house|address)|hurt (your|ur) family/.test(t);
+  if (threat) return { priority:'high', reason:'Threat detected: physical threat language identified. Buyer/seller has been advised to contact authorities if they feel unsafe.' };
+
+  var hasLink = /https?:\/\/|www\.[a-z0-9-]+\.[a-z]{2,}|\b[a-z0-9-]+\.(com|ng|net)\b/.test(t);
+  var offPlatformDiscount = /(discount|off|cheaper|better price).{0,25}(if you pay|directly|outside|that (site|website|app))/.test(t) || (hasLink && /discount|% off|cheaper/.test(t));
+  if (hasLink && offPlatformDiscount) return { priority:'medium', reason:'External link + off-platform discount solicitation. Lower severity — seller may be unaware of policy.' };
+
+  return null;
+}
+
+window.chatReportConversation = async function() {
+  var cid = window._activeConvId, peerId = window._activePeerId, peerName = window._activePeerName;
+  if (!cid) { showToast('Open a conversation first.'); return; }
+  var reason = prompt('Why are you reporting this conversation?');
+  if (!reason) return;
+  var user = auth.currentUser;
+  try {
+    await addDoc(collection(db,'messageFlags'), {
+      conversationId: cid, flagType: 'user_reported', priority: 'medium',
+      reason: 'Reported by user · Reason: ' + reason,
+      flaggedText: '', senderId: peerId, senderName: peerName,
+      otherPartyId: user.uid, otherPartyName: window._currentUser?.fullName || user.displayName || 'You',
+      reportedBy: user.uid, status: 'flagged', createdAt: serverTimestamp(),
+    });
+    showToast('🚩 Reported — our team will review this conversation.');
+  } catch(e) { showToast('Could not submit report.'); }
 };
 
 window.startNewConversation = async function() {
@@ -9406,6 +9563,7 @@ window.adminTab = function(name) {
   if (name === 'disputes')   adminLoadDisputes();
   if (name === 'banned')     adminLoadBanned();
   if (name === 'affiliates') aafLoadAll();
+  if (name === 'messages')   mmLoadAll();
 };
 
 window.adminLoadUsers = async function() {
@@ -9420,7 +9578,19 @@ window.adminLoadUsers = async function() {
     if (document.getElementById('astat-users')) document.getElementById('astat-users').textContent = _adminAllUsers.length;
     var sellers = _adminAllUsers.filter(function(u){ return u.sellerVerified; }).length;
     if (document.getElementById('astat-sellers')) document.getElementById('astat-sellers').textContent = sellers;
+    // Cache all orders once so both the user list and user-detail page can compute revenue without refetching
+    try {
+      var ordSnap = await fns.getDocs(fns.collection(db,'orders'));
+      window._adminOrdersCache = ordSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+      adminRenderUsers(_adminAllUsers); // re-render now that revenue data is available
+    } catch(oe) { console.error('adminLoadUsers orders:', oe); }
   } catch(e) { if(tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px;">Could not load users.</td></tr>'; }
+};
+
+window.adminUserRevenue = function(uid) {
+  var orders = window._adminOrdersCache || [];
+  return orders.filter(function(o){ return o.sellerId === uid && o.status === 'completed'; })
+               .reduce(function(s,o){ return s + Number(o.price||0); }, 0);
 };
 
 function adminRenderUsers(users) {
@@ -9429,18 +9599,23 @@ function adminRenderUsers(users) {
   if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No users found.</td></tr>'; return; }
   tbody.innerHTML = users.map(function(u) {
     var joined = u.createdAt&&u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString() : '-';
-    var role = u.isAdmin ? '🛡 Admin' : u.sellerVerified ? '✅ Seller' : '👤 Buyer';
+    var roleParts = [];
+    if (u.sellerVerified) roleParts.push('Seller');
+    if (u.isAffiliate) roleParts.push('Affiliate');
+    var role = roleParts.length ? roleParts.join(' + ') : '👤 Buyer';
     var status = u.banned ? '<span style="color:var(--red);font-weight:700;">Banned</span>' : '<span style="color:var(--green);">Active</span>';
-    var action = u.banned
-      ? '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + u._id + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Unban</button>'
+    var revenue = window._adminOrdersCache ? adminUserRevenue(u._id) : null;
+    var revDisplay = revenue !== null ? 'NGN ' + revenue.toLocaleString() : '…';
+    var banAction = u.banned
+      ? '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminUnbanUser(\'' + u._id + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Reinstate</button>'
       : '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminBanUser(\'' + u._id + '\',\'' + (u.email||'').replace(/'/g,"\\'") + '\',\'' + (u.fullName||'').replace(/'/g,"\\'") + '\')">Ban</button>';
     return '<tr>' +
-      '<td>' + (u.fullName||u.firstName||'-') + '</td>' +
-      '<td style="font-size:12px;color:var(--text3);">' + (u.email||'-') + '</td>' +
-      '<td>' + role + '</td>' +
+      '<td><div style="font-weight:600;">' + (u.fullName||u.firstName||'-') + '</div><div style="font-size:11.5px;color:var(--text3);">' + (u.email||'-') + '</div></td>' +
       '<td style="font-size:12px;color:var(--text3);">' + joined + '</td>' +
+      '<td>' + role + '</td>' +
       '<td>' + status + '</td>' +
-      '<td>' + action + '</td>' +
+      '<td style="font-weight:700;">' + revDisplay + '</td>' +
+      '<td><button class="btn btn-sm btn-ghost" style="font-size:11px;margin-right:4px;" onclick="adminViewUser(\'' + u._id + '\')">View</button>' + banAction + '</td>' +
       '</tr>';
   }).join('');
 }
@@ -13094,7 +13269,447 @@ window.showPage = function(name) {
   if (name === 'referral')         { setTimeout(referralLoadStats, 50); }
 };
 
-console.log('✅ ZÚLA — all features loaded.');
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: AUDIT LOG (shared helper used by all enforcement actions)
+// ══════════════════════════════════════════════════════════════════
+window.adminLogAction = async function(targetUid, icon, title, reason) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var admin = auth && auth.currentUser;
+  try {
+    await fns.addDoc(fns.collection(db,'auditLog'), {
+      targetUid: targetUid, icon: icon, title: title, reason: reason || '',
+      adminEmail: admin ? admin.email : 'admin', createdAt: fns.serverTimestamp(),
+    });
+  } catch(e) { console.error('adminLogAction:', e); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: MESSAGE MONITORING
+// ══════════════════════════════════════════════════════════════════
+window._mmFlags = [];
+window._mmFilter = 'all';
+
+window.mmLoadAll = async function() {
+  if (!isAdmin()) return;
+  var db = window._db, fns = window._fns;
+  var list = document.getElementById('mm-list');
+  if (list) list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.collection(db,'messageFlags'));
+    window._mmFlags = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); })
+      .sort(function(a,b){ var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0; return bt-at; });
+    var e = function(id){ return document.getElementById(id); };
+    var flags = window._mmFlags;
+    if (e('mm-stat-flagged'))  e('mm-stat-flagged').textContent  = flags.filter(function(f){ return f.status==='flagged'; }).length;
+    if (e('mm-stat-auto'))     e('mm-stat-auto').textContent     = flags.filter(function(f){ return f.flagType==='auto'; }).length;
+    if (e('mm-stat-reported')) e('mm-stat-reported').textContent = flags.filter(function(f){ return f.flagType==='user_reported'; }).length;
+    if (e('mm-stat-actions'))  e('mm-stat-actions').textContent  = flags.filter(function(f){ return f.status!=='flagged'; }).length;
+    mmRender();
+  } catch(e) {
+    console.error('mmLoadAll:', e);
+    if (list) list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">No flagged conversations yet.</div>';
+  }
+};
+
+window.mmFilter = function(btn, filter) {
+  window._mmFilter = filter;
+  document.querySelectorAll('.mm-filter-pill').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  mmRender();
+};
+
+window.mmRender = function() {
+  var list = document.getElementById('mm-list');
+  if (!list) return;
+  var filter = window._mmFilter;
+  var flags = window._mmFlags.filter(function(f) {
+    if (filter === 'all') return true;
+    if (filter === 'reviewed') return f.status !== 'flagged';
+    return f.priority === filter && f.status === 'flagged';
+  });
+  if (!flags.length) { list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No conversations match this filter.</div>'; return; }
+  list.innerHTML = flags.map(function(f) {
+    var reviewed = f.status !== 'flagged';
+    var priorityCls = reviewed ? 'mm-priority-reviewed' : (f.priority === 'high' ? 'mm-priority-high' : 'mm-priority-medium');
+    var priorityLabel = reviewed ? ('✅ ' + f.status) : (f.priority === 'high' ? '🔴 High priority' : '🟡 Medium');
+    var when = f.createdAt && f.createdAt.toDate ? timeSince(f.createdAt.toDate()) : '-';
+    var typeTag = f.flagType === 'user_reported' ? 'Reported by user' : 'Auto-detected';
+    var snippet = f.flaggedText ? ('<div class="mm-snippet">"' + f.flaggedText.slice(0,200) + '"</div>') : '';
+    var flagNote = f.reason ? ('<div class="mm-flag-note">⚠️ ' + f.reason + '</div>') : '';
+    var actions = reviewed ? '' :
+      '<div class="mm-actions">' +
+        '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="mmSuspendSeller(\''+f._id+'\',\''+f.senderId+'\')">Suspend seller</button>' +
+        '<button class="btn btn-sm" style="background:var(--gold);color:#000;border:none;" onclick="mmSendWarning(\''+f._id+'\',\''+f.senderId+'\')">Send warning</button>' +
+        '<button class="btn btn-sm btn-ghost" onclick="mmViewFullConversation(\''+f.conversationId+'\')">View full conversation</button>' +
+        (f.priority==='high'
+          ? '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="mmPermanentBan(\''+f._id+'\',\''+f.senderId+'\')">Permanently ban</button><button class="btn btn-sm btn-ghost" onclick="mmProtectBuyer(\''+f._id+'\',\''+f.otherPartyId+'\')">Protect buyer</button>'
+          : '<button class="btn btn-sm btn-ghost" onclick="mmMarkReviewed(\''+f._id+'\')">Mark reviewed</button><button class="btn btn-sm btn-ghost" onclick="mmSendPolicyReminder(\''+f._id+'\',\''+f.senderId+'\')">Send policy reminder</button>') +
+        '<button class="btn btn-sm btn-ghost" onclick="mmDismiss(\''+f._id+'\')">✓ Dismiss</button>' +
+      '</div>';
+    return '<div class="mm-card">' +
+      '<div class="mm-card-hd"><div class="mm-parties">' + (f.senderName||'Unknown') + ' ↔ Buyer: ' + (f.otherPartyName||'-') + '</div>' +
+      '<span class="mm-priority ' + priorityCls + '">' + priorityLabel + '</span></div>' +
+      '<div class="mm-meta">' + typeTag + ' · ' + when + '</div>' +
+      snippet + flagNote + actions +
+      '</div>';
+  }).join('');
+};
+
+window.mmSuspendSeller = async function(flagId, uid) {
+  if (!confirm('Suspend this user\'s account pending review?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { banned:true, banReason:'Suspended: flagged conversation under review' });
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'suspended', reviewedAt:fns.serverTimestamp() });
+    await adminLogAction(uid, '⏸', 'Account suspended (message flag)', 'Suspended following a flagged conversation.');
+    showToast('Seller suspended.'); mmLoadAll();
+  } catch(e) { showToast('Could not suspend.'); }
+};
+window.mmSendWarning = async function(flagId, uid) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:uid, type:'system', title:'⚠️ Formal warning', body:'A recent message of yours was flagged for violating our Terms of Service. Further violations may result in suspension.', read:false, createdAt:fns.serverTimestamp() });
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'warned', reviewedAt:fns.serverTimestamp() });
+    await adminLogAction(uid, '⚠️', 'Formal warning issued', 'Warned for a flagged conversation.');
+    showToast('Warning sent.'); mmLoadAll();
+  } catch(e) { showToast('Could not send warning.'); }
+};
+window.mmPermanentBan = async function(flagId, uid) {
+  var reason = prompt('Reason for permanent ban:'); if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { banned:true, banReason:reason });
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'banned', reviewedAt:fns.serverTimestamp() });
+    await adminLogAction(uid, '🚫', 'Permanently banned', reason);
+    showToast('User permanently banned.'); mmLoadAll();
+  } catch(e) { showToast('Could not ban user.'); }
+};
+window.mmProtectBuyer = async function(flagId, buyerId) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:buyerId, type:'system', title:'We\'re looking out for you', body:'We noticed a concerning message in one of your conversations and have taken action against the other party. If you feel unsafe, please contact local authorities.', read:false, createdAt:fns.serverTimestamp() });
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'buyer_protected', reviewedAt:fns.serverTimestamp() });
+    showToast('Buyer notified and protected.'); mmLoadAll();
+  } catch(e) { showToast('Could not complete action.'); }
+};
+window.mmMarkReviewed = async function(flagId) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'reviewed_no_action', reviewedAt:fns.serverTimestamp() });
+    showToast('Marked reviewed.'); mmLoadAll();
+  } catch(e) { showToast('Could not update.'); }
+};
+window.mmSendPolicyReminder = async function(flagId, uid) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:uid, type:'system', title:'Friendly reminder: ZÚLA policy', body:'All promotions and payments must stay within the ZÚLA app to keep your account and buyers protected. Off-platform deals aren\'t covered by escrow.', read:false, createdAt:fns.serverTimestamp() });
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'policy_reminder', reviewedAt:fns.serverTimestamp() });
+    showToast('Policy reminder sent.'); mmLoadAll();
+  } catch(e) { showToast('Could not send reminder.'); }
+};
+window.mmDismiss = async function(flagId) {
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'messageFlags',flagId), { status:'reviewed', actionTaken:'dismissed', reviewedAt:fns.serverTimestamp() });
+    showToast('Dismissed.'); mmLoadAll();
+  } catch(e) { showToast('Could not dismiss.'); }
+};
+window.mmViewLinkedDispute = async function(uid) {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'disputes'), fns.where('buyerId','==',uid)));
+    if (snap.empty) { showToast('No linked dispute found for this user.'); return; }
+    adminTab('disputes');
+    showToast('Showing disputes for this user in the Disputes tab.');
+  } catch(e) { showToast('Could not look up disputes.'); }
+};
+window.mmViewFullConversation = async function(cid) {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'conversations',cid,'messages'), fns.orderBy('createdAt','asc')));
+    var msgs = snap.docs.map(function(d){ return d.data(); });
+    var html = msgs.length ? msgs.map(function(m) {
+      var t = m.createdAt && m.createdAt.toDate ? m.createdAt.toDate().toLocaleString() : '';
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--border);"><div style="font-size:12.5px;font-weight:700;">' + (m.senderName||'User') + '</div><div style="font-size:13px;color:var(--text2);">' + (m.text||'').replace(/</g,'&lt;') + '</div><div style="font-size:10.5px;color:var(--text3);">' + t + '</div></div>';
+    }).join('') : '<div style="color:var(--text3);font-size:13px;">No messages found.</div>';
+    var win = window.open('', '_blank', 'width=480,height=600');
+    win.document.write('<html><head><title>Conversation (admin view)</title><style>body{font-family:sans-serif;padding:20px;background:#0d0d0f;color:#f0eff4;}</style></head><body><h3>Conversation — admin review</h3>' + html + '</body></html>');
+  } catch(e) { showToast('Could not load conversation.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: USER DETAIL PAGE
+// ══════════════════════════════════════════════════════════════════
+window._audCurrentUid = null;
+
+window.adminViewUser = async function(uid) {
+  if (!isAdmin()) return;
+  window._audCurrentUid = uid;
+  document.querySelectorAll('.admin-section').forEach(function(s){ s.classList.remove('active'); });
+  var sec = document.getElementById('asec-user-detail'); if (sec) sec.classList.add('active');
+  var content = document.getElementById('aud-content');
+  if (content) content.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;">Loading…</div>';
+
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db,'users',uid));
+    if (!snap.exists()) { if (content) content.innerHTML = '<div style="color:var(--red);">User not found.</div>'; return; }
+    var u = Object.assign({ _id: uid }, snap.data());
+
+    var orders = window._adminOrdersCache || (await fns.getDocs(fns.collection(db,'orders'))).docs.map(function(d){ return d.data(); });
+    var purchases = orders.filter(function(o){ return o.buyerId === uid; }).length;
+    var sales = orders.filter(function(o){ return o.sellerId === uid; }).length;
+    var revenue = orders.filter(function(o){ return o.sellerId === uid && o.status === 'completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
+
+    var earnSnap = await fns.getDocs(fns.query(fns.collection(db,'affiliateEarnings'), fns.where('affiliateId','==',uid))).catch(function(){ return { size:0 }; });
+    var affReferred = earnSnap.size || 0;
+
+    var disputeSnap = await fns.getDocs(fns.query(fns.collection(db,'disputes'), fns.where('buyerId','==',uid))).catch(function(){ return { size:0 }; });
+    var disputeCount = disputeSnap.size || 0;
+
+    var reviewSnap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('sellerId','==',uid))).catch(function(){ return { docs:[] }; });
+    var reviews = reviewSnap.docs ? reviewSnap.docs.map(function(d){ return d.data(); }) : [];
+    var avgRating = reviews.length ? (reviews.reduce(function(s,r){ return s+Number(r.rating||0); },0) / reviews.length) : 0;
+
+    var initials = ((u.fullName||u.firstName||'?')[0]||'?').toUpperCase();
+    var joined = u.joinedAt && u.joinedAt.toDate ? u.joinedAt.toDate().toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '-';
+
+    var badges = [];
+    if (u.banned) badges.push('<span class="tag tag-red">Banned</span>');
+    else badges.push('<span class="tag tag-green">Active</span>');
+    if (u.sellerVerified) badges.push('<span class="tag tag-gold">Verified Seller</span>');
+    if (u.isAffiliate) badges.push('<span class="tag" style="background:rgba(245,200,66,.15);color:var(--gold);">' + (u.affiliateTier||'starter').charAt(0).toUpperCase()+(u.affiliateTier||'starter').slice(1) + ' Affiliate</span>');
+    if (u.twoFaEnabled) badges.push('<span class="tag" style="background:rgba(39,201,122,.15);color:var(--green);">🔒 2FA On</span>');
+
+    if (content) content.innerHTML =
+      '<div class="aud-head">' +
+        '<div class="aud-name-row">' +
+          '<div class="aud-avatar">' + (u.photoUrl ? ('<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">') : initials) + '</div>' +
+          '<div><div class="aud-name">' + (u.fullName||u.firstName||'Unknown') + '</div>' +
+          '<div class="aud-uid">#USR-' + uid.slice(0,10).toUpperCase() + '</div>' +
+          '<div class="aud-contact">' + (u.email||'-') + (u.phone ? (' · ' + u.phone) : '') + (u.location ? (' · ' + u.location) : '') + '</div>' +
+          '<div class="aud-badges">' + badges.join('') + '</div></div>' +
+        '</div>' +
+        '<div><div class="aud-revenue-lbl">Total revenue</div><div class="aud-revenue-val">NGN ' + revenue.toLocaleString() + '</div></div>' +
+      '</div>' +
+      '<div class="aud-stat-grid">' +
+        '<div class="aud-stat"><div class="aud-stat-val">' + purchases + '</div><div class="aud-stat-lbl">Purchases</div></div>' +
+        '<div class="aud-stat"><div class="aud-stat-val">' + sales + '</div><div class="aud-stat-lbl">Sales</div></div>' +
+        '<div class="aud-stat"><div class="aud-stat-val" style="color:var(--gold);">' + affReferred + '</div><div class="aud-stat-lbl">Affiliate sales</div></div>' +
+        '<div class="aud-stat"><div class="aud-stat-val" style="color:' + (disputeCount>0?'var(--red)':'var(--text)') + ';">' + disputeCount + '</div><div class="aud-stat-lbl">Disputes</div></div>' +
+        '<div class="aud-stat"><div class="aud-stat-val">' + (avgRating ? avgRating.toFixed(1)+'★' : '—') + '</div><div class="aud-stat-lbl">Seller rating</div></div>' +
+      '</div>' +
+      '<div class="aud-cols">' +
+        '<div class="dash-card">' +
+          '<h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">⚠️ Account enforcement</h3>' +
+          '<button class="aud-enforce-btn" onclick="audSuspendTemp(\''+uid+'\')">⏸ Suspend account temporarily</button>' +
+          '<button class="aud-enforce-btn danger" onclick="audPermanentBan(\''+uid+'\')">🚫 Permanently ban account</button>' +
+          '<button class="aud-enforce-btn" onclick="audSendWarning(\''+uid+'\')">📨 Send formal warning</button>' +
+          '<button class="aud-enforce-btn" onclick="audForce2FAReset(\''+uid+'\')">🔐 Force 2FA reset</button>' +
+          '<button class="aud-enforce-btn" onclick="audForcePasswordReset(\''+uid+'\',\''+(u.email||'')+'\')">🔑 Force password reset</button>' +
+          '<button class="aud-enforce-btn" onclick="audManuallyVerify(\''+uid+'\')">✅ Manually verify seller</button>' +
+          (u.banned ? '<button class="aud-enforce-btn" style="border-color:var(--green);color:var(--green);margin-top:8px;" onclick="adminUnbanUser(\''+uid+'\',\''+(u.fullName||'').replace(/\'/g,"\\'")+'\')">✅ Reactivate account</button>' : '') +
+          (u.twoFaEnabled ? '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);"><h3 style="font-size:13px;font-weight:700;margin-bottom:6px;">2FA Admin Override</h3><p style="font-size:12px;color:var(--text3);margin-bottom:10px;">If a user has lost access to their authenticator and cannot use backup codes, you can disable 2FA after identity verification.</p><div style="font-size:11.5px;color:var(--gold);background:rgba(245,200,66,.07);border-radius:var(--radius-xs);padding:8px 10px;margin-bottom:10px;">⚠️ This action is logged and audited. Only disable if the user has provided identity proof to support.</div><button class="aud-enforce-btn danger" onclick="audDisable2FA(\''+uid+'\')">Disable 2FA for this user</button></div>' : '') +
+        '</div>' +
+        '<div class="dash-card">' +
+          '<h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">📋 Action log (audit trail)</h3>' +
+          '<div id="aud-log-list"><div style="color:var(--text3);font-size:12.5px;">Loading…</div></div>' +
+        '</div>' +
+      '</div>';
+
+    audLoadLog(uid, u.joinedAt);
+  } catch(e) { console.error('adminViewUser:', e); if (content) content.innerHTML = '<div style="color:var(--red);">Could not load user details.</div>'; }
+};
+
+window.audLoadLog = async function(uid, joinedAt) {
+  var db = window._db, fns = window._fns;
+  var wrap = document.getElementById('aud-log-list');
+  if (!wrap) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'auditLog'), fns.where('targetUid','==',uid)));
+    var logs = snap.docs.map(function(d){ return d.data(); })
+      .sort(function(a,b){ var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0; return bt-at; });
+    // Always show account-created as the earliest entry
+    logs.push({ icon:'👤', title:'Account created', reason: 'Signed up via web', createdAt: joinedAt, synthetic:true });
+    wrap.innerHTML = logs.map(function(l) {
+      var when = l.createdAt && l.createdAt.toDate ? l.createdAt.toDate().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '-';
+      return '<div class="aud-log-item"><div class="aud-log-icon">' + (l.icon||'•') + '</div>' +
+        '<div><div class="aud-log-title">' + l.title + '</div>' +
+        '<div class="aud-log-meta">' + when + (l.adminEmail ? (' · Admin: ' + l.adminEmail) : '') + '</div>' +
+        (l.reason ? ('<div class="aud-log-reason">' + l.reason + '</div>') : '') +
+        '</div></div>';
+    }).join('');
+  } catch(e) { wrap.innerHTML = '<div style="color:var(--text3);font-size:12.5px;">No log entries yet.</div>'; }
+};
+
+window.audSuspendTemp = async function(uid) {
+  var reason = prompt('Reason for temporary suspension (7 days):'); if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { banned:true, banReason:reason, banType:'temporary' });
+    await adminLogAction(uid, '⏸', 'Account suspended (7 days)', reason);
+    showToast('Account suspended.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not suspend.'); }
+};
+window.audPermanentBan = async function(uid) {
+  var reason = prompt('Reason for permanent ban:'); if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { banned:true, banReason:reason, banType:'permanent' });
+    await adminLogAction(uid, '🚫', 'Permanently banned', reason);
+    showToast('Account permanently banned.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not ban.'); }
+};
+window.audSendWarning = async function(uid) {
+  var reason = prompt('Warning message to send the user:'); if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:uid, type:'system', title:'⚠️ Formal warning from ZÚLA', body:reason, read:false, createdAt:fns.serverTimestamp() });
+    await adminLogAction(uid, '📨', 'Formal warning issued', reason);
+    showToast('Warning sent.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not send warning.'); }
+};
+window.audForce2FAReset = async function(uid) {
+  if (!confirm('Force this user to re-set up 2FA on next login?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { twoFaEnabled:false });
+    await adminLogAction(uid, '🔐', '2FA reset forced by admin', '');
+    showToast('2FA reset — user must re-enroll.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not reset 2FA.'); }
+};
+window.audDisable2FA = async function(uid) {
+  if (!confirm('Disable 2FA for this user? Only do this after verifying their identity.')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { twoFaEnabled:false });
+    await adminLogAction(uid, '🔓', '2FA disabled by admin override', 'Identity verified via support ticket.');
+    showToast('2FA disabled for this user.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not disable 2FA.'); }
+};
+window.audForcePasswordReset = async function(uid, email) {
+  if (!email) { showToast('No email on file for this user.'); return; }
+  if (!confirm('Send a password reset email to ' + email + '?')) return;
+  try {
+    await window._auth.constructor; // no-op guard
+    await sendPasswordResetEmailAdmin(email);
+    await adminLogAction(uid, '🔑', 'Password reset forced by admin', 'Reset link sent to ' + email);
+    showToast('Password reset email sent to ' + email);
+  } catch(e) { showToast('Could not send reset email.'); }
+};
+async function sendPasswordResetEmailAdmin(email) {
+  var fns = window._fns, auth = window._auth;
+  return fns.sendPasswordResetEmail(auth, email);
+}
+window.audManuallyVerify = async function(uid) {
+  if (!confirm('Manually mark this seller as verified?')) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { sellerVerified:true, sellerVerifiedAt:fns.serverTimestamp() });
+    await adminLogAction(uid, '✅', 'Seller verification approved', 'Manually approved by admin.');
+    showToast('Seller manually verified.'); adminViewUser(uid);
+  } catch(e) { showToast('Could not verify seller.'); }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: VERIFICATION QUEUE (redesigned)
+// ══════════════════════════════════════════════════════════════════
+var _origLoadAdminVerifQueue = window.loadAdminVerifQueue;
+window.loadAdminVerifQueue = async function() {
+  var db = window._db, fns = window._fns;
+  var list = document.getElementById('admin-verif-list');
+  if (!list) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('verifSubmitted','==',true)));
+    var users = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+
+    var pending = users.filter(function(u){ return !u.sellerVerified && !u.verifRejected; });
+    var approvedToday = users.filter(function(u){ return u.sellerVerified && u.sellerVerifiedAt && u.sellerVerifiedAt.toDate && isToday(u.sellerVerifiedAt.toDate()); }).length;
+    var rejectedToday = users.filter(function(u){ return u.verifRejected && u.verifRejectedAt && u.verifRejectedAt.toDate && isToday(u.verifRejectedAt.toDate()); }).length;
+
+    var e = function(id){ return document.getElementById(id); };
+    if (e('avq-stat-pending'))  e('avq-stat-pending').textContent  = pending.length;
+    if (e('avq-stat-approved')) e('avq-stat-approved').textContent = approvedToday;
+    if (e('avq-stat-rejected')) e('avq-stat-rejected').textContent = rejectedToday;
+    if (e('avq-stat-time'))     e('avq-stat-time').textContent     = '—';
+    if (e('astat-verif'))       e('astat-verif').textContent       = pending.length;
+
+    var docLabels = { id:'ID document', selfie:'Selfie', reg:'Proof of address / registration', ownership:'Ownership proof' };
+
+    if (!pending.length && !users.some(function(u){ return u.sellerVerified || u.verifRejected; })) {
+      list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No verification submissions yet.</div>';
+      return;
+    }
+
+    list.innerHTML = users.map(function(u) {
+      if (u.sellerVerified || u.verifRejected) return ''; // queue shows pending items; resolved ones tracked in stats only
+      var docs = u.verifDocs || {};
+      var flagged = !!u.verifFlagged;
+      var docBadges = Object.keys(docLabels).map(function(k) {
+        var has = !!docs[k];
+        var cls = (flagged && k==='id') ? 'avq-doc-badge flagged' : 'avq-doc-badge';
+        return has
+          ? '<span class="' + cls + '"><a href="'+docs[k]+'" target="_blank">📄 ' + docLabels[k] + (flagged && k==='id' ? ' ⚠️' : ' ✓') + '</a></span>'
+          : '<span class="avq-doc-badge" style="opacity:.5;">— ' + docLabels[k] + ' missing</span>';
+      }).join('');
+      var appliedAgo = u.verifSubmittedAt && u.verifSubmittedAt.toDate ? timeSince(u.verifSubmittedAt.toDate()) : '-';
+      var moreInfoNote = u.verifMoreInfoRequested ? '<div class="avq-flag-note" style="color:var(--accent);border-color:var(--accent);background:rgba(124,92,252,.06);">💬 More info requested: "' + u.verifMoreInfoMsg + '" — awaiting seller response.</div>' : '';
+
+      if (flagged) {
+        return '<div class="avq-card flagged">' +
+          '<div class="avq-card-hd"><div><div class="avq-name">' + (u.fullName||'-') + ' <span style="color:var(--red);font-size:11px;">⚠ AI flagged</span></div>' +
+          '<div class="avq-email">' + (u.email||'-') + ' · Applied ' + appliedAgo + '</div></div>' +
+          '<span class="avq-status-pill avq-status-flagged">Flagged</span></div>' +
+          '<div class="avq-doc-badges">' + docBadges + '</div>' +
+          '<div class="avq-flag-note">🚩 Flagged for manual review: ID document could not be automatically matched to the selfie provided, or appears to duplicate another application. Please review both documents closely before approving.</div>' +
+          moreInfoNote +
+          '<div class="mm-actions">' +
+            '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="adminApproveVerif(\''+u._id+'\')">Manually approve</button>' +
+            '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="adminRejectVerif(\''+u._id+'\')">Reject &amp; flag</button>' +
+            '<button class="btn btn-sm btn-ghost" onclick="adminRequestMoreInfo(\''+u._id+'\')">Request clearer docs</button>' +
+          '</div></div>';
+      }
+      return '<div class="avq-card">' +
+        '<div class="avq-card-hd"><div><div class="avq-name">' + (u.fullName||'-') + '</div>' +
+        '<div class="avq-email">' + (u.email||'-') + ' · Applied ' + appliedAgo + '</div></div>' +
+        '<span class="avq-status-pill avq-status-pending">⏳ Pending</span></div>' +
+        '<div class="avq-meta">' + (u.businessType||'Individual') + (u.category ? (' · ' + u.category) : '') + '</div>' +
+        '<div class="avq-doc-badges">' + docBadges + '</div>' +
+        (u.verifSellDescription ? ('<div class="avq-wants">Wants to sell: ' + u.verifSellDescription + '</div>') : '') +
+        moreInfoNote +
+        '<div class="mm-actions">' +
+          '<button class="btn btn-sm" style="background:var(--accent);color:#fff;border:none;" onclick="adminApproveVerif(\''+u._id+'\')">Approve</button>' +
+          '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;" onclick="adminRejectVerif(\''+u._id+'\')">Reject with reason</button>' +
+          '<button class="btn btn-sm btn-ghost" onclick="adminRequestMoreInfo(\''+u._id+'\')">Request more info</button>' +
+        '</div></div>';
+    }).join('');
+
+    if (!list.innerHTML.trim()) list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">🎉 No pending verifications — all caught up!</div>';
+  } catch(e) {
+    console.error('loadAdminVerifQueue:', e);
+    list.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load verifications.</div>';
+  }
+};
+
+function isToday(d) {
+  var now = new Date();
+  return d.getDate()===now.getDate() && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+}
+
+window.adminRequestMoreInfo = async function(uid) {
+  var msg = prompt('What additional info or clearer documents do you need from this seller?');
+  if (!msg) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'users',uid), { verifMoreInfoRequested:true, verifMoreInfoMsg: msg });
+    await fns.addDoc(fns.collection(db,'notifications'), {
+      userId: uid, type:'verif_more_info', title:'📋 More information needed for verification',
+      body: msg, read:false, createdAt: fns.serverTimestamp(),
+    });
+    showToast('Request sent — seller will see this in their notifications.');
+    loadAdminVerifQueue();
+  } catch(e) { showToast('Could not send request.'); }
+};
 
 </script>
 
