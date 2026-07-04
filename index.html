@@ -9572,7 +9572,7 @@ window.adminLoadUsers = async function() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.orderBy('createdAt','desc')));
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.orderBy('joinedAt','desc')));
     _adminAllUsers = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
     adminRenderUsers(_adminAllUsers);
     if (document.getElementById('astat-users')) document.getElementById('astat-users').textContent = _adminAllUsers.length;
@@ -9598,7 +9598,7 @@ function adminRenderUsers(users) {
   if (!tbody) return;
   if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No users found.</td></tr>'; return; }
   tbody.innerHTML = users.map(function(u) {
-    var joined = u.createdAt&&u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString() : '-';
+    var joined = u.joinedAt&&u.joinedAt.toDate ? u.joinedAt.toDate().toLocaleDateString() : '-';
     var roleParts = [];
     if (u.sellerVerified) roleParts.push('Seller');
     if (u.isAffiliate) roleParts.push('Affiliate');
