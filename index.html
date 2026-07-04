@@ -1545,6 +1545,11 @@ p{color:var(--text2);margin:0 0 1em;}
           <div class="ap-field"><label>Condition</label><select><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
           <div class="ap-field"><label>Available stock</label><input type="number" id="ap-field-stock" placeholder="e.g. 10" min="1"></div>
         </div>
+        <div class="ap-field-row">
+          <div class="ap-field"><label>Delivery fee (NGN)</label><input type="number" id="ap-field-delivery-fee" placeholder="e.g. 1500" min="0"></div>
+          <div class="ap-field"><label>Ships from</label><input type="text" id="ap-field-ships-from" placeholder="e.g. Lagos, Nigeria"></div>
+        </div>
+        <div class="ap-field-hint" style="margin:-8px 0 14px;">This is what buyers pay for delivery at checkout — leave blank or 0 for free delivery.</div>
         <div class="ap-field">
           <label>Sizes / Variants</label>
           <div id="ap-variants-list" style="margin-bottom:8px;">
@@ -3080,9 +3085,10 @@ if (_kycOrigShowPage) {
           <div>
             <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="owner-name">Loading…</div>
             <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="owner-meta">—</div>
-            <div style="display:flex;gap:7px;flex-wrap:wrap;" id="owner-badges">
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;" id="owner-badges">
               <span class="tag tag-green">✅ Verified buyer</span>
             </div>
+            <div style="font-size:13.5px;color:var(--text2);line-height:1.6;max-width:440px;" id="owner-bio">—</div>
           </div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-ghost btn-sm" onclick="openMsgWithSelf()">✉️ Message</button>
@@ -3095,7 +3101,6 @@ if (_kycOrigShowPage) {
           <div class="pub-stat"><div class="pub-stat-val" id="owner-following-count">0</div><div class="pub-stat-lbl">Following</div></div>
           <div class="pub-stat"><div class="pub-stat-val" id="owner-joined">—</div><div class="pub-stat-lbl">Member since</div></div>
         </div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;" id="owner-bio">—</div>
       </div>
     </div>
     <!-- SELLER'S LISTINGS -->
@@ -5233,7 +5238,10 @@ window.viewPeerProfile = async function(uid) {
 
     // Populate the myprofile / owner page fields and show it
     const el = id => document.getElementById(id);
-    if (el('owner-avatar')) el('owner-avatar').textContent = initials;
+    if (el('owner-avatar')) {
+      if (u.photoUrl) el('owner-avatar').innerHTML = '<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+      else el('owner-avatar').textContent = initials;
+    }
     if (el('owner-name'))   el('owner-name').textContent   = fullName;
     const joined = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '';
     if (el('owner-meta'))  el('owner-meta').textContent  = (u.location ? '📍 '+u.location+' · ' : '') + (joined ? 'Member since '+joined : '');
@@ -5541,9 +5549,15 @@ window.loadMyProfile = async function() {
   const initials = profile.firstName ? profile.firstName[0].toUpperCase() : user.email[0].toUpperCase();
   const fullName = profile.fullName || profile.firstName || user.email.split('@')[0];
 
-  if (el('owner-avatar')) el('owner-avatar').textContent = initials;
+  if (el('owner-avatar')) {
+    if (profile.photoUrl) el('owner-avatar').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else el('owner-avatar').textContent = initials;
+  }
   if (el('owner-name'))   el('owner-name').textContent   = fullName;
-  if (el('nav-avatar-myprofile')) el('nav-avatar-myprofile').textContent = initials;
+  if (el('nav-avatar-myprofile')) {
+    if (profile.photoUrl) el('nav-avatar-myprofile').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else el('nav-avatar-myprofile').textContent = initials;
+  }
 
   const joined = profile.joinedAt
     ? new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
@@ -6504,6 +6518,9 @@ window.submitProduct = async function() {
   const hasAff      = affToggle ? affToggle.classList.contains('on') : true;
   const affRangeEl  = document.querySelector('#ap-aff-settings input[type=range]');
   const commission  = affRangeEl ? parseInt(affRangeEl.value) : 20;
+  const deliveryFee = parseInt(document.getElementById('ap-field-delivery-fee')?.value) || 0;
+  const shipsFrom   = (document.getElementById('ap-field-ships-from')?.value || '').trim();
+  const stockCount  = parseInt(document.getElementById('ap-field-stock')?.value) || 0;
 
   // Product type from step 1 (set by apSelectType via _apType)
   const productType = window._apType || 'physical';
@@ -6573,7 +6590,9 @@ window.submitProduct = async function() {
       photos: photoUrls,
       photo:  photoUrls[0] || '',   // convenience alias for card display
       emoji:  photoUrls.length === 0 ? (window._apSelectedEmoji || '📦') : '',
-      stock:  window._pendingStock || 0,
+      stock:  stockCount,
+      deliveryFee: (productType === 'physical' || productType === 'vehicle') ? deliveryFee : 0,
+      shipsFrom: shipsFrom || null,
       viewCount: 0,
     };
 
@@ -11207,12 +11226,22 @@ function co2TypeLabel(item) {
   return 'Physical';
 }
 
+function co2CalcDeliveryFee(items) {
+  return items.reduce(function(s, i) {
+    var t = i.productType || i.type || 'physical';
+    if (t === 'physical' || t === 'vehicle') {
+      var fee = (i.deliveryFee !== null && i.deliveryFee !== undefined) ? Number(i.deliveryFee) : window.CO2_DELIVERY_FEE_NGN;
+      return s + fee;
+    }
+    return s;
+  }, 0);
+}
+
 window.co2RenderSummary = function() {
   var items = window._co2Items || [];
   var wrap = document.getElementById('co2-summary-items');
-  var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
   var subtotal = items.reduce(function(s,i){ return s + Number(i.price||0) * (i.qty||1); }, 0);
-  var deliveryFee = hasPhysical ? window.CO2_DELIVERY_FEE_NGN : 0;
+  var deliveryFee = co2CalcDeliveryFee(items);
   var u = window._currentUser || {};
   var availableCredit = Number(u.referralCredit || 0);
   var creditApplied = Math.min(availableCredit, subtotal + deliveryFee);
@@ -11332,7 +11361,6 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
   var db = window._db, fns = window._fns;
   try {
     var deliveryFee = window._co2DeliveryFee || 0;
-    var feeSplit = items.length ? deliveryFee / items.length : 0;
     var creditApplied = window._co2CreditApplied || 0;
     var affRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
     if (affRef === user.uid) affRef = null; // no self-referral commission
@@ -11342,13 +11370,15 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
       var p = items[i];
       var deliveryType = p.productType || p.type || 'physical';
       var isPhysical = (deliveryType === 'physical' || deliveryType === 'vehicle');
+      var itemDeliveryFee = isPhysical ? ((p.deliveryFee !== null && p.deliveryFee !== undefined) ? Number(p.deliveryFee) : window.CO2_DELIVERY_FEE_NGN) : 0;
       var orderData = {
         productId:    p.id || null,
         productName:  p.name,
         productPhoto: (p.photos && p.photos[0]) || p.photo || '',
         productEmoji: p.emoji || '',
         productType:  deliveryType,
-        price:        Number(p.price) * (p.qty || 1) + (isPhysical ? feeSplit : 0),
+        price:        Number(p.price) * (p.qty || 1) + itemDeliveryFee,
+        deliveryFee:  itemDeliveryFee,
         qty:          p.qty || 1,
         currency:     p.currency || 'NGN',
         sellerId:     p.sellerId,
@@ -11501,6 +11531,8 @@ window.sdEditProduct = async function(productId) {
       if (e('ap-field-category')) e('ap-field-category').value = p.category||'';
       if (e('ap-field-currency')) e('ap-field-currency').value = p.currency||'NGN';
       if (e('ap-field-stock'))    e('ap-field-stock').value    = p.stock||'';
+      if (e('ap-field-delivery-fee')) e('ap-field-delivery-fee').value = p.deliveryFee||'';
+      if (e('ap-field-ships-from'))   e('ap-field-ships-from').value   = p.shipsFrom||'';
       // Set product type
       if (p.productType && typeof apSelectType === 'function') apSelectType(p.productType);
       // Show existing photos
@@ -11534,6 +11566,8 @@ window.submitProduct = async function() {
     var category = (document.getElementById('ap-field-category')||{}).value;
     var currency = (document.getElementById('ap-field-currency')||{}).value||'NGN';
     var stock    = parseInt((document.getElementById('ap-field-stock')||{}).value)||0;
+    var deliveryFee = parseInt((document.getElementById('ap-field-delivery-fee')||{}).value)||0;
+    var shipsFrom = ((document.getElementById('ap-field-ships-from')||{}).value||'').trim();
     if (!name || !price) { showToast('⚠️ Name and price are required.'); if (publishBtn) { publishBtn.textContent = 'Update listing →'; publishBtn.disabled = false; } return; }
     // Upload any new photos (ones with actual File objects)
     var newPhotos = (window._apPhotos||[]).filter(function(ph){ return ph.file; });
@@ -11548,7 +11582,7 @@ window.submitProduct = async function() {
     }
     var allPhotos = existingUrls.concat(uploadedUrls);
     if (publishBtn) publishBtn.textContent = 'Saving…';
-    var updateData = { name, description:desc, price:Number(price), category, currency, stock, updatedAt:fns.serverTimestamp(), status:'active' };
+    var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active' };
     if (allPhotos.length) { updateData.photos = allPhotos; updateData.photo = allPhotos[0]; }
     await fns.updateDoc(fns.doc(db,'products',window._editingProductId), updateData);
     window._editingProductId = null;
@@ -11856,7 +11890,7 @@ window.pdAddToCart = function() {
       id: p.id, name: p.name, price: p.price, currency: p.currency||'NGN',
       sellerId: p.sellerId, sellerName: p.sellerName, qty: 1,
       photo: (p.photos&&p.photos[0])||p.photo||'', emoji: p.emoji||'📦',
-      productType: p.productType||'physical',
+      productType: p.productType||'physical', deliveryFee: p.deliveryFee!=null ? Number(p.deliveryFee) : null,
     });
   }
   cartSave();
@@ -12437,7 +12471,7 @@ window.affSignIn = function() {
   var btn = document.getElementById('aff-si-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
   var auth = window._auth, db = window._db, fns = window._fns;
-  signInWithEmailAndPassword(auth, email, pass)
+  fns.signInWithEmailAndPassword(auth, email, pass)
     .then(async function(r) {
       var u = r.user;
       if (!u.emailVerified) { showToast('Please verify your email first.'); showPage('verify-email'); return; }
@@ -12512,12 +12546,12 @@ window.affSubmitApplication = async function() {
   if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
   var inviteRef = zulaGetStoredRef('zula_invite_ref', 60);
   try {
-    var cred = await createUserWithEmailAndPassword(auth, email, pass);
+    var cred = await fns.createUserWithEmailAndPassword(auth, email, pass);
     var newUser = cred.user;
     var fullName = fname + (lname ? ' ' + lname : '');
-    await updateProfile(newUser, { displayName: fullName });
-    await sendEmailVerification(newUser);
-    await setDoc(doc(db, 'users', newUser.uid), {
+    await fns.updateProfile(newUser, { displayName: fullName });
+    await fns.sendEmailVerification(newUser);
+    await fns.setDoc(fns.doc(db, 'users', newUser.uid), {
       uid: newUser.uid, firstName: fname, lastName: lname, fullName, email,
       joinedAt: fns.serverTimestamp(), role: 'buyer', sellerVerified: false,
       followersCount: 0, followingCount: 0,
@@ -12780,38 +12814,55 @@ window.aafTab = function(name, btn) {
 window.aafLoadAll = async function() {
   if (!isAdmin()) return;
   var db = window._db, fns = window._fns;
+
+  var users = [], earnings = [], payouts = [], referrals = [], links = [];
+
   try {
     var usersSnap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('isAffiliate','==',true)));
-    var users = usersSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    users = usersSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+  } catch(e) { console.error('aafLoadAll users:', e); }
 
+  try {
     var earnSnap = await fns.getDocs(fns.collection(db,'affiliateEarnings'));
-    var earnings = earnSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    earnings = earnSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+  } catch(e) { console.error('aafLoadAll earnings:', e); }
 
+  try {
     var payoutSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sourceType','==','affiliate')));
-    var payouts = payoutSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    payouts = payoutSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+  } catch(e) { console.error('aafLoadAll payouts:', e); }
 
+  try {
     var refSnap = await fns.getDocs(fns.collection(db,'referrals'));
-    var referrals = refSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    referrals = refSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+  } catch(e) { console.error('aafLoadAll referrals:', e); }
 
-    var ordersSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('affiliateRef','!=', null)));
-    var links = ordersSnap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+  try {
+    // Fetch all orders and filter client-side — avoids the composite index a Firestore
+    // inequality filter (affiliateRef != null) would otherwise require.
+    var ordersSnap = await fns.getDocs(fns.collection(db,'orders'));
+    links = ordersSnap.docs
+      .map(function(d){ return Object.assign({ _id:d.id }, d.data()); })
+      .filter(function(o){ return !!o.affiliateRef; });
+  } catch(e) { console.error('aafLoadAll orders:', e); }
 
-    // Fraud heuristic: self-referral (affiliateRef === buyerId)
-    var fraud = links.filter(function(o){ return o.affiliateRef === o.buyerId; }).map(function(o) {
-      return { affiliateId:o.affiliateRef, reason:'Self-referral: bought through own affiliate link', detail:o.productName||'-', createdAt:o.createdAt, orderId:o._id };
-    });
+  // Fraud heuristic: self-referral (affiliateRef === buyerId)
+  var fraud = links.filter(function(o){ return o.affiliateRef === o.buyerId; }).map(function(o) {
+    return { affiliateId:o.affiliateRef, reason:'Self-referral: bought through own affiliate link', detail:o.productName||'-', createdAt:o.createdAt, orderId:o._id };
+  });
 
-    window._aafData = { users:users, earnings:earnings, payouts:payouts, referrals:referrals, links:links, fraud:fraud };
+  window._aafData = { users:users, earnings:earnings, payouts:payouts, referrals:referrals, links:links, fraud:fraud };
 
-    var e = function(id){ return document.getElementById(id); };
-    if (e('aaf-stat-total'))   e('aaf-stat-total').textContent   = users.length;
-    if (e('aaf-stat-gold'))    e('aaf-stat-gold').textContent    = users.filter(function(u){ return u.affiliateTier==='gold'; }).length;
-    var paidTotal = payouts.filter(function(p){ return p.status==='approved'||p.status==='paid'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
-    if (e('aaf-stat-paid'))    e('aaf-stat-paid').textContent    = 'NGN ' + paidTotal.toLocaleString();
-    var pendingTotal = payouts.filter(function(p){ return p.status==='pending'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
-    if (e('aaf-stat-pending')) e('aaf-stat-pending').textContent = 'NGN ' + pendingTotal.toLocaleString();
-    if (e('aaf-stat-flagged')) e('aaf-stat-flagged').textContent = fraud.length;
+  var e = function(id){ return document.getElementById(id); };
+  if (e('aaf-stat-total'))   e('aaf-stat-total').textContent   = users.length;
+  if (e('aaf-stat-gold'))    e('aaf-stat-gold').textContent    = users.filter(function(u){ return u.affiliateTier==='gold'; }).length;
+  var paidTotal = payouts.filter(function(p){ return p.status==='approved'||p.status==='paid'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+  if (e('aaf-stat-paid'))    e('aaf-stat-paid').textContent    = 'NGN ' + paidTotal.toLocaleString();
+  var pendingTotal = payouts.filter(function(p){ return p.status==='pending'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+  if (e('aaf-stat-pending')) e('aaf-stat-pending').textContent = 'NGN ' + pendingTotal.toLocaleString();
+  if (e('aaf-stat-flagged')) e('aaf-stat-flagged').textContent = fraud.length;
 
+  try {
     aafRenderUsers();
     aafRenderEarnings();
     aafRenderPayouts();
@@ -12819,7 +12870,7 @@ window.aafLoadAll = async function() {
     aafRenderLinks();
     aafRenderFraud();
     aafLoadSettingsIntoForm();
-  } catch(e) { console.error('aafLoadAll:', e); showToast('Could not load affiliate data — check Firestore rules/indexes.'); }
+  } catch(e) { console.error('aafLoadAll render:', e); }
 };
 
 window.aafRenderUsers = function() {
