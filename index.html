@@ -2865,11 +2865,11 @@ if (_kycOrigShowPage) {
       <!-- PAYOUTS (admin) -->
       <div class="admin-section" id="asec-payouts">
         <div class="dash-h1">Payout Requests</div>
-        <div class="dash-sub">Sellers requesting withdrawals — approve or reject</div>
+        <div class="dash-sub">Sellers &amp; affiliates requesting withdrawals — pending → processing → successful/failed</div>
         <div class="dash-card" style="padding:0;">
           <table class="dtable">
-            <thead><tr><th>Seller</th><th>Amount</th><th>Bank</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="a-payouts-table"><tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
+            <thead><tr><th>Seller</th><th>Amount</th><th>Bank</th><th>Requested</th><th>Status</th><th>Source</th><th>Action</th></tr></thead>
+            <tbody id="a-payouts-table"><tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -7162,27 +7162,37 @@ window.sdLoadPayout = async function() {
   if (!user) return;
   try {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
-    var total = 0;
+    var withdrawn = 0, inFlight = 0;
     var rows = '';
     snap.docs.forEach(function(d) {
       var p = d.data();
-      if (p.status === 'approved' || p.status === 'paid') total += Number(p.amount||0);
+      if (p.status === 'successful' || p.status === 'approved' || p.status === 'paid') withdrawn += Number(p.amount||0);
+      if (p.status === 'pending' || p.status === 'processing') inFlight += Number(p.amount||0);
       var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
-      var labelMap = { pending:'⏳ Pending', approved:'✅ Successful', paid:'✅ Successful', rejected:'❌ Rejected' };
-      var colorMap = { pending:'var(--gold)', approved:'var(--green)', paid:'var(--green)', rejected:'var(--red)' };
+      var labelMap = { pending:'⏳ Pending', processing:'🔄 Processing', successful:'✅ Successful', approved:'✅ Successful', paid:'✅ Successful', failed:'❌ Failed', rejected:'❌ Rejected' };
+      var colorMap = { pending:'var(--gold)', processing:'#5ba8f5', successful:'var(--green)', approved:'var(--green)', paid:'var(--green)', failed:'var(--red)', rejected:'var(--red)' };
       var label = labelMap[p.status] || p.status || '-';
       var color = colorMap[p.status] || 'var(--text3)';
-      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;"><div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div><div style="font-size:11px;color:var(--text3);">' + date + (p.bankName ? (' · ' + p.bankName + ' ····' + (p.accountNumber||'').slice(-4)) : '') + '</div></div><span style="color:' + color + ';font-weight:700;">' + label + '</span></div>';
+      var txLine = p.transactionId ? ('<div style="font-size:10.5px;color:var(--text3);font-family:monospace;">TX: ' + p.transactionId + '</div>') : '';
+      var failReasonLine = (p.status==='failed' && p.failReason) ? ('<div style="font-size:11px;color:var(--red);">' + p.failReason + '</div>') : '';
+      var rejectReasonLine = (p.status==='rejected' && p.rejectReason) ? ('<div style="font-size:11px;color:var(--red);">' + p.rejectReason + '</div>') : '';
+      rows += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;">' +
+        '<div><div style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);">' + date + (p.bankName ? (' · ' + p.bankName + ' ····' + (p.accountNumber||'').slice(-4)) : '') + '</div>' +
+        txLine + failReasonLine + rejectReasonLine + '</div>' +
+        '<span style="color:' + color + ';font-weight:700;white-space:nowrap;">' + label + '</span></div>';
     });
     var hist = document.getElementById('sd-payout-history');
     if (hist) hist.innerHTML = rows || '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No payout history yet.</div>';
     var totEl = document.getElementById('sd-payout-total');
-    if (totEl) totEl.textContent = '₦' + total.toLocaleString();
-    // Revenue = completed orders
+    if (totEl) totEl.textContent = '₦' + withdrawn.toLocaleString();
+    // Available balance = completed-order revenue minus everything already withdrawn or in-flight
     var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.where('status','==','completed')));
     var revenue = ordSnap.docs.reduce(function(s,d){ return s + Number(d.data().price||0); }, 0);
     var avail = document.getElementById('sd-payout-available');
-    if (avail) avail.textContent = '₦' + (revenue - total).toLocaleString();
+    if (avail) avail.textContent = '₦' + Math.max(0, revenue - withdrawn - inFlight).toLocaleString();
+    var pendingEl = document.getElementById('sd-payout-pending');
+    if (pendingEl) pendingEl.textContent = '₦' + inFlight.toLocaleString();
   } catch(e) {
     console.error('sdLoadPayout:', e);
     var hist = document.getElementById('sd-payout-history');
@@ -9261,13 +9271,14 @@ window.pdRenderShareRow = function() {
     if (s.isBtn) {
       return '<button onclick="pdShareCopyLink()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);">'+s.icon+' '+s.label+'</button>';
     }
-    return '<a href="'+s.href+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:'+s.color+';font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s;" onmouseenter="this.style.borderColor=\''+s.color+'\'" onmouseleave="this.style.borderColor=\'var(--border)\'">'+s.icon+' '+s.label+'</a>';
+    return '<a href="'+s.href+'" target="_blank" rel="noopener" onclick="zulaLogEngagement(\'share\',\''+p.id+'\',\''+(p.sellerId||'')+'\')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:'+s.color+';font-size:12.5px;font-weight:600;text-decoration:none;transition:.15s;" onmouseenter="this.style.borderColor=\''+s.color+'\'" onmouseleave="this.style.borderColor=\'var(--border)\'">'+s.icon+' '+s.label+'</a>';
   }).join('');
 };
 
 window.pdShareCopyLink = function() {
   var p = window._currentProduct;
   var url = window.location.href.split('?')[0] + (p ? '?product=' + p.id : '');
+  if (p) zulaLogEngagement('share', p.id, p.sellerId);
   navigator.clipboard.writeText(url).then(function(){ showToast('🔗 Link copied!'); }).catch(function(){ showToast('Link: ' + url); });
 };
 
@@ -9658,7 +9669,7 @@ window.sdSubmitPayout = async function() {
 
     var prSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid)));
     var alreadyRequested = prSnap.docs
-      .filter(function(d){ return d.data().status === 'pending' || d.data().status === 'approved' || d.data().status === 'paid'; })
+      .filter(function(d){ var st=d.data().status; return st==='pending'||st==='processing'||st==='approved'||st==='paid'||st==='successful'; })
       .reduce(function(s,d){ return s + Number(d.data().amount||0); }, 0);
 
     var actuallyAvailable = availableRevenue - alreadyRequested;
@@ -13257,6 +13268,7 @@ window.zulaTrackAffiliateClick = async function(affId, productId) {
     await fns.addDoc(fns.collection(db,'affiliateClicks'), {
       affiliateId: affId, productId: productId || null, createdAt: fns.serverTimestamp(),
     });
+    if (typeof zulaLogEngagement === 'function') zulaLogEngagement('affiliate_click', productId, null, { affiliateId: affId });
   } catch(e) {}
 };
 (function() {
@@ -14005,6 +14017,245 @@ window.adminRequestMoreInfo = async function(uid) {
     loadAdminVerifQueue();
   } catch(e) { showToast('Could not send request.'); }
 };
+
+// ══════════════════════════════════════════════════════════════════
+// ENGAGEMENT: real likes, comments, view counts (buyer-facing)
+// ══════════════════════════════════════════════════════════════════
+window._pdLiked = false;
+
+window.pdLoadEngagement = async function(productId, sellerId) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var e = function(id){ return document.getElementById(id); };
+  var p = window._currentProduct || {};
+  if (e('pd-view-count')) e('pd-view-count').textContent = (p.viewCount || 0).toLocaleString();
+
+  try {
+    var likeSnap = await fns.getDocs(fns.collection(db,'products',productId,'likes'));
+    if (e('pd-like-count')) e('pd-like-count').textContent = likeSnap.size;
+    window._pdLiked = user ? likeSnap.docs.some(function(d){ return d.id === user.uid; }) : false;
+    var icon = e('pd-like-icon'), btn = document.getElementById('pd-like-btn');
+    if (icon) icon.textContent = window._pdLiked ? '❤️' : '♡';
+    if (btn) btn.style.color = window._pdLiked ? 'var(--red)' : 'var(--text3)';
+  } catch(e2) { console.error('pdLoadEngagement likes:', e2); }
+
+  pdLoadComments(productId);
+};
+
+window.pdToggleLike = async function() {
+  var p = window._currentProduct;
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!p) return;
+  if (!user) { showToast('Sign in to like products.'); showPage('login'); return; }
+  var likeRef = fns.doc(db,'products',p.id,'likes',user.uid);
+  try {
+    if (window._pdLiked) {
+      await fns.deleteDoc(likeRef);
+      window._pdLiked = false;
+    } else {
+      await fns.setDoc(likeRef, { userId: user.uid, createdAt: fns.serverTimestamp() });
+      window._pdLiked = true;
+      zulaLogEngagement('like', p.id, p.sellerId);
+      if (p.sellerId && p.sellerId !== user.uid) {
+        fns.addDoc(fns.collection(db,'notifications'), {
+          userId: p.sellerId, type:'engagement', title:'❤️ Someone liked your product',
+          body: (window._currentUser?.fullName||'A buyer') + ' liked ' + p.name, read:false, createdAt: fns.serverTimestamp(),
+        }).catch(function(){});
+      }
+    }
+    var icon = document.getElementById('pd-like-icon'), btn = document.getElementById('pd-like-btn'), countEl = document.getElementById('pd-like-count');
+    if (icon) icon.textContent = window._pdLiked ? '❤️' : '♡';
+    if (btn) btn.style.color = window._pdLiked ? 'var(--red)' : 'var(--text3)';
+    if (countEl) countEl.textContent = Math.max(0, Number(countEl.textContent||0) + (window._pdLiked ? 1 : -1));
+  } catch(e2) { console.error('pdToggleLike:', e2); showToast('Could not update like.'); }
+};
+
+window.pdLoadComments = async function(productId) {
+  var db = window._db, fns = window._fns;
+  var wrap = document.getElementById('pd-comments-list');
+  if (!wrap) return;
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'productComments'), fns.where('productId','==',productId)));
+    var comments = snap.docs.map(function(d){ return d.data(); })
+      .sort(function(a,b){ var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0; return bt-at; });
+    var e = function(id){ return document.getElementById(id); };
+    if (e('pd-comment-count')) e('pd-comment-count').textContent = comments.length;
+    if (e('pd-comment-count-hd')) e('pd-comment-count-hd').textContent = comments.length;
+    if (!comments.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No comments yet — be the first!</div>'; return; }
+    wrap.innerHTML = comments.map(function(c) {
+      var when = c.createdAt && c.createdAt.toDate ? timeSince(c.createdAt.toDate()) : '';
+      var initials = (c.userName||'?').split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0,2);
+      return '<div style="display:flex;gap:10px;">' +
+        '<div class="conv-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0;">' + initials + '</div>' +
+        '<div><div style="font-size:13px;font-weight:700;">' + (c.userName||'User') + ' <span style="font-weight:400;color:var(--text3);font-size:11px;">' + when + '</span></div>' +
+        '<div style="font-size:13px;color:var(--text2);">' + (c.text||'').replace(/</g,'&lt;') + '</div></div>' +
+        '</div>';
+    }).join('');
+  } catch(e2) { console.error('pdLoadComments:', e2); wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load comments.</div>'; }
+};
+
+window.pdSubmitComment = async function() {
+  var p = window._currentProduct;
+  var input = document.getElementById('pd-comment-input');
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!p || !input) return;
+  var text = input.value.trim();
+  if (!text) return;
+  if (!user) { showToast('Sign in to comment.'); showPage('login'); return; }
+  try {
+    var profile = window._currentUser || {};
+    await fns.addDoc(fns.collection(db,'productComments'), {
+      productId: p.id, sellerId: p.sellerId, userId: user.uid,
+      userName: profile.fullName || user.displayName || 'Buyer',
+      text: text, createdAt: fns.serverTimestamp(),
+    });
+    input.value = '';
+    zulaLogEngagement('comment', p.id, p.sellerId);
+    if (p.sellerId && p.sellerId !== user.uid) {
+      fns.addDoc(fns.collection(db,'notifications'), {
+        userId: p.sellerId, type:'engagement', title:'💬 New comment on your product',
+        body: (profile.fullName||'A buyer') + ' commented on ' + p.name + ': "' + text.slice(0,80) + '"',
+        read:false, createdAt: fns.serverTimestamp(),
+      }).catch(function(){});
+    }
+    pdLoadComments(p.id);
+  } catch(e2) { console.error('pdSubmitComment:', e2); showToast('Could not post comment.'); }
+};
+
+// Hook engagement loading into the same points product pages already refresh from
+var _origShowPageEng = window.showPage;
+window.showPage = function(name) {
+  _origShowPageEng(name);
+  if (name === 'product') {
+    setTimeout(function() {
+      if (typeof pdRenderShareRow === 'function') pdRenderShareRow();
+      var p = window._currentProduct;
+      if (p && p.id) pdLoadEngagement(p.id, p.sellerId);
+    }, 150);
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN: ENGAGEMENT REVENUE DASHBOARD
+// ══════════════════════════════════════════════════════════════════
+window._engPeriod = 'today';
+window.ENG_DEFAULT_RATES = { likeRate:0.0005, commentRate:0.002, viewRate:0.00005, affClickRate:0.001, shareRate:0.003 };
+
+window.engSetPeriod = function(btn, period) {
+  window._engPeriod = period;
+  document.querySelectorAll('.eng-period-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  engLoadData();
+};
+
+function engPeriodStart(period) {
+  var now = new Date();
+  if (period === 'today') { var d = new Date(now.getFullYear(),now.getMonth(),now.getDate()); return d; }
+  if (period === 'week') { var d2 = new Date(now); d2.setDate(now.getDate()-7); return d2; }
+  var d3 = new Date(now); d3.setMonth(now.getMonth()-1); return d3;
+}
+
+window.engLoadData = async function() {
+  if (!isAdmin()) return;
+  var db = window._db, fns = window._fns;
+  try {
+    var ratesSnap = await fns.getDoc(fns.doc(db,'settings','engagement')).catch(function(){ return { exists:function(){return false;} }; });
+    var rates = ratesSnap.exists && ratesSnap.exists() ? ratesSnap.data() : window.ENG_DEFAULT_RATES;
+    window._engRates = rates;
+
+    var start = engPeriodStart(window._engPeriod);
+    var snap = await fns.getDocs(fns.collection(db,'engagementEvents'));
+    var events = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    var periodEvents = events.filter(function(ev){ return ev.createdAt && ev.createdAt.toDate && ev.createdAt.toDate() >= start; });
+
+    var counts = { like:0, comment:0, view:0, affiliate_click:0, share:0 };
+    periodEvents.forEach(function(ev){ if (counts[ev.type] !== undefined) counts[ev.type]++; });
+
+    var rateFor = { like: rates.likeRate||0.0005, comment: rates.commentRate||0.002, view: rates.viewRate||0.00005, affiliate_click: rates.affClickRate||0.001, share: rates.shareRate||0.003 };
+    var revLike = counts.like * rateFor.like;
+    var revComment = counts.comment * rateFor.comment;
+    var revView = counts.view * rateFor.view;
+    var revClick = counts.affiliate_click * rateFor.affiliate_click;
+    var revShare = counts.share * rateFor.share;
+    var totalRev = revLike + revComment + revView + revClick + revShare;
+
+    var e = function(id){ return document.getElementById(id); };
+    if (e('eng-stat-likes'))    e('eng-stat-likes').textContent    = counts.like.toLocaleString();
+    if (e('eng-stat-comments')) e('eng-stat-comments').textContent = counts.comment.toLocaleString();
+    if (e('eng-stat-views'))    e('eng-stat-views').textContent    = counts.view.toLocaleString();
+    if (e('eng-stat-total'))    e('eng-stat-total').textContent    = '$' + totalRev.toFixed(2);
+    if (e('eng-rev-likes'))     e('eng-rev-likes').textContent     = '+$' + revLike.toFixed(2) + ' revenue';
+    if (e('eng-rev-comments'))  e('eng-rev-comments').textContent  = '+$' + revComment.toFixed(2) + ' revenue';
+    if (e('eng-rev-views'))     e('eng-rev-views').textContent     = '+$' + revView.toFixed(2) + ' revenue';
+
+    var ratesTbody = e('eng-rates-table');
+    if (ratesTbody) {
+      var rows = [
+        { label:'Like on a product / post', rate:'$'+rateFor.like.toFixed(4)+' / like', vol:counts.like, rev:revLike },
+        { label:'Comment on a product', rate:'$'+rateFor.comment.toFixed(3)+' / comment', vol:counts.comment, rev:revComment },
+        { label:'Product page view', rate:'$'+rateFor.view.toFixed(5)+' / view', vol:counts.view, rev:revView },
+        { label:'Affiliate click-through', rate:'$'+rateFor.affiliate_click.toFixed(3)+' / click', vol:counts.affiliate_click, rev:revClick },
+        { label:'Product share (external)', rate:'$'+rateFor.share.toFixed(3)+' / share', vol:counts.share, rev:revShare },
+      ];
+      ratesTbody.innerHTML = rows.map(function(r) {
+        return '<tr><td>' + r.label + '</td><td style="color:var(--accent);font-weight:700;">' + r.rate + '</td><td>ZÚLA</td><td>' + r.vol.toLocaleString() + '</td><td style="color:var(--green);font-weight:700;">$' + r.rev.toFixed(2) + '</td></tr>';
+      }).join('');
+    }
+
+    // Live activity feed — most recent 20 events across all time
+    var recent = events.slice().sort(function(a,b){ var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0; return bt-at; }).slice(0,20);
+    var feed = e('eng-activity-feed');
+    if (feed) {
+      var typeIcon = { like:'❤️', comment:'💬', view:'👁', affiliate_click:'🔗', share:'📤' };
+      var typeLabel = { like:'liked', comment:'commented on', view:'viewed', affiliate_click:'clicked an affiliate link on', share:'shared' };
+      feed.innerHTML = recent.length ? recent.map(function(ev) {
+        var when = ev.createdAt && ev.createdAt.toDate ? timeSince(ev.createdAt.toDate()) : '-';
+        var rev = (rateFor[ev.type]||0);
+        return '<div class="eng-activity-item">' +
+          '<span class="eng-activity-icon">' + (typeIcon[ev.type]||'•') + '</span>' +
+          '<span class="eng-activity-text">' + typeLabel[ev.type] + ' a product</span>' +
+          '<span class="eng-activity-time">' + when + ' ago</span>' +
+          '<span class="eng-activity-rev">+$' + rev.toFixed(4) + '</span>' +
+          '</div>';
+      }).join('') : '<div style="color:var(--text3);font-size:13px;">No engagement activity yet.</div>';
+    }
+  } catch(e2) { console.error('engLoadData:', e2); showToast('Could not load engagement data.'); }
+};
+
+window.engEditRates = async function() {
+  var db = window._db, fns = window._fns;
+  var rates = window._engRates || window.ENG_DEFAULT_RATES;
+  var likeRate = prompt('Rate per like (USD):', rates.likeRate || 0.0005);
+  if (likeRate === null) return;
+  var commentRate = prompt('Rate per comment (USD):', rates.commentRate || 0.002);
+  if (commentRate === null) return;
+  var viewRate = prompt('Rate per product view (USD):', rates.viewRate || 0.00005);
+  if (viewRate === null) return;
+  var affClickRate = prompt('Rate per affiliate click-through (USD):', rates.affClickRate || 0.001);
+  if (affClickRate === null) return;
+  var shareRate = prompt('Rate per external share (USD):', rates.shareRate || 0.003);
+  if (shareRate === null) return;
+  try {
+    await fns.setDoc(fns.doc(db,'settings','engagement'), {
+      likeRate: parseFloat(likeRate)||0, commentRate: parseFloat(commentRate)||0,
+      viewRate: parseFloat(viewRate)||0, affClickRate: parseFloat(affClickRate)||0,
+      shareRate: parseFloat(shareRate)||0, updatedAt: fns.serverTimestamp(),
+    }, { merge:true });
+    showToast('✅ Engagement rates updated.');
+    engLoadData();
+  } catch(e2) { showToast('Could not save rates.'); }
+};
+
+// Wire the admin nav tab
+var _origAdminTabEng = window.adminTab;
+window.adminTab = function(name) {
+  _origAdminTabEng(name);
+  if (name === 'engagement') engLoadData();
+};
+
+console.log('✅ ZÚLA — all features loaded.');
 
 </script>
 
