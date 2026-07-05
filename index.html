@@ -507,6 +507,25 @@ p{color:var(--text2);margin:0 0 1em;}
 .avq-flag-note{font-size:12px;color:var(--red);background:rgba(240,82,82,.06);border-left:3px solid var(--red);padding:9px 12px;margin-bottom:12px;line-height:1.6;}
 .avq-status-pill{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;}
 .avq-status-pending{background:rgba(245,200,66,.15);color:var(--gold);}
+
+/* ── ADMIN: ENGAGEMENT REVENUE ── */
+.eng-period-btn{padding:8px 16px;border:none;border-radius:6px;background:transparent;color:var(--text3);font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+.eng-period-btn.active{background:var(--accent);color:#fff;}
+.eng-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+@media(max-width:760px){.eng-stat-row{grid-template-columns:repeat(2,1fr);}}
+.eng-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;}
+.eng-stat-card.highlight{border-color:var(--gold);background:rgba(245,200,66,.06);}
+.eng-stat-icon{font-size:18px;margin-bottom:8px;}
+.eng-stat-val{font-size:24px;font-weight:800;font-family:var(--font-display);}
+.eng-stat-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+.eng-stat-rev{font-size:11.5px;color:var(--green);margin-top:6px;font-weight:600;}
+.eng-activity-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.eng-activity-item:last-child{border-bottom:none;}
+.eng-activity-icon{font-size:14px;width:20px;flex-shrink:0;}
+.eng-activity-text{flex:1;color:var(--text2);}
+.eng-activity-text strong{color:var(--text);}
+.eng-activity-time{font-size:11px;color:var(--text3);white-space:nowrap;}
+.eng-activity-rev{font-size:11.5px;color:var(--green);font-weight:700;white-space:nowrap;}
 .avq-status-flagged{background:rgba(240,82,82,.15);color:var(--red);}
 .admin-denied h2{font-size:22px;font-weight:700;margin-bottom:8px;}
 
@@ -1291,6 +1310,15 @@ p{color:var(--text2);margin:0 0 1em;}
           <span id="pd-rating-count" style="font-size:12.5px;color:var(--text3);"></span>
         </div>
 
+        <!-- Engagement bar: views / like / comments -->
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+          <span style="font-size:12.5px;color:var(--text3);display:flex;align-items:center;gap:5px;">👁 <span id="pd-view-count">0</span></span>
+          <button id="pd-like-btn" onclick="pdToggleLike()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text3);padding:0;font-family:var(--font-body);">
+            <span id="pd-like-icon">♡</span> <span id="pd-like-count">0</span>
+          </button>
+          <span style="font-size:12.5px;color:var(--text3);display:flex;align-items:center;gap:5px;cursor:pointer;" onclick="document.getElementById('pd-comment-input')?.focus()">💬 <span id="pd-comment-count">0</span></span>
+        </div>
+
         <div class="pdetail-desc" id="pd-desc">Description</div>
 
         <!-- Real estate details -->
@@ -1353,6 +1381,18 @@ p{color:var(--text2);margin:0 0 1em;}
         <textarea id="pd-review-text" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:80px;resize:vertical;margin-bottom:10px;" placeholder="Share your experience with this product…"></textarea>
         <button class="btn btn-primary btn-sm" onclick="pdSubmitReview()">Submit review</button>
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pd-review-form').style.display='none'">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Comments section — open engagement, anyone signed in can comment -->
+    <div style="max-width:800px;margin:32px auto 0;">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">💬 Comments (<span id="pd-comment-count-hd">0</span>)</h3>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <input type="text" id="pd-comment-input" placeholder="Ask a question or leave a comment…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;" onkeydown="if(event.key==='Enter')pdSubmitComment()">
+        <button class="btn btn-primary btn-sm" onclick="pdSubmitComment()">Post</button>
+      </div>
+      <div id="pd-comments-list" style="display:flex;flex-direction:column;gap:12px;">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No comments yet — be the first!</div>
       </div>
     </div>
   </div>
@@ -2724,6 +2764,7 @@ if (_kycOrigShowPage) {
         <a id="anav-disputes"   onclick="adminTab('disputes')">⚠️ Disputes</a>
         <a id="anav-affiliates" onclick="adminTab('affiliates')">🤝 Affiliates</a>
         <a id="anav-messages"   onclick="adminTab('messages')">💬 Message Monitoring</a>
+        <a id="anav-engagement" onclick="adminTab('engagement')">💛 Engagement Revenue</a>
         <a id="anav-verif"      onclick="adminTab('verif')">🛡 Verif. Queue</a>
         <a id="anav-broadcast"  onclick="adminTab('broadcast')">📢 Broadcast</a>
         <a id="anav-banned"     onclick="adminTab('banned')">🚫 Banned</a>
@@ -3044,6 +3085,43 @@ if (_kycOrigShowPage) {
         </div>
       </div>
 
+      <!-- ENGAGEMENT REVENUE -->
+      <div class="admin-section" id="asec-engagement">
+        <div class="dash-h1">Engagement Revenue</div>
+        <div class="dash-sub">ZÚLA earns from platform-wide likes, comments, and views — not sellers (yet).</div>
+        <div style="background:rgba(240,82,82,.06);border:1px solid rgba(240,82,82,.2);border-radius:var(--radius-xs);padding:12px 16px;font-size:12.5px;color:var(--red);margin-bottom:18px;">
+          🔒 <strong>Admin-only feature.</strong> Engagement earnings go to ZÚLA platform treasury. Seller share is disabled — toggle it on when ready in Settings.
+        </div>
+        <div style="display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px;width:fit-content;margin-bottom:18px;">
+          <button class="eng-period-btn active" onclick="engSetPeriod(this,'today')">Today</button>
+          <button class="eng-period-btn" onclick="engSetPeriod(this,'week')">This week</button>
+          <button class="eng-period-btn" onclick="engSetPeriod(this,'month')">This month</button>
+        </div>
+        <div class="eng-stat-row">
+          <div class="eng-stat-card"><div class="eng-stat-icon">❤️</div><div class="eng-stat-val" id="eng-stat-likes">0</div><div class="eng-stat-lbl">Platform likes</div><div class="eng-stat-rev" id="eng-rev-likes">+$0.00 revenue</div></div>
+          <div class="eng-stat-card"><div class="eng-stat-icon">💬</div><div class="eng-stat-val" id="eng-stat-comments">0</div><div class="eng-stat-lbl">Comments</div><div class="eng-stat-rev" id="eng-rev-comments">+$0.00 revenue</div></div>
+          <div class="eng-stat-card"><div class="eng-stat-icon">👁</div><div class="eng-stat-val" id="eng-stat-views">0</div><div class="eng-stat-lbl">Product page views</div><div class="eng-stat-rev" id="eng-rev-views">+$0.00 revenue</div></div>
+          <div class="eng-stat-card highlight"><div class="eng-stat-icon">💰</div><div class="eng-stat-val" id="eng-stat-total">$0.00</div><div class="eng-stat-lbl">Total engagement revenue</div><div class="eng-stat-rev" id="eng-rev-change">—</div></div>
+        </div>
+
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">How engagement revenue is calculated</h3>
+          <table class="dtable">
+            <thead><tr><th>Action</th><th>Rate</th><th>Who earns</th><th>Today's volume</th><th>Today's revenue</th></tr></thead>
+            <tbody id="eng-rates-table"></tbody>
+          </table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+            <p style="font-size:11.5px;color:var(--text3);margin:0;">Revenue is derived from ad-value benchmarks and platform data-licensing agreements.</p>
+            <button class="btn btn-ghost btn-sm" onclick="engEditRates()">Edit rates</button>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Live engagement activity</h3>
+          <div id="eng-activity-feed" style="max-height:340px;overflow-y:auto;"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
+        </div>
+      </div>
+
       <!-- VERIFICATION QUEUE -->
       <div class="admin-section" id="asec-verif">
         <div class="dash-h1">Seller Verification Queue</div>
@@ -3147,6 +3225,23 @@ if (_kycOrigShowPage) {
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-listings">—</div><div style="font-size:11px;color:var(--text3);">Listings</div></div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-followers">0</div><div style="font-size:11px;color:var(--text3);">Followers</div></div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pv2-stat-revenue">NGN 0</div><div style="font-size:11px;color:var(--text3);">Revenue</div></div>
+    </div>
+    <!-- PROFILE TAB PANELS — real data per tab -->
+    <div class="dash-card" id="pv2-panel-orders">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My orders</h3>
+      <div id="pv2-orders-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
+    </div>
+    <div class="dash-card" id="pv2-panel-downloads" style="display:none;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My downloads</h3>
+      <div id="pv2-downloads-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
+    </div>
+    <div class="dash-card" id="pv2-panel-wishlist" style="display:none;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My wishlist</h3>
+      <div id="pv2-wishlist-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
+    </div>
+    <div class="dash-card" id="pv2-panel-reviews" style="display:none;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Reviews I've written</h3>
+      <div id="pv2-reviews-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
     <!-- MY LISTINGS PREVIEW -->
     <div class="dash-card" id="pv2-listings-card">
@@ -5693,7 +5788,12 @@ window.loadProfileV2 = async function() {
     }
   } catch(e) {}
 
-  if (el('pv2-stat-orders'))  el('pv2-stat-orders').textContent  = '—';
+  try {
+    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',user.uid)));
+    if (el('pv2-stat-orders')) el('pv2-stat-orders').textContent = ordSnap.size;
+  } catch(e) { if (el('pv2-stat-orders')) el('pv2-stat-orders').textContent = '0'; }
+
+  pv2LoadOrders();
 };
 
 // ── LOAD MY PUBLIC PROFILE (myprofile page) ───────────────────────
@@ -6223,8 +6323,103 @@ window.switchPv2Tab = function(tab, btn) {
   ['orders','downloads','wishlist','reviews'].forEach(t => {
     const b = document.getElementById('pv2-tab-' + t);
     if (b) { b.style.background = 'transparent'; b.style.color = 'var(--text2)'; }
+    const panel = document.getElementById('pv2-panel-' + t);
+    if (panel) panel.style.display = (t === tab) ? '' : 'none';
   });
   if (btn) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; }
+  if (tab === 'orders')    pv2LoadOrders();
+  if (tab === 'downloads') pv2LoadDownloads();
+  if (tab === 'wishlist')  pv2LoadWishlist();
+  if (tab === 'reviews')   pv2LoadReviews();
+};
+
+window.pv2LoadOrders = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var wrap = document.getElementById('pv2-orders-list');
+  if (!wrap || !user) return;
+  wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',user.uid)));
+    var orders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); })
+      .sort(function(a,b){ var at=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0, bt=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0; return bt-at; });
+    if (!orders.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No orders yet. <a onclick="showPage(\'marketplace\')" style="color:var(--accent);cursor:pointer;">Start shopping →</a></div>'; return; }
+    var statusColor = { pending:'var(--gold)', paid:'var(--gold)', packed:'var(--gold)', shipped:'#5ba8f5', 'in-transit':'#5ba8f5', completed:'var(--green)', refunded:'var(--red)', cancelled:'var(--text3)', disputed:'var(--red)' };
+    wrap.innerHTML = orders.map(function(o) {
+      var thumb = o.productPhoto ? ('<img src="'+o.productPhoto+'" style="width:100%;height:100%;object-fit:cover;">') : (o.productEmoji||'📦');
+      var date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '-';
+      var color = statusColor[o.status] || 'var(--text3)';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);">' +
+        '<div style="width:42px;height:42px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0;">' + thumb + '</div>' +
+        '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (o.productName||'Product') + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text3);">' + date + ' · <span style="color:'+color+';font-weight:700;">' + (o.status||'-') + '</span></div></div>' +
+        '<div style="font-size:13px;font-weight:800;color:var(--accent);white-space:nowrap;">' + (o.currency||'NGN') + ' ' + Number(o.price||0).toLocaleString() + '</div>' +
+        '<button class="btn btn-sm btn-ghost" onclick="openOrderDetail(\''+o._id+'\')">View</button>' +
+        '</div>';
+    }).join('');
+  } catch(e) { console.error('pv2LoadOrders:', e); wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load orders.</div>'; }
+};
+
+window.pv2LoadDownloads = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var wrap = document.getElementById('pv2-downloads-list');
+  if (!wrap || !user) return;
+  wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
+  var digitalTypes = ['course','ebook','template','software','audio','coaching'];
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',user.uid)));
+    var downloads = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); })
+      .filter(function(o){ return digitalTypes.indexOf(o.productType)!==-1 && (o.status==='paid'||o.status==='completed'); });
+    if (!downloads.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No digital purchases yet.</div>'; return; }
+    wrap.innerHTML = downloads.map(function(o) {
+      var thumb = o.productPhoto ? ('<img src="'+o.productPhoto+'" style="width:100%;height:100%;object-fit:cover;">') : (o.productEmoji||'📦');
+      var isCourse = o.productType === 'course';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);">' +
+        '<div style="width:42px;height:42px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0;">' + thumb + '</div>' +
+        '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;">' + (o.productName||'Product') + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text3);">' + (o.productType||'').charAt(0).toUpperCase()+(o.productType||'').slice(1) + '</div></div>' +
+        (isCourse
+          ? '<button class="btn btn-sm btn-primary" onclick="watchCourse(\''+o.productId+'\')">▶ Watch</button>'
+          : '<button class="btn btn-sm btn-ghost" onclick="openOrderDetail(\''+o._id+'\')">View order</button>') +
+        '</div>';
+    }).join('');
+  } catch(e) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load downloads.</div>'; }
+};
+
+window.pv2LoadWishlist = function() {
+  var wrap = document.getElementById('pv2-wishlist-list');
+  if (!wrap) return;
+  if (!window._wishlist || !window._wishlist.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Nothing saved yet. Tap ♡ on any product to save it here.</div>'; return; }
+  wrap.innerHTML = window._wishlist.map(function(item) {
+    var img = item.photo ? ('<img src="'+item.photo+'" style="width:100%;height:100%;object-fit:cover;">') : (item.emoji||'📦');
+    return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="openProduct(\''+item.id+'\')">' +
+      '<div style="width:42px;height:42px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0;">' + img + '</div>' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;">' + (item.name||'Product') + '</div></div>' +
+      '<div style="font-size:13px;font-weight:800;color:var(--accent);">' + (item.currency||'NGN') + ' ' + Number(item.price||0).toLocaleString() + '</div>' +
+      '</div>';
+  }).join('');
+};
+
+window.pv2LoadReviews = async function() {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var wrap = document.getElementById('pv2-reviews-list');
+  if (!wrap || !user) return;
+  wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
+  try {
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('reviewerId','==',user.uid)));
+    var reviews = snap.docs.map(function(d){ return d.data(); });
+    if (!reviews.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">You haven\'t written any reviews yet.</div>'; return; }
+    wrap.innerHTML = reviews.map(function(r) {
+      var stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
+      var date = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '-';
+      return '<div style="padding:11px 0;border-bottom:1px solid var(--border);">' +
+        '<div style="display:flex;justify-content:space-between;"><span style="color:#f5c842;font-size:13px;">' + stars + '</span><span style="font-size:11px;color:var(--text3);">' + date + '</span></div>' +
+        '<div style="font-size:13px;color:var(--text2);margin-top:4px;">' + (r.text||'') + '</div>' +
+        '</div>';
+    }).join('');
+  } catch(e) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load reviews.</div>'; }
 };
 
 // Settings sidebar tabs
@@ -9711,38 +9906,75 @@ window.adminLoadPayouts = async function() {
   var db = window._db, fns = window._fns;
   var tbody = document.getElementById('a-payouts-table');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:20px;">Loading…</td></tr>';
   try {
     var snap = await fns.getDocs(fns.collection(db,'payoutRequests'));
     var sortedPay = snap.docs.sort(function(a,b){ return ((b.data().createdAt&&b.data().createdAt.seconds)||0)-((a.data().createdAt&&a.data().createdAt.seconds)||0); });
+    var statusColor = { pending:'var(--gold)', processing:'#5ba8f5', successful:'var(--green)', approved:'var(--green)', failed:'var(--red)', rejected:'var(--red)' };
     var rows = sortedPay.map(function(d) {
       var p = d.data(); var did = d.id;
       var date = p.createdAt&&p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : '-';
-      var statusColor = { pending:'var(--gold)', approved:'var(--green)', rejected:'var(--red)' }[p.status]||'var(--text3)';
-      var action = p.status==='pending'
-        ? '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;margin-right:4px;" onclick="adminApprovePayout(\'' + did + '\',\'' + p.sellerId + '\',\'' + p.amount + '\')">Approve</button>' +
-          '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminRejectPayout(\'' + did + '\',\'' + p.sellerId + '\')">Reject</button>'
-        : '<span style="color:' + statusColor + ';font-weight:700;">' + p.status + '</span>';
-      return '<tr><td>' + (p.sellerName||'-') + '</td><td style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</td><td>' + (p.bankName||'-') + ' •••• ' + (p.accountNumber||'').slice(-4) + '</td><td style="font-size:12px;color:var(--text3);">' + date + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (p.status||'-') + '</td><td>' + action + '</td></tr>';
+      var color = statusColor[p.status] || 'var(--text3)';
+      var action = '';
+      if (p.status === 'pending') {
+        action = '<button class="btn btn-sm" style="background:#5ba8f5;color:#fff;border:none;font-size:11px;margin-right:4px;" onclick="adminApprovePayout(\'' + did + '\',\'' + p.sellerId + '\',\'' + p.amount + '\')">Mark processing</button>' +
+                 '<button class="btn btn-sm btn-ghost" style="font-size:11px;" onclick="adminRejectPayout(\'' + did + '\',\'' + p.sellerId + '\')">Reject</button>';
+      } else if (p.status === 'processing' || p.status === 'approved') {
+        action = '<button class="btn btn-sm" style="background:var(--green);color:#fff;border:none;font-size:11px;margin-right:4px;" onclick="adminMarkPayoutSuccessful(\'' + did + '\',\'' + p.sellerId + '\',\'' + p.amount + '\')">Mark successful</button>' +
+                 '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-size:11px;" onclick="adminMarkPayoutFailed(\'' + did + '\',\'' + p.sellerId + '\')">Mark failed</button>';
+      } else {
+        action = '<span style="color:' + color + ';font-weight:700;">' + p.status + '</span>';
+      }
+      var txId = p.transactionId ? ('<div style="font-size:10.5px;color:var(--text3);font-family:monospace;">TX: ' + p.transactionId + '</div>') : '';
+      return '<tr><td>' + (p.sellerName||'-') + '</td><td style="font-weight:700;">₦' + Number(p.amount||0).toLocaleString() + '</td>' +
+        '<td>' + (p.bankName||'-') + ' ····' + (p.accountNumber||'').slice(-4) + txId + '</td>' +
+        '<td style="font-size:12px;color:var(--text3);">' + date + '</td>' +
+        '<td style="color:' + color + ';font-weight:700;text-transform:capitalize;">' + (p.status||'-') + '</td>' +
+        '<td style="font-size:11.5px;">' + (p.sourceType==='affiliate' ? 'Affiliate' : 'Seller') + '</td>' +
+        '<td>' + action + '</td></tr>';
     });
-    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>';
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>';
   } catch(e) {
     console.error('adminLoadPayouts:', e);
     if (tbody) tbody.innerHTML = e.code === 'permission-denied'
-      ? '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>'
-      : '<tr><td colspan="6" style="color:var(--red);padding:20px;">Error loading payouts.</td></tr>';
+      ? '<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center;">No payout requests yet.</td></tr>'
+      : '<tr><td colspan="7" style="color:var(--red);padding:20px;">Error loading payouts.</td></tr>';
   }
 };
 
 window.adminApprovePayout = async function(payoutId, sellerId, amount) {
-  if (!confirm('Approve payout of ₦' + Number(amount).toLocaleString() + '?')) return;
+  if (!confirm('Mark payout of ₦' + Number(amount).toLocaleString() + ' as processing? This means you\'re initiating the bank transfer.')) return;
   var db = window._db, fns = window._fns;
   try {
-    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'approved', approvedAt:fns.serverTimestamp() });
-    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'Payout approved!', body:'Your payout of ₦' + Number(amount).toLocaleString() + ' has been approved and will be sent to your bank within 1 business day.', read:false, createdAt:fns.serverTimestamp() });
-    showToast('Payout approved and seller notified.');
+    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'processing', processingAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'Payout processing', body:'Your payout of ₦' + Number(amount).toLocaleString() + ' is now being processed and should arrive within 1 business day.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Marked as processing — seller notified.');
     adminLoadPayouts();
-  } catch(e) { showToast('Could not approve payout.'); }
+  } catch(e) { showToast('Could not update payout.'); }
+};
+
+window.adminMarkPayoutSuccessful = async function(payoutId, sellerId, amount) {
+  var txId = prompt('Enter the bank transfer / transaction ID for this payout:');
+  if (!txId) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'successful', transactionId:txId, completedAt:fns.serverTimestamp() });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'✅ Payout successful!', body:'₦' + Number(amount).toLocaleString() + ' has been sent to your bank account. Reference: ' + txId, read:false, createdAt:fns.serverTimestamp() });
+    showToast('Payout marked successful.');
+    adminLoadPayouts();
+  } catch(e) { showToast('Could not update payout.'); }
+};
+
+window.adminMarkPayoutFailed = async function(payoutId, sellerId) {
+  var reason = prompt('Reason the transfer failed (seller will see this):');
+  if (!reason) return;
+  var db = window._db, fns = window._fns;
+  try {
+    await fns.updateDoc(fns.doc(db,'payoutRequests',payoutId), { status:'failed', failReason:reason });
+    await fns.addDoc(fns.collection(db,'notifications'), { userId:sellerId, type:'payout', title:'⚠️ Payout failed', body:'Your withdrawal could not be completed. Reason: ' + reason + '. Please check your bank details in Settings and try again.', read:false, createdAt:fns.serverTimestamp() });
+    showToast('Marked as failed — seller notified.');
+    adminLoadPayouts();
+  } catch(e) { showToast('Could not update payout.'); }
 };
 
 window.adminRejectPayout = async function(payoutId, sellerId) {
@@ -11114,13 +11346,15 @@ window.sdLoadOverview = async function() {
     // Orders
     var oSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
     if (e('sd-stat-orders')) e('sd-stat-orders').textContent = oSnap.size;
-    // Revenue
+    // Revenue = completed orders only. Escrow = anything paid but not yet completed/refunded/cancelled/disputed —
+    // this must include every stage of the fulfillment pipeline (paid → packed → shipped), not just the literal 'paid' status.
+    var terminalBad = ['refunded','cancelled','disputed'];
     var revenue = oSnap.docs.filter(function(d){ return d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
-    var inEscrow = oSnap.docs.filter(function(d){ return d.data().status==='paid'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    var inEscrow = oSnap.docs.filter(function(d){ var st=d.data().status; return st!=='completed' && terminalBad.indexOf(st)===-1; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
     if (e('sd-stat-escrow')) e('sd-stat-escrow').textContent = '₦' + inEscrow.toLocaleString();
     if (e('sd-stat-revenue')) e('sd-stat-revenue').textContent = '₦' + revenue.toLocaleString();
-    // Pending orders
-    var pending = oSnap.docs.filter(function(d){ return d.data().status==='pending'; }).length;
+    // Pending orders (awaiting seller action)
+    var pending = oSnap.docs.filter(function(d){ var st=d.data().status; return st==='pending'||st==='paid'; }).length;
     if (e('sd-stat-pending')) e('sd-stat-pending').textContent = pending;
     // Show escrow note if there are funds held
     var escrowNote = e('sd-escrow-note');
@@ -11708,8 +11942,11 @@ window.sdEditProduct = async function(productId) {
       if (e('ap-field-stock'))    e('ap-field-stock').value    = p.stock||'';
       if (e('ap-field-delivery-fee')) e('ap-field-delivery-fee').value = p.deliveryFee||'';
       if (e('ap-field-ships-from'))   e('ap-field-ships-from').value   = p.shipsFrom||'';
-      // Set product type
-      if (p.productType && typeof apSelectType === 'function') apSelectType(p.productType);
+      // Select the correct product type card (apSelectType expects the clicked element, not a string)
+      if (p.productType) {
+        var typeEl = document.querySelector('.ap-type-opt[data-type="' + p.productType + '"]');
+        if (typeEl) apSelectType(typeEl);
+      }
       // Show existing photos
       if (p.photos && p.photos.length) {
         window._apPhotos = p.photos.map(function(url,i){ return { dataUrl:url, name:'photo_'+i+'.jpg', file:null }; });
@@ -11717,6 +11954,8 @@ window.sdEditProduct = async function(productId) {
       }
       // Sync preview
       if (typeof apSyncPreview === 'function') apSyncPreview();
+      // Jump straight to Step 2 (Details & pricing) — editing shouldn't restart the wizard from Step 1
+      apGoStep2();
       // Update publish button label
       var pubBtn = document.querySelector('#ap-step-3 .btn-primary');
       if (pubBtn) pubBtn.textContent = 'Update listing →';
@@ -11780,7 +12019,22 @@ window.trackProductView = async function(productId, sellerId) {
     await fns.updateDoc(viewDoc, { viewCount: fns.increment(1) });
     // Also write to analytics collection for seller dashboard
     await fns.setDoc(fns.doc(db,'analytics',sellerId), { totalViews: fns.increment(1) }, { merge:true });
+    zulaLogEngagement('view', productId, sellerId);
   } catch(e) { /* silent */ }
+};
+
+// ── Unified, timestamped engagement event log — powers real Today/Week/Month admin analytics ──
+window.zulaLogEngagement = async function(type, productId, sellerId, extra) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  if (!db || !fns) return;
+  var user = auth && auth.currentUser;
+  try {
+    var payload = Object.assign({
+      type: type, productId: productId || null, sellerId: sellerId || null,
+      userId: user ? user.uid : null, createdAt: fns.serverTimestamp(),
+    }, extra || {});
+    await fns.addDoc(fns.collection(db,'engagementEvents'), payload);
+  } catch(e) { /* silent — engagement logging should never block the UI */ }
 };
 
 // Patch viewProduct to track views
@@ -11801,29 +12055,48 @@ window.sdLoadAnalytics = async function() {
   var sec = document.getElementById('sd-sec-analytics');
   if (!sec || !user) return;
   try {
-    // Load orders
-    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
-    // Load analytics doc for views (non-blocking — falls back to 0 if rule/doc missing)
+    var ordSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('sellerId','==',user.uid)));
+    var orders = ordSnap.docs.map(function(d){ return d.data(); });
+
     var totalViews = 0;
     try {
       var analyticsDoc = await fns.getDoc(fns.doc(db,'analytics',user.uid));
       totalViews = analyticsDoc.exists() ? (analyticsDoc.data().totalViews||0) : 0;
     } catch(viewErr) { console.warn('Analytics views unavailable:', viewErr.message); }
-    // Build monthly revenue
+
+    // ── Real, status-aware bucketing — revenue must never include refunded/cancelled orders ──
+    var completed = orders.filter(function(o){ return o.status==='completed'; });
+    var refunded  = orders.filter(function(o){ return o.status==='refunded'; });
+    var cancelled = orders.filter(function(o){ return o.status==='cancelled'; });
+    var disputed  = orders.filter(function(o){ return o.status==='disputed'; });
+    var inEscrow  = orders.filter(function(o){ return ['completed','refunded','cancelled','disputed'].indexOf(o.status)===-1; });
+    var pendingOrders = orders.filter(function(o){ return o.status==='pending'||o.status==='paid'; });
+
+    var totalRevenue   = completed.reduce(function(s,o){ return s+Number(o.price||0); },0);
+    var pendingRevenue = inEscrow.reduce(function(s,o){ return s+Number(o.price||0); },0);
+    var refundedAmount = refunded.reduce(function(s,o){ return s+Number(o.price||0); },0);
+
+    // Withdrawn / processing amounts come from real payout requests, not the order set
+    var payoutSnap = await fns.getDocs(fns.query(fns.collection(db,'payoutRequests'), fns.where('sellerId','==',user.uid))).catch(function(){ return { docs:[] }; });
+    var payouts = payoutSnap.docs.map(function(d){ return d.data(); });
+    var withdrawn = payouts.filter(function(p){ return p.status==='approved'||p.status==='paid'||p.status==='successful'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+    var inFlight   = payouts.filter(function(p){ return p.status==='pending'||p.status==='processing'; }).reduce(function(s,p){ return s+Number(p.amount||0); },0);
+    var availableBalance = Math.max(0, totalRevenue - withdrawn - inFlight);
+
+    var conversionRate = totalViews > 0 ? ((completed.length/totalViews)*100).toFixed(1) : '0.0';
+
+    // Monthly revenue — completed orders only
     var monthly = {};
-    ordSnap.docs.forEach(function(d) {
-      var o = d.data();
-      if (!o.createdAt||!o.createdAt.toDate) return;
+    completed.forEach(function(o) {
+      if (!o.createdAt || !o.createdAt.toDate) return;
       var dt = o.createdAt.toDate();
       var key = dt.toLocaleString('default',{month:'short',year:'numeric'});
       monthly[key] = (monthly[key]||0) + Number(o.price||0);
     });
-    var labels = Object.keys(monthly).slice(-6); // last 6 months
+    var labels = Object.keys(monthly).slice(-6);
     var values = labels.map(function(k){ return monthly[k]; });
     var maxV = Math.max.apply(null, values.concat([1]));
-    var total = values.reduce(function(s,v){ return s+v; },0);
-    var aov = ordSnap.size ? Math.round(total/ordSnap.size) : 0;
-    var convRate = totalViews > 0 ? ((ordSnap.size/totalViews)*100).toFixed(1) : '0.0';
+    var aov = completed.length ? Math.round(totalRevenue/completed.length) : 0;
     var bars = labels.map(function(l,i) {
       var pct = Math.round((values[i]/maxV)*100);
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">' +
@@ -11832,20 +12105,41 @@ window.sdLoadAnalytics = async function() {
         '<div style="width:100%;background:linear-gradient(180deg,var(--accent),var(--accent2));height:'+pct+'%;border-radius:4px 4px 0 0;transition:.4s;"></div></div>' +
         '<div style="font-size:10px;color:var(--text3);">' + l + '</div></div>';
     }).join('');
+
+    // Product performance — revenue + units per product, completed orders only
+    var perProduct = {};
+    completed.forEach(function(o) {
+      var key = o.productId || o.productName || 'unknown';
+      if (!perProduct[key]) perProduct[key] = { name:o.productName||'Product', qty:0, revenue:0 };
+      perProduct[key].qty += (o.qty||1);
+      perProduct[key].revenue += Number(o.price||0);
+    });
+    var perfRows = Object.values(perProduct).sort(function(a,b){ return b.revenue-a.revenue; }).slice(0,6);
+    var perfHtml = perfRows.length ? perfRows.map(function(p) {
+      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>' + p.name + '</span><span style="color:var(--text3);">' + p.qty + ' sold</span><span style="font-weight:700;color:var(--accent);">₦' + p.revenue.toLocaleString() + '</span></div>';
+    }).join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No completed sales yet.</div>';
+
     sec.innerHTML =
-      '<div class="sd-page-hd">Analytics</div><div class="sd-page-sub">Your sales performance over time</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + total.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val">' + ordSnap.size + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
+      '<div class="sd-page-hd">Analytics</div><div class="sd-page-sub">Your sales performance over time — figures reflect completed orders only</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + totalRevenue.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val">' + orders.length + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">' + completed.length + '</div><div class="sd-stat-lbl">Completed orders</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">' + pendingOrders.length + '</div><div class="sd-stat-lbl">Pending orders</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--text3);">' + cancelled.length + '</div><div class="sd-stat-lbl">Cancelled orders</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--red);">₦' + refundedAmount.toLocaleString() + '</div><div class="sd-stat-lbl">Refunded amount</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + pendingRevenue.toLocaleString() + '</div><div class="sd-stat-lbl">Escrow balance</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">₦' + availableBalance.toLocaleString() + '</div><div class="sd-stat-lbl">Available balance</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val">₦' + withdrawn.toLocaleString() + '</div><div class="sd-stat-lbl">Withdrawn</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">₦' + aov.toLocaleString() + '</div><div class="sd-stat-lbl">Avg. order value</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:#60b4ff;">' + totalViews.toLocaleString() + '</div><div class="sd-stat-lbl">Product views</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">' + convRate + '%</div><div class="sd-stat-lbl">Conversion rate</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--accent);">' + (window._myProducts ? window._myProducts.length : '—') + '</div><div class="sd-stat-lbl">Active listings</div></div>' +
+        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">' + conversionRate + '%</div><div class="sd-stat-lbl">Conversion rate</div></div>' +
       '</div>' +
-      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">📊 Monthly revenue</div>' +
+      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">📊 Monthly revenue (completed orders)</div>' +
       (bars ? '<div style="display:flex;gap:8px;align-items:flex-end;min-height:160px;">' + bars + '</div>' :
-        '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No sales yet — your revenue chart will appear here.</div>') +
-      '</div>';
+        '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No completed sales yet — your revenue chart will appear here.</div>') +
+      '</div>' +
+      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">🏆 Product performance</div>' + perfHtml + '</div>';
   } catch(e) { console.error(e); sec.innerHTML = '<div class="sd-page-hd">Analytics</div><div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No data yet. Sales and views will appear here once you start selling.</div>'; }
 };
 
@@ -12357,11 +12651,12 @@ window.sdLoadFulfillOrders = async function() {
 };
 
 function sdFulfillBucket(status) {
-  if (status === 'paid' || status === 'pending') return 'new';
   if (status === 'packed') return 'packed';
   if (status === 'shipped' || status === 'in-transit') return 'shipped';
   if (status === 'completed' || status === 'delivered') return 'completed';
-  return 'other';
+  // Anything else that reaches this list (paid, pending, undefined, or any unexpected/legacy value)
+  // is treated as a fresh order needing action — it must never fall through uncounted.
+  return 'new';
 }
 
 window.sdUpdateFulfillTabs = function() {
