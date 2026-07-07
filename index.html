@@ -5999,8 +5999,10 @@ window.loadMyProfile = async function() {
       } else {
         grid.innerHTML = lsnap.docs.map(d => {
           const p = d.data();
+          const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+          const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
           return `<div class="pcard" onclick="viewProduct('${d.id}')">
-            <div class="pcard-img">${p.emoji||'📦'}</div>
+            <div class="pcard-img" style="overflow:hidden;">${imgHtml}</div>
             <div class="pcard-body">
               <div class="pcard-name">${p.name}</div>
               <div class="pcard-seller">by ${p.sellerName||fullName}</div>
@@ -6204,6 +6206,69 @@ function isAdmin() {
   const user = window._auth && window._auth.currentUser;
   return user && ADMIN_EMAILS.includes(user.email.toLowerCase());
 }
+
+// ══════════════════════════════════════════════════
+// MARKETPLACE COMMISSION — per-category platform fee rates.
+// This is the single source of truth for how much ZÚLA keeps on each
+// sale. Every place that needs a commission rate (Add Product preview,
+// order creation/splitting, dashboards) calls getCategoryFeeRate(type)
+// instead of hardcoding a number, so updating a rate here updates the
+// whole app consistently.
+// ══════════════════════════════════════════════════
+window.ZULA_CATEGORY_FEES = {
+  physical:   0.06,  // Physical Products
+  realestate: 0.10,  // Real Estate
+  vehicle:    0.10,  // Vehicles (cars, etc.)
+  ebook:      0.10,  // Ebooks & PDFs
+  course:     0.12,  // Online Courses
+  template:   0.10,  // Templates & Design Files
+  audio:      0.10,  // Music & Audio
+  software:   0.10,  // Software & Tools
+  coaching:   0.10,  // Coaching / Service (default digital rate — no rate specified for this category)
+};
+window.getCategoryFeeRate = function(productType) {
+  var rate = window.ZULA_CATEGORY_FEES[productType];
+  return (typeof rate === 'number') ? rate : 0.10; // safe default for any future/unmapped category
+};
+// Net amount a seller is actually owed for an order (gross minus platform commission
+// minus affiliate commission, plus delivery passed straight through). Falls back to
+// computing the split on the fly for any legacy order saved before these fields existed,
+// so every dashboard reading this always shows an accurate number.
+window.sellerNetOf = function(o) {
+  if (typeof o.sellerNetAmount === 'number') return o.sellerNetAmount;
+  var rate = (typeof o.platformFeeRate === 'number') ? o.platformFeeRate : window.getCategoryFeeRate(o.productType);
+  var deliveryFee = Number(o.deliveryFee || 0);
+  var saleValue = Number(o.price || 0) - deliveryFee;
+  var aff = Number(o.affiliateCommissionAmount || 0);
+  return Math.max(0, saleValue - Math.round(saleValue * rate) - aff) + deliveryFee;
+};
+// The platform's own commission cut for an order (never the full gross sale price).
+window.platformFeeOf = function(o) {
+  if (typeof o.platformFeeAmount === 'number') return o.platformFeeAmount;
+  var rate = (typeof o.platformFeeRate === 'number') ? o.platformFeeRate : window.getCategoryFeeRate(o.productType);
+  var saleValue = Number(o.price || 0) - Number(o.deliveryFee || 0);
+  return Math.round(saleValue * rate);
+};
+
+// ══════════════════════════════════════════════════
+// PAYSTACK PROCESSING FEE — charged to the buyer, on top of the order
+// total, so the seller's payout is never reduced by payment-processing
+// costs. Matches Paystack's current published Nigeria pricing:
+//   Local cards: 1.5% + ₦100 flat, capped at ₦2,000 per transaction,
+//   flat ₦100 portion waived under ₦2,500. International cards: 3.9% + ₦100
+//   (no cap). See https://paystack.com/pricing — update here if Paystack's
+//   rates change and every checkout screen updates automatically.
+// ══════════════════════════════════════════════════
+window.calcPaystackFee = function(amount, currency) {
+  amount = Number(amount) || 0;
+  if (amount <= 0) return 0;
+  if ((currency || 'NGN') !== 'NGN') {
+    return Math.round(amount * 0.039 + 100); // international card rate, no cap
+  }
+  var flat = amount < 2500 ? 0 : 100; // Paystack waives the flat ₦100 under ₦2,500
+  var fee = amount * 0.015 + flat;
+  return Math.round(Math.min(fee, 2000)); // ₦2,000 local-transaction cap
+};
 
 window.openAdmin = function() {
   // Don't call showPage here - called directly from nav link
@@ -6764,12 +6829,13 @@ window.apUpdateAffPreview = function() {
   var curEl = document.getElementById('ap-field-currency');
   var currency = curEl ? curEl.value : 'NGN';
   var sym = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[currency] || '';
-  var platFee = price * 0.05, affEarn = price * (affPct/100), sellerGet = price - affEarn - platFee;
+  var platFeeRate = (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(_apType) : 0.10;
+  var platFee = price * platFeeRate, affEarn = price * (affPct/100), sellerGet = price - affEarn - platFee;
   var fmt = function(v){ return price > 0 ? sym + v.toLocaleString('en',{maximumFractionDigits:0}) : '-'; };
   var e = id => document.getElementById(id);
   if (e('ap-aep-affiliate')) e('ap-aep-affiliate').textContent = fmt(affEarn);
   if (e('ap-aep-seller'))    e('ap-aep-seller').textContent    = fmt(sellerGet);
-  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (5%)' : '-';
+  if (e('ap-aep-platform'))  e('ap-aep-platform').textContent  = price > 0 ? fmt(platFee) + ' (' + Math.round(platFeeRate*100) + '%)' : '-';
   var affTag = e('ap-pv-aff-tag');
   if (affTag) affTag.textContent = 'Affiliate · ' + affPct + '%';
 };
@@ -7083,6 +7149,7 @@ window.submitProduct = async function() {
       productType,
       commission:   hasAff ? commission : 0,
       affiliateEnabled: hasAff,
+      platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(productType) : 0.10,
       sellerId:     user.uid,
       sellerName:   profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
       sellerVerified: profile.sellerVerified || false,
@@ -9199,7 +9266,7 @@ window.pdToggleWishlist = function() {
   if (!p) return;
   var idx = _wishlist.findIndex(function(i){ return i.id === p.id; });
   if (idx >= 0) { _wishlist.splice(idx, 1); showToast('Removed from wishlist'); document.getElementById('pd-wishlist-btn').textContent = '♡ Save'; }
-  else { _wishlist.push({ id:p.id, name:p.name, price:p.price, currency:p.currency||'NGN' }); showToast('❤️ Saved to wishlist!'); document.getElementById('pd-wishlist-btn').textContent = '❤️ Saved'; }
+  else { _wishlist.push({ id:p.id, name:p.name, price:p.price, currency:p.currency||'NGN', photo:(p.photos&&p.photos[0])||p.photo||'', emoji:p.emoji||'📦', productType:p.productType||'physical', sellerId:p.sellerId, sellerName:p.sellerName }); showToast('❤️ Saved to wishlist!'); document.getElementById('pd-wishlist-btn').textContent = '❤️ Saved'; }
   wishSave();
 };
 
@@ -10019,7 +10086,9 @@ window.adminLoadOrders = async function() {
     var snap = await fns.getDocs(fns.collection(db,'orders'));
     var orders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
     orders.sort(function(a,b){ return ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0); });
-    var revenue = orders.filter(function(o){ return o.status==='completed'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
+    // Admin revenue = the platform's own commission cut only (never the full gross sale price) —
+    // see window.platformFeeOf for the shared calculation.
+    var revenue = orders.filter(function(o){ return o.status==='completed'; }).reduce(function(s,o){ return s+platformFeeOf(o); },0);
     var escrow = orders.filter(function(o){ return o.status==='pending'; }).reduce(function(s,o){ return s+Number(o.price||0); },0);
     var e = function(id){ return document.getElementById(id); };
     if (e('astat-orders')) e('astat-orders').textContent = orders.length;
@@ -10371,6 +10440,7 @@ window.sdTab = function(name) {
           <div class="co-card-hd">Order summary</div>
           <div id="co2-summary-items"></div>
           <div class="co-summary-row"><span>Subtotal</span><span id="co2-subtotal">NGN 0</span></div>
+          <div class="co-summary-row"><span id="co2-fee-label">Service fee</span><span id="co2-fee">NGN 0</span></div>
           <div class="co-summary-row"><span>Delivery</span><span id="co2-delivery-fee">Free</span></div>
           <div class="co-summary-row co2-total-row"><span>Total</span><span id="co2-total">NGN 0</span></div>
           <button class="btn btn-primary" style="width:100%;padding:13px;margin-top:16px;" id="co2-pay-btn" onclick="co2SubmitOrder()">Pay →</button>
@@ -10648,7 +10718,7 @@ window.sdTab = function(name) {
       <div class="cart-summary-box">
         <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Order summary</div>
         <div class="cart-summary-row"><span style="color:var(--text3);">Subtotal</span><span id="cart-subtotal">₦0</span></div>
-        <div class="cart-summary-row"><span style="color:var(--text3);">Service fee (2%)</span><span id="cart-fee">₦0</span></div>
+        <div class="cart-summary-row"><span style="color:var(--text3);" id="cart-fee-label">Service fee</span><span id="cart-fee">₦0</span></div>
         <div class="cart-summary-row" style="font-size:15px;font-weight:800;padding-top:12px;border-top:1px solid var(--border);margin-top:4px;">
           <span>Total</span><span id="cart-total" style="color:var(--accent);">₦0</span>
         </div>
@@ -10920,11 +10990,13 @@ window.cartRemove = function(idx) {
 
 window.cartCalcTotals = function() {
   var sub = _cart.reduce(function(s,i){ return s + (Number(i.price||0) * (i.qty||1)); }, 0);
-  var fee = Math.round(sub * 0.02);
+  var currency = (_cart[0] && _cart[0].currency) || 'NGN';
+  var fee = (typeof window.calcPaystackFee === 'function') ? window.calcPaystackFee(sub, currency) : Math.round(sub * 0.02);
   var total = sub + fee;
   var e = function(id){ return document.getElementById(id); };
   if (e('cart-subtotal')) e('cart-subtotal').textContent = '₦' + sub.toLocaleString();
   if (e('cart-fee')) e('cart-fee').textContent = '₦' + fee.toLocaleString();
+  if (e('cart-fee-label')) e('cart-fee-label').textContent = 'Service fee' + (sub > 0 ? ' (' + ((fee/sub)*100).toFixed(1) + '%)' : '');
   if (e('cart-total')) e('cart-total').textContent = '₦' + total.toLocaleString();
 };
 
@@ -11509,9 +11581,11 @@ window.sdLoadOverview = async function() {
     if (e('sd-stat-orders')) e('sd-stat-orders').textContent = oSnap.size;
     // Revenue = completed orders only. Escrow = anything paid but not yet completed/refunded/cancelled/disputed —
     // this must include every stage of the fulfillment pipeline (paid → packed → shipped), not just the literal 'paid' status.
+    // Sellers are credited their NET amount (gross minus platform commission minus affiliate commission),
+    // never the full gross price — see window.sellerNetOf for the shared calculation.
     var terminalBad = ['refunded','cancelled','disputed'];
-    var revenue = oSnap.docs.filter(function(d){ return d.data().status==='completed'; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
-    var inEscrow = oSnap.docs.filter(function(d){ var st=d.data().status; return st!=='completed' && terminalBad.indexOf(st)===-1; }).reduce(function(s,d){ return s+Number(d.data().price||0); },0);
+    var revenue = oSnap.docs.filter(function(d){ return d.data().status==='completed'; }).reduce(function(s,d){ return s+sellerNetOf(d.data()); },0);
+    var inEscrow = oSnap.docs.filter(function(d){ var st=d.data().status; return st!=='completed' && terminalBad.indexOf(st)===-1; }).reduce(function(s,d){ return s+sellerNetOf(d.data()); },0);
     if (e('sd-stat-escrow')) e('sd-stat-escrow').textContent = '₦' + inEscrow.toLocaleString();
     if (e('sd-stat-revenue')) e('sd-stat-revenue').textContent = '₦' + revenue.toLocaleString();
     // Pending orders (awaiting seller action)
@@ -11574,7 +11648,8 @@ function renderProductGrid(products) {
   }
   if (empty) empty.style.display = 'none';
   grid.innerHTML = products.map(function(p) {
-    var img = p.photos && p.photos.length ? '<img src="'+p.photos[0]+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
+    var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+    var img = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
     var badge = p.productType==='realestate' ? '<span style="position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;">🏠 Property</span>' : '';
     var _pid = p._id || p.id || '';
     return '<div class="pcard" onclick="viewProduct(\''+_pid+'\');" style="position:relative;">' +
@@ -11815,8 +11890,13 @@ window.co2RenderSummary = function() {
   var u = window._currentUser || {};
   var availableCredit = Number(u.referralCredit || 0);
   var creditApplied = Math.min(availableCredit, subtotal + deliveryFee);
-  var total = Math.max(0, subtotal + deliveryFee - creditApplied);
+  var baseTotal = Math.max(0, subtotal + deliveryFee - creditApplied);
   var currency = (items[0] && items[0].currency) || 'NGN';
+  // Paystack's own processing cost is charged to the buyer on top of the order
+  // total — the seller's payout is never reduced to cover it. See calcPaystackFee
+  // for the exact, currently-accurate Paystack Nigeria fee structure.
+  var serviceFee = (typeof window.calcPaystackFee === 'function') ? window.calcPaystackFee(baseTotal, currency) : Math.round(baseTotal * 0.02);
+  var total = baseTotal + serviceFee;
 
   if (wrap) {
     wrap.innerHTML = items.map(function(item) {
@@ -11833,6 +11913,8 @@ window.co2RenderSummary = function() {
   var e = function(id){ return document.getElementById(id); };
   if (e('co2-subtotal'))      e('co2-subtotal').textContent = currency + ' ' + subtotal.toLocaleString();
   if (e('co2-delivery-fee'))  e('co2-delivery-fee').textContent = deliveryFee ? (currency + ' ' + deliveryFee.toLocaleString()) : 'Free';
+  if (e('co2-fee'))           e('co2-fee').textContent = currency + ' ' + serviceFee.toLocaleString();
+  if (e('co2-fee-label'))     e('co2-fee-label').textContent = 'Service fee' + (baseTotal > 0 ? ' (' + ((serviceFee/baseTotal)*100).toFixed(1) + '%)' : '');
   var creditRow = document.getElementById('co2-credit-row');
   if (creditApplied > 0) {
     if (!creditRow) {
@@ -11850,6 +11932,7 @@ window.co2RenderSummary = function() {
   window._co2Total = total;
   window._co2DeliveryFee = deliveryFee;
   window._co2CreditApplied = creditApplied;
+  window._co2ServiceFee = serviceFee;
 };
 
 window.co2SubmitOrder = async function() {
@@ -11932,6 +12015,7 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
   try {
     var deliveryFee = window._co2DeliveryFee || 0;
     var creditApplied = window._co2CreditApplied || 0;
+    var serviceFeeTotal = window._co2ServiceFee || 0;
     var affRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
     if (affRef === user.uid) affRef = null; // no self-referral commission
     var orderSubtotal = items.reduce(function(s,i){ return s + Number(i.price||0)*(i.qty||1); }, 0) + deliveryFee;
@@ -11941,14 +12025,39 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
       var deliveryType = p.productType || p.type || 'physical';
       var isPhysical = (deliveryType === 'physical' || deliveryType === 'vehicle');
       var itemDeliveryFee = isPhysical ? ((p.deliveryFee !== null && p.deliveryFee !== undefined) ? Number(p.deliveryFee) : window.CO2_DELIVERY_FEE_NGN) : 0;
+      var itemSalePrice = Number(p.price||0) * (p.qty || 1); // product value only — commission is never taken from delivery/shipping
+
+      // ── Automatic payment split ────────────────────────────────
+      // Platform commission uses the rate locked in on the product at
+      // listing time (per-category, via getCategoryFeeRate) so it can
+      // never silently stay at some generic default. Affiliate
+      // commission (if this sale came through a referral link) and the
+      // platform fee are both deducted before the seller's cut — the
+      // seller never receives the full gross price directly.
+      var platformFeeRate = (typeof p.platformFeeRate === 'number') ? p.platformFeeRate
+                           : (typeof getCategoryFeeRate === 'function' ? getCategoryFeeRate(deliveryType) : 0.10);
+      var platformFeeAmount = Math.round(itemSalePrice * platformFeeRate);
+      var willPayAffiliate = !!(affRef && p.affiliateEnabled && p.commission > 0);
+      var affiliateCommissionAmount = willPayAffiliate ? Math.round(itemSalePrice * (p.commission / 100)) : 0;
+      var sellerNetAmount = itemSalePrice - platformFeeAmount - affiliateCommissionAmount + itemDeliveryFee;
+      // The buyer's share of the total Paystack processing fee for this line item —
+      // recorded for accurate transaction history, never deducted from the seller.
+      var itemBuyerServiceFee = orderSubtotal > 0 ? Math.round(serviceFeeTotal * ((itemSalePrice + itemDeliveryFee) / orderSubtotal)) : 0;
+
       var orderData = {
         productId:    p.id || null,
         productName:  p.name,
         productPhoto: (p.photos && p.photos[0]) || p.photo || '',
         productEmoji: p.emoji || '',
         productType:  deliveryType,
-        price:        Number(p.price) * (p.qty || 1) + itemDeliveryFee,
+        price:        itemSalePrice + itemDeliveryFee,
         deliveryFee:  itemDeliveryFee,
+        buyerServiceFee: itemBuyerServiceFee,
+        // Payment split — the definitive numbers every dashboard should read from.
+        platformFeeRate:           platformFeeRate,
+        platformFeeAmount:         platformFeeAmount,
+        affiliateCommissionAmount: affiliateCommissionAmount,
+        sellerNetAmount:           sellerNetAmount,
         qty:          p.qty || 1,
         currency:     p.currency || 'NGN',
         sellerId:     p.sellerId,
@@ -11961,7 +12070,7 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
         createdAt:    fns.serverTimestamp(),
       };
       if (delivery && isPhysical) orderData.delivery = delivery;
-      if (affRef && p.affiliateEnabled && p.commission > 0) orderData.affiliateRef = affRef;
+      if (willPayAffiliate) orderData.affiliateRef = affRef;
       var orderRef = await fns.addDoc(fns.collection(db, 'orders'), orderData);
 
       if (p.id && p.stock > 0) {
@@ -11975,9 +12084,10 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
         orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
       });
 
-      // Real affiliate commission — credited on the product's own configured rate
+      // Real affiliate commission — credited on the product's own configured rate,
+      // using the exact amount already computed and stored above (single source of truth).
       if (orderData.affiliateRef) {
-        var commissionAmt = Math.round(orderData.price * (p.commission / 100));
+        var commissionAmt = orderData.affiliateCommissionAmount;
         if (commissionAmt > 0) {
           await fns.addDoc(fns.collection(db,'affiliateEarnings'), {
             affiliateId: orderData.affiliateRef,
@@ -12157,7 +12267,7 @@ window.submitProduct = async function() {
     }
     var allPhotos = existingUrls.concat(uploadedUrls);
     if (publishBtn) publishBtn.textContent = 'Saving…';
-    var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active' };
+    var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active', platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(window._apType || 'physical') : 0.10 };
     if (allPhotos.length) { updateData.photos = allPhotos; updateData.photo = allPhotos[0]; }
     await fns.updateDoc(fns.doc(db,'products',window._editingProductId), updateData);
     window._editingProductId = null;
