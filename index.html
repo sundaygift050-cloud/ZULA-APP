@@ -2063,212 +2063,6 @@ body.dock-active .page.active{padding-bottom:104px;}
 </div>
 
 
-<div class="page" id="page-profile">
-  <header class="hdr">
-    <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="showPage('messaging')" style="position:relative;" title="Messages">💬</a>
-        <a onclick="showPage('notifications')">🔔</a>
-        <a onclick="showPage('settings')">⚙️</a>
-        <a onclick="zulaSignOut()" style="color:var(--red);">Sign out</a>
-      </nav>
-    </div>
-  </header>
-  <div class="dash-wrap">
-
-    <!-- PROFILE HEADER -->
-    <div class="profile-header">
-      <div class="profile-avatar" id="profile-avatar">?</div>
-      <div class="profile-info" style="flex:1;">
-        <h2 id="profile-name">Loading…</h2>
-        <p id="profile-email" style="margin:0;"></p>
-        <p id="profile-joined" style="font-size:12px;color:var(--text3);margin:2px 0 8px;"></p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="tag tag-green" id="profile-buyer-badge">✅ Verified buyer</span>
-          <span class="tag tag-gold" id="profile-seller-badge" style="display:none;">🛍 Verified seller</span>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-ghost btn-sm" onclick="showPage('verification')">🛡 Get seller verified</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('verifstatus')">✅ Verif. status</button>
-        <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
-      </div>
-    </div>
-
-    <!-- QUICK STATS (real from Firebase) -->
-    <div class="pstat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
-        <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-orders">0</div>
-        <div style="font-size:11px;color:var(--text3);">Orders</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
-        <div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pstat-listings">0</div>
-        <div style="font-size:11px;color:var(--text3);">Listings</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
-        <div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="pstat-revenue">NGN 0</div>
-        <div style="font-size:11px;color:var(--text3);">Total revenue</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;">
-        <div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pstat-aff">NGN 0</div>
-        <div style="font-size:11px;color:var(--text3);">Aff. earned</div>
-      </div>
-    </div>
-
-    <!-- PROFILE TABS -->
-    <div class="dash-tabs">
-      <div class="dash-tab active" id="ptab-listings"  onclick="profileTab('listings')">📦 My listings</div>
-      <div class="dash-tab"        id="ptab-orders"    onclick="profileTab('orders')">🛍 My orders</div>
-    </div>
-
-    <!-- TAB: MY LISTINGS -->
-    <div class="dash-tab-content active" id="ptc-listings">
-      <div class="dash-card">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">
-          My listings
-          <button class="btn btn-primary btn-sm" onclick="goAddProduct()">+ Add product</button>
-        </h3>
-        <div id="my-listings-list">
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="es-icon">📦</div>
-            <h3>No listings yet</h3>
-            <p>Get seller verified first, then list your first product.</p>
-            <button class="btn btn-primary btn-sm" onclick="showPage('verification')">Get verified →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: SELLER DASHBOARD -->
-    <div class="dash-tab-content" id="ptc-seller">
-      <!-- Earnings summary -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
-        <div class="dash-card" style="text-align:center;padding:20px;">
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Total revenue</div>
-          <div style="font-size:26px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="sdash-revenue">NGN 0</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px);">All time</div>
-        </div>
-        <div class="dash-card" style="text-align:center;padding:20px;">
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Product views</div>
-          <div style="font-size:26px;font-weight:700;font-family:var(--font-display);" id="sdash-views">0</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Click traffic</div>
-        </div>
-        <div class="dash-card" style="text-align:center;padding:20px;">
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Total orders</div>
-          <div style="font-size:26px;font-weight:700;color:var(--accent);font-family:var(--font-display);" id="sdash-orders">0</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Completed sales</div>
-        </div>
-      </div>
-
-      <!-- Seller analytics tabs -->
-      <div class="analytics-tabs" style="margin-bottom:16px;">
-        <button class="active" onclick="sellerAnalyticsTab('revenue',this)">💰 Revenue</button>
-        <button onclick="sellerAnalyticsTab('traffic',this)">👁 Traffic</button>
-        <button onclick="sellerAnalyticsTab('conversion',this)">📈 Conversion</button>
-        <button onclick="sellerAnalyticsTab('affiliates',this)">🔗 Affiliates</button>
-      </div>
-
-      <!-- Revenue tab -->
-      <div id="sdat-revenue" class="sdash-tab">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Revenue — my products</h3>
-          <div id="sdash-product-revenue">
-            <div style="color:var(--text3);font-size:13px;">No sales yet. Once buyers purchase your products, revenue appears here.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Traffic tab -->
-      <div id="sdat-traffic" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Product views &amp; clicks</h3>
-          <div id="sdash-traffic-data">
-            <div style="color:var(--text3);font-size:13px;">Traffic data will appear here as buyers view your listings.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Conversion tab -->
-      <div id="sdat-conversion" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Conversion rate</h3>
-          <div style="color:var(--text3);font-size:13px;">Conversion tracking (views → purchases) will appear here once you have sales.</div>
-        </div>
-      </div>
-
-      <!-- Affiliates tab -->
-      <div id="sdat-affiliates" class="sdash-tab" style="display:none;">
-        <div class="dash-card">
-          <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Affiliates promoting your products</h3>
-          <div style="color:var(--text3);font-size:13px;">When affiliates share your products and drive sales, they appear here.</div>
-        </div>
-      </div>
-
-      <!-- Payout section (legacy — superseded by payout-modal, IDs prefixed to avoid collisions) -->
-      <div class="dash-card" style="margin-top:4px;">
-        <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">💳 Payout</h3>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:14px;">
-          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Available balance</div>
-          <div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--font-display);" id="sdash-balance">NGN 0</div>
-        </div>
-        <div class="form-field">
-          <label>Bank name</label>
-          <input type="text" id="legacy-payout-bank" placeholder="e.g. GTBank">
-        </div>
-        <div class="form-field">
-          <label>Account number</label>
-          <input type="text" id="legacy-payout-acct" placeholder="0123456789">
-        </div>
-        <div class="form-field">
-          <label>Account name</label>
-          <input type="text" id="legacy-payout-name" placeholder="Your full name">
-        </div>
-        <button class="btn btn-primary" onclick="sdRequestPayout()">Request payout →</button>
-      </div>
-    </div>
-
-    <!-- TAB: MY ORDERS -->
-    <div class="dash-tab-content" id="ptc-orders">
-      <div class="dash-card">
-        <h3>My orders</h3>
-        <div class="empty-state" style="padding:40px 0;">
-          <div class="es-icon">🛍</div>
-          <h3>No orders yet</h3>
-          <p>Your purchase history will appear here.</p>
-          <button class="btn btn-primary btn-sm" onclick="showPage('marketplace')">Browse products</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: SETTINGS -->
-    <div class="dash-tab-content" id="ptc-settings">
-      <div class="dash-card">
-        <h3>Account settings</h3>
-        <div class="form-field">
-          <label>Full name</label>
-          <input type="text" id="settings-name" placeholder="Your full name">
-        </div>
-        <div class="form-field">
-          <label>Phone number</label>
-          <input type="tel" id="settings-phone" placeholder="+234 800 000 0000">
-        </div>
-        <div class="form-field">
-          <label>Bio</label>
-          <textarea id="settings-bio" placeholder="Tell buyers about yourself..." style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;"></textarea>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save changes</button>
-      </div>
-      <div class="dash-card">
-        <h3>Danger zone</h3>
-        <button class="btn btn-sm" style="border-color:var(--red);color:var(--red);" onclick="zulaSignOut()">Sign out</button>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 <!-- ================================================================
      PAGE: SELLER VERIFICATION
@@ -4694,6 +4488,10 @@ window.viewProduct = function(id) {
   // ── SOCIAL SHARE ROW ──────────────────────────────────────────
   if (typeof pdRenderShareRow === 'function') pdRenderShareRow();
 
+  // ── ENGAGEMENT (views/likes/comments) — called directly, not left to
+  // race against the async showPage hook, so counts never stick at 0 ──
+  if (typeof pdLoadEngagement === 'function') pdLoadEngagement(p.id, p.sellerId);
+
   showPage('product');
 };
 
@@ -6578,12 +6376,16 @@ window.pv2RenderListingsGrid = async function(sellerId, containerId, opts) {
   if (!listEl || !sellerId) return;
   listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
   try {
-    var lq = opts.activeOnly
-      ? fns.query(fns.collection(db, 'products'), fns.where('sellerId','==', sellerId), fns.where('status','==','active'))
-      : fns.query(fns.collection(db, 'products'), fns.where('sellerId','==', sellerId));
+    // A single field query (sellerId only) needs no composite index, and — importantly —
+    // filtering "not a draft" client-side (rather than an exact status=="active" match in
+    // the query itself) means any product whose status field is missing, blank, or set to
+    // something unexpected still shows up correctly instead of silently disappearing.
+    var lq = fns.query(fns.collection(db, 'products'), fns.where('sellerId','==', sellerId));
     var lsnap = await fns.getDocs(lq);
-    if (opts.countElId) { var ce = document.getElementById(opts.countElId); if (ce) ce.textContent = lsnap.size; }
-    if (lsnap.empty) {
+    var docs = lsnap.docs;
+    if (opts.activeOnly) docs = docs.filter(function(d) { return d.data().status !== 'draft'; });
+    if (opts.countElId) { var ce = document.getElementById(opts.countElId); if (ce) ce.textContent = docs.length; }
+    if (!docs.length) {
       listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">' +
         (opts.emptyMsg || 'No listings yet.') + '</div>';
       return;
@@ -6592,7 +6394,7 @@ window.pv2RenderListingsGrid = async function(sellerId, containerId, opts) {
     listEl.style.display = 'grid';
     listEl.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
     listEl.style.gap = '14px';
-    listEl.innerHTML = lsnap.docs.map(function(d) {
+    listEl.innerHTML = docs.map(function(d) {
       var p = d.data();
       var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
       var imgHtml = photoSrc ? ('<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">') : (p.emoji || '📦');
@@ -9538,6 +9340,15 @@ window.openProduct = async function(productId) {
       } catch(e) {}
     }
 
+    // Engagement (views/likes/comments) — called directly here, right after
+    // window._currentProduct is confirmed set, instead of relying on the
+    // showPage hook's 150ms timer racing against this function's own async
+    // Firestore fetch above. That race is exactly why counts were sticking at 0
+    // whenever a product was opened through this path (storefronts, wishlist,
+    // search results, admin/affiliate tables — anywhere not already in the
+    // cached marketplace grid).
+    if (typeof pdLoadEngagement === 'function') pdLoadEngagement(productId, p.sellerId);
+
   } catch(e) { console.error(e); showToast('Could not load product.'); }
 };
 
@@ -10376,7 +10187,8 @@ window.adminLoadOverview = async function() {
   if (!db || !fns) return;
   try {
     var usersSnap = await fns.getDocs(fns.collection(db,'users'));
-    var prodSnap  = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active')));
+    var prodSnapAll = await fns.getDocs(fns.collection(db,'products'));
+    var prodSnap  = { size: prodSnapAll.docs.filter(function(d){ return d.data().status !== 'draft'; }).length };
     var sellers   = usersSnap.docs.filter(function(d){ return d.data().sellerVerified; }).length;
     var verifSnap = await fns.getDocs(fns.query(fns.collection(db,'users'), fns.where('verifSubmitted','==',true), fns.where('sellerVerified','==',false)));
     var e = function(id){ return document.getElementById(id); };
@@ -11749,8 +11561,11 @@ window.loadProducts = async function() {
   var grid = document.getElementById('products-grid');
   if (!grid) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active'), fns.orderBy('createdAt','desc')));
-    _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
+    // Fetch by recency only, then filter out drafts client-side — an exact status=="active"
+    // match in the query would silently exclude any product whose status field is missing
+    // or inconsistent, which is exactly what was causing listings to vanish from view.
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.orderBy('createdAt','desc')));
+    _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); }).filter(function(p){ return p.status !== 'draft'; });
     renderProductGrid(_allProducts);
   } catch(e) { console.error('loadProducts error', e); }
 };
@@ -12368,6 +12183,14 @@ window.trackProductView = async function(productId, sellerId) {
     // Also write to analytics collection for seller dashboard
     await fns.setDoc(fns.doc(db,'analytics',sellerId), { totalViews: fns.increment(1) }, { merge:true });
     zulaLogEngagement('view', productId, sellerId);
+    // Reflect the new count immediately if this product is still the one on screen,
+    // instead of leaving the number stale until the page is reloaded.
+    var p = window._currentProduct;
+    if (p && p.id === productId) {
+      p.viewCount = (p.viewCount || 0) + 1;
+      var vEl = document.getElementById('pd-view-count');
+      if (vEl) vEl.textContent = p.viewCount.toLocaleString();
+    }
   } catch(e) { /* silent */ }
 };
 
@@ -13486,8 +13309,9 @@ window.affLoadHub = async function() {
 
   // Top products to promote — real, sorted by commission
   try {
-    var psnap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('status','==','active')));
+    var psnap = await fns.getDocs(fns.collection(db,'products'));
     var products = psnap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); })
+      .filter(function(p){ return p.status !== 'draft'; })
       .filter(function(p){ return p.affiliateEnabled && p.commission > 0; })
       .sort(function(a,b){ return (b.commission||0) - (a.commission||0); })
       .slice(0, 8);
