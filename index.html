@@ -3363,6 +3363,7 @@ if (_kycOrigShowPage) {
       <button class="btn btn-sm" id="pv2-tab-downloads" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('downloads',this)">Downloads</button>
       <button class="btn btn-sm" id="pv2-tab-wishlist" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('wishlist',this)">Wishlist</button>
       <button class="btn btn-sm" id="pv2-tab-reviews" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('reviews',this)">Reviews</button>
+      <button class="btn btn-sm" id="pv2-tab-listings" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('listings',this)">My listings</button>
     </div>
     <!-- QUICK STATS — real from Firebase -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
@@ -3388,9 +3389,18 @@ if (_kycOrigShowPage) {
       <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Reviews I've written</h3>
       <div id="pv2-reviews-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
-    <!-- MY LISTINGS PREVIEW -->
-    <div class="dash-card" id="pv2-listings-card">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My listings</h3>
+    <!-- MY LISTINGS TAB PANEL -->
+    <div class="dash-card" id="pv2-panel-listings" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;">
+        <h3 style="font-size:14px;font-weight:600;margin:0;">My listings</h3>
+        <div style="position:relative;">
+          <button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:16px;line-height:1;" onclick="togglePv2ListingsMenu(event)" title="More options">⋮</button>
+          <div id="pv2-listings-menu" style="display:none;position:absolute;top:34px;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-xs);min-width:190px;z-index:50;box-shadow:0 8px 28px rgba(0,0,0,.45);overflow:hidden;">
+            <div class="dd-item" onclick="copyStoreLink();closePv2ListingsMenu()">🔗 Copy store link</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Share your store link on social media — anyone who opens it sees every product you have listed on ZÚLA and can buy directly, no ZÚLA account browsing needed to look around.</div>
       <div id="pv2-listings-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
   </div>
@@ -3429,8 +3439,8 @@ if (_kycOrigShowPage) {
             <div style="font-size:13.5px;color:var(--text2);line-height:1.6;max-width:440px;" id="owner-bio">—</div>
           </div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost btn-sm" onclick="openMsgWithSelf()">✉️ Message</button>
-            <button class="btn btn-primary btn-sm" onclick="showPage('marketplace')">View listings</button>
+            <button class="btn btn-ghost btn-sm" id="owner-msg-btn" onclick="openMsgWithSelf()">✉️ Message</button>
+            <button class="btn btn-primary btn-sm" id="owner-view-listings-btn" onclick="document.getElementById('owner-listings-grid').scrollIntoView({behavior:'smooth'})">View listings</button>
           </div>
         </div>
         <div class="pub-stats-row">
@@ -5898,40 +5908,11 @@ window.loadProfileV2 = async function() {
     if (el('pv2-stat-followers'))  el('pv2-stat-followers').textContent  = d.followersCount || 0;
   } catch(e) {}
 
-  // Listings count
+  // Listings count (grid itself is lazy-loaded when the "My listings" tab is opened)
   try {
     const lq = query(collection(db, 'products'), where('sellerId','==', user.uid));
     const lsnap = await getDocs(lq);
     if (el('pv2-stat-listings')) el('pv2-stat-listings').textContent = lsnap.size;
-    // Render as a grid of product cards (like the marketplace), with real photos
-    const listEl = document.getElementById('pv2-listings-list');
-    if (listEl) {
-      if (lsnap.empty) {
-        listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first →</a></div>';
-      } else {
-        listEl.className = 'pgrid';
-        listEl.style.display = 'grid';
-        listEl.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
-        listEl.style.gap = '14px';
-        listEl.innerHTML = lsnap.docs.map(d => {
-          const p = d.data();
-          const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
-          const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
-          const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString();
-          const statusTag = p.status === 'draft' ? '<span class="tag" style="background:var(--bg3);color:var(--text3);">Draft</span>' : '<span class="tag tag-green">Live</span>';
-          return `<div class="pcard" onclick="viewProduct('${d.id}')" style="cursor:pointer;">
-            <div class="pcard-img" style="overflow:hidden;height:130px;">${imgHtml}</div>
-            <div class="pcard-body" style="padding:10px 12px;">
-              <div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-              <div class="pcard-foot" style="margin-top:6px;">
-                <div class="pcard-price" style="font-size:13px;">${priceDisplay}</div>
-                ${statusTag}
-              </div>
-            </div>
-          </div>`;
-        }).join('');
-      }
-    }
   } catch(e) {}
 
   try {
@@ -5944,22 +5925,46 @@ window.loadProfileV2 = async function() {
 
 // ── LOAD MY PUBLIC PROFILE (myprofile page) ───────────────────────
 window.loadMyProfile = async function() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const profile = window._currentUser || {};
+  const currentAuthUser = auth.currentUser;
+  const params = new URLSearchParams(window.location.search);
+  const sellerParam = params.get('seller');
+  // Viewing a shared storefront link (?seller=uid) always shows that seller,
+  // even to a visitor who isn't signed in. With no param, it's your own profile.
+  const targetUid = sellerParam || (currentAuthUser && currentAuthUser.uid) || null;
+  const isOwnProfile = !!currentAuthUser && currentAuthUser.uid === targetUid;
   const el = id => document.getElementById(id);
 
-  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : user.email[0].toUpperCase();
-  const fullName = profile.fullName || profile.firstName || user.email.split('@')[0];
+  if (!targetUid) {
+    if (el('owner-name')) el('owner-name').textContent = 'Sign in to view this profile';
+    if (el('owner-bio'))  el('owner-bio').textContent  = '';
+    return;
+  }
+
+  // Resolve which profile to display: your own cached profile, or a fetch
+  // for whoever's storefront this link points to.
+  let profile;
+  if (isOwnProfile) {
+    profile = window._currentUser || {};
+  } else {
+    try {
+      const pSnap = await getDoc(doc(db, 'users', targetUid));
+      profile = pSnap.exists() ? pSnap.data() : {};
+    } catch(e) { profile = {}; }
+  }
+
+  const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (profile.email ? profile.email[0].toUpperCase() : '?');
+  const fullName = profile.fullName || profile.firstName || (profile.email ? profile.email.split('@')[0] : 'ZÚLA seller');
 
   if (el('owner-avatar')) {
     if (profile.photoUrl) el('owner-avatar').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
     else el('owner-avatar').textContent = initials;
   }
   if (el('owner-name'))   el('owner-name').textContent   = fullName;
-  if (el('nav-avatar-myprofile')) {
-    if (profile.photoUrl) el('nav-avatar-myprofile').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-    else el('nav-avatar-myprofile').textContent = initials;
+  if (el('nav-avatar-myprofile') && currentAuthUser) {
+    const myProfile = window._currentUser || {};
+    const myInitials = myProfile.firstName ? myProfile.firstName[0].toUpperCase() : currentAuthUser.email[0].toUpperCase();
+    if (myProfile.photoUrl) el('nav-avatar-myprofile').innerHTML = '<img src="'+myProfile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else el('nav-avatar-myprofile').textContent = myInitials;
   }
 
   const joined = profile.joinedAt
@@ -5979,40 +5984,28 @@ window.loadMyProfile = async function() {
     badgesEl.innerHTML = badges;
   }
 
+  // Storefront action buttons — messaging yourself makes no sense, and
+  // "View listings" is redundant on this page since listings are shown
+  // right below, so both are scoped to whether this is your own profile.
+  const msgBtn = el('owner-msg-btn'), viewBtn = el('owner-view-listings-btn');
+  if (msgBtn)  msgBtn.style.display  = isOwnProfile ? 'none' : '';
+  if (viewBtn) viewBtn.style.display = isOwnProfile ? '' : 'none';
+
   // Counts
   try {
-    const snap = await getDoc(doc(db, 'users', user.uid));
+    const snap = await getDoc(doc(db, 'users', targetUid));
     const d = snap.data() || {};
     if (el('owner-followers-count')) el('owner-followers-count').textContent = d.followersCount || 0;
     if (el('owner-following-count')) el('owner-following-count').textContent = d.followingCount || 0;
   } catch(e) {}
 
-  // My listings
-  try {
-    const lq = query(collection(db, 'products'), where('sellerId','==', user.uid));
-    const lsnap = await getDocs(lq);
-    if (el('owner-listings-count')) el('owner-listings-count').textContent = lsnap.size;
-    const grid = el('owner-listings-grid');
-    if (grid) {
-      if (lsnap.empty) {
-        grid.innerHTML = '<div style="color:var(--text3);font-size:13px;">No listings yet.</div>';
-      } else {
-        grid.innerHTML = lsnap.docs.map(d => {
-          const p = d.data();
-          const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
-          const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
-          return `<div class="pcard" onclick="viewProduct('${d.id}')">
-            <div class="pcard-img" style="overflow:hidden;">${imgHtml}</div>
-            <div class="pcard-body">
-              <div class="pcard-name">${p.name}</div>
-              <div class="pcard-seller">by ${p.sellerName||fullName}</div>
-              <div class="pcard-foot"><span class="pcard-price">NGN ${Number(p.price).toLocaleString()}</span><span class="pcard-type">${p.type||'Physical'}</span></div>
-            </div>
-          </div>`;
-        }).join('');
-      }
-    }
-  } catch(e) {}
+  // Storefront listings — only ACTIVE listings are shown to the public;
+  // a visitor from a shared link never sees drafts.
+  pv2RenderListingsGrid(targetUid, 'owner-listings-grid', {
+    countElId: 'owner-listings-count',
+    activeOnly: true,
+    emptyMsg: 'No active listings yet.'
+  });
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────────
@@ -6323,7 +6316,7 @@ window.loadAdminData = async function() {
         ? '<tr><td colspan="5" style="color:var(--text3);">No products yet.<\/td><\/tr>'
         : products.slice(0,10).map(p => `
           <tr>
-            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb" style="overflow:hidden;">${(p.photos&&p.photos.length)?('<img src="'+p.photos[0]+'" style="width:100%;height:100%;object-fit:cover;">'):(p.photo?('<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover;">'):(p.emoji||'📦'))}<\/div>${p.name}<\/div><\/td>
             <td>${p.sellerName||'-'}<\/td>
             <td>${p.category||'-'}<\/td>
             <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
@@ -6338,7 +6331,7 @@ window.loadAdminData = async function() {
         ? '<tr><td colspan="6" style="color:var(--text3);">No products yet.<\/td><\/tr>'
         : products.map(p => `
           <tr>
-            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb">${p.emoji||'📦'}<\/div>${p.name}<\/div><\/td>
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="dthumb" style="overflow:hidden;">${(p.photos&&p.photos.length)?('<img src="'+p.photos[0]+'" style="width:100%;height:100%;object-fit:cover;">'):(p.photo?('<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover;">'):(p.emoji||'📦'))}<\/div>${p.name}<\/div><\/td>
             <td>${p.sellerName||'-'}<\/td>
             <td>NGN ${Number(p.price||0).toLocaleString()}<\/td>
             <td>${p.category||'-'}<\/td>
@@ -6533,7 +6526,7 @@ window._selectedType = 'Physical';
 
 // Profile v2 tabs
 window.switchPv2Tab = function(tab, btn) {
-  ['orders','downloads','wishlist','reviews'].forEach(t => {
+  ['orders','downloads','wishlist','reviews','listings'].forEach(t => {
     const b = document.getElementById('pv2-tab-' + t);
     if (b) { b.style.background = 'transparent'; b.style.color = 'var(--text2)'; }
     const panel = document.getElementById('pv2-panel-' + t);
@@ -6544,6 +6537,89 @@ window.switchPv2Tab = function(tab, btn) {
   if (tab === 'downloads') pv2LoadDownloads();
   if (tab === 'wishlist')  pv2LoadWishlist();
   if (tab === 'reviews')   pv2LoadReviews();
+  if (tab === 'listings')  pv2LoadListings();
+};
+
+// ── Store-link menu (3-dot menu on the My listings tab) ──────────
+window.togglePv2ListingsMenu = function(e) {
+  if (e) e.stopPropagation();
+  var menu = document.getElementById('pv2-listings-menu');
+  if (!menu) return;
+  var isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) setTimeout(function(){ document.addEventListener('click', closePv2ListingsMenu, { once:true }); }, 30);
+};
+window.closePv2ListingsMenu = function() {
+  var menu = document.getElementById('pv2-listings-menu');
+  if (menu) menu.style.display = 'none';
+};
+// Builds a public, shareable link to the current seller's storefront —
+// every active listing they have, viewable (and buyable) by anyone who
+// opens it, signed in or not. Works from any social platform.
+window.copyStoreLink = function() {
+  var auth = window._auth, user = auth && auth.currentUser;
+  if (!user) { showToast('Please sign in first.'); return; }
+  var url = window.location.origin + window.location.pathname + '?seller=' + user.uid;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('🔗 Store link copied! Paste it anywhere.');
+    }).catch(function() { prompt('Copy your store link:', url); });
+  } else {
+    prompt('Copy your store link:', url);
+  }
+};
+
+// Renders a seller's listings grid into any container id, real photos, no dead code duplication —
+// used by the "My listings" profile tab and (with a different uid + container) the public storefront page.
+window.pv2RenderListingsGrid = async function(sellerId, containerId, opts) {
+  opts = opts || {};
+  var db = window._db, fns = window._fns;
+  var listEl = document.getElementById(containerId);
+  if (!listEl || !sellerId) return;
+  listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading…</div>';
+  try {
+    var lq = opts.activeOnly
+      ? fns.query(fns.collection(db, 'products'), fns.where('sellerId','==', sellerId), fns.where('status','==','active'))
+      : fns.query(fns.collection(db, 'products'), fns.where('sellerId','==', sellerId));
+    var lsnap = await fns.getDocs(lq);
+    if (opts.countElId) { var ce = document.getElementById(opts.countElId); if (ce) ce.textContent = lsnap.size; }
+    if (lsnap.empty) {
+      listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">' +
+        (opts.emptyMsg || 'No listings yet.') + '</div>';
+      return;
+    }
+    listEl.className = 'pgrid';
+    listEl.style.display = 'grid';
+    listEl.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
+    listEl.style.gap = '14px';
+    listEl.innerHTML = lsnap.docs.map(function(d) {
+      var p = d.data();
+      var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+      var imgHtml = photoSrc ? ('<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">') : (p.emoji || '📦');
+      var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString();
+      var statusTag = (opts.showStatus && p.status === 'draft') ? '<span class="tag" style="background:var(--bg3);color:var(--text3);">Draft</span>' : (opts.showStatus ? '<span class="tag tag-green">Live</span>' : '');
+      return '<div class="pcard" onclick="viewProduct(\''+d.id+'\')" style="cursor:pointer;">' +
+        '<div class="pcard-img" style="overflow:hidden;height:130px;">'+imgHtml+'</div>' +
+        '<div class="pcard-body" style="padding:10px 12px;">' +
+          '<div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>' +
+          '<div class="pcard-foot" style="margin-top:6px;">' +
+            '<div class="pcard-price" style="font-size:13px;">'+priceDisplay+'</div>' +
+            statusTag +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } catch(e) { console.error('pv2RenderListingsGrid:', e); listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load listings.</div>'; }
+};
+
+window.pv2LoadListings = function() {
+  var auth = window._auth, user = auth && auth.currentUser;
+  if (!user) return;
+  pv2RenderListingsGrid(user.uid, 'pv2-listings-list', {
+    countElId: 'pv2-stat-listings',
+    showStatus: true,
+    emptyMsg: 'No listings yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first →</a>'
+  });
 };
 
 window.pv2LoadOrders = async function() {
@@ -9387,6 +9463,7 @@ window.openProduct = async function(productId) {
     var imgEl = el('pd-img');
     if (imgEl) {
       if (p.photos && p.photos.length > 0) { imgEl.innerHTML = '<img src="' + p.photos[0] + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">'; }
+      else if (p.photo) { imgEl.innerHTML = '<img src="' + p.photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">'; }
       else { imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦'); imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex'; imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center'; }
     }
     // Thumbnail strip
@@ -13417,7 +13494,8 @@ window.affLoadHub = async function() {
     var grid = document.getElementById('affhub-products');
     if (grid) {
       grid.innerHTML = products.length ? products.map(function(p) {
-        var img = (p.photos && p.photos[0]) ? ('<img src="'+p.photos[0]+'">') : (p.emoji || '📦');
+        var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+        var img = photoSrc ? ('<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">') : (p.emoji || '📦');
         var earn = Math.round(Number(p.price||0) * (p.commission||0) / 100);
         return '<div class="affhub-pcard">' +
           '<div class="affhub-pcard-thumb">' + img + '</div>' +
@@ -14568,6 +14646,20 @@ function dockSync() {
 })();
 
 document.addEventListener('DOMContentLoaded', function() { setTimeout(dockSync, 300); });
+
+// Shared storefront links (?seller=uid) should open straight to that seller's
+// public profile on first load, whether or not the visitor is signed in —
+// dockSync() above still governs the floating dock's own visibility separately.
+(function() {
+  try {
+    var sellerParam = new URLSearchParams(window.location.search).get('seller');
+    if (sellerParam) {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { if (typeof showPage === 'function') showPage('myprofile'); }, 50);
+      });
+    }
+  } catch (e) {}
+})();
 
 // macOS-style magnify effect — desktop / cursor devices only.
 // Mobile gets a plain CSS :active scale-down instead (see .dock-item:active).
