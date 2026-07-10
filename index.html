@@ -395,7 +395,6 @@ body.dock-active .page.active{padding-bottom:104px;}
 .listing-actions{display:flex;gap:6px;}
 .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;}
 .tag-green{background:rgba(39,201,122,.15);color:var(--green);}
-.tag-accent{background:rgba(124,92,252,.15);color:var(--accent);}
 .tag-gold{background:rgba(245,200,66,.15);color:var(--gold);}
 .tag-red{background:rgba(240,82,82,.15);color:var(--red);}
 
@@ -958,7 +957,7 @@ body.dock-active .page.active{padding-bottom:104px;}
 .ap-type-opt .to-sub{font-size:11px;color:var(--text3);line-height:1.4;}
 .ap-type-opt .to-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:10px;color:#fff;}
 .ap-type-opt.selected .to-check{display:flex;}
-.ap-digital-badge{display:inline-block;background:rgba(124,92,252,.12);color:var(--accent);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
+.ap-digital-badge{display:inline-block;background:rgba(91,163,245,.12);color:#5ba8f5;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
 .ap-physical-badge{display:inline-block;background:rgba(39,201,122,.1);color:var(--green);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-top:4px;}
 .ap-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
 .ap-field:last-child{margin-bottom:0;}
@@ -1460,13 +1459,13 @@ body.dock-active .page.active{padding-bottom:104px;}
       <div class="filter-card">
         <h4 style="margin-bottom:10px;">Star Rating</h4>
         <div class="mkt-stars-row">
-          <div class="mkt-stars" id="mkt-stars-display" onclick="mktCycleStars(event)">☆☆☆☆☆</div>
-          <div class="mkt-stars-label" id="mkt-stars-label">Any rating</div>
+          <div class="mkt-stars" id="mkt-stars-display" onclick="mktCycleStars(event)">★★★★☆</div>
+          <div class="mkt-stars-label" id="mkt-stars-label">4 Stars &amp; up</div>
         </div>
         <div style="display:none;">
           <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
           <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> 3+</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()" id="mkt-rating-4"> 4+</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()" id="mkt-rating-4" checked> 4+</label>
           <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> 4.5+</label>
         </div>
       </div>
@@ -1558,10 +1557,8 @@ body.dock-active .page.active{padding-bottom:104px;}
   <div class="pdetail-wrap">
     <div class="pdetail-layout">
       <!-- Photo gallery -->
-      <div style="position:relative;">
+      <div>
         <div class="pdetail-img" id="pd-img">📦</div>
-        <button id="pd-img-prev" onclick="pdNavPhoto(-1)" style="display:none;position:absolute;left:10px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(20,20,24,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:18px;cursor:pointer;align-items:center;justify-content:center;z-index:3;">‹</button>
-        <button id="pd-img-next" onclick="pdNavPhoto(1)" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(20,20,24,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:18px;cursor:pointer;align-items:center;justify-content:center;z-index:3;">›</button>
         <div id="pd-photo-thumbs" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;"></div>
       </div>
       <div>
@@ -1587,11 +1584,6 @@ body.dock-active .page.active{padding-bottom:104px;}
         </div>
 
         <div class="pdetail-desc" id="pd-desc">Description</div>
-
-        <!-- Extra seller-entered details: condition/variants for physical
-             products, video-by-video breakdown for courses, etc. Populated
-             by pdRenderExtraDetails() — see viewProduct/openProduct. -->
-        <div id="pd-extra-details" style="display:none;margin-bottom:16px;"></div>
 
         <!-- Real estate details -->
         <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
@@ -1919,7 +1911,7 @@ body.dock-active .page.active{padding-bottom:104px;}
         <div class="ap-card-hd">Physical product details</div>
         <div class="ap-card-sub">Size, material, condition — anything a buyer can't see through a photo.</div>
         <div class="ap-field-row">
-          <div class="ap-field"><label>Condition</label><select id="ap-field-condition"><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
+          <div class="ap-field"><label>Condition</label><select><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
           <div class="ap-field"><label>Available stock</label><input type="number" id="ap-field-stock" placeholder="e.g. 10" min="1"></div>
         </div>
         <div class="ap-field-row">
@@ -1930,7 +1922,7 @@ body.dock-active .page.active{padding-bottom:104px;}
         <div class="ap-field">
           <label>Sizes / Variants</label>
           <div id="ap-variants-list" style="margin-bottom:8px;">
-            <div class="ap-variant-row"><input class="ap-variant-name" placeholder="Size or variant name" type="text"><input class="ap-variant-price" placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
+            <div class="ap-variant-row"><input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button></div>
           </div>
           <button class="ap-add-variant-btn" onclick="apAddVariant()">+ Add size or variant</button>
         </div>
@@ -4587,7 +4579,6 @@ window.viewProduct = function(id) {
       thumbs.innerHTML = '';
     }
   }
-  if (typeof pdUpdatePhotoArrows === 'function') pdUpdatePhotoArrows(p);
 
   // ── TEXT FIELDS ────────────────────────────────────────────────
   var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
@@ -4595,7 +4586,6 @@ window.viewProduct = function(id) {
   setText('pd-seller', 'By ' + (p.sellerName || 'ZÚLA Seller'));
   setText('pd-price',  typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
   setText('pd-desc',   p.description || '');
-  if (typeof pdRenderExtraDetails === 'function') pdRenderExtraDetails(p);
 
   var tagsEl = document.getElementById('pd-tags');
   if (tagsEl) tagsEl.innerHTML =
@@ -4634,51 +4624,6 @@ window.viewProduct = function(id) {
 };
 
 // Swap main product photo when thumbnail clicked
-// ── Renders every seller-entered field beyond the plain description —
-// condition/stock/delivery/variants for physical products, and the
-// video-by-video "what you'll learn" breakdown for courses. Called from
-// both viewProduct and openProduct right after the description is set. ──
-window.pdRenderExtraDetails = function(p) {
-  var wrap = document.getElementById('pd-extra-details');
-  if (!wrap) return;
-  var html = '';
-
-  if (p.productType === 'physical' || p.productType === 'vehicle') {
-    var rows = [];
-    if (p.condition) rows.push(['Condition', p.condition]);
-    if (typeof p.stock === 'number' && p.stock > 0) rows.push(['Available stock', p.stock + ' unit' + (p.stock===1?'':'s')]);
-    if (p.shipsFrom) rows.push(['Ships from', p.shipsFrom]);
-    if (p.deliveryFee) rows.push(['Delivery fee', (typeof formatPrice === 'function' ? formatPrice(p.deliveryFee) : (p.currency||'NGN')+' '+Number(p.deliveryFee).toLocaleString())]);
-    if (rows.length) {
-      html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">' +
-        '<div style="font-weight:700;font-size:14px;margin-bottom:10px;">Product details</div>' +
-        rows.map(function(r){ return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--border);font-size:13px;"><span style="color:var(--text3);">'+r[0]+'</span><span style="color:var(--text);font-weight:600;">'+r[1]+'</span></div>'; }).join('') +
-        '</div>';
-    }
-    if (p.variants && p.variants.length) {
-      html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">' +
-        '<div style="font-weight:700;font-size:14px;margin-bottom:10px;">Sizes / Variants</div>' +
-        p.variants.map(function(v){ return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--border);font-size:13px;"><span style="color:var(--text);">'+v.name+'</span>' + (v.price ? '<span style="color:var(--accent);font-weight:600;">'+v.price+'</span>' : '') + '</div>'; }).join('') +
-        '</div>';
-    }
-  }
-
-  if (p.productType === 'course' && p.lessons && p.lessons.length) {
-    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">' +
-      '<div style="font-weight:700;font-size:14px;margin-bottom:10px;">📚 Course content — ' + p.lessons.length + ' video' + (p.lessons.length===1?'':'s') + '</div>' +
-      p.lessons.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).map(function(l, i){
-        return '<div style="padding:10px 0;border-top:1px solid var(--border);">' +
-          '<div style="font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:' + (l.summary ? '4px' : '0') + ';">' + (i+1) + '. ' + (l.title||'Lesson '+(i+1)) + '</div>' +
-          (l.summary ? '<div style="font-size:12.5px;color:var(--text3);line-height:1.5;">' + l.summary + '</div>' : '') +
-        '</div>';
-      }).join('') +
-      '</div>';
-  }
-
-  wrap.innerHTML = html;
-  wrap.style.display = html ? '' : 'none';
-};
-
 window.pdSwapPhoto = function(src) {
   var imgEl = document.getElementById('pd-img');
   if (imgEl) imgEl.innerHTML = '<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">';
@@ -4686,29 +4631,6 @@ window.pdSwapPhoto = function(src) {
   document.querySelectorAll('#pd-photo-thumbs img').forEach(function(img) {
     img.style.borderColor = img.src === src ? 'var(--accent)' : 'var(--border)';
   });
-  // Keep the arrow-nav index in sync when a thumbnail is clicked directly
-  var photos = (window._currentProduct && window._currentProduct.photos) || [];
-  var idx = photos.indexOf(src);
-  if (idx > -1) window._pdPhotoIndex = idx;
-};
-
-// ── Prev/next arrow navigation through a product's uploaded photos ──
-window._pdPhotoIndex = 0;
-window.pdNavPhoto = function(dir) {
-  var p = window._currentProduct;
-  var photos = (p && p.photos) || [];
-  if (photos.length < 2) return;
-  window._pdPhotoIndex = ((window._pdPhotoIndex + dir) % photos.length + photos.length) % photos.length;
-  pdSwapPhoto(photos[window._pdPhotoIndex]);
-};
-// Shows/hides the arrow buttons based on how many photos this product has —
-// called from viewProduct/openProduct right after the thumbnail strip renders.
-window.pdUpdatePhotoArrows = function(p) {
-  window._pdPhotoIndex = 0;
-  var hasMultiple = p && p.photos && p.photos.length > 1;
-  var prevBtn = document.getElementById('pd-img-prev'), nextBtn = document.getElementById('pd-img-next');
-  if (prevBtn) prevBtn.style.display = hasMultiple ? 'flex' : 'none';
-  if (nextBtn) nextBtn.style.display = hasMultiple ? 'flex' : 'none';
 };
 
 window.publishProduct = async function() {
@@ -6871,7 +6793,7 @@ window.apApplyType = function() {
   var pvT1 = document.getElementById('ap-pv-t1');
   if (pvT1) pvT1.textContent = m.icon;
   var pvTag = document.getElementById('ap-pv-type-tag');
-  if (pvTag) { pvTag.textContent = m.label; pvTag.className = 'tag ' + (m.digital ? 'tag-accent' : 'tag-green'); }
+  if (pvTag) { pvTag.textContent = m.label; pvTag.className = 'tag ' + (m.digital ? 'tag-blue' : 'tag-green'); }
 };
 
 window.apSetPriceMode = function(mode) {
@@ -6960,21 +6882,11 @@ window.apAddFeature = function() {
 window.apAddVariant = function() {
   var row = document.createElement('div');
   row.className = 'ap-variant-row';
-  row.innerHTML = '<input class="ap-variant-name" placeholder="Size or variant name" type="text"><input class="ap-variant-price" placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×<\/button>';
+  row.innerHTML = '<input placeholder="Size or variant name" type="text"><input placeholder="Price (if different)" type="text" style="max-width:160px;"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×<\/button>';
   var list = document.getElementById('ap-variants-list');
   if (list) list.appendChild(row);
 };
 window.apRemoveVariant = function(btn) { btn.closest('.ap-variant-row').remove(); };
-// Collect size/variant rows from the physical-product form
-window.apGetVariants = function() {
-  var out = [];
-  document.querySelectorAll('#ap-variants-list .ap-variant-row').forEach(function(row) {
-    var name = (row.querySelector('.ap-variant-name')?.value || '').trim();
-    var price = (row.querySelector('.ap-variant-price')?.value || '').trim();
-    if (name) out.push({ name: name, price: price });
-  });
-  return out;
-};
 
 window.apAddModule = function() {
   var num = document.querySelectorAll('#ap-modules-list .ap-module-item').length + 1;
@@ -7255,12 +7167,6 @@ window.submitProduct = async function() {
       shipsFrom: shipsFrom || null,
       viewCount: 0,
     };
-
-    // Attach physical-product-only fields
-    if (productType === 'physical') {
-      productData.condition = document.getElementById('ap-field-condition')?.value || '';
-      productData.variants = window.apGetVariants ? window.apGetVariants() : [];
-    }
 
     // Attach lessons if this is a course
     if (productType === 'course' && window._pendingLessons && window._pendingLessons.length > 0) {
@@ -7810,7 +7716,7 @@ window.saveManualLocation = async function() {
             <div style="font-size:13.5px;font-weight:700;">Request payout</div>
             <div style="font-size:12px;color:var(--text3);margin-top:3px;">Withdraw your earnings</div>
           </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('analytics')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('analytics')" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
             <div style="font-size:24px;margin-bottom:8px;">📈</div>
             <div style="font-size:13.5px;font-weight:700;">View analytics</div>
             <div style="font-size:12px;color:var(--text3);margin-top:3px;">Sales & traffic data</div>
@@ -8691,8 +8597,7 @@ window.apAddLesson = function() {
       '<span class="ap-lesson-url-icon">🔗</span>' +
       '<input class="ap-lesson-url-input" placeholder="Paste YouTube, Vimeo, Google Drive, or Firebase video link…" oninput="apDetectVideoSource(this)">' +
       '<span class="ap-lesson-url-badge badge-other" style="display:none;"></span>' +
-    '</div>' +
-    '<textarea class="ap-lesson-summary-input" placeholder="What will students learn in this video? (shown to buyers on the course page)" style="width:100%;margin-top:8px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 11px;color:var(--text);font-family:var(--font-body);font-size:12.5px;resize:vertical;min-height:44px;"></textarea>';
+    '</div>';
 
   list.appendChild(row);
 };
@@ -8723,8 +8628,7 @@ window.apGetLessons = function() {
   document.querySelectorAll('#ap-lessons-list .ap-lesson-row').forEach(function(row, i) {
     var title = (row.querySelector('.ap-lesson-row-title')?.value || 'Lesson ' + (i+1)).trim();
     var url   = (row.querySelector('.ap-lesson-url-input')?.value || '').trim();
-    var summary = (row.querySelector('.ap-lesson-summary-input')?.value || '').trim();
-    lessons.push({ title: title, url: url, summary: summary, order: i });
+    lessons.push({ title: title, url: url, order: i });
   });
   return lessons;
 };
@@ -9476,7 +9380,6 @@ window.openProduct = async function(productId) {
     if (el('pd-seller')) el('pd-seller').textContent = 'By ' + (p.sellerName || 'Seller');
     if (el('pd-price')) el('pd-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     if (el('pd-desc')) el('pd-desc').textContent = p.description || '';
-    if (typeof pdRenderExtraDetails === 'function') pdRenderExtraDetails(p);
 
     // Original price
     if (p.originalPrice && p.originalPrice > p.price) {
@@ -9492,12 +9395,9 @@ window.openProduct = async function(productId) {
     }
     // Thumbnail strip
     var thumbs = el('pd-photo-thumbs');
-    if (thumbs) {
-      thumbs.innerHTML = (p.photos && p.photos.length > 1)
-        ? p.photos.map(function(ph,i){ return '<img src="'+ph+'" onclick="pdSwapPhoto(\''+ph+'\')" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--accent)':'var(--border)')+'">'; }).join('')
-        : '';
+    if (thumbs && p.photos && p.photos.length > 1) {
+      thumbs.innerHTML = p.photos.map(function(ph,i){ return '<img src="'+ph+'" onclick="document.getElementById(\'pd-img\').innerHTML=\'<img src=\\\'' + ph + '\\\' style=\\\"width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);\\\">\';" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--accent)':'var(--border)')+'" >'; }).join('');
     }
-    if (typeof pdUpdatePhotoArrows === 'function') pdUpdatePhotoArrows(p);
 
     // Tags
     var tagsEl = el('pd-tags');
@@ -10238,7 +10138,7 @@ window.adminLoadViewings = async function() {
     var rows = allDocs.map(function(d) {
       var r = d.data();
       var slot = r.slot ? r.slot.day + ' ' + r.slot.from + '-' + r.slot.to : '-';
-      var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--accent)', completed:'var(--green)' }[r.status]||'var(--text3)';
+      var statusColor = { pending:'var(--gold)', confirmed:'var(--green)', declined:'var(--red)', done:'var(--accent)', payment_submitted:'var(--blue)', completed:'var(--green)' }[r.status]||'var(--text3)';
       return '<tr><td>' + (r.productName||'-') + '</td><td>' + (r.buyerName||'-') + '</td><td>' + (r.sellerId||'-').slice(0,8) + '</td><td style="font-size:12px;">' + slot + '</td><td style="color:' + statusColor + ';font-weight:700;">' + (r.status||'-') + '</td><td>-</td></tr>';
     });
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="color:var(--text3);padding:20px;text-align:center;">No viewings yet.</td></tr>';
@@ -11168,7 +11068,7 @@ function myOrdersRender(orders) {
     pending:    { label:'Awaiting payment', color:'var(--gold)', bg:'rgba(245,200,66,.12)' },
     paid:       { label:'Payment confirmed', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
     processing: { label:'Processing', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
-    shipped:    { label:'Shipped', color:'var(--accent)', bg:'rgba(124,92,252,.12)' },
+    shipped:    { label:'Shipped', color:'#60b4ff', bg:'rgba(96,180,255,.12)' },
     'in-transit':{ label:'In transit', color:'#60b4ff', bg:'rgba(96,180,255,.12)' },
     completed:  { label:'Delivered', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
     delivered:  { label:'Delivered', color:'var(--green)', bg:'rgba(39,201,122,.12)' },
@@ -12597,14 +12497,6 @@ window.submitProduct = async function() {
     var allPhotos = existingUrls.concat(uploadedUrls);
     if (publishBtn) publishBtn.textContent = 'Saving…';
     var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active', platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(window._apType || 'physical') : 0.10 };
-    if (window._apType === 'physical') {
-      updateData.condition = document.getElementById('ap-field-condition')?.value || '';
-      updateData.variants = window.apGetVariants ? window.apGetVariants() : [];
-    }
-    if (window._apType === 'course') {
-      var editedLessons = window.apGetLessons ? window.apGetLessons() : [];
-      if (editedLessons.length) updateData.lessons = editedLessons;
-    }
     if (allPhotos.length) { updateData.photos = allPhotos; updateData.photo = allPhotos[0]; }
     await fns.updateDoc(fns.doc(db,'products',window._editingProductId), updateData);
     window._editingProductId = null;
