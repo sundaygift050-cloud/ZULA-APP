@@ -5827,10 +5827,15 @@ window.loadMyProfile = async function() {
   } catch(e) {}
 
   // Storefront listings — only ACTIVE listings are shown to the public;
-  // a visitor from a shared link never sees drafts.
+  // a visitor from a shared link never sees drafts. Full buyer treatment:
+  // wishlist heart + quick "add to cart" pill, since this is exactly the
+  // page a buyer lands on from a shared link and should be able to buy
+  // straight from.
   pv2RenderListingsGrid(targetUid, 'owner-listings-grid', {
     countElId: 'owner-listings-count',
     activeOnly: true,
+    showHeart: true,
+    showBuyPill: true,
     emptyMsg: 'No active listings yet.'
   });
 };
@@ -6425,20 +6430,12 @@ window.pv2RenderListingsGrid = async function(sellerId, containerId, opts) {
     listEl.style.gap = '14px';
     listEl.innerHTML = docs.map(function(d) {
       var p = d.data();
-      var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
-      var imgHtml = photoSrc ? ('<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">') : (p.emoji || '📦');
-      var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString();
-      var statusTag = (opts.showStatus && p.status === 'draft') ? '<span class="tag" style="background:var(--bg3);color:var(--text3);">Draft</span>' : (opts.showStatus ? '<span class="tag tag-green">Live</span>' : '');
-      return '<div class="pcard" onclick="viewProduct(\''+d.id+'\')" style="cursor:pointer;">' +
-        '<div class="pcard-img" style="overflow:hidden;height:130px;">'+imgHtml+'</div>' +
-        '<div class="pcard-body" style="padding:10px 12px;">' +
-          '<div class="pcard-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>' +
-          '<div class="pcard-foot" style="margin-top:6px;">' +
-            '<div class="pcard-price" style="font-size:13px;">'+priceDisplay+'</div>' +
-            statusTag +
-          '</div>' +
-        '</div>' +
-      '</div>';
+      return zulaBuildProductCard(p, d.id, {
+        showHeart: !!opts.showHeart,
+        showBuyPill: !!opts.showBuyPill,
+        showSeller: !!opts.showSeller,
+        showStatus: !!opts.showStatus
+      });
     }).join('');
   } catch(e) { console.error('pv2RenderListingsGrid:', e); listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;">Could not load listings.</div>'; }
 };
@@ -11573,6 +11570,51 @@ function applyActiveFilters(products) {
   renderProductGrid(filtered);
 }
 
+// ══════════════════════════════════════════════════
+// SHARED PRODUCT CARD BUILDER — every place that renders a product card
+// (main marketplace, "My listings" tab, public storefront, and any future
+// one) calls this same function, so the design is defined in exactly one
+// place and can't drift out of sync between pages again.
+// ══════════════════════════════════════════════════
+window.zulaBuildProductCard = function(p, id, opts) {
+  opts = opts || {};
+  var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+  var img = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
+  var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+
+  var topBadge = '';
+  if (opts.showStatus) {
+    topBadge = p.status === 'draft'
+      ? '<span class="pcard-top-badge" style="background:var(--bg3);color:var(--text3);">Draft</span>'
+      : '<span class="pcard-top-badge" style="background:var(--green,#27c97a);color:#fff;">Live</span>';
+  } else if (p.featured) {
+    topBadge = '<span class="pcard-top-badge">Top item</span>';
+  } else if (p.productType === 'realestate') {
+    topBadge = '<span class="pcard-top-badge" style="background:var(--accent);color:#fff;">🏠 Property</span>';
+  }
+
+  var heartHtml = '';
+  if (opts.showHeart) {
+    var isSaved = (typeof _wishlist !== 'undefined') && _wishlist.some(function(w){ return w.id === id; });
+    heartHtml = '<button class="pcard-heart' + (isSaved?' saved':'') + '" onclick="mktToggleWishlist(\''+id+'\',event,this)" title="Save">' + (isSaved?'❤️':'♡') + '</button>';
+  }
+
+  var sellerLine = opts.showSeller ? '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + '</div>' : '';
+
+  var buyRow = opts.showBuyPill
+    ? '<div class="pcard-buy-row"><button class="pcard-buy-pill" onclick="mktAddToCart(\''+id+'\',event)"><span class="pcard-cart-icon">🛒</span>' + priceDisplay + '</button></div>'
+    : '<div class="pcard-buy-row"><span style="font-weight:800;color:var(--accent);font-size:14px;">' + priceDisplay + '</span></div>';
+
+  return '<div class="pcard" onclick="viewProduct(\''+id+'\');" style="position:relative;">' +
+    topBadge + heartHtml +
+    '<div class="pcard-img" style="overflow:hidden;">' + img + '</div>' +
+    '<div class="pcard-body">' +
+      '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
+      sellerLine +
+      buyRow +
+    '</div></div>';
+};
+
 function renderProductGrid(products) {
   var grid = document.getElementById('products-grid');
   var empty = document.getElementById('empty-state');
@@ -11586,23 +11628,8 @@ function renderProductGrid(products) {
   }
   if (empty) empty.style.display = 'none';
   grid.innerHTML = products.map(function(p) {
-    var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
-    var img = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
     var _pid = p._id || p.id || '';
-    var topBadge = p.featured ? '<span class="pcard-top-badge">Top item</span>' : (p.productType==='realestate' ? '<span class="pcard-top-badge" style="background:var(--accent);color:#fff;">🏠 Property</span>' : '');
-    var isSaved = _wishlist.some(function(w){ return w.id === _pid; });
-    var priceDisplay = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
-    return '<div class="pcard" onclick="viewProduct(\''+_pid+'\');" style="position:relative;">' +
-      topBadge +
-      '<button class="pcard-heart' + (isSaved?' saved':'') + '" onclick="mktToggleWishlist(\''+_pid+'\',event,this)" title="Save">' + (isSaved?'❤️':'♡') + '</button>' +
-      '<div class="pcard-img">' + img + '</div>' +
-      '<div class="pcard-body">' +
-      '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
-      '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + '</div>' +
-      '<div class="pcard-buy-row">' +
-        '<button class="pcard-buy-pill" onclick="mktAddToCart(\''+_pid+'\',event)"><span class="pcard-cart-icon">🛒</span>' + priceDisplay + '</button>' +
-      '</div>' +
-      '</div></div>';
+    return zulaBuildProductCard(p, _pid, { showHeart:true, showBuyPill:true, showSeller:true });
   }).join('');
 }
 
