@@ -230,6 +230,83 @@ body.dock-active .page.active{padding-bottom:104px;}
 /* Cart stays in the header on mobile only (hidden in header on desktop, lives in dock instead) */
 @media(min-width:761px){ .hdr-cart-mobile-only{display:none !important;} }
 
+/* ══════════════════════════════════════════════════
+   MARKETPLACE PAGE — light "MLC reference" redesign, scoped entirely to
+   #page-marketplace via CSS variable overrides. Every component here
+   (.pcard, .filter-panel, .mkt-cat-pill, .hdr, etc.) already reads from
+   CSS variables, so redefining them within this page re-themes the whole
+   page without touching the rest of the app, which stays on the dark theme.
+   ══════════════════════════════════════════════════ */
+#page-marketplace{
+  --bg:#efedfb; --bg2:#ffffff; --bg3:#f5f3fd;
+  --surface:#ffffff; --surface2:#ffffff;
+  --border:#ece8f8; --border2:#ddd5f7;
+  --text:#171325; --text2:#605d70; --text3:#a19eae;
+  --hdr-bg:#ffffff;
+  background:linear-gradient(150deg,#9370fb 0%,#7c5cfc 45%,#5a3fd6 100%);
+  min-height:100vh; padding:26px 26px 60px;
+}
+#page-marketplace .mkt-frame{max-width:1320px;margin:0 auto;background:var(--bg2);border-radius:28px;overflow:hidden;box-shadow:0 30px 80px rgba(30,15,90,.35);}
+#page-marketplace .hdr{position:static;}
+#page-marketplace .logo{color:#15111f;}
+#page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);border-radius:999px;}
+#page-marketplace .hdr-search input{color:var(--text);}
+#page-marketplace .hdr-search input::placeholder{color:var(--text3);}
+#page-marketplace .mkt-hdr-link{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--text2);cursor:pointer;position:relative;}
+#page-marketplace .mkt-hdr-link .ico{font-size:18px;}
+#page-marketplace .mkt-hdr-link:hover{color:var(--text);}
+#page-marketplace .avatar-btn{border:2px solid var(--bg3);}
+
+#page-marketplace .mkt-cat-pills{border-bottom:none;margin-bottom:22px;padding-bottom:0;}
+#page-marketplace .mkt-cat-pill{background:var(--bg2);border:1px solid var(--border);color:var(--text2);}
+#page-marketplace .mkt-cat-pill:hover{border-color:var(--border2);}
+#page-marketplace .mkt-cat-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+#page-marketplace .mkt-layout{padding:0 28px 50px;gap:26px;}
+#page-marketplace .mkt-topbar{border-bottom:none;margin-bottom:16px;}
+#page-marketplace .mkt-topbar h2{color:var(--text);}
+
+#page-marketplace .filter-panel{background:transparent;border:none;padding:0;}
+#page-marketplace .filter-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(25,10,70,.04);}
+#page-marketplace .filter-card h4{font-size:14px;font-weight:800;color:var(--text);margin:0;}
+#page-marketplace .filter-card .fcheck{color:var(--text2);}
+
+#page-marketplace .pcard{box-shadow:0 1px 3px rgba(25,10,70,.06);border-color:var(--border);}
+#page-marketplace .pcard:hover{box-shadow:0 8px 24px rgba(25,10,70,.12);}
+#page-marketplace .pcard-img{background:var(--bg3);}
+#page-marketplace .pcard-heart{background:#fff;border:1px solid var(--border);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+#page-marketplace .pcard-heart.saved{background:var(--accent);border-color:var(--accent);color:#fff;}
+#page-marketplace .pcard-buy-pill{border-color:var(--accent);}
+#page-marketplace .pcard-name{color:var(--text);}
+
+/* Price range: histogram + dual-handle slider */
+#page-marketplace .mkt-hist{display:flex;align-items:flex-end;gap:2px;height:42px;margin:12px 0 10px;}
+#page-marketplace .mkt-hist span{flex:1;background:linear-gradient(180deg,#cabdfd,#a78bfa);border-radius:2px 2px 0 0;min-height:3px;}
+#page-marketplace .mkt-range-wrap{position:relative;height:26px;margin-bottom:2px;}
+#page-marketplace .mkt-range-track{position:absolute;top:11px;left:0;right:0;height:4px;background:var(--bg3);border-radius:999px;}
+#page-marketplace .mkt-range-fill{position:absolute;top:11px;height:4px;background:var(--accent);border-radius:999px;}
+#page-marketplace .mkt-range-wrap input[type=range]{position:absolute;width:100%;top:8px;left:0;-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;margin:0;}
+#page-marketplace .mkt-range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+#page-marketplace .mkt-range-wrap input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+#page-marketplace .mkt-price-pill{background:#171325;color:#fff;font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;}
+
+/* Star rating row */
+#page-marketplace .mkt-stars-row{display:flex;align-items:center;justify-content:space-between;}
+#page-marketplace .mkt-stars{font-size:19px;letter-spacing:2px;cursor:pointer;color:var(--border2);}
+#page-marketplace .mkt-stars .on{color:#f5c842;}
+#page-marketplace .mkt-stars-label{font-size:11.5px;color:var(--text3);font-weight:600;}
+
+/* Seller checklist rows (styled like the reference's Brand list) */
+#page-marketplace .mkt-seller-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--text2);cursor:pointer;}
+#page-marketplace .mkt-seller-icon{width:22px;height:22px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+#page-marketplace .mkt-seller-row input{margin-left:auto;width:16px;height:16px;accent-color:var(--accent);}
+
+/* Delivery toggle pills */
+#page-marketplace .mkt-delivery-toggle{display:flex;gap:8px;}
+#page-marketplace .mkt-delivery-btn{flex:1;padding:9px;border-radius:999px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;}
+#page-marketplace .mkt-delivery-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+@media(max-width:860px){ #page-marketplace{padding:14px 10px 40px;} #page-marketplace .mkt-frame{border-radius:20px;} #page-marketplace .mkt-layout{padding:0 14px 40px;} }
+
+
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;}
 @media(max-width:860px){.mkt-layout{grid-template-columns:1fr;}}
@@ -1311,6 +1388,7 @@ body.dock-active .page.active{padding-bottom:104px;}
      PAGE: MARKETPLACE (logged in users only)
      ================================================================ -->
 <div class="page" id="page-marketplace">
+  <div class="mkt-frame">
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
@@ -1318,9 +1396,14 @@ body.dock-active .page.active{padding-bottom:104px;}
         <span class="hdr-search-icon">🔍</span>
         <input placeholder="Search products…" oninput="filterProducts(this.value)">
       </div>
-      <nav class="hdr-nav">
+      <nav class="hdr-nav" style="gap:22px;">
+        <div class="mkt-hdr-link" onclick="showPage('my-orders')"><span class="ico">📦</span>Orders</div>
+        <div class="mkt-hdr-link" onclick="openWishlist()"><span class="ico">🤍</span>Favourites</div>
+        <div class="mkt-hdr-link" onclick="openCart()" style="position:relative;">
+          <span class="ico">🛒</span>Cart
+          <span id="cart-badge" style="display:none;position:absolute;top:-4px;right:2px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span>
+        </div>
         <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔 <span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-        <a onclick="openCart()" style="position:relative;" title="Cart" class="hdr-cart-mobile-only">🛒 <span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
         <!-- Admin/user dropdown -->
         <div id="user-dropdown" style="display:none;position:absolute;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
@@ -1345,36 +1428,60 @@ body.dock-active .page.active{padding-bottom:104px;}
   </header>
   <div class="wrap mkt-layout">
     <aside class="filter-panel" id="filter-panel">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <h3 style="margin:0;">Filters</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding:0 2px;">
+        <h3 style="margin:0;color:var(--text);">Filters</h3>
         <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()" id="filter-clear-btn" style="display:none;font-size:11.5px;padding:4px 10px;">Clear all</button>
       </div>
 
       <!-- Price Range -->
-      <div class="filter-group">
-        <h4>Price range</h4>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
-          <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-min-lbl">Min (₦)</div>
-            <input type="number" id="filter-price-min" placeholder="0" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="filter-max-lbl">Max (₦)</div>
-            <input type="number" id="filter-price-max" placeholder="Any" min="0" oninput="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
-          </div>
+      <div class="filter-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <h4>Price Range</h4>
+          <a onclick="resetPriceRange()" style="font-size:11.5px;color:var(--text3);cursor:pointer;">Reset</a>
         </div>
-        <!-- Quick price presets -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="fp-preset" id="fp-preset-1" onclick="setFilterPreset(0,5000)">Under ₦5k</button>
-          <button class="fp-preset" id="fp-preset-2" onclick="setFilterPreset(5000,20000)">₦5k–20k</button>
-          <button class="fp-preset" id="fp-preset-3" onclick="setFilterPreset(20000,100000)">₦20k–100k</button>
-          <button class="fp-preset" id="fp-preset-4" onclick="setFilterPreset(100000,0)">₦100k+</button>
+        <div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;" id="mkt-price-avg-lbl">The average price is ₦50,000</div>
+        <div class="mkt-hist" id="mkt-price-hist"></div>
+        <div class="mkt-range-wrap">
+          <div class="mkt-range-track"></div>
+          <div class="mkt-range-fill" id="mkt-range-fill"></div>
+          <input type="range" id="mkt-range-min" min="0" max="500000" value="0" step="1000" oninput="mktRangeSliderInput()">
+          <input type="range" id="mkt-range-max" min="0" max="500000" value="500000" step="1000" oninput="mktRangeSliderInput()">
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span class="mkt-price-pill" id="mkt-price-pill-min">₦0</span>
+          <span class="mkt-price-pill" id="mkt-price-pill-max">₦500k+</span>
+        </div>
+        <input type="hidden" id="filter-price-min">
+        <input type="hidden" id="filter-price-max">
+      </div>
+
+      <!-- Star Rating -->
+      <div class="filter-card">
+        <h4 style="margin-bottom:10px;">Star Rating</h4>
+        <div class="mkt-stars-row">
+          <div class="mkt-stars" id="mkt-stars-display" onclick="mktCycleStars(event)">★★★★☆</div>
+          <div class="mkt-stars-label" id="mkt-stars-label">4 Stars &amp; up</div>
+        </div>
+        <div style="display:none;">
+          <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> 3+</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()" id="mkt-rating-4" checked> 4+</label>
+          <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> 4.5+</label>
         </div>
       </div>
 
+      <!-- Seller (styled like the reference's Brand checklist) -->
+      <div class="filter-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <h4>Seller</h4>
+        </div>
+        <label class="mkt-seller-row"><span class="mkt-seller-icon">🛡</span>Verified sellers only<input type="checkbox" id="filter-verified-only" onchange="applyFilters()"></label>
+        <label class="mkt-seller-row"><span class="mkt-seller-icon">💰</span>Has affiliate programme<input type="checkbox" id="filter-has-affiliate" onchange="applyFilters()"></label>
+      </div>
+
       <!-- Type -->
-      <div class="filter-group" id="filter-group-type">
-        <h4>Product type</h4>
+      <div class="filter-card" id="filter-group-type">
+        <h4 style="margin-bottom:8px;">Product type</h4>
         <label class="fcheck"><input type="checkbox" value="physical" onchange="applyFilters()"> Physical</label>
         <label class="fcheck"><input type="checkbox" value="digital" onchange="applyFilters()"> Digital</label>
         <label class="fcheck"><input type="checkbox" value="course" onchange="applyFilters()"> Course</label>
@@ -1382,27 +1489,9 @@ body.dock-active .page.active{padding-bottom:104px;}
         <label class="fcheck"><input type="checkbox" value="service" onchange="applyFilters()"> Service</label>
       </div>
 
-      <!-- Rating -->
-      <div class="filter-group">
-        <h4>Min. rating</h4>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> ★★★ 3+ stars</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()"> ★★★★ 4+ stars</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> ★★★★★ 4.5+ stars</label>
-        </div>
-      </div>
-
-      <!-- Seller -->
-      <div class="filter-group">
-        <h4>Seller</h4>
-        <label class="fcheck"><input type="checkbox" id="filter-verified-only" onchange="applyFilters()"> 🛡 Verified sellers only</label>
-        <label class="fcheck"><input type="checkbox" id="filter-has-affiliate" onchange="applyFilters()"> 💰 Has affiliate programme</label>
-      </div>
-
       <!-- Sort -->
-      <div class="filter-group" style="border:none;padding-bottom:0;">
-        <h4>Sort by</h4>
+      <div class="filter-card">
+        <h4 style="margin-bottom:8px;">Sort by</h4>
         <select id="filter-sort" onchange="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
           <option value="newest">Newest first</option>
           <option value="price_asc">Price: low to high</option>
@@ -1410,6 +1499,15 @@ body.dock-active .page.active{padding-bottom:104px;}
           <option value="rating">Highest rated</option>
           <option value="name">Name A–Z</option>
         </select>
+      </div>
+
+      <!-- Delivery Options (visual, per the reference design) -->
+      <div class="filter-card">
+        <h4 style="margin-bottom:10px;">Delivery Options</h4>
+        <div class="mkt-delivery-toggle">
+          <button class="mkt-delivery-btn active" id="mkt-delivery-standard" onclick="mktSelectDelivery('standard',this)">Standard</button>
+          <button class="mkt-delivery-btn" id="mkt-delivery-pickup" onclick="mktSelectDelivery('pickup',this)">Pick Up</button>
+        </div>
       </div>
     </aside>
     <main>
@@ -1439,6 +1537,7 @@ body.dock-active .page.active{padding-bottom:104px;}
         <button class="btn btn-primary" onclick="goAddProduct()">List a product →</button>
       </div>
     </main>
+  </div>
   </div>
 </div>
 
@@ -11524,7 +11623,8 @@ var _allProducts = [];
 
 // Override filterProducts to work with real data
 window.filterProducts = function(query) {
-  var q = (query||'').toLowerCase().trim();
+  window._searchQuery = (query||'').trim();
+  var q = window._searchQuery.toLowerCase();
   var filtered = q
     ? _allProducts.filter(function(p){ return (p.name||'').toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q) || (p.sellerName||'').toLowerCase().includes(q); })
     : _allProducts;
@@ -11536,6 +11636,17 @@ window.applyFilters = function() {
 };
 
 function applyActiveFilters(products) {
+  var _rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  var priceMinRaw = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
+  var priceMaxRaw = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
+  // Filter inputs are typed in the user's chosen display currency — convert back to NGN (product.price is always stored in NGN)
+  var priceMin = priceMinRaw > 0 ? priceMinRaw / _rate : 0;
+  var priceMax = priceMaxRaw !== Infinity ? priceMaxRaw / _rate : Infinity;
+  var minRating = parseFloat(document.querySelector('input[name="filter-rating"]:checked')?.value || '0');
+  var verifiedOnly = document.getElementById('filter-verified-only')?.checked;
+  var hasAffiliate = document.getElementById('filter-has-affiliate')?.checked;
+  var sort = document.getElementById('filter-sort')?.value || 'newest';
+
   // Category — the pill bar above the grid is now the single source of truth
   // (the sidebar no longer duplicates it with its own checkbox list).
   var activeCat = window._mktActiveCategory || 'all';
@@ -11565,9 +11676,33 @@ function applyActiveFilters(products) {
   var filtered = products.filter(function(p) {
     var catMatch = activeCat === 'all' || productMatchesCat(p, activeCat);
     var typeMatch = !types.length || types.some(function(t){ return (p.type||p.productType||'').toLowerCase().includes(t); });
+    var price = Number(p.price || 0);
+    if (price < priceMin) return false;
+    if (priceMax !== Infinity && price > priceMax) return false;
+    if (minRating > 0 && (Number(p.avgRating)||0) < minRating) return false;
+    if (verifiedOnly && !p.sellerVerified) return false;
+    if (hasAffiliate && !p.commission) return false;
     return catMatch && typeMatch;
   });
+
+  // Sort
+  filtered = filtered.slice().sort(function(a, b) {
+    if (sort === 'price_asc')  return Number(a.price||0) - Number(b.price||0);
+    if (sort === 'price_desc') return Number(b.price||0) - Number(a.price||0);
+    if (sort === 'rating')     return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
+    if (sort === 'name')       return (a.name||'').localeCompare(b.name||'');
+    return 0; // newest: Firestore already returns newest-first
+  });
+
   renderProductGrid(filtered);
+
+  // Show "Clear all" button when any filter is active
+  var anyActive = priceMin > 0 || priceMax !== Infinity || minRating > 0 ||
+    verifiedOnly || hasAffiliate || activeCat !== 'all' || types.length || sort !== 'newest';
+  var clearBtn = document.getElementById('filter-clear-btn');
+  if (clearBtn) clearBtn.style.display = anyActive ? '' : 'none';
+  var titleEl = document.querySelector('.mkt-topbar h2');
+  if (titleEl) titleEl.textContent = window._searchQuery ? 'Results for "' + window._searchQuery + '"' : 'All products';
 }
 
 // ══════════════════════════════════════════════════
@@ -11664,6 +11799,87 @@ window.mktAddToCart = function(id, event) {
 
 // ── Category pill bar: the sole category selector now (sidebar checkboxes removed) ──
 window._mktActiveCategory = 'all';
+// ── Price range: dual-handle slider + histogram (MLC-reference redesign) ──
+window.mktBuildPriceHistogram = function() {
+  var hist = document.getElementById('mkt-price-hist');
+  var avgLbl = document.getElementById('mkt-price-avg-lbl');
+  if (!hist) return;
+  var prices = (window._allProducts || []).map(function(p){ return Number(p.price)||0; }).filter(function(n){ return n > 0; });
+  if (!prices.length) { hist.innerHTML = ''; return; }
+  var max = Math.max.apply(null, prices);
+  var avg = Math.round(prices.reduce(function(a,b){ return a+b; },0) / prices.length);
+  if (avgLbl) avgLbl.textContent = 'The average price is ' + (typeof formatPrice==='function' ? formatPrice(avg) : 'NGN ' + avg.toLocaleString());
+  // Bucket into 16 bars across the price range
+  var buckets = new Array(16).fill(0);
+  prices.forEach(function(p) {
+    var idx = Math.min(15, Math.floor((p / (max||1)) * 16));
+    buckets[idx]++;
+  });
+  var maxBucket = Math.max.apply(null, buckets) || 1;
+  hist.innerHTML = buckets.map(function(c) {
+    var h = Math.max(8, Math.round((c / maxBucket) * 100));
+    return '<span style="height:' + h + '%;"></span>';
+  }).join('');
+  // Extend the sliders' range to match real data
+  var maxRounded = Math.ceil(max / 10000) * 10000 || 500000;
+  var minEl = document.getElementById('mkt-range-min'), maxElS = document.getElementById('mkt-range-max');
+  if (minEl) minEl.max = maxRounded;
+  if (maxElS) { maxElS.max = maxRounded; maxElS.value = maxRounded; }
+  mktRangeSliderInput();
+};
+window.mktRangeSliderInput = function() {
+  var minEl = document.getElementById('mkt-range-min'), maxEl = document.getElementById('mkt-range-max');
+  if (!minEl || !maxEl) return;
+  var min = parseInt(minEl.value, 10), max = parseInt(maxEl.value, 10);
+  if (min > max) { var t = min; min = max; max = t; }
+  var sliderMax = parseInt(maxEl.max, 10) || 500000;
+  var fill = document.getElementById('mkt-range-fill');
+  if (fill) { fill.style.left = (min/sliderMax*100) + '%'; fill.style.right = (100 - max/sliderMax*100) + '%'; }
+  var pillMin = document.getElementById('mkt-price-pill-min'), pillMax = document.getElementById('mkt-price-pill-max');
+  if (pillMin) pillMin.textContent = typeof formatPrice==='function' ? formatPrice(min) : 'NGN ' + min.toLocaleString();
+  if (pillMax) {
+    var maxText = typeof formatPrice==='function' ? formatPrice(max) : 'NGN ' + max.toLocaleString();
+    pillMax.textContent = maxText + (max >= sliderMax ? '+' : '');
+  }
+  // Feed into the same hidden inputs applyActiveFilters already reads. Those
+  // inputs are expected in the user's display currency (applyActiveFilters
+  // converts back to NGN via the exchange rate) — the slider itself works in
+  // raw NGN (product prices are always stored in NGN), so convert here.
+  var _rate2 = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  var hiddenMin = document.getElementById('filter-price-min'), hiddenMax = document.getElementById('filter-price-max');
+  if (hiddenMin) hiddenMin.value = min * _rate2;
+  if (hiddenMax) hiddenMax.value = max >= sliderMax ? '' : max * _rate2;
+  applyFilters();
+};
+window.resetPriceRange = function() {
+  var minEl = document.getElementById('mkt-range-min'), maxEl = document.getElementById('mkt-range-max');
+  if (minEl) minEl.value = 0;
+  if (maxEl) maxEl.value = maxEl.max || 500000;
+  mktRangeSliderInput();
+};
+
+// ── Star rating: click a star to set "N stars & up" ──
+window.mktCycleStars = function(event) {
+  var rect = event.currentTarget.getBoundingClientRect();
+  var pct = (event.clientX - rect.left) / rect.width;
+  var stars = Math.max(1, Math.min(5, Math.ceil(pct * 5)));
+  var radioVal = stars >= 5 ? '4.5' : String(stars);
+  var radio = document.querySelector('input[name="filter-rating"][value="' + radioVal + '"]') || document.querySelector('input[name="filter-rating"][value="4"]');
+  if (radio) radio.checked = true;
+  var display = document.getElementById('mkt-stars-display'), label = document.getElementById('mkt-stars-label');
+  if (display) display.innerHTML = '<span class="on">' + '★'.repeat(stars) + '</span>' + '☆'.repeat(5-stars);
+  if (label) label.textContent = stars + (stars>=5?' Stars':' Stars & up');
+  applyFilters();
+};
+
+// ── Delivery Options toggle (visual, matching the reference design) ──
+window._mktDeliveryMode = 'standard';
+window.mktSelectDelivery = function(mode, btn) {
+  window._mktDeliveryMode = mode;
+  document.querySelectorAll('.mkt-delivery-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+};
+
 window.mktSelectCategoryPill = function(cat, btn) {
   document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
@@ -11687,6 +11903,7 @@ window.loadProducts = async function() {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.orderBy('createdAt','desc')));
     _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); }).filter(function(p){ return p.status !== 'draft'; });
     renderProductGrid(_allProducts);
+    if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
   } catch(e) { console.error('loadProducts error', e); }
 };
 
