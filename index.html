@@ -4032,8 +4032,12 @@ onAuthStateChanged(auth, async (user) => {
       adminLink.style.display = 'inline';
     }
     // If an admin refreshes the page while it's showing the default home/landing page,
-    // send them straight to the Admin Panel instead of the buyer-facing homepage
-    if (isAdminUser) {
+    // send them straight to the Admin Panel instead of the buyer-facing homepage.
+    // Skip this when the URL is a storefront link (?seller=...) — an admin opening
+    // their own (or anyone's) shared storefront link should see the storefront,
+    // not get yanked into the Admin Panel mid-load.
+    const isStorefrontLink = !!new URLSearchParams(window.location.search).get('seller');
+    if (isAdminUser && !isStorefrontLink) {
       const homeEl = document.getElementById('page-home');
       const isOnHome = homeEl && homeEl.classList.contains('active');
       if (isOnHome) {
@@ -14474,14 +14478,21 @@ document.addEventListener('DOMContentLoaded', function() { setTimeout(dockSync, 
 // Shared storefront links (?seller=uid) should open straight to that seller's
 // public profile on first load, whether or not the visitor is signed in —
 // dockSync() above still governs the floating dock's own visibility separately.
+// Re-asserted a few times over the first couple seconds (not just once) because
+// other startup logic (auth-state resolution, admin auto-redirect, etc.) can
+// still be settling at that point — re-firing showPage('myprofile') is cheap
+// and guarantees the storefront wins regardless of exact timing order.
 (function() {
   try {
     var sellerParam = new URLSearchParams(window.location.search).get('seller');
-    if (sellerParam) {
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() { if (typeof showPage === 'function') showPage('myprofile'); }, 50);
+    if (!sellerParam) return;
+    document.addEventListener('DOMContentLoaded', function() {
+      [50, 600, 1500].forEach(function(delay) {
+        setTimeout(function() {
+          if (typeof showPage === 'function') showPage('myprofile');
+        }, delay);
       });
-    }
+    });
   } catch (e) {}
 })();
 
