@@ -264,6 +264,28 @@ body.dock-active .page.active{padding-bottom:104px;}
 .pcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:9px;margin-top:2px;border-top:1px solid var(--border);}
 .pcard-price{font-size:14.5px;font-weight:800;color:var(--accent);}
 .pcard-type{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--bg3);padding:2px 7px;border-radius:999px;}
+
+/* ══════════════════════════════════════════
+   MARKETPLACE — category pill bar (horizontal, like the reference design)
+   ══════════════════════════════════════════ */
+.mkt-cat-pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--border);scrollbar-width:thin;}
+.mkt-cat-pills::-webkit-scrollbar{height:5px;}
+.mkt-cat-pills::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px;}
+.mkt-cat-pill{flex:0 0 auto;padding:9px 18px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s,transform .15s;}
+.mkt-cat-pill:hover{border-color:var(--border2);transform:translateY(-1px);}
+.mkt-cat-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* Redesigned product card — heart save button + combined price/cart pill,
+   matching the reference layout while keeping ZÚLA's dark theme. */
+.pcard-heart{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(20,20,24,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;z-index:2;transition:transform .15s,background .15s;}
+.pcard-heart:hover{transform:scale(1.1);}
+.pcard-heart.saved{background:var(--accent);border-color:var(--accent);}
+.pcard-top-badge{position:absolute;top:10px;left:10px;background:var(--gold);color:#1a1a1a;font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:2;}
+.pcard-buy-row{display:flex;align-items:center;justify-content:flex-start;margin-top:8px;}
+.pcard-buy-pill{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);font-family:var(--font-body);font-weight:700;font-size:13px;padding:6px 14px 6px 8px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s;}
+.pcard-buy-pill:hover{background:var(--accent);color:#fff;}
+.pcard-buy-pill .pcard-cart-icon{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.pcard-buy-pill:hover .pcard-cart-icon{background:#fff;color:var(--accent);}
 .empty-state{text-align:center;padding:80px 20px;color:var(--text3);}
 .empty-state .es-icon{font-size:52px;margin-bottom:16px;}
 .empty-state h3{font-size:18px;font-weight:700;color:var(--text2);margin-bottom:8px;}
@@ -1351,20 +1373,20 @@ body.dock-active .page.active{padding-bottom:104px;}
       </div>
 
       <!-- Category -->
-      <div class="filter-group">
+      <div class="filter-group" id="filter-group-category">
         <h4>Category</h4>
-        <label class="fcheck"><input type="checkbox" value="fashion" onchange="applyFilters()"> Fashion</label>
-        <label class="fcheck"><input type="checkbox" value="electronics" onchange="applyFilters()"> Electronics</label>
-        <label class="fcheck"><input type="checkbox" value="ebooks" onchange="applyFilters()"> Ebooks</label>
-        <label class="fcheck"><input type="checkbox" value="courses" onchange="applyFilters()"> Courses</label>
-        <label class="fcheck"><input type="checkbox" value="beauty" onchange="applyFilters()"> Beauty</label>
-        <label class="fcheck"><input type="checkbox" value="realestate" onchange="applyFilters()"> Real Estate</label>
-        <label class="fcheck"><input type="checkbox" value="food" onchange="applyFilters()"> Food & Drinks</label>
-        <label class="fcheck"><input type="checkbox" value="other" onchange="applyFilters()"> Other</label>
+        <label class="fcheck"><input type="checkbox" value="fashion" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Fashion</label>
+        <label class="fcheck"><input type="checkbox" value="electronics" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Electronics</label>
+        <label class="fcheck"><input type="checkbox" value="ebooks" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Ebooks</label>
+        <label class="fcheck"><input type="checkbox" value="courses" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Courses</label>
+        <label class="fcheck"><input type="checkbox" value="beauty" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Beauty</label>
+        <label class="fcheck"><input type="checkbox" value="realestate" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Real Estate</label>
+        <label class="fcheck"><input type="checkbox" value="food" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Food & Drinks</label>
+        <label class="fcheck"><input type="checkbox" value="other" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Other</label>
       </div>
 
       <!-- Type -->
-      <div class="filter-group">
+      <div class="filter-group" id="filter-group-type">
         <h4>Product type</h4>
         <label class="fcheck"><input type="checkbox" value="physical" onchange="applyFilters()"> Physical</label>
         <label class="fcheck"><input type="checkbox" value="digital" onchange="applyFilters()"> Digital</label>
@@ -1404,6 +1426,17 @@ body.dock-active .page.active{padding-bottom:104px;}
       </div>
     </aside>
     <main>
+      <div class="mkt-cat-pills" id="mkt-cat-pills">
+        <button class="mkt-cat-pill active" data-cat="all" onclick="mktSelectCategoryPill('all',this)">All Categories</button>
+        <button class="mkt-cat-pill" data-cat="fashion" onclick="mktSelectCategoryPill('fashion',this)">Fashion</button>
+        <button class="mkt-cat-pill" data-cat="electronics" onclick="mktSelectCategoryPill('electronics',this)">Electronics</button>
+        <button class="mkt-cat-pill" data-cat="ebooks" onclick="mktSelectCategoryPill('ebooks',this)">Ebooks</button>
+        <button class="mkt-cat-pill" data-cat="courses" onclick="mktSelectCategoryPill('courses',this)">Courses</button>
+        <button class="mkt-cat-pill" data-cat="beauty" onclick="mktSelectCategoryPill('beauty',this)">Beauty</button>
+        <button class="mkt-cat-pill" data-cat="realestate" onclick="mktSelectCategoryPill('realestate',this)">Real Estate</button>
+        <button class="mkt-cat-pill" data-cat="food" onclick="mktSelectCategoryPill('food',this)">Food &amp; Drinks</button>
+        <button class="mkt-cat-pill" data-cat="other" onclick="mktSelectCategoryPill('other',this)">Other</button>
+      </div>
       <div class="mkt-topbar">
         <div style="display:flex;align-items:center;gap:10px;">
           <h2>All products</h2>
@@ -11514,14 +11547,37 @@ window.applyFilters = function() {
 };
 
 function applyActiveFilters(products) {
-  // Category checkboxes
-  var catChecks = document.querySelectorAll('.filter-panel .filter-group:first-of-type .fcheck input:checked');
-  var cats = Array.from(catChecks).map(function(c){ return c.parentNode.textContent.trim().toLowerCase(); });
-  // Type checkboxes
-  var typeChecks = document.querySelectorAll('.filter-panel .filter-group:last-of-type .fcheck input:checked');
-  var types = Array.from(typeChecks).map(function(c){ return c.parentNode.textContent.trim().toLowerCase(); });
+  // Category checkboxes — targeted by id now, not :first-of-type (which was
+  // actually matching the Price range group, since it has no checkboxes that
+  // section silently contributed zero matches and the category filter never
+  // did anything).
+  var catChecks = document.querySelectorAll('#filter-group-category .fcheck input:checked');
+  var cats = Array.from(catChecks).map(function(c){ return c.value.toLowerCase(); });
+  // Type checkboxes — same fix, targeted by id instead of :last-of-type
+  // (which was actually matching the Sort dropdown section).
+  var typeChecks = document.querySelectorAll('#filter-group-type .fcheck input:checked');
+  var types = Array.from(typeChecks).map(function(c){ return c.value.toLowerCase(); });
+
+  // Keyword sets per category — the Add Product category dropdown stores full
+  // labels like "Fashion & Accessories" or "Food & Drink", not these short
+  // filter values, so each one matches by substring against known keywords.
+  // Real Estate listings don't go through the category dropdown at all — they're
+  // tagged via productType — so that one is matched separately.
+  var CAT_KEYWORDS = { fashion:['fashion'], electronics:['electronics'], ebooks:['ebook'], courses:['course'], beauty:['beauty'], food:['food','drink'] };
+  function productMatchesCat(p, cat) {
+    var catText = (p.category || '').toLowerCase();
+    if (cat === 'realestate') return catText.indexOf('real estate') > -1 || (p.productType||'') === 'realestate';
+    if (cat === 'other') {
+      var known = ['fashion','electronics','ebook','course','beauty','food','drink','real estate'];
+      var matchesKnown = known.some(function(k){ return catText.indexOf(k) > -1; }) || (p.productType||'') === 'realestate';
+      return !matchesKnown;
+    }
+    var kws = CAT_KEYWORDS[cat] || [cat];
+    return kws.some(function(k){ return catText.indexOf(k) > -1; });
+  }
+
   var filtered = products.filter(function(p) {
-    var catMatch = !cats.length || cats.some(function(c){ return (p.category||'').toLowerCase().includes(c); });
+    var catMatch = !cats.length || cats.some(function(c){ return productMatchesCat(p, c); });
     var typeMatch = !types.length || types.some(function(t){ return (p.type||p.productType||'').toLowerCase().includes(t); });
     return catMatch && typeMatch;
   });
@@ -11543,18 +11599,78 @@ function renderProductGrid(products) {
   grid.innerHTML = products.map(function(p) {
     var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
     var img = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
-    var badge = p.productType==='realestate' ? '<span style="position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;">🏠 Property</span>' : '';
     var _pid = p._id || p.id || '';
+    var topBadge = p.featured ? '<span class="pcard-top-badge">Top item</span>' : (p.productType==='realestate' ? '<span class="pcard-top-badge" style="background:var(--accent);color:#fff;">🏠 Property</span>' : '');
+    var isSaved = _wishlist.some(function(w){ return w.id === _pid; });
+    var priceDisplay = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     return '<div class="pcard" onclick="viewProduct(\''+_pid+'\');" style="position:relative;">' +
-      badge +
+      topBadge +
+      '<button class="pcard-heart' + (isSaved?' saved':'') + '" onclick="mktToggleWishlist(\''+_pid+'\',event,this)" title="Save">' + (isSaved?'❤️':'♡') + '</button>' +
       '<div class="pcard-img">' + img + '</div>' +
       '<div class="pcard-body">' +
       '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
-      '<div style="font-size:11.5px;color:var(--text3);margin-bottom:4px;">by ' + (p.sellerName||'Seller') + '</div>' +
-      '<div class="pcard-price">' + (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString() + '</div>' +
+      '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + '</div>' +
+      '<div class="pcard-buy-row">' +
+        '<button class="pcard-buy-pill" onclick="mktAddToCart(\''+_pid+'\',event)"><span class="pcard-cart-icon">🛒</span>' + priceDisplay + '</button>' +
+      '</div>' +
       '</div></div>';
   }).join('');
 }
+
+// ── Marketplace grid quick-actions: save to wishlist / add to cart,
+// both without navigating into the product detail page ──
+window.mktToggleWishlist = function(id, event, btn) {
+  if (event) event.stopPropagation();
+  var p = (window._allProducts || []).find(function(x){ return (x._id||x.id) === id; });
+  if (!p) return;
+  var idx = _wishlist.findIndex(function(w){ return w.id === id; });
+  if (idx >= 0) {
+    _wishlist.splice(idx, 1);
+    if (btn) { btn.classList.remove('saved'); btn.textContent = '♡'; }
+    showToast('Removed from wishlist');
+  } else {
+    _wishlist.push({ id:id, name:p.name, price:p.price, currency:p.currency||'NGN', photo:(p.photos&&p.photos[0])||p.photo||'', emoji:p.emoji||'📦', productType:p.productType||'physical', sellerId:p.sellerId, sellerName:p.sellerName });
+    if (btn) { btn.classList.add('saved'); btn.textContent = '❤️'; }
+    showToast('❤️ Saved to wishlist!');
+  }
+  wishSave();
+};
+window.mktAddToCart = function(id, event) {
+  if (event) event.stopPropagation();
+  var p = (window._allProducts || []).find(function(x){ return (x._id||x.id) === id; });
+  if (!p) return;
+  var existing = _cart.find(function(i){ return i.id === id; });
+  if (existing) { existing.qty = (existing.qty||1) + 1; }
+  else { _cart.push({ id:id, name:p.name, price:p.price, currency:p.currency||'NGN', photo:(p.photos&&p.photos[0])||p.photo||'', emoji:p.emoji||'📦', sellerId:p.sellerId, sellerName:p.sellerName, productType:p.productType||'physical', qty:1 }); }
+  cartSave();
+  showToast('🛒 Added to cart!');
+};
+
+// ── Category pill bar: single-select, mirrors the sidebar checkboxes
+// (the checkboxes stay fully functional for anyone who wants multi-select) ──
+window.mktSelectCategoryPill = function(cat, btn) {
+  document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var boxes = document.querySelectorAll('#filter-group-category .fcheck input[type="checkbox"]');
+  boxes.forEach(function(b){ b.checked = (cat !== 'all' && b.value === cat); });
+  applyFilters();
+};
+// Keeps the pill bar in sync if someone uses the sidebar checkboxes directly
+window.mktSyncPillsFromCheckboxes = function() {
+  var boxes = document.querySelectorAll('#filter-group-category .fcheck input[type="checkbox"]');
+  var checkedVals = Array.from(boxes).filter(function(b){ return b.checked; }).map(function(b){ return b.value; });
+  document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
+  var pillsEl = document.getElementById('mkt-cat-pills');
+  if (!pillsEl) return;
+  if (checkedVals.length === 1) {
+    var match = pillsEl.querySelector('[data-cat="'+checkedVals[0]+'"]');
+    if (match) match.classList.add('active');
+  } else if (checkedVals.length === 0) {
+    var allPill = pillsEl.querySelector('[data-cat="all"]');
+    if (allPill) allPill.classList.add('active');
+  }
+  // 2+ categories selected at once (only possible via sidebar checkboxes) — no single pill can represent that, so leave none highlighted.
+};
 
 // Load all products on marketplace open - patch the existing loadProducts
 var _origLoadProducts = window.loadProducts;
