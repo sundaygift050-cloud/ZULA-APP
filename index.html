@@ -1372,19 +1372,6 @@ body.dock-active .page.active{padding-bottom:104px;}
         </div>
       </div>
 
-      <!-- Category -->
-      <div class="filter-group" id="filter-group-category">
-        <h4>Category</h4>
-        <label class="fcheck"><input type="checkbox" value="fashion" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Fashion</label>
-        <label class="fcheck"><input type="checkbox" value="electronics" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Electronics</label>
-        <label class="fcheck"><input type="checkbox" value="ebooks" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Ebooks</label>
-        <label class="fcheck"><input type="checkbox" value="courses" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Courses</label>
-        <label class="fcheck"><input type="checkbox" value="beauty" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Beauty</label>
-        <label class="fcheck"><input type="checkbox" value="realestate" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Real Estate</label>
-        <label class="fcheck"><input type="checkbox" value="food" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Food & Drinks</label>
-        <label class="fcheck"><input type="checkbox" value="other" onchange="mktSyncPillsFromCheckboxes();applyFilters()"> Other</label>
-      </div>
-
       <!-- Type -->
       <div class="filter-group" id="filter-group-type">
         <h4>Product type</h4>
@@ -4457,6 +4444,11 @@ window.clearAllFilters = function() {
   if (sortEl) sortEl.value = 'newest';
   // Remove preset highlights
   document.querySelectorAll('.fp-preset').forEach(function(b) { b.classList.remove('active'); });
+  // Reset category pill bar back to "All Categories"
+  window._mktActiveCategory = 'all';
+  document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
+  var allPillEl = document.querySelector('.mkt-cat-pill[data-cat="all"]');
+  if (allPillEl) allPillEl.classList.add('active');
   applyFilters();
 };
 
@@ -11547,14 +11539,11 @@ window.applyFilters = function() {
 };
 
 function applyActiveFilters(products) {
-  // Category checkboxes — targeted by id now, not :first-of-type (which was
-  // actually matching the Price range group, since it has no checkboxes that
-  // section silently contributed zero matches and the category filter never
-  // did anything).
-  var catChecks = document.querySelectorAll('#filter-group-category .fcheck input:checked');
-  var cats = Array.from(catChecks).map(function(c){ return c.value.toLowerCase(); });
-  // Type checkboxes — same fix, targeted by id instead of :last-of-type
-  // (which was actually matching the Sort dropdown section).
+  // Category — the pill bar above the grid is now the single source of truth
+  // (the sidebar no longer duplicates it with its own checkbox list).
+  var activeCat = window._mktActiveCategory || 'all';
+  // Type checkboxes — targeted by id, not :last-of-type (which used to
+  // silently match the Sort dropdown section instead of Product type).
   var typeChecks = document.querySelectorAll('#filter-group-type .fcheck input:checked');
   var types = Array.from(typeChecks).map(function(c){ return c.value.toLowerCase(); });
 
@@ -11577,7 +11566,7 @@ function applyActiveFilters(products) {
   }
 
   var filtered = products.filter(function(p) {
-    var catMatch = !cats.length || cats.some(function(c){ return productMatchesCat(p, c); });
+    var catMatch = activeCat === 'all' || productMatchesCat(p, activeCat);
     var typeMatch = !types.length || types.some(function(t){ return (p.type||p.productType||'').toLowerCase().includes(t); });
     return catMatch && typeMatch;
   });
@@ -11646,36 +11635,20 @@ window.mktAddToCart = function(id, event) {
   showToast('🛒 Added to cart!');
 };
 
-// ── Category pill bar: single-select, mirrors the sidebar checkboxes
-// (the checkboxes stay fully functional for anyone who wants multi-select) ──
+// ── Category pill bar: the sole category selector now (sidebar checkboxes removed) ──
+window._mktActiveCategory = 'all';
 window.mktSelectCategoryPill = function(cat, btn) {
   document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
-  var boxes = document.querySelectorAll('#filter-group-category .fcheck input[type="checkbox"]');
-  boxes.forEach(function(b){ b.checked = (cat !== 'all' && b.value === cat); });
+  window._mktActiveCategory = cat;
   applyFilters();
 };
-// Keeps the pill bar in sync if someone uses the sidebar checkboxes directly
-window.mktSyncPillsFromCheckboxes = function() {
-  var boxes = document.querySelectorAll('#filter-group-category .fcheck input[type="checkbox"]');
-  var checkedVals = Array.from(boxes).filter(function(b){ return b.checked; }).map(function(b){ return b.value; });
-  document.querySelectorAll('.mkt-cat-pill').forEach(function(b){ b.classList.remove('active'); });
-  var pillsEl = document.getElementById('mkt-cat-pills');
-  if (!pillsEl) return;
-  if (checkedVals.length === 1) {
-    var match = pillsEl.querySelector('[data-cat="'+checkedVals[0]+'"]');
-    if (match) match.classList.add('active');
-  } else if (checkedVals.length === 0) {
-    var allPill = pillsEl.querySelector('[data-cat="all"]');
-    if (allPill) allPill.classList.add('active');
-  }
-  // 2+ categories selected at once (only possible via sidebar checkboxes) — no single pill can represent that, so leave none highlighted.
-};
 
-// Load all products on marketplace open - patch the existing loadProducts
-var _origLoadProducts = window.loadProducts;
+// Load all products on marketplace open — replaces the legacy loadProducts
+// entirely (it used to call the old renderer first, then immediately overwrite
+// it with this one — a wasteful double-render that risked the old-style cards
+// winning if anything interrupted the second render).
 window.loadProducts = async function() {
-  if (_origLoadProducts) { try { await _origLoadProducts(); } catch(e) {} }
   var db = window._db, fns = window._fns;
   if (!db || !fns) return;
   var grid = document.getElementById('products-grid');
