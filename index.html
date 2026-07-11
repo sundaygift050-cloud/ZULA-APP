@@ -306,6 +306,61 @@ body.dock-active .page.active{padding-bottom:104px;}
 #page-marketplace .mkt-delivery-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 @media(max-width:860px){ #page-marketplace{padding:14px 10px 40px;} #page-marketplace .mkt-frame{border-radius:20px;} #page-marketplace .mkt-layout{padding:0 14px 40px;} }
 
+/* ══════════════════════════════════════════════════
+   MARKETPLACE TEMPLATE REDESIGN — category carousel, promo
+   cards, featured deals, trending section, slide-over filters.
+   All still scoped to #page-marketplace's variable overrides above.
+   ══════════════════════════════════════════════════ */
+#page-marketplace .mkt-cat-carousel-wrap{display:flex;align-items:center;gap:8px;margin-bottom:22px;}
+#page-marketplace .mkt-cat-nav-btn{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#page-marketplace .mkt-cat-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+#page-marketplace .mkt-cat-carousel{flex:1;display:flex;gap:26px;overflow-x:auto;scroll-behavior:smooth;padding:4px 2px;scrollbar-width:none;}
+#page-marketplace .mkt-cat-carousel::-webkit-scrollbar{display:none;}
+#page-marketplace .mkt-cat-icon-item{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;width:76px;}
+#page-marketplace .mkt-cat-icon-circle{width:52px;height:52px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;transition:.15s;}
+#page-marketplace .mkt-cat-icon-item.active .mkt-cat-icon-circle{background:var(--accent);border-color:var(--accent);}
+#page-marketplace .mkt-cat-icon-item span{font-size:11px;font-weight:600;color:var(--text2);text-align:center;line-height:1.25;}
+#page-marketplace .mkt-cat-icon-item.active span{color:var(--accent);font-weight:700;}
+
+#page-marketplace .mkt-promo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+#page-marketplace .mkt-promo-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;}
+#page-marketplace .mkt-promo-eyebrow{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--accent);margin-bottom:6px;}
+#page-marketplace .mkt-promo-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px;}
+#page-marketplace .mkt-promo-sub{font-size:12.5px;color:var(--text3);line-height:1.4;margin-bottom:14px;}
+#page-marketplace .mkt-promo-btn{background:var(--accent);color:#fff;border:none;border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;}
+
+#page-marketplace .mkt-deals-section, #page-marketplace .mkt-trending-section{margin-bottom:36px;}
+#page-marketplace .mkt-deals-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+#page-marketplace .mkt-deals-head h2{font-size:19px;font-weight:800;color:var(--text);margin:0;}
+#page-marketplace .mkt-deals-countdown{background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;}
+#page-marketplace .mkt-deals-row{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px;scrollbar-width:none;}
+#page-marketplace .mkt-deals-row::-webkit-scrollbar{display:none;}
+#page-marketplace .mkt-deal-card{flex:0 0 auto;width:170px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;}
+#page-marketplace .mkt-deal-img{width:100%;height:110px;border-radius:10px;background:var(--bg3);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:10px;}
+#page-marketplace .mkt-deal-img img{width:100%;height:100%;object-fit:cover;}
+#page-marketplace .mkt-deal-name{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+#page-marketplace .mkt-deal-price{font-size:13.5px;font-weight:800;color:var(--accent);margin-bottom:6px;}
+#page-marketplace .mkt-deal-bar-track{height:5px;background:var(--bg3);border-radius:999px;overflow:hidden;margin-bottom:4px;}
+#page-marketplace .mkt-deal-bar-fill{height:100%;background:var(--accent);border-radius:999px;}
+#page-marketplace .mkt-deal-sold{font-size:10px;color:var(--text3);}
+
+#page-marketplace .mkt-trend-tabs{display:flex;gap:6px;}
+#page-marketplace .mkt-trend-tab{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;cursor:pointer;}
+#page-marketplace .mkt-trend-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+#page-marketplace .mkt-trend-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);gap:14px;}
+#page-marketplace .mkt-trend-grid .pcard:first-child{grid-row:span 2;}
+
+#page-marketplace .mkt-bottom-banner{background:linear-gradient(135deg,#7c5cfc,#5a3fd6);border-radius:20px;padding:36px 32px;color:#fff;text-align:center;}
+
+/* Filters slide-over panel (was a fixed sidebar, now a toggleable drawer) */
+#page-marketplace .mkt-filter-modal{position:fixed;top:0;right:-360px;width:340px;height:100vh;background:var(--bg2);z-index:900;overflow-y:auto;padding:20px;box-shadow:-10px 0 40px rgba(0,0,0,.2);transition:right .25s ease;}
+#page-marketplace .mkt-filter-modal.open{right:0;}
+@media(max-width:600px){ #page-marketplace .mkt-filter-modal{width:88vw;right:-88vw;} }
+@media(max-width:860px){
+  #page-marketplace .mkt-promo-row{grid-template-columns:1fr;}
+  #page-marketplace .mkt-trend-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:none;}
+  #page-marketplace .mkt-trend-grid .pcard:first-child{grid-row:auto;grid-column:span 2;}
+}
 
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;}
@@ -1426,119 +1481,191 @@ body.dock-active .page.active{padding-bottom:104px;}
       </nav>
     </div>
   </header>
-  <div class="wrap mkt-layout">
-    <aside class="filter-panel" id="filter-panel">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding:0 2px;">
-        <h3 style="margin:0;color:var(--text);">Filters</h3>
+
+  <div class="wrap" style="padding:22px 28px 50px;">
+
+    <!-- Category icon carousel -->
+    <div class="mkt-cat-carousel-wrap">
+      <button class="mkt-cat-nav-btn" onclick="mktScrollCats(-1)">‹</button>
+      <div class="mkt-cat-carousel" id="mkt-cat-carousel">
+        <div class="mkt-cat-icon-item active" data-cat="all" onclick="mktSelectCategoryIcon('all',this)"><div class="mkt-cat-icon-circle">🛍️</div><span>All Categories</span></div>
+        <div class="mkt-cat-icon-item" data-cat="fashion" onclick="mktSelectCategoryIcon('fashion',this)"><div class="mkt-cat-icon-circle">👗</div><span>Fashion</span></div>
+        <div class="mkt-cat-icon-item" data-cat="electronics" onclick="mktSelectCategoryIcon('electronics',this)"><div class="mkt-cat-icon-circle">💻</div><span>Electronics</span></div>
+        <div class="mkt-cat-icon-item" data-cat="ebooks" onclick="mktSelectCategoryIcon('ebooks',this)"><div class="mkt-cat-icon-circle">📚</div><span>Ebooks</span></div>
+        <div class="mkt-cat-icon-item" data-cat="courses" onclick="mktSelectCategoryIcon('courses',this)"><div class="mkt-cat-icon-circle">🎓</div><span>Courses</span></div>
+        <div class="mkt-cat-icon-item" data-cat="beauty" onclick="mktSelectCategoryIcon('beauty',this)"><div class="mkt-cat-icon-circle">💄</div><span>Beauty</span></div>
+        <div class="mkt-cat-icon-item" data-cat="realestate" onclick="mktSelectCategoryIcon('realestate',this)"><div class="mkt-cat-icon-circle">🏠</div><span>Real Estate</span></div>
+        <div class="mkt-cat-icon-item" data-cat="food" onclick="mktSelectCategoryIcon('food',this)"><div class="mkt-cat-icon-circle">🍔</div><span>Food &amp; Drinks</span></div>
+        <div class="mkt-cat-icon-item" data-cat="other" onclick="mktSelectCategoryIcon('other',this)"><div class="mkt-cat-icon-circle">📦</div><span>Other</span></div>
+      </div>
+      <button class="mkt-cat-nav-btn" onclick="mktScrollCats(1)">›</button>
+    </div>
+
+    <!-- Promo banner row -->
+    <div class="mkt-promo-row">
+      <div class="mkt-promo-card">
+        <div class="mkt-promo-eyebrow">GET REWARDED</div>
+        <div class="mkt-promo-title">Sell for free</div>
+        <div class="mkt-promo-sub">Zero listing fees — only pay when you make a sale.</div>
+        <button class="mkt-promo-btn" onclick="goAddProduct()">List a product →</button>
+      </div>
+      <div class="mkt-promo-card">
+        <div class="mkt-promo-eyebrow">EARN MORE</div>
+        <div class="mkt-promo-title">Become an affiliate</div>
+        <div class="mkt-promo-sub">Share any product and earn up to 20% commission.</div>
+        <button class="mkt-promo-btn" onclick="affNavClick()">Start earning →</button>
+      </div>
+      <div class="mkt-promo-card">
+        <div class="mkt-promo-eyebrow">BUY WITH CONFIDENCE</div>
+        <div class="mkt-promo-title">Escrow protected</div>
+        <div class="mkt-promo-sub">Your payment is held safely until you confirm receipt.</div>
+        <button class="mkt-promo-btn" onclick="showPage('marketplace')">Shop now →</button>
+      </div>
+    </div>
+
+    <!-- Today's Featured Deals -->
+    <div class="mkt-deals-section" id="mkt-deals-section" style="display:none;">
+      <div class="mkt-deals-head">
+        <h2>Today's Featured Deals</h2>
+        <div class="mkt-deals-countdown">Ends in <span id="mkt-countdown">00:00:00</span></div>
+        <div style="flex:1;"></div>
+        <div style="display:flex;gap:6px;">
+          <button class="mkt-cat-nav-btn" onclick="mktScrollDeals(-1)">‹</button>
+          <button class="mkt-cat-nav-btn" onclick="mktScrollDeals(1)">›</button>
+        </div>
+      </div>
+      <div class="mkt-deals-row" id="mkt-deals-row"></div>
+    </div>
+
+    <!-- Trending This Week -->
+    <div class="mkt-trending-section" id="mkt-trending-section" style="display:none;">
+      <div class="mkt-deals-head">
+        <h2>Trending This Week</h2>
+        <div style="flex:1;"></div>
+        <div class="mkt-trend-tabs">
+          <button class="mkt-trend-tab active" onclick="mktSwitchTrendTab('newest',this)">New</button>
+          <button class="mkt-trend-tab" onclick="mktSwitchTrendTab('rating',this)">Best Rated</button>
+          <button class="mkt-trend-tab" onclick="mktSwitchTrendTab('price_asc',this)">Sales</button>
+          <button class="mkt-trend-tab" onclick="showPage('marketplace')">View All</button>
+        </div>
+      </div>
+      <div class="mkt-trend-grid" id="mkt-trend-grid"></div>
+    </div>
+
+    <!-- Bottom CTA banner -->
+    <div class="mkt-bottom-banner">
+      <div class="mkt-promo-eyebrow" style="color:rgba(255,255,255,.75);">NEW SELLER? START TODAY</div>
+      <div style="font-size:26px;font-weight:800;margin:6px 0 4px;">List for free, keep more of what you earn</div>
+      <div style="font-size:13.5px;opacity:.85;margin-bottom:16px;">No monthly fees. Category-based commission only, charged when you actually sell.</div>
+      <button class="mkt-promo-btn" style="background:#fff;color:var(--accent);" onclick="goAddProduct()">Start selling →</button>
+    </div>
+
+    <!-- All products -->
+    <div class="mkt-topbar" style="margin-top:34px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h2>All products</h2>
+        <button class="btn btn-ghost btn-sm" onclick="mktOpenFilterModal()">⚙️ Filters</button>
+      </div>
+      <div class="result-count" id="result-count"></div>
+    </div>
+    <div class="pgrid" id="products-grid"></div>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="es-icon">🛍</div>
+      <h3>No products yet</h3>
+      <p>Be the first to list a product on ZÚLA. Verify your account and start selling.</p>
+      <button class="btn btn-primary" onclick="goAddProduct()">List a product →</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- Filters slide-over panel -->
+  <div id="mkt-filter-overlay" onclick="mktCloseFilterModal()" style="display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:800;"></div>
+  <aside class="filter-panel mkt-filter-modal" id="filter-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding:0 2px;">
+      <h3 style="margin:0;color:var(--text);">Filters</h3>
+      <div style="display:flex;align-items:center;gap:10px;">
         <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()" id="filter-clear-btn" style="display:none;font-size:11.5px;padding:4px 10px;">Clear all</button>
+        <button onclick="mktCloseFilterModal()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;">×</button>
       </div>
+    </div>
 
-      <!-- Price Range -->
-      <div class="filter-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
-          <h4>Price Range</h4>
-          <a onclick="resetPriceRange()" style="font-size:11.5px;color:var(--text3);cursor:pointer;">Reset</a>
-        </div>
-        <div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;" id="mkt-price-avg-lbl">The average price is ₦50,000</div>
-        <div class="mkt-hist" id="mkt-price-hist"></div>
-        <div class="mkt-range-wrap">
-          <div class="mkt-range-track"></div>
-          <div class="mkt-range-fill" id="mkt-range-fill"></div>
-          <input type="range" id="mkt-range-min" min="0" max="500000" value="0" step="1000" oninput="mktRangeSliderInput()">
-          <input type="range" id="mkt-range-max" min="0" max="500000" value="500000" step="1000" oninput="mktRangeSliderInput()">
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span class="mkt-price-pill" id="mkt-price-pill-min">₦0</span>
-          <span class="mkt-price-pill" id="mkt-price-pill-max">₦500k+</span>
-        </div>
-        <input type="hidden" id="filter-price-min">
-        <input type="hidden" id="filter-price-max">
+    <!-- Price Range -->
+    <div class="filter-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+        <h4>Price Range</h4>
+        <a onclick="resetPriceRange()" style="font-size:11.5px;color:var(--text3);cursor:pointer;">Reset</a>
       </div>
+      <div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;" id="mkt-price-avg-lbl">The average price is ₦50,000</div>
+      <div class="mkt-hist" id="mkt-price-hist"></div>
+      <div class="mkt-range-wrap">
+        <div class="mkt-range-track"></div>
+        <div class="mkt-range-fill" id="mkt-range-fill"></div>
+        <input type="range" id="mkt-range-min" min="0" max="500000" value="0" step="1000" oninput="mktRangeSliderInput()">
+        <input type="range" id="mkt-range-max" min="0" max="500000" value="500000" step="1000" oninput="mktRangeSliderInput()">
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span class="mkt-price-pill" id="mkt-price-pill-min">₦0</span>
+        <span class="mkt-price-pill" id="mkt-price-pill-max">₦500k+</span>
+      </div>
+      <input type="hidden" id="filter-price-min">
+      <input type="hidden" id="filter-price-max">
+    </div>
 
-      <!-- Star Rating -->
-      <div class="filter-card">
-        <h4 style="margin-bottom:10px;">Star Rating</h4>
-        <div class="mkt-stars-row">
-          <div class="mkt-stars" id="mkt-stars-display" onclick="mktCycleStars(event)">★★★★☆</div>
-          <div class="mkt-stars-label" id="mkt-stars-label">4 Stars &amp; up</div>
-        </div>
-        <div style="display:none;">
-          <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> 3+</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()" id="mkt-rating-4" checked> 4+</label>
-          <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> 4.5+</label>
-        </div>
+    <!-- Star Rating -->
+    <div class="filter-card">
+      <h4 style="margin-bottom:10px;">Star Rating</h4>
+      <div class="mkt-stars-row">
+        <div class="mkt-stars" id="mkt-stars-display" onclick="mktCycleStars(event)">☆☆☆☆☆</div>
+        <div class="mkt-stars-label" id="mkt-stars-label">Any rating</div>
       </div>
+      <div style="display:none;">
+        <label class="fcheck"><input type="radio" name="filter-rating" value="0" checked onchange="applyFilters()"> Any rating</label>
+        <label class="fcheck"><input type="radio" name="filter-rating" value="3" onchange="applyFilters()"> 3+</label>
+        <label class="fcheck"><input type="radio" name="filter-rating" value="4" onchange="applyFilters()" id="mkt-rating-4"> 4+</label>
+        <label class="fcheck"><input type="radio" name="filter-rating" value="4.5" onchange="applyFilters()"> 4.5+</label>
+      </div>
+    </div>
 
-      <!-- Seller (styled like the reference's Brand checklist) -->
-      <div class="filter-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <h4>Seller</h4>
-        </div>
-        <label class="mkt-seller-row"><span class="mkt-seller-icon">🛡</span>Verified sellers only<input type="checkbox" id="filter-verified-only" onchange="applyFilters()"></label>
-        <label class="mkt-seller-row"><span class="mkt-seller-icon">💰</span>Has affiliate programme<input type="checkbox" id="filter-has-affiliate" onchange="applyFilters()"></label>
+    <!-- Seller -->
+    <div class="filter-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <h4>Seller</h4>
       </div>
+      <label class="mkt-seller-row"><span class="mkt-seller-icon">🛡</span>Verified sellers only<input type="checkbox" id="filter-verified-only" onchange="applyFilters()"></label>
+      <label class="mkt-seller-row"><span class="mkt-seller-icon">💰</span>Has affiliate programme<input type="checkbox" id="filter-has-affiliate" onchange="applyFilters()"></label>
+    </div>
 
-      <!-- Type -->
-      <div class="filter-card" id="filter-group-type">
-        <h4 style="margin-bottom:8px;">Product type</h4>
-        <label class="fcheck"><input type="checkbox" value="physical" onchange="applyFilters()"> Physical</label>
-        <label class="fcheck"><input type="checkbox" value="digital" onchange="applyFilters()"> Digital</label>
-        <label class="fcheck"><input type="checkbox" value="course" onchange="applyFilters()"> Course</label>
-        <label class="fcheck"><input type="checkbox" value="realestate" onchange="applyFilters()"> Real Estate</label>
-        <label class="fcheck"><input type="checkbox" value="service" onchange="applyFilters()"> Service</label>
-      </div>
+    <!-- Type -->
+    <div class="filter-card" id="filter-group-type">
+      <h4 style="margin-bottom:8px;">Product type</h4>
+      <label class="fcheck"><input type="checkbox" value="physical" onchange="applyFilters()"> Physical</label>
+      <label class="fcheck"><input type="checkbox" value="digital" onchange="applyFilters()"> Digital</label>
+      <label class="fcheck"><input type="checkbox" value="course" onchange="applyFilters()"> Course</label>
+      <label class="fcheck"><input type="checkbox" value="realestate" onchange="applyFilters()"> Real Estate</label>
+      <label class="fcheck"><input type="checkbox" value="service" onchange="applyFilters()"> Service</label>
+    </div>
 
-      <!-- Sort -->
-      <div class="filter-card">
-        <h4 style="margin-bottom:8px;">Sort by</h4>
-        <select id="filter-sort" onchange="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
-          <option value="newest">Newest first</option>
-          <option value="price_asc">Price: low to high</option>
-          <option value="price_desc">Price: high to low</option>
-          <option value="rating">Highest rated</option>
-          <option value="name">Name A–Z</option>
-        </select>
-      </div>
+    <!-- Sort -->
+    <div class="filter-card">
+      <h4 style="margin-bottom:8px;">Sort by</h4>
+      <select id="filter-sort" onchange="applyFilters()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;color:var(--text);font-family:var(--font-body);font-size:13px;">
+        <option value="newest">Newest first</option>
+        <option value="price_asc">Price: low to high</option>
+        <option value="price_desc">Price: high to low</option>
+        <option value="rating">Highest rated</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
 
-      <!-- Delivery Options (visual, per the reference design) -->
-      <div class="filter-card">
-        <h4 style="margin-bottom:10px;">Delivery Options</h4>
-        <div class="mkt-delivery-toggle">
-          <button class="mkt-delivery-btn active" id="mkt-delivery-standard" onclick="mktSelectDelivery('standard',this)">Standard</button>
-          <button class="mkt-delivery-btn" id="mkt-delivery-pickup" onclick="mktSelectDelivery('pickup',this)">Pick Up</button>
-        </div>
+    <!-- Delivery Options -->
+    <div class="filter-card">
+      <h4 style="margin-bottom:10px;">Delivery Options</h4>
+      <div class="mkt-delivery-toggle">
+        <button class="mkt-delivery-btn active" id="mkt-delivery-standard" onclick="mktSelectDelivery('standard',this)">Standard</button>
+        <button class="mkt-delivery-btn" id="mkt-delivery-pickup" onclick="mktSelectDelivery('pickup',this)">Pick Up</button>
       </div>
-    </aside>
-    <main>
-      <div class="mkt-cat-pills" id="mkt-cat-pills">
-        <button class="mkt-cat-pill active" data-cat="all" onclick="mktSelectCategoryPill('all',this)">All Categories</button>
-        <button class="mkt-cat-pill" data-cat="fashion" onclick="mktSelectCategoryPill('fashion',this)">Fashion</button>
-        <button class="mkt-cat-pill" data-cat="electronics" onclick="mktSelectCategoryPill('electronics',this)">Electronics</button>
-        <button class="mkt-cat-pill" data-cat="ebooks" onclick="mktSelectCategoryPill('ebooks',this)">Ebooks</button>
-        <button class="mkt-cat-pill" data-cat="courses" onclick="mktSelectCategoryPill('courses',this)">Courses</button>
-        <button class="mkt-cat-pill" data-cat="beauty" onclick="mktSelectCategoryPill('beauty',this)">Beauty</button>
-        <button class="mkt-cat-pill" data-cat="realestate" onclick="mktSelectCategoryPill('realestate',this)">Real Estate</button>
-        <button class="mkt-cat-pill" data-cat="food" onclick="mktSelectCategoryPill('food',this)">Food &amp; Drinks</button>
-        <button class="mkt-cat-pill" data-cat="other" onclick="mktSelectCategoryPill('other',this)">Other</button>
-      </div>
-      <div class="mkt-topbar">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <h2>All products</h2>
-          <button class="btn btn-ghost btn-sm" id="filter-toggle-btn" onclick="toggleMobileFilter()" style="display:none;">⚙️ Filters</button>
-        </div>
-        <div class="result-count" id="result-count"></div>
-      </div>
-      <div class="pgrid" id="products-grid"></div>
-      <div class="empty-state" id="empty-state" style="display:none;">
-        <div class="es-icon">🛍</div>
-        <h3>No products yet</h3>
-        <p>Be the first to list a product on ZÚLA. Verify your account and start selling.</p>
-        <button class="btn btn-primary" onclick="goAddProduct()">List a product →</button>
-      </div>
-    </main>
-  </div>
-  </div>
+    </div>
+  </aside>
 </div>
 
 <!-- ================================================================
@@ -11800,6 +11927,135 @@ window.mktAddToCart = function(id, event) {
 // ── Category pill bar: the sole category selector now (sidebar checkboxes removed) ──
 window._mktActiveCategory = 'all';
 // ── Price range: dual-handle slider + histogram (MLC-reference redesign) ──
+// ── Category icon carousel (top of marketplace) ──
+window.mktScrollCats = function(dir) {
+  var el = document.getElementById('mkt-cat-carousel');
+  if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+};
+window.mktSelectCategoryIcon = function(cat, el) {
+  document.querySelectorAll('.mkt-cat-icon-item').forEach(function(b){ b.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  window._mktActiveCategory = cat;
+  applyFilters();
+};
+
+// ── Today's Featured Deals — real products, real "already sold" counts ──
+// computed from actual completed orders (not fabricated numbers).
+window.mktLoadFeaturedDeals = async function() {
+  var section = document.getElementById('mkt-deals-section');
+  var row = document.getElementById('mkt-deals-row');
+  if (!section || !row) return;
+  var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft'; });
+  if (!products.length) { section.style.display = 'none'; return; }
+  // Prefer products the seller marked as featured; fall back to the newest ones
+  var pool = products.filter(function(p){ return p.featured; });
+  if (pool.length < 4) pool = products.slice(0, 6);
+  else pool = pool.slice(0, 6);
+
+  // Real sold-count per product, from actual completed orders — one query,
+  // not fabricated, not N+1.
+  var soldMap = {};
+  try {
+    var db = window._db, fns = window._fns;
+    if (db && fns) {
+      var osnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('status','==','completed')));
+      osnap.docs.forEach(function(d) {
+        var o = d.data();
+        if (o.productId) soldMap[o.productId] = (soldMap[o.productId] || 0) + 1;
+      });
+    }
+  } catch(e) { /* soldMap stays empty — bars just won't show, no fake data used */ }
+
+  row.innerHTML = pool.map(function(p) {
+    var id = p._id || p.id;
+    var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
+    var img = photoSrc ? '<img src="'+photoSrc+'">' : (p.emoji || '📦');
+    var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+    var sold = soldMap[id] || 0;
+    var stock = Number(p.stock) || 0;
+    var barHtml = '';
+    if (stock > 0) {
+      var pct = Math.min(100, Math.round((sold / stock) * 100));
+      barHtml = '<div class="mkt-deal-bar-track"><div class="mkt-deal-bar-fill" style="width:'+pct+'%;"></div></div>' +
+        '<div class="mkt-deal-sold">'+sold+' sold'+ (stock ? ' of '+stock : '') +'</div>';
+    } else if (sold > 0) {
+      barHtml = '<div class="mkt-deal-sold">🔥 '+sold+' sold so far</div>';
+    }
+    return '<div class="mkt-deal-card" onclick="viewProduct(\''+id+'\')">' +
+      '<div class="mkt-deal-img">'+img+'</div>' +
+      '<div class="mkt-deal-name">'+(p.name||'Product')+'</div>' +
+      '<div class="mkt-deal-price">'+priceDisplay+'</div>' +
+      barHtml +
+    '</div>';
+  }).join('');
+  section.style.display = '';
+};
+window.mktScrollDeals = function(dir) {
+  var el = document.getElementById('mkt-deals-row');
+  if (el) el.scrollBy({ left: dir * 200, behavior: 'smooth' });
+};
+
+// Countdown to midnight (resets daily) — a genuine, honest countdown, not a
+// fixed fake deadline that never actually expires.
+window.mktStartCountdown = function() {
+  var el = document.getElementById('mkt-countdown');
+  if (!el) return;
+  function tick() {
+    var now = new Date();
+    var midnight = new Date(now); midnight.setHours(24,0,0,0);
+    var diff = Math.max(0, midnight - now);
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+  tick();
+  if (window._mktCountdownInterval) clearInterval(window._mktCountdownInterval);
+  window._mktCountdownInterval = setInterval(tick, 1000);
+};
+
+// ── Trending This Week — same real product data, different sort, with a
+// larger featured card for the top result ──
+window.mktLoadTrending = function(sort) {
+  var section = document.getElementById('mkt-trending-section');
+  var grid = document.getElementById('mkt-trend-grid');
+  if (!section || !grid) return;
+  var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft'; });
+  if (products.length < 3) { section.style.display = 'none'; return; }
+  var sorted = products.slice().sort(function(a,b) {
+    if (sort === 'rating') return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
+    if (sort === 'price_asc') return Number(a.price||0) - Number(b.price||0);
+    return 0; // 'newest' — already newest-first from the fetch
+  }).slice(0, 5);
+  grid.innerHTML = sorted.map(function(p) {
+    var id = p._id || p.id;
+    return zulaBuildProductCard(p, id, { showHeart:true, showBuyPill:true, showSeller:true });
+  }).join('');
+  section.style.display = '';
+};
+window.mktSwitchTrendTab = function(sort, btn) {
+  document.querySelectorAll('.mkt-trend-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  mktLoadTrending(sort);
+};
+
+// ── Filters slide-over panel (was an always-visible sidebar) ──
+window.mktOpenFilterModal = function() {
+  var panel = document.getElementById('filter-panel'), overlay = document.getElementById('mkt-filter-overlay');
+  if (panel) panel.classList.add('open');
+  if (overlay) overlay.style.display = 'block';
+};
+window.mktCloseFilterModal = function() {
+  var panel = document.getElementById('filter-panel'), overlay = document.getElementById('mkt-filter-overlay');
+  if (panel) panel.classList.remove('open');
+  if (overlay) overlay.style.display = 'none';
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof mktStartCountdown === 'function') mktStartCountdown();
+});
+
 window.mktBuildPriceHistogram = function() {
   var hist = document.getElementById('mkt-price-hist');
   var avgLbl = document.getElementById('mkt-price-avg-lbl');
@@ -11904,6 +12160,8 @@ window.loadProducts = async function() {
     _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); }).filter(function(p){ return p.status !== 'draft'; });
     renderProductGrid(_allProducts);
     if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
+    if (typeof mktLoadFeaturedDeals === 'function') mktLoadFeaturedDeals();
+    if (typeof mktLoadTrending === 'function') mktLoadTrending('newest');
   } catch(e) { console.error('loadProducts error', e); }
 };
 
