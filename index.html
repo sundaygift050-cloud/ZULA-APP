@@ -363,10 +363,11 @@ body.dock-active .page.active{padding-bottom:104px;}
 }
 
 /* ══════════════════════════════════════════════════
-   MARKETPLACE — "electronics marketplace" redesign v2.
-   White/blue/red tech-marketplace look, still scoped entirely to
-   #page-marketplace so no other page (incl. the public homepage) changes.
-   Loads AFTER the purple theme block above, so these rules win the cascade.
+   MARKETPLACE — Temu-style redesign v3 (final).
+   Matches the approved standalone preview: no top strip, compact category
+   row, blue accent price (not red), black-to-blue flash-sale bar with a
+   real countdown to midnight, HOT!/discount badges, and split BUY / CART
+   buttons. Still scoped entirely to #page-marketplace.
    ══════════════════════════════════════════════════ */
 #page-marketplace{
   --bg:#f3f5f8; --bg2:#ffffff; --bg3:#f0f4fa;
@@ -387,57 +388,54 @@ body.dock-active .page.active{padding-bottom:104px;}
 #page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);}
 #page-marketplace .mkt-layout, #page-marketplace > .wrap{max-width:1320px;}
 
-/* Full-width royal-blue top strip, like the reference image's category bar */
-#page-marketplace .mkt-topstrip{background:linear-gradient(90deg,#1a3fae,#1a56db);height:14px;width:100%;}
-
-/* Category icon carousel row sits on white just below the blue strip */
-#page-marketplace .mkt-cat-carousel-wrap{background:var(--bg2);border-bottom:1px solid var(--border);margin:0;padding:14px 0;gap:10px;}
-#page-marketplace .mkt-cat-nav-btn{background:var(--accent);border-color:var(--accent);color:#fff;}
+/* Compact category icon row (no blue top strip above it) */
+#page-marketplace .mkt-cat-carousel-wrap{background:var(--bg2);border-bottom:1px solid var(--border);margin:0;padding:9px 0;gap:8px;}
+#page-marketplace .mkt-cat-nav-btn{width:24px;height:24px;font-size:13px;background:var(--accent);border-color:var(--accent);color:#fff;}
 #page-marketplace .mkt-cat-nav-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
-#page-marketplace .mkt-cat-icon-circle{background:#eef1f6;border-color:#eef1f6;}
+#page-marketplace .mkt-cat-carousel{gap:18px;}
+#page-marketplace .mkt-cat-icon-item{gap:3px;width:auto;}
+#page-marketplace .mkt-cat-icon-circle{width:38px;height:38px;font-size:16px;background:#eef1f6;border-color:#eef1f6;}
 #page-marketplace .mkt-cat-icon-item.active .mkt-cat-icon-circle{background:var(--accent);border-color:var(--accent);}
-#page-marketplace .mkt-cat-icon-item span{color:var(--text2);}
+#page-marketplace .mkt-cat-icon-item span{font-size:10px;color:var(--text2);}
 #page-marketplace .mkt-cat-icon-item.active span{color:var(--accent);}
 
 /* Everything below the cat carousel keeps its normal side padding */
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
 
-/* Promo banner cards — light card, bold red eyebrow tag, blue Shop Now pill */
-#page-marketplace .mkt-promo-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden;}
-#page-marketplace .mkt-promo-eyebrow{color:var(--red);font-weight:800;}
-#page-marketplace .mkt-promo-title{color:var(--text);}
-#page-marketplace .mkt-promo-btn{background:var(--accent);border-radius:8px;}
+/* Flash-sale urgency bar — black-to-blue, not red/orange */
+#page-marketplace .mkt-flash-bar{margin:18px 0;background:linear-gradient(90deg,#0f172a,var(--accent));border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:14px;color:#fff;}
+#page-marketplace .mkt-flash-lbl{font-weight:800;font-size:14px;white-space:nowrap;}
+#page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:800;letter-spacing:2px;background:rgba(0,0,0,.35);border-radius:6px;padding:4px 10px;}
+#page-marketplace .mkt-flash-sub{font-size:12px;opacity:.9;margin-left:auto;white-space:nowrap;}
+@media(max-width:640px){
+  #page-marketplace .mkt-flash-bar{flex-wrap:wrap;}
+  #page-marketplace .mkt-flash-sub{margin-left:0;}
+}
 
-/* Today's Featured Deals — thin blue border box, black-on-yellow countdown pill */
-#page-marketplace .mkt-deals-section{border:1px solid var(--accent);border-radius:14px;padding:18px 18px 20px;background:var(--bg2);}
-#page-marketplace .mkt-deals-countdown{background:#fde047;color:#1a1a1a;font-family:'Inter',monospace;letter-spacing:.5px;border-radius:6px;}
-#page-marketplace .mkt-deal-card{background:var(--bg2);border-color:var(--border);border-radius:10px;}
-#page-marketplace .mkt-deal-price{color:var(--red);}
-#page-marketplace .mkt-deal-bar-fill{background:var(--accent);}
-
-/* Trending — pill filter tabs, blue active state */
-#page-marketplace .mkt-trend-tab.active{background:var(--accent);border-color:var(--accent);}
-
-/* Product cards — badge top-left (red % off / green NEW), red price, gold stars */
-#page-marketplace .pcard{background:var(--bg2);border-color:var(--border);}
-#page-marketplace .pcard-price{color:var(--red);}
-#page-marketplace .pcard-cat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
-#page-marketplace .pcard-orig-price{font-size:11.5px;color:var(--text3);text-decoration:line-through;font-weight:600;margin-left:6px;}
-#page-marketplace .pcard-discount-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
-#page-marketplace .pcard-new-badge{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
-#page-marketplace .pcard-buy-pill{border-color:var(--accent);color:var(--accent);}
-#page-marketplace .pcard-buy-pill:hover{background:var(--accent);}
-#page-marketplace .pcard-buy-pill .pcard-cart-icon{background:var(--accent);}
-
-/* Bottom banner — light-gray full-width strip, "Up to 30% Off" collage style */
-#page-marketplace .mkt-bottom-banner{background:#eef1f6;color:var(--text);text-align:left;border-radius:14px;position:relative;}
-#page-marketplace .mkt-bottom-banner .mkt-promo-eyebrow{color:var(--red);opacity:1 !important;}
-
+/* Product cards */
 #page-marketplace .mkt-topbar{margin-bottom:16px;padding-bottom:12px;}
 #page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+#page-marketplace .pcard{background:var(--bg2);border-color:var(--border);}
 #page-marketplace .pcard-img{height:150px;}
+#page-marketplace .pcard-cat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
 #page-marketplace .pcard-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);letter-spacing:1px;margin:2px 0 6px;}
 #page-marketplace .pcard-rating .cnt{color:var(--text3);letter-spacing:normal;font-weight:600;}
+#page-marketplace .pcard-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
+#page-marketplace .pcard-price{font-size:16px;font-weight:800;color:var(--accent);}
+#page-marketplace .pcard-orig-price{font-size:11.5px;color:var(--text3);text-decoration:line-through;font-weight:600;}
+
+/* Badges: bouncing red HOT!, red -XX% discount, green NEW */
+#page-marketplace .pcard-hot-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;z-index:2;animation:mktBounce 1.4s infinite;}
+#page-marketplace .pcard-discount-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+#page-marketplace .pcard-new-badge{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+@keyframes mktBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+
+/* Split BUY / CART buttons, replacing the old single cart pill */
+#page-marketplace .pcard-btn-row{display:flex;gap:6px;}
+#page-marketplace .pcard-buy-btn{flex:1;text-align:center;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+#page-marketplace .pcard-buy-btn:hover{background:var(--accent2);}
+#page-marketplace .pcard-cart-btn{flex:1;text-align:center;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+#page-marketplace .pcard-cart-btn:hover{background:var(--bg3);}
 
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;}
@@ -495,6 +493,26 @@ body.dock-active .page.active{padding-bottom:104px;}
 .pcard-buy-pill:hover{background:var(--accent);color:#fff;}
 .pcard-buy-pill .pcard-cart-icon{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
 .pcard-buy-pill:hover .pcard-cart-icon{background:#fff;color:var(--accent);}
+
+/* Shared across every page that renders zulaBuildProductCard (marketplace,
+   wishlist, storefront) — category label, star rating, price row, badges,
+   and the BUY / CART button pair. #page-marketplace above can still tweak
+   sizing/spacing on top of these. */
+.pcard-cat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
+.pcard-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);letter-spacing:1px;margin:2px 0 6px;}
+.pcard-rating .cnt{color:var(--text3);letter-spacing:normal;font-weight:600;}
+.pcard-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
+.pcard-orig-price{font-size:11.5px;color:var(--text3);text-decoration:line-through;font-weight:600;}
+.pcard-hot-badge{position:absolute;top:10px;left:10px;background:var(--red,#e02424);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;z-index:2;animation:pcardBounce 1.4s infinite;}
+.pcard-discount-badge{position:absolute;top:10px;left:10px;background:var(--red,#e02424);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+.pcard-new-badge{position:absolute;top:10px;left:10px;background:var(--green,#0e9f6e);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+@keyframes pcardBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+.pcard-btn-row{display:flex;gap:6px;}
+.pcard-buy-btn{flex:1;text-align:center;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+.pcard-buy-btn:hover{opacity:.9;}
+.pcard-cart-btn{flex:1;text-align:center;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+.pcard-cart-btn:hover{background:var(--accent);color:#fff;}
+
 .empty-state{text-align:center;padding:80px 20px;color:var(--text3);}
 .empty-state .es-icon{font-size:52px;margin-bottom:16px;}
 .empty-state h3{font-size:18px;font-weight:700;color:var(--text2);margin-bottom:8px;}
@@ -1559,8 +1577,6 @@ body.dock-active .page.active{padding-bottom:104px;}
     </div>
   </header>
 
-  <div class="mkt-topstrip"></div>
-
   <!-- Category icon carousel -->
   <div class="mkt-cat-carousel-wrap">
     <div class="wrap" style="display:flex;align-items:center;gap:8px;">
@@ -1581,6 +1597,15 @@ body.dock-active .page.active{padding-bottom:104px;}
   </div>
 
   <div class="wrap" style="padding:18px 28px 50px;">
+
+    <!-- Flash sale urgency bar (real countdown to midnight, no fake timer) -->
+    <div class="mkt-flash-bar">
+      <div class="mkt-flash-lbl">⚡ FLASH SALE</div>
+      <div class="mkt-flash-clock" id="mkt-countdown-wrap">
+        <span id="mkt-countdown">00:00:00</span>
+      </div>
+      <div class="mkt-flash-sub">Prices this low won't last — grab it before it's gone</div>
+    </div>
 
     <!-- All products -->
     <div class="mkt-topbar">
@@ -11877,14 +11902,16 @@ window.zulaBuildProductCard = function(p, id, opts) {
     topBadge = p.status === 'draft'
       ? '<span class="pcard-top-badge" style="background:var(--bg3);color:var(--text3);">Draft</span>'
       : '<span class="pcard-top-badge" style="background:var(--green,#27c97a);color:#fff;">Live</span>';
-  } else if (p.featured) {
-    topBadge = '<span class="pcard-top-badge">Top item</span>';
   } else if (p.productType === 'realestate') {
     topBadge = '<span class="pcard-top-badge" style="background:var(--accent);color:#fff;">🏠 Property</span>';
+  } else if (opts.showDiscountBadge && p.featured) {
+    topBadge = '<span class="pcard-hot-badge">HOT!</span>';
   } else if (opts.showDiscountBadge && hasDiscount) {
     topBadge = '<span class="pcard-discount-badge">-' + discountPct + '%</span>';
   } else if (opts.showDiscountBadge && p.isNew) {
     topBadge = '<span class="pcard-new-badge">NEW</span>';
+  } else if (p.featured) {
+    topBadge = '<span class="pcard-top-badge">Top item</span>';
   }
 
   var heartHtml = '';
@@ -11902,10 +11929,11 @@ window.zulaBuildProductCard = function(p, id, opts) {
     ratingHtml = '<div class="pcard-rating">' + starStr + ' <span class="cnt">(' + (p.reviewCount||0) + ')</span></div>';
   }
   var origPriceHtml = (opts.showDiscountBadge && hasDiscount) ? '<span class="pcard-orig-price">' + origPriceDisplay + '</span>' : '';
+  var priceRow = '<div class="pcard-price-row"><span class="pcard-price">' + priceDisplay + '</span>' + origPriceHtml + '</div>';
 
-  var buyRow = opts.showBuyPill
-    ? '<div class="pcard-buy-row"><button class="pcard-buy-pill" onclick="mktAddToCart(\''+id+'\',event)"><span class="pcard-cart-icon">🛒</span>' + priceDisplay + '</button>' + origPriceHtml + '</div>'
-    : '<div class="pcard-buy-row"><span style="font-weight:800;color:var(--accent);font-size:14px;">' + priceDisplay + '</span>' + origPriceHtml + '</div>';
+  var actionRow = opts.showBuyPill
+    ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>'
+    : '';
 
   return '<div class="pcard" onclick="viewProduct(\''+id+'\');" style="position:relative;">' +
     topBadge + heartHtml +
@@ -11915,7 +11943,8 @@ window.zulaBuildProductCard = function(p, id, opts) {
       '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
       sellerLine +
       ratingHtml +
-      buyRow +
+      priceRow +
+      actionRow +
     '</div></div>';
 };
 
@@ -11964,6 +11993,18 @@ window.mktAddToCart = function(id, event) {
   else { _cart.push({ id:id, name:p.name, price:p.price, currency:p.currency||'NGN', photo:(p.photos&&p.photos[0])||p.photo||'', emoji:p.emoji||'📦', sellerId:p.sellerId, sellerName:p.sellerName, productType:p.productType||'physical', qty:1 }); }
   cartSave();
   showToast('🛒 Added to cart!');
+};
+
+// ── Buy Now straight from the marketplace grid card (no need to open the
+// product page first) — mirrors pdBuyNow but works from a product id ──
+window.mktBuyNow = function(id, event) {
+  if (event) event.stopPropagation();
+  var p = (window._allProducts || []).find(function(x){ return (x._id||x.id) === id; });
+  if (!p) return;
+  var auth = window._auth;
+  if (!auth || !auth.currentUser) { showToast('Please sign in to buy.'); showPage('login'); return; }
+  var item = Object.assign({}, p, { qty: 1, photo: (p.photos && p.photos[0]) || p.photo || '' });
+  openCheckoutPage([item]);
 };
 
 // ── Category pill bar: the sole category selector now (sidebar checkboxes removed) ──
