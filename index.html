@@ -1576,71 +1576,9 @@ body.dock-active .page.active{padding-bottom:104px;}
 
   <div class="wrap" style="padding:22px 28px 50px;">
 
-    <!-- Promo banner row -->
-    <div class="mkt-promo-row">
-      <div class="mkt-promo-card">
-        <div class="mkt-promo-eyebrow">GET REWARDED</div>
-        <div class="mkt-promo-title">Sell for free</div>
-        <div class="mkt-promo-sub">Zero listing fees — only pay when you make a sale.</div>
-        <button class="mkt-promo-btn" onclick="goAddProduct()">List a product →</button>
-      </div>
-      <div class="mkt-promo-card">
-        <div class="mkt-promo-eyebrow">EARN MORE</div>
-        <div class="mkt-promo-title">Become an affiliate</div>
-        <div class="mkt-promo-sub">Share any product and earn up to 20% commission.</div>
-        <button class="mkt-promo-btn" onclick="affNavClick()">Start earning →</button>
-      </div>
-      <div class="mkt-promo-card">
-        <div class="mkt-promo-eyebrow">BUY WITH CONFIDENCE</div>
-        <div class="mkt-promo-title">Escrow protected</div>
-        <div class="mkt-promo-sub">Your payment is held safely until you confirm receipt.</div>
-        <button class="mkt-promo-btn" onclick="showPage('marketplace')">Shop now →</button>
-      </div>
-    </div>
-
-    <!-- Today's Featured Deals -->
-    <div class="mkt-deals-section" id="mkt-deals-section" style="display:none;">
-      <div class="mkt-deals-head">
-        <h2>Today's Featured Deals</h2>
-        <div class="mkt-deals-countdown">Ends in <span id="mkt-countdown">00:00:00</span></div>
-        <div style="flex:1;"></div>
-        <div style="display:flex;gap:6px;">
-          <button class="mkt-cat-nav-btn" onclick="mktScrollDeals(-1)">‹</button>
-          <button class="mkt-cat-nav-btn" onclick="mktScrollDeals(1)">›</button>
-        </div>
-      </div>
-      <div class="mkt-deals-row" id="mkt-deals-row"></div>
-    </div>
-
-    <!-- Trending This Week -->
-    <div class="mkt-trending-section" id="mkt-trending-section" style="display:none;">
-      <div class="mkt-deals-head">
-        <h2>Trending This Week</h2>
-        <div style="flex:1;"></div>
-        <div class="mkt-trend-tabs">
-          <button class="mkt-trend-tab active" onclick="mktSwitchTrendTab('newest',this)">New</button>
-          <button class="mkt-trend-tab" onclick="mktSwitchTrendTab('rating',this)">Best Rated</button>
-          <button class="mkt-trend-tab" onclick="mktSwitchTrendTab('price_asc',this)">Sales</button>
-          <button class="mkt-trend-tab" onclick="showPage('marketplace')">View All</button>
-        </div>
-      </div>
-      <div class="mkt-trend-grid" id="mkt-trend-grid"></div>
-    </div>
-
-    <!-- Bottom CTA banner -->
-    <div class="mkt-bottom-banner" style="padding:36px 40px;">
-      <div class="mkt-promo-eyebrow" style="font-size:11px;">NEW SELLER? START TODAY</div>
-      <div style="font-size:30px;font-weight:800;margin:6px 0 6px;color:var(--text);">List for free, <span style="color:var(--red);">keep more</span> of what you earn</div>
-      <div style="font-size:14px;color:var(--text2);margin-bottom:18px;max-width:420px;">No monthly fees. Category-based commission only, charged when you actually sell.</div>
-      <button class="mkt-promo-btn" onclick="goAddProduct()">Start selling →</button>
-    </div>
-
     <!-- All products -->
-    <div class="mkt-topbar" style="margin-top:34px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <h2>All products</h2>
-        <button class="btn btn-ghost btn-sm" onclick="mktOpenFilterModal()">⚙️ Filters</button>
-      </div>
+    <div class="mkt-topbar">
+      <h2>All products</h2>
       <div class="result-count" id="result-count"></div>
     </div>
     <div class="pgrid" id="products-grid"></div>
