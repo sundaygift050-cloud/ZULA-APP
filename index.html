@@ -391,7 +391,7 @@ body.dock-active .page.active{padding-bottom:104px;}
 #page-marketplace .mkt-topstrip{background:linear-gradient(90deg,#1a3fae,#1a56db);height:14px;width:100%;}
 
 /* Category icon carousel row sits on white just below the blue strip */
-#page-marketplace .mkt-cat-carousel-wrap{background:var(--bg2);border-bottom:1px solid var(--border);margin:0 0 22px;padding:14px 0;gap:10px;}
+#page-marketplace .mkt-cat-carousel-wrap{background:var(--bg2);border-bottom:1px solid var(--border);margin:0;padding:14px 0;gap:10px;}
 #page-marketplace .mkt-cat-nav-btn{background:var(--accent);border-color:var(--accent);color:#fff;}
 #page-marketplace .mkt-cat-nav-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
 #page-marketplace .mkt-cat-icon-circle{background:#eef1f6;border-color:#eef1f6;}
@@ -432,6 +432,12 @@ body.dock-active .page.active{padding-bottom:104px;}
 /* Bottom banner — light-gray full-width strip, "Up to 30% Off" collage style */
 #page-marketplace .mkt-bottom-banner{background:#eef1f6;color:var(--text);text-align:left;border-radius:14px;position:relative;}
 #page-marketplace .mkt-bottom-banner .mkt-promo-eyebrow{color:var(--red);opacity:1 !important;}
+
+#page-marketplace .mkt-topbar{margin-bottom:16px;padding-bottom:12px;}
+#page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+#page-marketplace .pcard-img{height:150px;}
+#page-marketplace .pcard-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);letter-spacing:1px;margin:2px 0 6px;}
+#page-marketplace .pcard-rating .cnt{color:var(--text3);letter-spacing:normal;font-weight:600;}
 
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;}
@@ -1574,7 +1580,7 @@ body.dock-active .page.active{padding-bottom:104px;}
     </div>
   </div>
 
-  <div class="wrap" style="padding:22px 28px 50px;">
+  <div class="wrap" style="padding:18px 28px 50px;">
 
     <!-- All products -->
     <div class="mkt-topbar">
@@ -11889,6 +11895,12 @@ window.zulaBuildProductCard = function(p, id, opts) {
 
   var catLabel = (opts.showCategory && p.category) ? '<div class="pcard-cat-label">' + p.category + '</div>' : '';
   var sellerLine = opts.showSeller ? '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + '</div>' : '';
+  var ratingHtml = '';
+  if (opts.showRating && Number(p.avgRating) > 0) {
+    var full = Math.round(Number(p.avgRating));
+    var starStr = '★'.repeat(full) + '☆'.repeat(5 - full);
+    ratingHtml = '<div class="pcard-rating">' + starStr + ' <span class="cnt">(' + (p.reviewCount||0) + ')</span></div>';
+  }
   var origPriceHtml = (opts.showDiscountBadge && hasDiscount) ? '<span class="pcard-orig-price">' + origPriceDisplay + '</span>' : '';
 
   var buyRow = opts.showBuyPill
@@ -11902,6 +11914,7 @@ window.zulaBuildProductCard = function(p, id, opts) {
       catLabel +
       '<div class="pcard-name">' + (p.name||'Product') + '</div>' +
       sellerLine +
+      ratingHtml +
       buyRow +
     '</div></div>';
 };
@@ -11920,7 +11933,7 @@ function renderProductGrid(products) {
   if (empty) empty.style.display = 'none';
   grid.innerHTML = products.map(function(p) {
     var _pid = p._id || p.id || '';
-    return zulaBuildProductCard(p, _pid, { showHeart:true, showBuyPill:true, showSeller:true, showCategory:true, showDiscountBadge:true });
+    return zulaBuildProductCard(p, _pid, { showHeart:true, showBuyPill:true, showSeller:true, showCategory:true, showDiscountBadge:true, showRating:true });
   }).join('');
 }
 
@@ -12059,7 +12072,7 @@ window.mktLoadTrending = function(sort) {
   }).slice(0, 5);
   grid.innerHTML = sorted.map(function(p) {
     var id = p._id || p.id;
-    return zulaBuildProductCard(p, id, { showHeart:true, showBuyPill:true, showSeller:true, showCategory:true, showDiscountBadge:true });
+    return zulaBuildProductCard(p, id, { showHeart:true, showBuyPill:true, showSeller:true, showCategory:true, showDiscountBadge:true, showRating:true });
   }).join('');
   section.style.display = '';
 };
