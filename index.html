@@ -4530,143 +4530,33 @@ window.sendResetLink = async function(resend) {
 };
 
 // ── PRODUCTS ────────────────────────────────────────────────────────
-window.loadProducts = async function() {
-  const grid  = document.getElementById('products-grid');
-  const empty = document.getElementById('empty-state');
-  const count = document.getElementById('result-count');
-  if (!grid) return;
-  // Show skeleton cards while loading
-  grid.innerHTML = Array(6).fill(0).map(() =>
-    '<div class="pcard pcard-skeleton"><div class="pcard-img skeleton-box"></div>' +
-    '<div class="pcard-body"><div class="skeleton-line" style="width:70%;height:14px;margin-bottom:8px;"></div>' +
-    '<div class="skeleton-line" style="width:50%;height:12px;margin-bottom:12px;"></div>' +
-    '<div class="skeleton-line" style="width:40%;height:16px;"></div></div></div>'
-  ).join('');
-  try {
-    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
-    window._allProducts = [];
-    snap.forEach(d => window._allProducts.push({ id: d.id, ...d.data() }));
-    renderProducts(window._allProducts);
-  } catch(e) {
-    grid.innerHTML = '';
-    if (empty) empty.style.display = 'block';
-  }
-};
-
-function renderProducts(products) {
-  const grid  = document.getElementById('products-grid');
-  const empty = document.getElementById('empty-state');
-  const count = document.getElementById('result-count');
-  if (!grid) return;
-  if (products.length === 0) {
-    grid.innerHTML = '';
-    if (empty) empty.style.display = 'block';
-    if (count) count.textContent = '0 products';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-  if (count) count.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
-  grid.innerHTML = products.map(p => {
-    const stars = p.avgRating ? '★'.repeat(Math.round(p.avgRating)) + '☆'.repeat(5 - Math.round(p.avgRating)) : '';
-    const ratingHtml = p.avgRating ? `<div style="font-size:11px;color:var(--gold);letter-spacing:.5px;" title="${p.avgRating} / 5">${stars} <span style="color:var(--text3);">(${p.reviewCount||0})</span></div>` : '';
-    const verifiedBadge = p.sellerVerified ? '<span style="font-size:10px;color:var(--accent);margin-left:4px;">🛡</span>' : '';
-    const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
-    const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
-    const pid = p.id || p._id || '';
-    return `<div class="pcard" onclick="viewProduct('${pid}')">
-      <div class="pcard-img" style="overflow:hidden;">${imgHtml}</div>
-      <div class="pcard-body">
-        <div class="pcard-name">${p.name}</div>
-        <div class="pcard-seller" style="display:flex;align-items:center;">By ${p.sellerName || 'ZÚLA Seller'}${verifiedBadge}</div>
-        ${ratingHtml}
-        <div class="pcard-foot">
-          <div class="pcard-price">${typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString()}</div>
-          <div class="pcard-type">${p.type || 'Physical'}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
+// NOTE: the real loadProducts/renderProductGrid live later in the file in a
+// classic (non-module) <script> block. This block is `type="module"`, and
+// module scripts are deferred — they run AFTER every classic script on the
+// page, regardless of source order. A legacy loadProducts/renderProducts
+// pair used to live right here, which meant it always executed *last* and
+// silently clobbered the up-to-date marketplace card design on every load.
+// Removed for good — do not redefine loadProducts/renderProducts in this
+// module block.
 
 // Current search query (kept in sync by the search input)
 window._searchQuery = '';
 
-window.filterProducts = function(query) {
-  window._searchQuery = query;
-  applyFilters();
-};
+// NOTE: the real filterProducts (does the actual name/description/category
+// text search, then hands off to applyActiveFilters) lives in the same later
+// classic script block as applyFilters/renderProductGrid. A simpler
+// filterProducts used to live here — same deferred-module-runs-last bug —
+// and it didn't do the text search itself, so it would have silently broken
+// marketplace search once the legacy applyFilters/renderProducts above were
+// removed. Removed for good.
 
-window.applyFilters = function() {
-  if (!window._allProducts) return;
+// NOTE: the real applyFilters (category pills, price range, rating, sort,
+// and the up-to-date card renderer) lives later in the file in a classic
+// script block. A legacy applyFilters used to live here too — same deferred-
+// module-runs-last problem as loadProducts above — so it's been removed.
+// window.filterProducts below still works: it just calls applyFilters(),
+// which now correctly resolves to the one true (later, correct) definition.
 
-  const q = (window._searchQuery || '').toLowerCase().trim();
-  const _rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
-  const priceMinRaw = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
-  const priceMaxRaw = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
-  // Filter inputs are typed in the user's chosen display currency — convert back to NGN (product.price is always stored in NGN)
-  const priceMin = priceMinRaw > 0 ? priceMinRaw / _rate : 0;
-  const priceMax = priceMaxRaw !== Infinity ? priceMaxRaw / _rate : Infinity;
-  const minRating = parseFloat(document.querySelector('input[name="filter-rating"]:checked')?.value || '0');
-  const verifiedOnly = document.getElementById('filter-verified-only')?.checked;
-  const hasAffiliate = document.getElementById('filter-has-affiliate')?.checked;
-  const sort = document.getElementById('filter-sort')?.value || 'newest';
-
-  // Collect checked categories & types
-  const checkedCats  = Array.from(document.querySelectorAll('.filter-panel input[type="checkbox"][value]'))
-    .filter(cb => cb.checked && ['fashion','electronics','ebooks','courses','beauty','realestate','food','other'].includes(cb.value))
-    .map(cb => cb.value.toLowerCase());
-  const checkedTypes = Array.from(document.querySelectorAll('.filter-panel input[type="checkbox"][value]'))
-    .filter(cb => cb.checked && ['physical','digital','course','service'].includes(cb.value))
-    .map(cb => cb.value.toLowerCase());
-
-  let filtered = window._allProducts.filter(p => {
-    // Search text
-    if (q && !(
-      (p.name||'').toLowerCase().includes(q) ||
-      (p.description||'').toLowerCase().includes(q) ||
-      (p.category||'').toLowerCase().includes(q) ||
-      (p.sellerName||'').toLowerCase().includes(q)
-    )) return false;
-    // Price
-    const price = Number(p.price || 0);
-    if (price < priceMin) return false;
-    if (priceMax !== Infinity && price > priceMax) return false;
-    // Category checkboxes
-    if (checkedCats.length && !checkedCats.includes((p.category||'').toLowerCase())) return false;
-    // Type checkboxes
-    if (checkedTypes.length && !checkedTypes.includes((p.type||'').toLowerCase())) return false;
-    // Rating
-    if (minRating > 0 && (Number(p.avgRating)||0) < minRating) return false;
-    // Verified
-    if (verifiedOnly && !p.sellerVerified) return false;
-    // Affiliate
-    if (hasAffiliate && !p.commission) return false;
-    return true;
-  });
-
-  // Sort
-  filtered = filtered.slice().sort((a, b) => {
-    if (sort === 'price_asc')  return Number(a.price||0) - Number(b.price||0);
-    if (sort === 'price_desc') return Number(b.price||0) - Number(a.price||0);
-    if (sort === 'rating')     return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
-    if (sort === 'name')       return (a.name||'').localeCompare(b.name||'');
-    // newest: rely on original order from Firestore (already sorted desc by createdAt)
-    return 0;
-  });
-
-  renderProducts(filtered);
-
-  // Show "Clear all" button when any filter is active
-  const anyActive = q || priceMin > 0 || priceMax !== Infinity || minRating > 0 ||
-    verifiedOnly || hasAffiliate || checkedCats.length || checkedTypes.length || sort !== 'newest';
-  const clearBtn = document.getElementById('filter-clear-btn');
-  if (clearBtn) clearBtn.style.display = anyActive ? '' : 'none';
-
-  // Update the page title to show search context
-  const titleEl = document.querySelector('.mkt-topbar h2');
-  if (titleEl) titleEl.textContent = q ? `Results for "${q}"` : 'All products';
-};
 
 window.setFilterPreset = function(min, max) {
   const minEl = document.getElementById('filter-price-min');
