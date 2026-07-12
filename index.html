@@ -403,10 +403,10 @@ body.dock-active .page.active{padding-bottom:104px;}
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
 
 /* Flash-sale urgency bar — black-to-blue, not red/orange */
-#page-marketplace .mkt-flash-bar{margin:18px 0;background:linear-gradient(90deg,#0f172a,var(--accent));border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:14px;color:#fff;}
-#page-marketplace .mkt-flash-lbl{font-weight:800;font-size:14px;white-space:nowrap;}
-#page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:800;letter-spacing:2px;background:rgba(0,0,0,.35);border-radius:6px;padding:4px 10px;}
-#page-marketplace .mkt-flash-sub{font-size:12px;opacity:.9;margin-left:auto;white-space:nowrap;}
+#page-marketplace .mkt-flash-bar{margin:8px 0 14px;background:linear-gradient(90deg,#0f172a,var(--accent));border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:10px;color:#fff;}
+#page-marketplace .mkt-flash-lbl{font-weight:800;font-size:11px;white-space:nowrap;}
+#page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:700;font-size:11.5px;letter-spacing:1px;background:rgba(0,0,0,.35);border-radius:4px;padding:2px 7px;}
+#page-marketplace .mkt-flash-sub{font-size:10.5px;opacity:.9;margin-left:auto;white-space:nowrap;}
 @media(max-width:640px){
   #page-marketplace .mkt-flash-bar{flex-wrap:wrap;}
   #page-marketplace .mkt-flash-sub{margin-left:0;}
@@ -436,6 +436,54 @@ body.dock-active .page.active{padding-bottom:104px;}
 #page-marketplace .pcard-buy-btn:hover{background:var(--accent2);}
 #page-marketplace .pcard-cart-btn{flex:1;text-align:center;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
 #page-marketplace .pcard-cart-btn:hover{background:var(--bg3);}
+
+/* ══════════════════════════════════════════════════
+   MARKETPLACE — responsive across phone / tablet / laptop / desktop.
+   Desktop styles above are the default (>1024px). These narrow the layout
+   down progressively so it fits and reads well on smaller screens too.
+   ══════════════════════════════════════════════════ */
+
+/* Tablet / small laptop (768–1024px) */
+@media(max-width:1024px){
+  #page-marketplace .wrap{padding-left:20px;padding-right:20px;}
+  #page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+}
+
+/* Large phone / small tablet (≤768px) */
+@media(max-width:768px){
+  #page-marketplace .wrap{padding-left:16px;padding-right:16px;}
+  #page-marketplace .hdr-search{max-width:220px;}
+  #page-marketplace .mkt-cat-carousel-wrap{padding:8px 0;}
+  #page-marketplace .mkt-cat-icon-circle{width:34px;height:34px;font-size:15px;}
+  #page-marketplace .mkt-cat-icon-item span{font-size:9.5px;}
+  #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:10px;}
+  #page-marketplace .pcard-img{height:120px;}
+}
+
+/* Phone (≤640px) */
+@media(max-width:640px){
+  #page-marketplace .wrap{padding-left:12px;padding-right:12px;}
+  #page-marketplace .hdr-search{display:none;}
+  #page-marketplace .mkt-cat-nav-btn{display:none;}
+  #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  #page-marketplace .pcard-img{height:130px;}
+  #page-marketplace .pcard-body{padding:9px 9px 11px;}
+  #page-marketplace .pcard-name{font-size:12px;height:32px;}
+  #page-marketplace .pcard-price{font-size:14px;}
+  #page-marketplace .pcard-orig-price{font-size:10.5px;}
+  #page-marketplace .pcard-btn-row{gap:5px;}
+  #page-marketplace .pcard-buy-btn, #page-marketplace .pcard-cart-btn{font-size:10.5px;padding:7px 0;}
+  #page-marketplace .pcard-hot-badge, #page-marketplace .pcard-discount-badge, #page-marketplace .pcard-new-badge{font-size:9px;padding:2px 6px;}
+}
+
+/* Small phone (≤400px) */
+@media(max-width:400px){
+  #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  #page-marketplace .pcard-img{height:110px;}
+  #page-marketplace .mkt-flash-lbl{font-size:10px;}
+  #page-marketplace .mkt-flash-clock{font-size:10px;padding:2px 5px;}
+  #page-marketplace .mkt-flash-sub{display:none;}
+}
 
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;}
@@ -1596,7 +1644,7 @@ body.dock-active .page.active{padding-bottom:104px;}
     </div>
   </div>
 
-  <div class="wrap" style="padding:18px 28px 50px;">
+  <div class="wrap" style="padding:10px 28px 50px;">
 
     <!-- Flash sale urgency bar (real countdown to midnight, no fake timer) -->
     <div class="mkt-flash-bar">
