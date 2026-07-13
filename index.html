@@ -4293,16 +4293,74 @@ window.showPage = function(name) {
      FIREBASE + APP LOGIC (upgraded: real messaging, follows, verif)
      ================================================================ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-         sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
-         reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, updatePassword,
-         updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
-         getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
-         updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
-         writeBatch, deleteField }
-         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// ── PREVIEW-SAFE FIREBASE LOADER ─────────────────────────────────
+// Sandboxed preview environments (e.g. Claude artifacts) often block
+// network requests to gstatic.com. Rather than let a failed static
+// import crash the whole module (and leave the page blank), we try a
+// dynamic import first and fall back to harmless no-op stubs so the
+// UI still renders. Real hosting environments with network access to
+// gstatic.com will load the real Firebase SDK as normal.
+let initializeApp, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
+    reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, updatePassword,
+    updateProfile, getFirestore, doc, setDoc, getDoc, collection, addDoc,
+    getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
+    updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
+    writeBatch, deleteField;
+
+try {
+  const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  ({ initializeApp } = appMod);
+  ({ getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+     sendEmailVerification, onAuthStateChanged, signOut, sendPasswordResetEmail,
+     reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, updatePassword,
+     updateProfile } = authMod);
+  ({ getFirestore, doc, setDoc, getDoc, collection, addDoc,
+     getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
+     updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
+     writeBatch, deleteField } = fsMod);
+  console.info('[Zula] Firebase SDK loaded.');
+} catch (e) {
+  console.warn('[Zula] Firebase SDK unreachable — running in preview mode with stub backend.', e);
+  const _noop = () => {};
+  const _asyncNoop = async () => {};
+  const _fakeDoc = () => ({ exists: () => false, data: () => ({}), id: 'preview' });
+  const _fakeSnap = () => ({ docs: [], empty: true, size: 0, forEach: _noop });
+  initializeApp = () => ({});
+  getAuth = () => ({ currentUser: null });
+  createUserWithEmailAndPassword = async () => { throw new Error('Preview mode: sign-up is disabled.'); };
+  signInWithEmailAndPassword = async () => { throw new Error('Preview mode: sign-in is disabled.'); };
+  sendEmailVerification = _asyncNoop;
+  onAuthStateChanged = (a, cb) => { cb(null); return _noop; };
+  signOut = _asyncNoop;
+  sendPasswordResetEmail = _asyncNoop;
+  reauthenticateWithCredential = _asyncNoop;
+  EmailAuthProvider = { credential: () => ({}) };
+  verifyBeforeUpdateEmail = _asyncNoop;
+  updatePassword = _asyncNoop;
+  updateProfile = _asyncNoop;
+  getFirestore = () => ({});
+  doc = () => ({});
+  setDoc = _asyncNoop;
+  getDoc = async () => _fakeDoc();
+  collection = () => ({});
+  addDoc = async () => ({ id: 'preview' });
+  getDocs = async () => _fakeSnap();
+  query = () => ({});
+  orderBy = () => ({});
+  serverTimestamp = () => new Date();
+  where = () => ({});
+  onSnapshot = (q, cb) => { cb(_fakeSnap()); return _noop; };
+  updateDoc = _asyncNoop;
+  arrayUnion = (...v) => v;
+  arrayRemove = (...v) => v;
+  increment = (n) => n;
+  deleteDoc = _asyncNoop;
+  writeBatch = () => ({ set: _noop, update: _noop, delete: _noop, commit: _asyncNoop });
+  deleteField = () => undefined;
+}
 
 const firebaseConfig = {
   apiKey:            "AIzaSyCRrkJujgQYt-PocdBnLD2rFPVelYAy7Cg",
