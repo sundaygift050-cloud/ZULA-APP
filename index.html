@@ -1314,6 +1314,34 @@ body.dock-active .page.active{padding-bottom:104px;}
 .pcard-skeleton .pcard-img{background:var(--bg3)!important;height:180px;display:block;}
 .skeleton-line{display:block;height:13px;margin-bottom:7px;}
 
+/* ── PROFILE SCREEN (ported 1:1 from reference app design) ── */
+.p-hero{padding:8px 0 0;}
+.p-top-row{display:flex;align-items:center;gap:20px;margin-bottom:18px;flex-wrap:wrap;}
+.p-avatar-wrap{position:relative;width:88px;height:88px;flex-shrink:0;}
+.p-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#f97316);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;border:2px solid rgba(168,85,247,.5);}
+.p-online{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--green);border:3px solid var(--bg2);}
+.p-stats{display:flex;gap:28px;flex:1;flex-wrap:wrap;}
+.p-stats .n{font-size:20px;font-weight:800;font-family:var(--font-display);}
+.p-stats .l{font-size:12.5px;color:var(--text2);}
+.p-name{font-size:23px;font-weight:800;margin-bottom:8px;font-family:var(--font-display);}
+.p-bio-line{font-size:14px;color:var(--text2);margin-bottom:4px;}
+.p-btn-row{display:flex;gap:10px;margin:16px 0;}
+.p-btn-row .primary-btn{flex:1;justify-content:center;padding:13px;text-align:center;background:var(--accent-grad);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow-btn);}
+.ghost-outline-btn{flex:1;text-align:center;background:var(--surface);border:1px solid var(--border);color:var(--text);font-weight:700;font-size:14.5px;padding:13px;border-radius:12px;cursor:pointer;}
+.icon-square-btn{width:48px;height:48px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text);}
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+@media(max-width:600px){.qa-grid{grid-template-columns:repeat(4,1fr);gap:8px;}}
+.qa-tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;position:relative;text-align:center;transition:transform .15s ease,border-color .15s ease;}
+.qa-tile:hover{transform:translateY(-2px);border-color:var(--border2);}
+.qa-tile svg{stroke:#a78bfa;}
+.qa-tile .l{font-size:11px;font-weight:700;color:var(--text2);}
+.qa-badge{position:absolute;top:6px;right:6px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.p-tabs{display:flex;gap:22px;padding:0;overflow-x:auto;border-bottom:1px solid var(--border);scrollbar-width:none;margin-bottom:0;}
+.p-tabs::-webkit-scrollbar{display:none;}
+.p-tab{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:13px 2px;font-size:14px;font-weight:600;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;background:none;font-family:var(--font-body);}
+.p-tab.active{color:var(--text);border-color:#a78bfa;font-weight:800;}
+.p-tab-panel{padding:18px 0 20px;}
+
 /* ── GLOBAL CARD POLISH (professional-app parity pass) ── */
 .aff-card,.aff-tier-card,.affhub-stat-card,.ap-card,.aud-stat,.auth-card,.avq-card,
 .cart-items-wrap,.cart-summary-box,.co-card,.dash-card,.dispute-card,.eng-stat-card,
@@ -3485,77 +3513,98 @@ if (_kycOrigShowPage) {
     <div class="lang-banner" id="lang-banner-v2">
       🌐 ZÚLA is displayed in <strong id="v2-lang-name">English</strong> — <a onclick="showPage('language')" style="cursor:pointer;">Change</a>
     </div>
-    <!-- PROFILE HEADER -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;">
-      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
-        <div style="position:relative;">
-          <div class="profile-avatar" id="pv2-avatar" style="width:80px;height:80px;font-size:28px;">?</div>
-          <div style="position:absolute;bottom:2px;right:2px;width:18px;height:18px;background:var(--green);border:3px solid var(--surface);border-radius:50%;"></div>
+
+    <!-- PROFILE HERO — ported 1:1 from reference app -->
+    <div class="p-hero">
+      <div class="p-top-row">
+        <div class="p-avatar-wrap">
+          <div class="p-avatar" id="pv2-avatar">?</div>
+          <div class="p-online"></div>
         </div>
-        <div style="flex:1;min-width:180px;">
-          <div style="font-size:21px;font-weight:700;margin-bottom:3px;" id="pv2-name">Loading…</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:6px;" id="pv2-email"></div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-            <span style="font-size:13px;color:var(--text2);" id="pv2-location">📍 —</span>
-          </div>
-          <!-- Follow stats -->
-          <div style="display:flex;gap:18px;margin-bottom:10px;">
-            <div style="cursor:pointer;" onclick="showFollowModal('followers')">
-              <span style="font-weight:700;color:var(--text);" id="pv2-followers-count">0</span>
-              <span style="font-size:12px;color:var(--text3);"> followers</span>
-            </div>
-            <div style="cursor:pointer;" onclick="showFollowModal('following')">
-              <span style="font-weight:700;color:var(--text);" id="pv2-following-count">0</span>
-              <span style="font-size:12px;color:var(--text3);"> following</span>
-            </div>
-          </div>
-          <div style="display:flex;gap:7px;flex-wrap:wrap;">
-            <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
-            <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
-            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;background:rgba(56,152,236,.1);border:1px solid rgba(56,152,236,.2);color:#5ba8f5;">🌐 English</span>
-          </div>
+        <div class="p-stats">
+          <div style="cursor:pointer;" onclick="showPage('addproduct')"><div class="n" id="pv2-stat-listings">0</div><div class="l">Listings</div></div>
+          <div style="cursor:pointer;" onclick="showFollowModal('followers')"><div class="n" id="pv2-followers-count">0</div><div class="l">Followers</div></div>
+          <div style="cursor:pointer;" onclick="showFollowModal('following')"><div class="n" id="pv2-following-count">0</div><div class="l">Following</div></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn btn-ghost btn-sm" id="pv2-verify-btn" style="display:none;" onclick="showPage('verification')">🛡 Get seller verified</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('myprofile')">👁 Public view</button>
-          <button class="btn btn-ghost btn-sm" onclick="openEditBioModal()">✏️ Edit bio</button>
+      </div>
+      <div class="p-name" id="pv2-name">Loading…</div>
+      <div class="p-bio-line" id="pv2-email"></div>
+      <div class="p-bio-line" id="pv2-location">📍 —</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
+        <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
+        <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;background:rgba(56,152,236,.1);border:1px solid rgba(56,152,236,.2);color:#5ba8f5;">🌐 English</span>
+      </div>
+
+      <div class="p-btn-row">
+        <button class="primary-btn" onclick="openEditBioModal()">✏️ Edit profile</button>
+        <div class="ghost-outline-btn" onclick="showPage('myprofile')">👁 Public view</div>
+        <div class="icon-square-btn" id="pv2-verify-btn" style="display:none;" onclick="showPage('verification')" title="Get seller verified">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS GRID — ported 1:1 from reference app, wired to existing pages -->
+      <div class="qa-grid">
+        <div class="qa-tile" onclick="showPage('notifications')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="l">Notifications</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('wishlist')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>
+          <div class="l">Wishlist</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('my-orders')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M9 21V13h6v8"/></svg>
+          <div class="l">My Orders</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('my-viewings')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+          <div class="l">Viewings</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('dispute')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="l">Disputes</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('referral')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7"/><path d="M12 8c-1.5-3-6-3-6-1s2 2 6 1zM12 8c1.5-3 6-3 6-1s-2 2-6 1z"/></svg>
+          <div class="l">Referral</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('verifstatus')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z"/><path d="M9 12l2 2 4-4"/></svg>
+          <div class="l">Verif. Status</div>
+        </div>
+        <div class="qa-tile" onclick="showPage('settings')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <div class="l">Settings</div>
         </div>
       </div>
     </div>
-    <!-- PROFILE TABS -->
-    <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px;overflow-x:auto;">
-      <button class="btn btn-sm" id="pv2-tab-orders" style="flex:1;min-width:80px;background:var(--accent-grad);color:#fff;" onclick="switchPv2Tab('orders',this)">Orders</button>
-      <button class="btn btn-sm" id="pv2-tab-downloads" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('downloads',this)">Downloads</button>
-      <button class="btn btn-sm" id="pv2-tab-wishlist" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('wishlist',this)">Wishlist</button>
-      <button class="btn btn-sm" id="pv2-tab-reviews" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('reviews',this)">Reviews</button>
-      <button class="btn btn-sm" id="pv2-tab-listings" style="flex:1;min-width:80px;background:transparent;color:var(--text2);" onclick="switchPv2Tab('listings',this)">My listings</button>
+
+    <!-- PROFILE TABS — underline style, ported 1:1 from reference app -->
+    <div class="p-tabs" id="pTabs">
+      <div class="p-tab active" id="pv2-tab-orders" onclick="switchPv2Tab('orders',this)">📋 Orders</div>
+      <div class="p-tab" id="pv2-tab-downloads" onclick="switchPv2Tab('downloads',this)">⬇️ Downloads</div>
+      <div class="p-tab" id="pv2-tab-wishlist" onclick="switchPv2Tab('wishlist',this)">♡ Wishlist</div>
+      <div class="p-tab" id="pv2-tab-reviews" onclick="switchPv2Tab('reviews',this)">☆ Reviews</div>
+      <div class="p-tab" id="pv2-tab-listings" onclick="switchPv2Tab('listings',this)">▦ Listings</div>
     </div>
-    <!-- QUICK STATS — real from Firebase -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-orders">—</div><div style="font-size:11px;color:var(--text3);">Orders</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-listings">—</div><div style="font-size:11px;color:var(--text3);">Listings</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-followers">0</div><div style="font-size:11px;color:var(--text3);">Followers</div></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pv2-stat-revenue">NGN 0</div><div style="font-size:11px;color:var(--text3);">Revenue</div></div>
-    </div>
+
     <!-- PROFILE TAB PANELS — real data per tab -->
-    <div class="dash-card" id="pv2-panel-orders">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My orders</h3>
+    <div class="p-tab-panel active" id="pv2-panel-orders">
       <div id="pv2-orders-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
-    <div class="dash-card" id="pv2-panel-downloads" style="display:none;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My downloads</h3>
+    <div class="p-tab-panel" id="pv2-panel-downloads" style="display:none;">
       <div id="pv2-downloads-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
-    <div class="dash-card" id="pv2-panel-wishlist" style="display:none;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">My wishlist</h3>
+    <div class="p-tab-panel" id="pv2-panel-wishlist" style="display:none;">
       <div id="pv2-wishlist-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
-    <div class="dash-card" id="pv2-panel-reviews" style="display:none;">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px;">Reviews I've written</h3>
+    <div class="p-tab-panel" id="pv2-panel-reviews" style="display:none;">
       <div id="pv2-reviews-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
     </div>
     <!-- MY LISTINGS TAB PANEL -->
-    <div class="dash-card" id="pv2-panel-listings" style="display:none;">
+    <div class="p-tab-panel" id="pv2-panel-listings" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;">
         <h3 style="font-size:14px;font-weight:600;margin:0;">My listings</h3>
         <div style="position:relative;">
@@ -3567,6 +3616,12 @@ if (_kycOrigShowPage) {
       </div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Share your store link on social media — anyone who opens it sees every product you have listed on ZÚLA and can buy directly, no ZÚLA account browsing needed to look around.</div>
       <div id="pv2-listings-list"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
+    </div>
+
+    <!-- Extra account stats (orders count + revenue) not present in the reference app; kept as a compact strip so no data is lost -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px 0 4px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:18px;font-weight:700;font-family:var(--font-display);" id="pv2-stat-orders">—</div><div style="font-size:11px;color:var(--text3);">Orders placed</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px;text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--gold);font-family:var(--font-display);" id="pv2-stat-revenue">NGN 0</div><div style="font-size:11px;color:var(--text3);">Revenue</div></div>
     </div>
   </div>
 </div>
@@ -6601,11 +6656,11 @@ window._selectedType = 'Physical';
 window.switchPv2Tab = function(tab, btn) {
   ['orders','downloads','wishlist','reviews','listings'].forEach(t => {
     const b = document.getElementById('pv2-tab-' + t);
-    if (b) { b.style.background = 'transparent'; b.style.color = 'var(--text2)'; }
+    if (b) b.classList.remove('active');
     const panel = document.getElementById('pv2-panel-' + t);
     if (panel) panel.style.display = (t === tab) ? '' : 'none';
   });
-  if (btn) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; }
+  if (btn) btn.classList.add('active');
   if (tab === 'orders')    pv2LoadOrders();
   if (tab === 'downloads') pv2LoadDownloads();
   if (tab === 'wishlist')  pv2LoadWishlist();
