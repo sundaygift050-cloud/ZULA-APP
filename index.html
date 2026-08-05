@@ -806,28 +806,55 @@ body.dock-active .page.active{padding-bottom:104px;}
 
 /* ADMIN */
 .admin-shell{display:flex;min-height:100vh;}
-.dash-side{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;}
+.dash-side{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;}
 .dash-side .d-brand{padding:0 18px 20px;font-family:var(--font-display);font-size:15px;font-weight:700;border-bottom:1px solid var(--border);margin-bottom:8px;}
 .dash-side .d-brand span{color:var(--accent);}
-.dash-nav a{display:flex;align-items:center;gap:8px;padding:10px 18px;font-size:13.5px;font-weight:500;color:var(--text2);border-left:3px solid transparent;cursor:pointer;transition:.15s;}
-.dash-nav a:hover{color:var(--text);background:rgba(255,255,255,.03);}
-.dash-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(124,92,252,.07);}
-.dash-main{flex:1;padding:28px 32px;overflow-x:auto;}
+.dash-nav a{display:flex;align-items:center;gap:8px;padding:10px 14px;margin:0 10px 2px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--text2);border-left:none;cursor:pointer;transition:.15s;}
+.dash-nav a:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.dash-nav a.active{color:#fff;background:linear-gradient(135deg,#ef4444,#b91c1c);font-weight:700;box-shadow:0 4px 16px rgba(239,68,68,.35);}
+.dash-main{flex:1;padding:0 32px 40px;overflow-x:auto;}
 .dash-h1{font-size:22px;font-weight:700;margin-bottom:4px;}
 .dash-sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
-.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;min-width:140px;}
-.stat-lbl{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
-.stat-val{font-family:var(--font-display);font-size:22px;font-weight:700;}
+
+/* Admin topbar — ported 1:1 from reference app, shown above every tab */
+.adm-topbar{display:flex;align-items:center;gap:16px;padding:26px 0 22px;margin-bottom:22px;border-bottom:1px solid var(--border);}
+.adm-topbar-icon{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ef4444,#b91c1c);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(239,68,68,.35);}
+.adm-topbar h1{font-size:23px;font-weight:800;font-family:var(--font-display);}
+.adm-topbar p{font-size:13px;color:var(--text3);margin-top:2px;}
+.adm-topbar-badge{margin-left:auto;display:flex;align-items:center;gap:7px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#f87171;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;flex-shrink:0;}
+.adm-topbar-badge-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.3);}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;min-width:0;display:flex;align-items:center;gap:12px;}
+.stat-card .stat-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stat-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat-val{font-family:var(--font-display);font-size:21px;font-weight:800;}
 .dtable{width:100%;border-collapse:collapse;font-size:13px;}
 .dtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:9px;border-bottom:1px solid var(--border);}
-.dtable td{padding:11px 9px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text2);}
+.dtable td{padding:12px 9px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text2);}
 .dtable tr:last-child td{border-bottom:none;}
+.dtable tr:hover td{background:rgba(255,255,255,.02);}
 .dtable td:first-child{color:var(--text);font-weight:500;}
-.dthumb{width:40px;height:40px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.dthumb{width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;}
 .admin-section{display:none;}
 .admin-section.active{display:block;}
 .admin-denied{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+/* Role badges — ported 1:1 from reference app */
+.adm-role-badge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;display:inline-block;}
+.adm-role-badge.buyer{background:rgba(168,85,247,.18);color:#a78bfa;}
+.adm-role-badge.seller{background:rgba(245,158,11,.18);color:var(--gold);}
+.adm-role-badge.affiliate{background:rgba(34,197,94,.18);color:var(--green);}
+/* Settings sections — ported 1:1 from reference app */
+.settings-section-lbl{display:flex;align-items:center;gap:12px;margin:26px 0 14px;}
+.settings-section-lbl .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.settings-section-lbl h3{font-size:16.5px;font-weight:800;}
+.toggle-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;}
+.toggle-card-title{font-weight:700;font-size:14.5px;}
+.toggle-card-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.fee-input-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;}
+.fee-input-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.fee-input-lbl{font-size:12px;color:var(--text3);margin-bottom:4px;}
+.fee-input-val{font-size:19px;font-weight:800;background:transparent;border:none;outline:none;color:var(--text);width:100%;font-family:var(--font-body);}
 
 /* ── ADMIN: USER DETAIL ── */
 .aud-head{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;}
@@ -1055,6 +1082,11 @@ body.dock-active .page.active{padding-bottom:104px;}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;}
 .toggle-switch input:checked+.toggle-track{background:var(--accent-grad);}
 .toggle-switch input:checked~.toggle-thumb{left:23px;}
+/* Div-based toggle variant (admin settings, ported from reference app) */
+.toggle-switch.pset{width:48px;height:27px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);}
+.toggle-switch.pset.on{background:var(--accent-grad);border-color:transparent;}
+.toggle-switch.pset .toggle-knob{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--text3);transition:all .2s ease;}
+.toggle-switch.pset.on .toggle-knob{left:23px;background:#fff;}
 
 /* ── 2FA ── */
 .twofa-method{display:flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;cursor:pointer;margin-bottom:10px;transition:.15s;}
@@ -2679,6 +2711,7 @@ window.kycHandleFile = function(input, key) {
   _kycFiles[key] = file;
   // Also keep legacy _verifFiles in sync
   if (window._verifFiles) window._verifFiles[key] = file;
+  if (window.kycUpdateSubmitBtn) window.kycUpdateSubmitBtn();
 
   var zoneId = { id:'kyc-zone-id', selfie:'kyc-zone-selfie', reg:'kyc-zone-reg', ownership:'kyc-zone-own' }[key];
   var innerId = { id:'kyc-zone-id-inner', selfie:'kyc-zone-selfie-inner', reg:'kyc-zone-reg-inner', ownership:'kyc-zone-own-inner' }[key];
@@ -3104,6 +3137,7 @@ if (_kycOrigShowPage) {
         <a class="active" id="anav-overview"    onclick="adminTab('overview')">📊 Overview</a>
         <a id="anav-products"   onclick="adminTab('products')">📦 Products</a>
         <a id="anav-users"      onclick="adminTab('users')">👥 Users</a>
+        <a id="anav-sellers"    onclick="adminGoSellers()">🏪 Sellers</a>
         <a id="anav-orders"     onclick="adminTab('orders')">🛍 Orders</a>
         <a id="anav-viewings"   onclick="adminTab('viewings')">🏠 Viewings</a>
         <a id="anav-payouts"    onclick="adminTab('payouts')">💸 Payouts</a>
@@ -3122,15 +3156,22 @@ if (_kycOrigShowPage) {
 
     <main class="dash-main">
 
+      <!-- Admin topbar — ported 1:1 from reference app, persistent across every tab -->
+      <div class="adm-topbar">
+        <div class="adm-topbar-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z"/></svg></div>
+        <div><h1>Admin Dashboard</h1><p>Platform oversight &amp; control</p></div>
+        <div class="adm-topbar-badge"><span class="adm-topbar-badge-dot"></span>Admin</div>
+      </div>
+
       <!-- OVERVIEW -->
       <div class="admin-section active" id="asec-overview">
         <div class="dash-h1">Overview</div>
         <div class="dash-sub">Live data from ZÚLA marketplace</div>
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-lbl">Total users</div><div class="stat-val" id="astat-users">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Total products</div><div class="stat-val" id="astat-products">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Active sellers</div><div class="stat-val" id="astat-sellers">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Pending verif.</div><div class="stat-val" id="astat-verif">0</div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="stat-lbl">Total users</div><div class="stat-val" id="astat-users">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(168,85,247,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/></svg></div><div><div class="stat-lbl">Total products</div><div class="stat-val" id="astat-products">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M14 9h1M14 13h1"/></svg></div><div><div class="stat-lbl">Active sellers</div><div class="stat-val" id="astat-sellers">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(239,68,68,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z"/></svg></div><div><div class="stat-lbl">Pending verif.</div><div class="stat-val" id="astat-verif">0</div></div></div>
         </div>
         <div class="dash-card">
           <div style="font-size:15px;font-weight:700;margin-bottom:14px;">Recent products</div>
@@ -3184,9 +3225,9 @@ if (_kycOrigShowPage) {
         <div class="dash-h1">Orders</div>
         <div class="dash-sub">All orders across every seller and product type</div>
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Revenue (NGN)</div><div class="stat-val" id="astat-revenue">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">In escrow</div><div class="stat-val" id="astat-escrow">—</div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg></div><div><div class="stat-lbl">Total orders</div><div class="stat-val" id="astat-orders">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="stat-lbl">Revenue (NGN)</div><div class="stat-val" id="astat-revenue">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><div class="stat-lbl">In escrow</div><div class="stat-val" id="astat-escrow">—</div></div></div>
         </div>
         <div class="dash-card" style="padding:0;">
           <table class="dtable">
@@ -3238,11 +3279,11 @@ if (_kycOrigShowPage) {
         <div class="dash-sub">Full visibility and control over the ZÚLA Affiliate Program</div>
 
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-lbl">Total affiliates</div><div class="stat-val" id="aaf-stat-total">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Gold tier</div><div class="stat-val" id="aaf-stat-gold">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Total commissions paid</div><div class="stat-val" id="aaf-stat-paid">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Pending payouts</div><div class="stat-val" id="aaf-stat-pending">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Flagged (suspicious)</div><div class="stat-val" style="color:var(--red);" id="aaf-stat-flagged">—</div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="stat-lbl">Total affiliates</div><div class="stat-val" id="aaf-stat-total">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M8.2 13.6L6 22l6-3 6 3-2.2-8.4"/></svg></div><div><div class="stat-lbl">Gold tier</div><div class="stat-val" id="aaf-stat-gold">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(168,85,247,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="stat-lbl">Total commissions paid</div><div class="stat-val" id="aaf-stat-paid">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="stat-lbl">Pending payouts</div><div class="stat-val" id="aaf-stat-pending">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(239,68,68,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="stat-lbl">Flagged (suspicious)</div><div class="stat-val" style="color:var(--red);" id="aaf-stat-flagged">—</div></div></div>
         </div>
 
         <div class="analytics-tabs" style="margin-bottom:16px;">
@@ -3414,10 +3455,10 @@ if (_kycOrigShowPage) {
         <div class="dash-h1">Message Monitoring</div>
         <div class="dash-sub">Review reported conversations. ZÚLA does not read all messages — only conversations flagged by users or triggered by automated fraud detection are reviewed here.</div>
         <div class="mm-stat-row">
-          <div class="stat-card"><div class="stat-lbl">Flagged convos</div><div class="stat-val" id="mm-stat-flagged" style="color:var(--red);">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Auto-detected</div><div class="stat-val" id="mm-stat-auto">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">User-reported</div><div class="stat-val" id="mm-stat-reported">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Actions taken</div><div class="stat-val" id="mm-stat-actions">—</div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(239,68,68,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="stat-lbl">Flagged convos</div><div class="stat-val" id="mm-stat-flagged" style="color:var(--red);">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(168,85,247,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div><div><div class="stat-lbl">Auto-detected</div><div class="stat-val" id="mm-stat-auto">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="stat-lbl">User-reported</div><div class="stat-val" id="mm-stat-reported">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div><div class="stat-lbl">Actions taken</div><div class="stat-val" id="mm-stat-actions">—</div></div></div>
         </div>
         <div class="mm-filter-row">
           <button class="mm-filter-pill active" onclick="mmFilter(this,'all')">All flagged</button>
@@ -3473,10 +3514,10 @@ if (_kycOrigShowPage) {
         <div class="dash-h1">Seller Verification Queue</div>
         <div class="dash-sub">Review ID documents, business registrations, and ownership proofs. All docs stored encrypted.</div>
         <div class="avq-stat-row">
-          <div class="stat-card"><div class="stat-lbl">Pending review</div><div class="stat-val" id="avq-stat-pending">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Approved today</div><div class="stat-val" style="color:var(--green);" id="avq-stat-approved">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Rejected today</div><div class="stat-val" style="color:var(--red);" id="avq-stat-rejected">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Avg review time</div><div class="stat-val" id="avq-stat-time">—</div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="stat-lbl">Pending review</div><div class="stat-val" id="avq-stat-pending">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div><div class="stat-lbl">Approved today</div><div class="stat-val" style="color:var(--green);" id="avq-stat-approved">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(239,68,68,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div><div><div class="stat-lbl">Rejected today</div><div class="stat-val" style="color:var(--red);" id="avq-stat-rejected">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="stat-lbl">Avg review time</div><div class="stat-val" id="avq-stat-time">—</div></div></div>
         </div>
         <div id="admin-verif-list">
           <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
@@ -3487,8 +3528,39 @@ if (_kycOrigShowPage) {
       <div class="admin-section" id="asec-settings">
         <div class="dash-h1">Platform Settings</div>
         <div class="dash-sub">Global settings for ZÚLA</div>
+
+        <div class="settings-section-lbl"><div class="ic" style="background:rgba(168,85,247,.15);">⚙️</div><h3>Platform Status</h3></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Maintenance Mode</div><div class="toggle-card-sub">Temporarily disable the platform for all users</div></div><div class="toggle-switch pset" id="pset-maintenance" onclick="adminToggleSetting(this,'maintenanceMode')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">New User Registrations</div><div class="toggle-card-sub">Allow new buyers to sign up</div></div><div class="toggle-switch pset on" id="pset-newuser" onclick="adminToggleSetting(this,'allowNewUsers')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Seller Registrations</div><div class="toggle-card-sub">Allow new sellers to apply</div></div><div class="toggle-switch pset on" id="pset-sellerreg" onclick="adminToggleSetting(this,'allowSellerReg')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Affiliate Registrations</div><div class="toggle-card-sub">Allow new affiliates to join</div></div><div class="toggle-switch pset on" id="pset-affreg" onclick="adminToggleSetting(this,'allowAffiliateReg')"><div class="toggle-knob"></div></div></div>
+
+        <div class="settings-section-lbl"><div class="ic" style="background:rgba(245,158,11,.15);color:var(--gold);">%</div><h3>Commission &amp; Fees</h3></div>
+        <div class="fee-input-card">
+          <div class="fee-input-ic" style="background:rgba(168,85,247,.15);">🏛️</div>
+          <div style="flex:1;"><div class="fee-input-lbl">Platform Fee (%)</div><input class="fee-input-val" type="number" id="pset-platformfee" value="10"></div>
+        </div>
+        <div class="fee-input-card">
+          <div class="fee-input-ic" style="background:rgba(245,158,11,.15);">👥</div>
+          <div style="flex:1;"><div class="fee-input-lbl">Affiliate Commission (%)</div><input class="fee-input-val" type="number" id="pset-affcommission" value="10"></div>
+        </div>
+        <div class="fee-input-card">
+          <div class="fee-input-ic" style="background:rgba(59,130,246,.15);">🕐</div>
+          <div style="flex:1;"><div class="fee-input-lbl">Escrow Hold Period (days)</div><input class="fee-input-val" type="number" id="pset-escrowdays" value="7"></div>
+        </div>
+
+        <div class="settings-section-lbl"><div class="ic" style="background:rgba(59,130,246,.15);">🎚️</div><h3>Platform Features</h3></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Flash Sales</div><div class="toggle-card-sub">Enable flash sale countdown banners</div></div><div class="toggle-switch pset on" id="pset-flash" onclick="adminToggleSetting(this,'flashSalesEnabled')" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);border-color:transparent;"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Escrow System</div><div class="toggle-card-sub">Hold payments until buyer confirms delivery</div></div><div class="toggle-switch pset on" id="pset-escrow" onclick="adminToggleSetting(this,'escrowEnabled')"><div class="toggle-knob"></div></div></div>
+
+        <div class="settings-section-lbl"><div class="ic" style="background:rgba(245,158,11,.15);color:var(--gold);">🔔</div><h3>Notifications</h3></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">Email Notifications</div><div class="toggle-card-sub">Send email alerts for orders, disputes, etc.</div></div><div class="toggle-switch pset on" id="pset-emailnotif" onclick="adminToggleSetting(this,'emailNotifications')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-card"><div style="flex:1;"><div class="toggle-card-title">SMS Notifications</div><div class="toggle-card-sub">Send SMS alerts to users</div></div><div class="toggle-switch pset" id="pset-smsnotif" onclick="adminToggleSetting(this,'smsNotifications')"><div class="toggle-knob"></div></div></div>
+
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:15px;margin:20px 0 28px;font-size:14.5px;" id="pset-save-btn" onclick="adminSavePlatformSettings()">Save Settings</button>
+
+        <div class="settings-section-lbl"><div class="ic" style="background:rgba(239,68,68,.12);">🔐</div><h3>Admin accounts</h3></div>
         <div class="dash-card">
-          <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Admin accounts</div>
           <p style="font-size:13.5px;color:var(--text2);">The following emails have full admin access:</p>
           <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
             <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:13px;">sundaygift050@gmail.com</div>
@@ -5285,17 +5357,17 @@ window.uploadToCloudinary = async function(file, folder) {
 window.submitVerification = async function() {
   const user = auth.currentUser;
   if (!user) { showToast('Please log in first.'); return; }
-  if (Object.keys(_verifFiles).length === 0) {
+  if (Object.keys(_kycFiles).length === 0) {
     showToast('⚠️ Please upload at least one document first.');
     return;
   }
 
-  const btn = document.querySelector('#page-verification .btn-primary');
+  const btn = document.getElementById('kyc-submit-btn') || document.querySelector('#page-verification .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
 
   try {
     const urls = {};
-    for (const [key, file] of Object.entries(_verifFiles)) {
+    for (const [key, file] of Object.entries(_kycFiles)) {
       showToast(`📤 Uploading ${key}…`);
       urls[key] = await uploadToCloudinary(file, `zula_verifications/${user.uid}`);
     }
@@ -10276,6 +10348,78 @@ window.adminFilterUsers = function(search) {
   adminRenderUsers(filtered);
 };
 
+window.adminGoSellers = function() {
+  adminTab('users');
+  var navUsers = document.getElementById('anav-users');
+  var navSellers = document.getElementById('anav-sellers');
+  if (navUsers) navUsers.classList.remove('active');
+  if (navSellers) navSellers.classList.add('active');
+  var sel = document.getElementById('a-user-filter');
+  if (sel) sel.value = 'seller';
+  var search = document.getElementById('a-user-search');
+  adminFilterUsers(search ? search.value : '');
+  setTimeout(function(){ adminFilterUsers(search ? search.value : ''); }, 700);
+};
+
+// ── ADMIN: PLATFORM SETTINGS (ported from reference app, wired to Firestore) ──
+window.adminToggleSetting = function(el, key) {
+  el.classList.toggle('on');
+};
+
+window.adminLoadPlatformSettings = async function() {
+  var db = window._db, fns = window._fns;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'settings', 'platform'));
+    var s = snap.exists() ? snap.data() : {};
+    var setToggle = function(id, val) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('on', !!val);
+    };
+    setToggle('pset-maintenance', s.maintenanceMode);
+    setToggle('pset-newuser', s.allowNewUsers !== false);
+    setToggle('pset-sellerreg', s.allowSellerReg !== false);
+    setToggle('pset-affreg', s.allowAffiliateReg !== false);
+    setToggle('pset-flash', s.flashSalesEnabled !== false);
+    setToggle('pset-escrow', s.escrowEnabled !== false);
+    setToggle('pset-emailnotif', s.emailNotifications !== false);
+    setToggle('pset-smsnotif', !!s.smsNotifications);
+    if (document.getElementById('pset-platformfee'))    document.getElementById('pset-platformfee').value = (s.platformFeePct != null ? s.platformFeePct : 10);
+    if (document.getElementById('pset-affcommission'))  document.getElementById('pset-affcommission').value = (s.affiliateCommissionPct != null ? s.affiliateCommissionPct : 10);
+    if (document.getElementById('pset-escrowdays'))     document.getElementById('pset-escrowdays').value = (s.escrowHoldDays != null ? s.escrowHoldDays : 7);
+  } catch(e) { console.error('Could not load platform settings:', e); }
+};
+
+window.adminSavePlatformSettings = async function() {
+  var db = window._db, fns = window._fns;
+  var btn = document.getElementById('pset-save-btn');
+  var isOn = function(id) { var el = document.getElementById(id); return !!(el && el.classList.contains('on')); };
+  var payload = {
+    maintenanceMode:       isOn('pset-maintenance'),
+    allowNewUsers:          isOn('pset-newuser'),
+    allowSellerReg:         isOn('pset-sellerreg'),
+    allowAffiliateReg:      isOn('pset-affreg'),
+    flashSalesEnabled:      isOn('pset-flash'),
+    escrowEnabled:          isOn('pset-escrow'),
+    emailNotifications:     isOn('pset-emailnotif'),
+    smsNotifications:       isOn('pset-smsnotif'),
+    platformFeePct:         Number(document.getElementById('pset-platformfee')?.value || 10),
+    affiliateCommissionPct: Number(document.getElementById('pset-affcommission')?.value || 10),
+    escrowHoldDays:         Number(document.getElementById('pset-escrowdays')?.value || 7),
+    updatedAt: fns.serverTimestamp()
+  };
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    await fns.setDoc(fns.doc(db, 'settings', 'platform'), payload, { merge: true });
+    showToast('✅ Platform settings saved.');
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not save settings.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Settings'; }
+  }
+};
+
 window.adminBanUser = async function(userId, email, name) {
   var reason = prompt('Reason for banning ' + (name||email) + ':');
   if (!reason) return;
@@ -15136,6 +15280,7 @@ var _origAdminTabEng = window.adminTab;
 window.adminTab = function(name) {
   _origAdminTabEng(name);
   if (name === 'engagement') engLoadData();
+  if (name === 'settings') adminLoadPlatformSettings();
 };
 
 console.log('✅ ZÚLA — all features loaded.');
