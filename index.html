@@ -234,68 +234,61 @@ body.dock-active .page.active{padding-bottom:104px;}
 @media(min-width:761px){ .hdr-cart-mobile-only{display:none !important;} }
 
 /* ══════════════════════════════════════════════════
-   MARKETPLACE PAGE — light "MLC reference" redesign, scoped entirely to
-   #page-marketplace via CSS variable overrides. Every component here
-   (.pcard, .filter-panel, .mkt-cat-pill, .hdr, etc.) already reads from
-   CSS variables, so redefining them within this page re-themes the whole
-   page without touching the rest of the app, which stays on the dark theme.
+   MARKETPLACE PAGE — dark theme matching the reference app 1:1.
+   Every component here (.pcard, .filter-panel, .mkt-cat-pill, .hdr, etc.)
+   already reads from CSS variables, so this page uses the same dark
+   tokens as the rest of the app — no separate light theme anymore.
    ══════════════════════════════════════════════════ */
 #page-marketplace{
-  --bg:#efedfb; --bg2:#ffffff; --bg3:#f5f3fd;
-  --surface:#ffffff; --surface2:#ffffff;
-  --border:#ece8f8; --border2:#ddd5f7;
-  --text:#171325; --text2:#605d70; --text3:#a19eae;
-  --hdr-bg:#ffffff;
-  background:linear-gradient(150deg,#9370fb 0%,#7c5cfc 45%,#5a3fd6 100%);
-  min-height:100vh; padding:26px 26px 60px;
+  background:var(--bg);
+  min-height:100vh; padding:0;
 }
-#page-marketplace .mkt-frame{max-width:1320px;margin:0 auto;background:var(--bg2);border-radius:28px;overflow:hidden;box-shadow:0 30px 80px rgba(30,15,90,.35);}
+#page-marketplace .mkt-frame{max-width:100%;margin:0;background:transparent;border-radius:0;box-shadow:none;}
 #page-marketplace .hdr{position:static;}
-#page-marketplace .logo{color:#15111f;}
-#page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);border-radius:999px;}
+#page-marketplace .hdr-search{background:var(--surface2);border:1px solid var(--border);border-radius:999px;}
 #page-marketplace .hdr-search input{color:var(--text);}
 #page-marketplace .hdr-search input::placeholder{color:var(--text3);}
 #page-marketplace .mkt-hdr-link{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--text2);cursor:pointer;position:relative;}
 #page-marketplace .mkt-hdr-link .ico{font-size:18px;}
 #page-marketplace .mkt-hdr-link:hover{color:var(--text);}
-#page-marketplace .avatar-btn{border:2px solid var(--bg3);}
+#page-marketplace .avatar-btn{border:2px solid var(--surface2);}
 
 #page-marketplace .mkt-cat-pills{border-bottom:none;margin-bottom:22px;padding-bottom:0;}
-#page-marketplace .mkt-cat-pill{background:var(--bg2);border:1px solid var(--border);color:var(--text2);}
+#page-marketplace .mkt-cat-pill{background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
 #page-marketplace .mkt-cat-pill:hover{border-color:var(--border2);}
 #page-marketplace .mkt-cat-pill.active{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
 #page-marketplace .mkt-layout{padding:0 28px 50px;gap:26px;}
 #page-marketplace .mkt-topbar{border-bottom:none;margin-bottom:16px;}
 #page-marketplace .mkt-topbar h2{color:var(--text);}
 
-#page-marketplace .filter-panel{background:transparent;border:none;padding:0;}
-#page-marketplace .filter-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(25,10,70,.04);}
+#page-marketplace .filter-panel{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:var(--radius-sm);}
+#page-marketplace .filter-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px;}
 #page-marketplace .filter-card h4{font-size:14px;font-weight:800;color:var(--text);margin:0;}
 #page-marketplace .filter-card .fcheck{color:var(--text2);}
 
-#page-marketplace .pcard{box-shadow:0 1px 3px rgba(25,10,70,.06);border-color:var(--border);}
-#page-marketplace .pcard:hover{box-shadow:0 8px 24px rgba(25,10,70,.12);}
+#page-marketplace .pcard{box-shadow:var(--shadow-card);border-color:var(--border);}
+#page-marketplace .pcard:hover{box-shadow:0 12px 30px rgba(0,0,0,.4);}
 #page-marketplace .pcard-img{background:var(--bg3);}
-#page-marketplace .pcard-heart{background:#fff;border:1px solid var(--border);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+#page-marketplace .pcard-heart{background:rgba(20,20,31,.72);border:1px solid rgba(255,255,255,.12);color:#fff;}
 #page-marketplace .pcard-heart.saved{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
 #page-marketplace .pcard-buy-pill{border-color:var(--accent);}
 #page-marketplace .pcard-name{color:var(--text);}
 
 /* Price range: histogram + dual-handle slider */
 #page-marketplace .mkt-hist{display:flex;align-items:flex-end;gap:2px;height:42px;margin:12px 0 10px;}
-#page-marketplace .mkt-hist span{flex:1;background:linear-gradient(180deg,#cabdfd,#a78bfa);border-radius:2px 2px 0 0;min-height:3px;}
+#page-marketplace .mkt-hist span{flex:1;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:2px 2px 0 0;min-height:3px;}
 #page-marketplace .mkt-range-wrap{position:relative;height:26px;margin-bottom:2px;}
 #page-marketplace .mkt-range-track{position:absolute;top:11px;left:0;right:0;height:4px;background:var(--bg3);border-radius:999px;}
 #page-marketplace .mkt-range-fill{position:absolute;top:11px;height:4px;background:var(--accent-grad);border-radius:999px;}
 #page-marketplace .mkt-range-wrap input[type=range]{position:absolute;width:100%;top:8px;left:0;-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;margin:0;}
 #page-marketplace .mkt-range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 #page-marketplace .mkt-range-wrap input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25);}
-#page-marketplace .mkt-price-pill{background:#171325;color:#fff;font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;}
+#page-marketplace .mkt-price-pill{background:var(--surface2);color:var(--text);font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;border:1px solid var(--border);}
 
 /* Star rating row */
 #page-marketplace .mkt-stars-row{display:flex;align-items:center;justify-content:space-between;}
 #page-marketplace .mkt-stars{font-size:19px;letter-spacing:2px;cursor:pointer;color:var(--border2);}
-#page-marketplace .mkt-stars .on{color:#f5c842;}
+#page-marketplace .mkt-stars .on{color:var(--gold);}
 #page-marketplace .mkt-stars-label{font-size:11.5px;color:var(--text3);font-weight:600;}
 
 /* Seller checklist rows (styled like the reference's Brand list) */
@@ -305,7 +298,7 @@ body.dock-active .page.active{padding-bottom:104px;}
 
 /* Delivery toggle pills */
 #page-marketplace .mkt-delivery-toggle{display:flex;gap:8px;}
-#page-marketplace .mkt-delivery-btn{flex:1;padding:9px;border-radius:999px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;}
+#page-marketplace .mkt-delivery-btn{flex:1;padding:9px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;}
 #page-marketplace .mkt-delivery-btn.active{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
 @media(max-width:860px){ #page-marketplace{padding:14px 10px 40px;} #page-marketplace .mkt-frame{border-radius:20px;} #page-marketplace .mkt-layout{padding:0 14px 40px;} }
 
@@ -314,16 +307,17 @@ body.dock-active .page.active{padding-bottom:104px;}
    cards, featured deals, trending section, slide-over filters.
    All still scoped to #page-marketplace's variable overrides above.
    ══════════════════════════════════════════════════ */
-#page-marketplace .mkt-cat-carousel-wrap{display:flex;align-items:center;gap:8px;margin-bottom:22px;}
+#page-marketplace .mkt-cat-carousel-wrap{display:flex;align-items:center;gap:8px;margin-bottom:26px;}
 #page-marketplace .mkt-cat-nav-btn{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 #page-marketplace .mkt-cat-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
-#page-marketplace .mkt-cat-carousel{flex:1;display:flex;gap:26px;overflow-x:auto;scroll-behavior:smooth;padding:4px 2px;scrollbar-width:none;}
+#page-marketplace .mkt-cat-carousel{flex:1;display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding:4px 2px;scrollbar-width:none;}
 #page-marketplace .mkt-cat-carousel::-webkit-scrollbar{display:none;}
-#page-marketplace .mkt-cat-icon-item{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;width:76px;}
-#page-marketplace .mkt-cat-icon-circle{width:52px;height:52px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;transition:.15s;}
-#page-marketplace .mkt-cat-icon-item.active .mkt-cat-icon-circle{background:var(--accent-grad);border-color:var(--accent);}
-#page-marketplace .mkt-cat-icon-item span{font-size:11px;font-weight:600;color:var(--text2);text-align:center;line-height:1.25;}
-#page-marketplace .mkt-cat-icon-item.active span{color:var(--accent);font-weight:700;}
+#page-marketplace .mkt-cat-icon-item{flex:0 0 auto;display:flex;align-items:center;gap:7px;cursor:pointer;padding:10px 20px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);transition:transform .15s,background .15s,border-color .15s;}
+#page-marketplace .mkt-cat-icon-item:hover{transform:translateY(-1px);border-color:var(--border2);}
+#page-marketplace .mkt-cat-icon-circle{width:auto;height:auto;border-radius:0;background:none;border:none;display:inline-flex;font-size:15px;}
+#page-marketplace .mkt-cat-icon-item.active{background:var(--accent-grad);border-color:transparent;box-shadow:var(--shadow-btn);}
+#page-marketplace .mkt-cat-icon-item span{font-size:13.5px;font-weight:700;color:var(--text2);text-align:center;line-height:1.25;white-space:nowrap;}
+#page-marketplace .mkt-cat-icon-item.active span{color:#fff;font-weight:700;}
 
 #page-marketplace .mkt-promo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
 #page-marketplace .mkt-promo-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;}
@@ -372,74 +366,59 @@ body.dock-active .page.active{padding-bottom:104px;}
    real countdown to midnight, HOT!/discount badges, and split BUY / CART
    buttons. Still scoped entirely to #page-marketplace.
    ══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════
+   MARKETPLACE — matches the reference app's dark design 1:1,
+   reflowed for laptop/desktop (wide multi-column grid, persistent
+   filter access) instead of a single-column phone layout.
+   Still scoped entirely to #page-marketplace.
+   ══════════════════════════════════════════════════ */
 #page-marketplace{
-  --bg:#f3f5f8; --bg2:#ffffff; --bg3:#f0f4fa;
-  --surface:#ffffff; --surface2:#ffffff;
-  --border:#e8ecf2; --border2:#d7e0ec;
-  --text:#14181f; --text2:#6b7280; --text3:#9aa3af;
-  --accent:#7c3aed; --accent2:#5b21b6;
-  --accent-grad:linear-gradient(135deg,#8b5cf6 0%,#6d28d9 100%);
-  --red:#e02424; --green:#0e9f6e; --gold:#f5b400;
-  --hdr-bg:#ffffff;
   background:var(--bg);
   min-height:100vh; padding:0 0 60px;
 }
-/* Flatten the floating purple "card" — this theme is a plain full-bleed page */
 #page-marketplace .mkt-frame{max-width:100%;margin:0;background:transparent;border-radius:0;box-shadow:none;overflow:visible;}
-#page-marketplace .hdr{background:var(--hdr-bg);border-bottom:1px solid var(--border);}
-#page-marketplace .logo{color:#14181f;}
-#page-marketplace .logo span{color:var(--accent);}
-#page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);}
+#page-marketplace .hdr{background:var(--hdr-bg);border-bottom:1px solid var(--border);backdrop-filter:blur(16px) saturate(140%);}
 #page-marketplace .mkt-layout, #page-marketplace > .wrap{max-width:1320px;}
-
-/* Compact category icon row (no blue top strip above it) */
-#page-marketplace .mkt-cat-carousel-wrap{background:var(--bg2);border-bottom:1px solid var(--border);margin:0;padding:9px 0;gap:8px;}
-#page-marketplace .mkt-cat-nav-btn{width:24px;height:24px;font-size:13px;background:var(--accent-grad);border-color:var(--accent);color:#fff;}
-#page-marketplace .mkt-cat-nav-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
-#page-marketplace .mkt-cat-carousel{gap:18px;}
-#page-marketplace .mkt-cat-icon-item{gap:3px;width:auto;}
-#page-marketplace .mkt-cat-icon-circle{width:38px;height:38px;font-size:16px;background:#eef1f6;border-color:#eef1f6;}
-#page-marketplace .mkt-cat-icon-item.active .mkt-cat-icon-circle{background:var(--accent-grad);border-color:var(--accent);}
-#page-marketplace .mkt-cat-icon-item span{font-size:10px;color:var(--text2);}
-#page-marketplace .mkt-cat-icon-item.active span{color:var(--accent);}
 
 /* Everything below the cat carousel keeps its normal side padding */
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
 
-/* Flash-sale urgency bar — black-to-blue, not red/orange */
-#page-marketplace .mkt-flash-bar{margin:8px 0 14px;background:linear-gradient(90deg,#0f172a,var(--accent));border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:10px;color:#fff;}
-#page-marketplace .mkt-flash-lbl{font-weight:800;font-size:11px;white-space:nowrap;}
-#page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:700;font-size:11.5px;letter-spacing:1px;background:rgba(0,0,0,.35);border-radius:4px;padding:2px 7px;}
-#page-marketplace .mkt-flash-sub{font-size:10.5px;opacity:.9;margin-left:auto;white-space:nowrap;}
+/* Flash-sale bar — ported 1:1 from the reference app: solid purple
+   gradient pill, icon chip on the left, label+timer stacked, subtext right */
+#page-marketplace .mkt-flash-bar{margin:6px 0 24px;background:var(--accent-grad);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;color:#fff;box-shadow:var(--shadow-btn);}
+#page-marketplace .mkt-flash-icon{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+#page-marketplace .mkt-flash-lbl{font-weight:800;font-size:11px;letter-spacing:.04em;white-space:nowrap;opacity:.92;}
+#page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:800;font-size:15px;letter-spacing:1px;background:rgba(0,0,0,.28);border-radius:8px;padding:4px 10px;display:inline-block;margin-top:2px;}
+#page-marketplace .mkt-flash-sub{font-size:12px;opacity:.85;margin-left:auto;white-space:nowrap;}
 @media(max-width:640px){
   #page-marketplace .mkt-flash-bar{flex-wrap:wrap;}
   #page-marketplace .mkt-flash-sub{margin-left:0;}
 }
 
-/* Product cards */
-#page-marketplace .mkt-topbar{margin-bottom:16px;padding-bottom:12px;}
-#page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
-#page-marketplace .pcard{background:var(--bg2);border-color:var(--border);}
-#page-marketplace .pcard-img{height:150px;}
-#page-marketplace .pcard-cat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
-#page-marketplace .pcard-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);letter-spacing:1px;margin:2px 0 6px;}
-#page-marketplace .pcard-rating .cnt{color:var(--text3);letter-spacing:normal;font-weight:600;}
-#page-marketplace .pcard-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
-#page-marketplace .pcard-price{font-size:16px;font-weight:800;color:var(--accent);}
-#page-marketplace .pcard-orig-price{font-size:11.5px;color:var(--text3);text-decoration:line-through;font-weight:600;}
+/* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
+#page-marketplace .mkt-banner-wrap{margin-bottom:24px;overflow:hidden;}
+#page-marketplace .mkt-banner-track{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+#page-marketplace .mkt-banner{position:relative;height:160px;border-radius:18px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
+#page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 55%);}
+#page-marketplace .mkt-banner-tag{position:absolute;top:12px;left:12px;background:var(--gold-grad);color:#1a1206;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:2;}
+#page-marketplace .mkt-banner-content{position:absolute;bottom:14px;left:16px;right:16px;z-index:2;}
+#page-marketplace .mkt-banner-title{font-size:17px;font-weight:800;color:#fff;font-family:var(--font-display);}
+#page-marketplace .mkt-banner-sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;}
+@media(max-width:900px){#page-marketplace .mkt-banner-track{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){#page-marketplace .mkt-banner-track{grid-template-columns:1fr;}#page-marketplace .mkt-banner{height:150px;}}
 
-/* Badges: bouncing red HOT!, red -XX% discount, green NEW */
-#page-marketplace .pcard-hot-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;z-index:2;animation:mktBounce 1.4s infinite;}
-#page-marketplace .pcard-discount-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
-#page-marketplace .pcard-new-badge{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
-@keyframes mktBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+/* Product cards — laptop grid, more columns than the phone version */
+#page-marketplace .mkt-topbar{margin-bottom:18px;padding-bottom:14px;}
+#page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:20px;}
+@media(min-width:1400px){#page-marketplace .pgrid{grid-template-columns:repeat(6,1fr);}}
+@media(min-width:1100px) and (max-width:1399px){#page-marketplace .pgrid{grid-template-columns:repeat(5,1fr);}}
 
-/* Split BUY / CART buttons, replacing the old single cart pill */
+/* Split BUY / CART buttons, styled like the reference app's rounded pill CTA */
 #page-marketplace .pcard-btn-row{display:flex;gap:6px;}
-#page-marketplace .pcard-buy-btn{flex:1;text-align:center;background:var(--accent-grad);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
-#page-marketplace .pcard-buy-btn:hover{background:var(--accent2);}
-#page-marketplace .pcard-cart-btn{flex:1;text-align:center;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
-#page-marketplace .pcard-cart-btn:hover{background:var(--bg3);}
+#page-marketplace .pcard-buy-btn{flex:1;text-align:center;background:var(--accent-grad);color:#fff;border:none;border-radius:10px;padding:9px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+#page-marketplace .pcard-buy-btn:hover{opacity:.9;}
+#page-marketplace .pcard-cart-btn{flex:1;text-align:center;background:transparent;color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:9px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
+#page-marketplace .pcard-cart-btn:hover{background:var(--surface2);}
 
 /* ══════════════════════════════════════════════════
    MARKETPLACE — responsive across phone / tablet / laptop / desktop.
@@ -458,10 +437,9 @@ body.dock-active .page.active{padding-bottom:104px;}
   #page-marketplace .wrap{padding-left:16px;padding-right:16px;}
   #page-marketplace .hdr-search{max-width:220px;}
   #page-marketplace .mkt-cat-carousel-wrap{padding:8px 0;}
-  #page-marketplace .mkt-cat-icon-circle{width:34px;height:34px;font-size:15px;}
-  #page-marketplace .mkt-cat-icon-item span{font-size:9.5px;}
+  #page-marketplace .mkt-cat-icon-item{padding:8px 14px;}
+  #page-marketplace .mkt-cat-icon-item span{font-size:12px;}
   #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:10px;}
-  #page-marketplace .pcard-img{height:120px;}
 }
 
 /* Phone (≤640px) */
@@ -470,7 +448,6 @@ body.dock-active .page.active{padding-bottom:104px;}
   #page-marketplace .hdr-search{display:none;}
   #page-marketplace .mkt-cat-nav-btn{display:none;}
   #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
-  #page-marketplace .pcard-img{height:130px;}
   #page-marketplace .pcard-body{padding:9px 9px 11px;}
   #page-marketplace .pcard-name{font-size:12px;height:32px;}
   #page-marketplace .pcard-price{font-size:14px;}
@@ -483,7 +460,6 @@ body.dock-active .page.active{padding-bottom:104px;}
 /* Small phone (≤400px) */
 @media(max-width:400px){
   #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:8px;}
-  #page-marketplace .pcard-img{height:110px;}
   #page-marketplace .mkt-flash-lbl{font-size:10px;}
   #page-marketplace .mkt-flash-clock{font-size:10px;padding:2px 5px;}
   #page-marketplace .mkt-flash-sub{display:none;}
@@ -511,17 +487,17 @@ body.dock-active .page.active{padding-bottom:104px;}
 .filter-group h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);}
 .fcheck{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:7px;cursor:pointer;}
 .fcheck input{accent-color:var(--accent);}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;}
-.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 1px 2px rgba(0,0,0,.16);}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 1px 2px rgba(0,0,0,.16);}
 .pcard:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.28);}
-.pcard-img{width:100%;height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden;}
-.pcard-img img{transition:transform .3s ease;}
+.pcard-img{width:100%;aspect-ratio:1/1.05;height:auto;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden;}
+.pcard-img img{transition:transform .3s ease;width:100%;height:100%;object-fit:cover;}
 .pcard:hover .pcard-img img{transform:scale(1.05);}
 .pcard-body{padding:14px 15px 15px;}
 .pcard-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.35;}
 .pcard-seller{font-size:11.5px;color:var(--text3);margin-bottom:9px;}
 .pcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:9px;margin-top:2px;border-top:1px solid var(--border);}
-.pcard-price{font-size:14.5px;font-weight:800;color:var(--accent);}
+.pcard-price{font-size:14.5px;font-weight:800;color:#a78bfa;}
 .pcard-type{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--bg3);padding:2px 7px;border-radius:999px;}
 
 /* ══════════════════════════════════════════
@@ -554,10 +530,11 @@ body.dock-active .page.active{padding-bottom:104px;}
 .pcard-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);letter-spacing:1px;margin:2px 0 6px;}
 .pcard-rating .cnt{color:var(--text3);letter-spacing:normal;font-weight:600;}
 .pcard-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
+.pcard-price-row .pcard-price{color:#a78bfa;}
 .pcard-orig-price{font-size:11.5px;color:var(--text3);text-decoration:line-through;font-weight:600;}
-.pcard-hot-badge{position:absolute;top:10px;left:10px;background:var(--red,#e02424);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;z-index:2;animation:pcardBounce 1.4s infinite;}
-.pcard-discount-badge{position:absolute;top:10px;left:10px;background:var(--red,#e02424);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
-.pcard-new-badge{position:absolute;top:10px;left:10px;background:var(--green,#0e9f6e);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+.pcard-hot-badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;z-index:2;animation:pcardBounce 1.4s infinite;}
+.pcard-discount-badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
+.pcard-new-badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;z-index:2;}
 @keyframes pcardBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
 .pcard-btn-row{display:flex;gap:6px;}
 .pcard-buy-btn{flex:1;text-align:center;background:var(--accent-grad);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:800;letter-spacing:.02em;cursor:pointer;font-family:var(--font-body);}
@@ -1707,12 +1684,29 @@ body.dock-active .page.active{padding-bottom:104px;}
 
   <div class="wrap" style="padding:10px 28px 50px;">
 
+    <!-- Promo banner carousel — ported from reference app, laptop-width (3 visible at once) -->
+    <div class="mkt-banner-wrap">
+      <div class="mkt-banner-track" id="mkt-banner-track">
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80');">
+          <div class="mkt-banner-tag">50% OFF</div>
+          <div class="mkt-banner-content"><div class="mkt-banner-title">Selected Items</div><div class="mkt-banner-sub">Limited time only</div></div>
+        </div>
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&q=80');">
+          <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
+        </div>
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&q=80');">
+          <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Flash sale urgency bar (real countdown to midnight, no fake timer) -->
     <div class="mkt-flash-bar">
-      <div class="mkt-flash-lbl">⚡ FLASH SALE</div>
+      <div class="mkt-flash-icon">⚡</div>
+      <div><div class="mkt-flash-lbl">FLASH SALE</div>
       <div class="mkt-flash-clock" id="mkt-countdown-wrap">
         <span id="mkt-countdown">00:00:00</span>
-      </div>
+      </div></div>
       <div class="mkt-flash-sub">Prices this low won't last — grab it before it's gone</div>
     </div>
 
