@@ -1208,7 +1208,7 @@ body.dock-active .page.active{padding-bottom:104px;}
 .sd-sidebar-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:8px;}
 .sd-nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-xs);font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;border:none;background:none;font-family:var(--font-body);width:100%;text-align:left;}
 .sd-nav-item:hover{background:var(--surface);color:var(--text);}
-.sd-nav-item.active{background:rgba(124,92,252,.12);color:var(--accent);font-weight:600;}
+.sd-nav-item.active{background:var(--accent-grad);color:#fff;font-weight:700;box-shadow:0 4px 16px rgba(124,58,237,.4);}
 .sd-nav-item .sd-nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
 .sd-nav-item .sd-nav-badge{margin-left:auto;background:var(--accent-grad);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;}
 .sd-nav-item .sd-nav-badge.gold{background:var(--gold-grad);color:#000;}
@@ -1239,6 +1239,20 @@ body.dock-active .page.active{padding-bottom:104px;}
 .sd-payout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;margin-bottom:16px;}
 .sd-payout-balance{font-size:36px;font-weight:800;font-family:var(--font-display);color:var(--green);margin-bottom:4px;}
 .sd-payout-pending{font-size:13px;color:var(--text3);}
+
+/* ── Hero revenue card + icon-chip stats, ported 1:1 from reference app ── */
+.sd-hero-card{background:var(--accent-grad);border-radius:22px;padding:24px;margin-bottom:20px;box-shadow:0 10px 30px rgba(124,58,237,.3);}
+.sd-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sd-hero-label{font-size:14.5px;opacity:.85;color:#fff;}
+.sd-hero-pill{background:rgba(255,255,255,.18);font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;color:#fff;}
+.sd-hero-value{font-size:38px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px;color:#fff;font-family:var(--font-display);}
+.sd-hero-sub-row{display:flex;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.2);flex-wrap:wrap;}
+.sd-hero-sub-item .n{font-size:17px;font-weight:800;color:#fff;font-family:var(--font-display);}
+.sd-hero-sub-item .l{font-size:12px;opacity:.8;color:#fff;}
+.sd-stat-grid-icon{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px;}
+@media(max-width:600px){.sd-stat-grid-icon{grid-template-columns:1fr;}}
+.sd-stat-card-icon{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 14px;}
+.sd-stat-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
 .sd-bank-row{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:10px;}
 .sd-bank-icon{font-size:24px;width:40px;height:40px;background:var(--surface);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sd-mobile-nav{display:none;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;white-space:nowrap;}
@@ -7862,12 +7876,21 @@ window.saveManualLocation = async function() {
       <div class="sd-section active" id="sd-sec-overview">
         <div class="sd-page-hd">Dashboard</div>
         <div class="sd-page-sub">Welcome back — here's how your store is doing</div>
-        <div class="sd-stat-grid">
-          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);" id="sd-stat-revenue">₦0</div><div class="sd-stat-lbl">Available revenue</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-escrow">₦0</div><div class="sd-stat-lbl">🔒 In escrow</div></div>
-          <div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);" id="sd-stat-aff">₦0</div><div class="sd-stat-lbl">Aff. earned</div></div>
+
+        <!-- Hero revenue card — ported 1:1 from reference app -->
+        <div class="sd-hero-card">
+          <div class="sd-hero-top"><span class="sd-hero-label">Available Revenue</span><span class="sd-hero-pill">All Time</span></div>
+          <div class="sd-hero-value" id="sd-stat-revenue">₦0</div>
+          <div class="sd-hero-sub-row">
+            <div class="sd-hero-sub-item"><div class="n" id="sd-stat-escrow">₦0</div><div class="l">🔒 In escrow</div></div>
+            <div class="sd-hero-sub-item"><div class="n" id="sd-stat-aff">₦0</div><div class="l">Affiliate earned</div></div>
+          </div>
+        </div>
+
+        <!-- Icon-chip stat cards — ported 1:1 from reference app -->
+        <div class="sd-stat-grid-icon">
+          <div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/></svg></div><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
+          <div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 2v4M16 2v4M4 10h16"/></svg></div><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
         </div>
         <div id="sd-escrow-note" style="display:none;font-size:12px;color:var(--text3);margin:-8px 0 16px;padding:10px 14px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);">
           🔒 Funds in escrow are held until the buyer confirms they've received their order. You can only withdraw <strong>Available revenue</strong> — escrowed funds aren't withdrawable yet.
@@ -7988,20 +8011,15 @@ window.saveManualLocation = async function() {
         <div class="sd-page-hd">Payout</div>
         <div class="sd-page-sub">Withdraw your earnings to your bank account</div>
 
-        <!-- Balance cards -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
-          <div class="sd-payout-card">
-            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Available balance</div>
-            <div class="sd-payout-balance" id="sd-payout-available">₦0.00</div>
-            <div class="sd-payout-pending">Pending: <span id="sd-payout-pending">₦0.00</span></div>
-            <button class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;" onclick="sdRequestPayout()">Request payout →</button>
+        <!-- Balance hero — ported 1:1 from reference app's Payouts hero -->
+        <div class="sd-hero-card">
+          <div class="sd-hero-top"><span class="sd-hero-label">Available Balance</span><span class="sd-hero-pill" id="sd-payout-status-pill">No sales yet</span></div>
+          <div class="sd-hero-value" id="sd-payout-available">₦0.00</div>
+          <div class="sd-hero-sub-row">
+            <div class="sd-hero-sub-item"><div class="n" id="sd-payout-pending">₦0.00</div><div class="l">Pending</div></div>
+            <div class="sd-hero-sub-item"><div class="n" id="sd-payout-total">₦0.00</div><div class="l">Total Paid</div></div>
           </div>
-          <div class="sd-payout-card">
-            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total paid out</div>
-            <div class="sd-payout-balance" style="color:var(--text);" id="sd-payout-total">₦0.00</div>
-            <div class="sd-payout-pending">All time earnings</div>
-            <div style="margin-top:14px;font-size:12px;color:var(--text3);">Payouts processed within 1–3 business days</div>
-          </div>
+          <button class="btn" style="margin-top:16px;width:100%;justify-content:center;background:rgba(255,255,255,.18);color:#fff;border:none;font-weight:700;" onclick="sdRequestPayout()">Request payout →</button>
         </div>
 
         <!-- Bank account -->
@@ -12294,17 +12312,17 @@ window.sdLoadAnalytics = async function() {
     var bars = labels.map(function(l,i) {
       var pct = Math.round((values[i]/maxV)*100);
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">' +
-        '<div style="font-size:11px;color:var(--accent);font-weight:700;">₦' + (values[i]/1000).toFixed(0) + 'k</div>' +
-        '<div style="width:100%;background:var(--bg3);border-radius:4px;height:120px;display:flex;align-items:flex-end;overflow:hidden;">' +
-        '<div style="width:100%;background:linear-gradient(180deg,var(--accent),var(--accent2));height:' + pct + '%;border-radius:4px 4px 0 0;transition:.4s;"></div></div>' +
+        '<div style="font-size:11px;color:#a78bfa;font-weight:700;">₦' + (values[i]/1000).toFixed(0) + 'k</div>' +
+        '<div style="width:100%;background:var(--bg3);border-radius:8px 8px 3px 3px;height:120px;display:flex;align-items:flex-end;overflow:hidden;">' +
+        '<div style="width:100%;background:var(--accent-grad);height:' + pct + '%;border-radius:8px 8px 3px 3px;transition:.4s;"></div></div>' +
         '<div style="font-size:10px;color:var(--text3);">' + l + '</div></div>';
     }).join('');
     var total = values.reduce(function(s,v){ return s+v; },0);
     sec.innerHTML = '<div class="sd-page-hd">Analytics</div><div class="sd-page-sub">Your sales performance over time</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">' +
-      '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + total.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
-      '<div class="sd-stat-card"><div class="sd-stat-val">' + snap.size + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
-      '<div class="sd-stat-card"><div class="sd-stat-val">₦' + (snap.size ? Math.round(total/snap.size).toLocaleString() : 0) + '</div><div class="sd-stat-lbl">Avg order value</div></div></div>' +
+      '<div class="sd-stat-grid-icon" style="grid-template-columns:repeat(3,1fr);">' +
+      '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="sd-stat-val">₦' + total.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
+      '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg></div><div class="sd-stat-val">' + snap.size + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
+      '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M3 20h18M6 16v4M12 10v10M18 4v16"/></svg></div><div class="sd-stat-val">₦' + (snap.size ? Math.round(total/snap.size).toLocaleString() : 0) + '</div><div class="sd-stat-lbl">Avg order value</div></div></div>' +
       '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">Monthly revenue</div>' +
       (bars ? '<div style="display:flex;gap:8px;align-items:flex-end;min-height:160px;">' + bars + '</div>' : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No sales data yet.</div>') +
       '</div>';
@@ -12969,9 +12987,9 @@ window.sdLoadAnalytics = async function() {
     var bars = labels.map(function(l,i) {
       var pct = Math.round((values[i]/maxV)*100);
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">' +
-        '<div style="font-size:11px;color:var(--accent);font-weight:700;">₦' + (values[i]/1000).toFixed(0) + 'k</div>' +
-        '<div style="width:100%;background:var(--bg3);border-radius:4px;height:120px;display:flex;align-items:flex-end;overflow:hidden;">' +
-        '<div style="width:100%;background:linear-gradient(180deg,var(--accent),var(--accent2));height:'+pct+'%;border-radius:4px 4px 0 0;transition:.4s;"></div></div>' +
+        '<div style="font-size:11px;color:#a78bfa;font-weight:700;">₦' + (values[i]/1000).toFixed(0) + 'k</div>' +
+        '<div style="width:100%;background:var(--bg3);border-radius:8px 8px 3px 3px;height:120px;display:flex;align-items:flex-end;overflow:hidden;">' +
+        '<div style="width:100%;background:var(--accent-grad);height:'+pct+'%;border-radius:8px 8px 3px 3px;transition:.4s;"></div></div>' +
         '<div style="font-size:10px;color:var(--text3);">' + l + '</div></div>';
     }).join('');
 
@@ -12985,14 +13003,26 @@ window.sdLoadAnalytics = async function() {
     });
     var perfRows = Object.values(perProduct).sort(function(a,b){ return b.revenue-a.revenue; }).slice(0,6);
     var perfHtml = perfRows.length ? perfRows.map(function(p) {
-      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>' + p.name + '</span><span style="color:var(--text3);">' + p.qty + ' sold</span><span style="font-weight:700;color:var(--accent);">₦' + p.revenue.toLocaleString() + '</span></div>';
+      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>' + p.name + '</span><span style="color:var(--text3);">' + p.qty + ' sold</span><span style="font-weight:700;color:#a78bfa;">₦' + p.revenue.toLocaleString() + '</span></div>';
     }).join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No completed sales yet.</div>';
 
     sec.innerHTML =
       '<div class="sd-page-hd">Analytics</div><div class="sd-page-sub">Your sales performance over time — figures reflect completed orders only</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + totalRevenue.toLocaleString() + '</div><div class="sd-stat-lbl">Total revenue</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val">' + orders.length + '</div><div class="sd-stat-lbl">Total orders</div></div>' +
+      /* Primary 4 metrics — icon-chip cards, ported 1:1 from reference app */
+      '<div class="sd-stat-grid-icon" style="grid-template-columns:repeat(4,1fr);">' +
+        '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="sd-stat-val">₦' + totalRevenue.toLocaleString() + '</div><div class="sd-stat-lbl">Revenue</div></div>' +
+        '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg></div><div class="sd-stat-val">' + orders.length + '</div><div class="sd-stat-lbl">Orders</div></div>' +
+        '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(168,85,247,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div><div class="sd-stat-val">' + conversionRate + '%</div><div class="sd-stat-lbl">Conversion</div></div>' +
+        '<div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M3 20h18M6 16v4M12 10v10M18 4v16"/></svg></div><div class="sd-stat-val">₦' + aov.toLocaleString() + '</div><div class="sd-stat-lbl">Avg. Order</div></div>' +
+      '</div>' +
+      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">Daily Revenue</div>' +
+      (bars ? '<div style="display:flex;gap:8px;align-items:flex-end;min-height:160px;">' + bars + '</div>' :
+        '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No completed sales yet — your revenue chart will appear here.</div>') +
+      '</div>' +
+      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">Top Products by Revenue</div>' + perfHtml + '</div>' +
+      /* Extra detail metrics kept below, not in the reference design but real data we don't want to lose */
+      '<div class="row-head" style="margin:20px 0 10px;"><h3 style="font-size:14px;color:var(--text3);font-weight:700;">More detail</h3></div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">' + completed.length + '</div><div class="sd-stat-lbl">Completed orders</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">' + pendingOrders.length + '</div><div class="sd-stat-lbl">Pending orders</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--text3);">' + cancelled.length + '</div><div class="sd-stat-lbl">Cancelled orders</div></div>' +
@@ -13000,15 +13030,8 @@ window.sdLoadAnalytics = async function() {
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">₦' + pendingRevenue.toLocaleString() + '</div><div class="sd-stat-lbl">Escrow balance</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">₦' + availableBalance.toLocaleString() + '</div><div class="sd-stat-lbl">Available balance</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val">₦' + withdrawn.toLocaleString() + '</div><div class="sd-stat-lbl">Withdrawn</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--green);">₦' + aov.toLocaleString() + '</div><div class="sd-stat-lbl">Avg. order value</div></div>' +
         '<div class="sd-stat-card"><div class="sd-stat-val" style="color:#60b4ff;">' + totalViews.toLocaleString() + '</div><div class="sd-stat-lbl">Product views</div></div>' +
-        '<div class="sd-stat-card"><div class="sd-stat-val" style="color:var(--gold);">' + conversionRate + '%</div><div class="sd-stat-lbl">Conversion rate</div></div>' +
-      '</div>' +
-      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px;">📊 Monthly revenue (completed orders)</div>' +
-      (bars ? '<div style="display:flex;gap:8px;align-items:flex-end;min-height:160px;">' + bars + '</div>' :
-        '<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">No completed sales yet — your revenue chart will appear here.</div>') +
-      '</div>' +
-      '<div class="dash-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">🏆 Product performance</div>' + perfHtml + '</div>';
+      '</div>';
   } catch(e) { console.error(e); sec.innerHTML = '<div class="sd-page-hd">Analytics</div><div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No data yet. Sales and views will appear here once you start selling.</div>'; }
 };
 
