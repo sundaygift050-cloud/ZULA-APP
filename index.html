@@ -1757,6 +1757,10 @@ body.dock-active .page.active{padding-bottom:104px;}
     </div>
 
     <!-- All products -->
+    <div id="mkt-people-results" style="display:none;margin-bottom:22px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">People</div>
+      <div id="mkt-people-list" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+    </div>
     <div class="mkt-topbar">
       <h2>All products</h2>
       <div class="result-count" id="result-count"></div>
@@ -3609,8 +3613,10 @@ if (_kycOrigShowPage) {
         </div>
       </div>
       <div class="p-name" id="pv2-name">Loading…</div>
+      <div class="p-bio-line" id="pv2-handle" style="color:#a78bfa;font-weight:600;"></div>
       <div class="p-bio-line" id="pv2-email"></div>
       <div class="p-bio-line" id="pv2-location">📍 —</div>
+      <div class="p-bio-line" id="pv2-bio" style="margin-top:6px;color:var(--text);"></div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
         <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
         <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
@@ -3732,7 +3738,8 @@ if (_kycOrigShowPage) {
         </div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
-            <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="owner-name">Loading…</div>
+            <div style="font-size:22px;font-weight:700;margin-bottom:2px;" id="owner-name">Loading…</div>
+            <div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:4px;" id="owner-handle"></div>
             <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="owner-meta">—</div>
             <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;" id="owner-badges">
               <span class="tag tag-green">✅ Verified buyer</span>
@@ -3957,6 +3964,14 @@ if (_kycOrigShowPage) {
             <h3>Account information</h3>
             <div class="sc-sub">Update your name, phone and bio</div>
             <div class="form-field"><label>Full name</label><input type="text" id="st-name" placeholder="Your full name"></div>
+            <div class="form-field">
+              <label>Handle (username)</label>
+              <div style="display:flex;align-items:center;gap:0;">
+                <span style="background:var(--bg3);border:1px solid var(--border);border-right:none;border-radius:var(--radius-xs) 0 0 var(--radius-xs);padding:11px 10px 11px 14px;font-size:14px;color:var(--text3);">@</span>
+                <input type="text" id="st-handle" placeholder="yourhandle" style="border-radius:0 var(--radius-xs) var(--radius-xs) 0;" oninput="stCheckHandleAvailability(this.value)">
+              </div>
+              <div id="st-handle-status" style="font-size:12px;margin-top:6px;color:var(--text3);">Letters, numbers, and underscores only.</div>
+            </div>
             <div class="form-field"><label>Phone number</label><input type="tel" id="st-phone" placeholder="+234 800 000 0000"></div>
             <div class="form-field"><label>Bio</label><textarea id="st-bio" style="height:80px;resize:vertical;width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font-body);font-size:14px;" placeholder="Tell buyers about yourself…"></textarea></div>
             <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save changes</button>
@@ -5030,13 +5045,54 @@ window.saveSettings = async function() {
   const name  = document.getElementById('st-name') ? document.getElementById('st-name').value.trim() : (document.getElementById('settings-name') ? document.getElementById('settings-name').value.trim() : '');
   const phone = document.getElementById('st-phone') ? document.getElementById('st-phone').value.trim() : (document.getElementById('settings-phone') ? document.getElementById('settings-phone').value.trim() : '');
   const bio   = document.getElementById('st-bio') ? document.getElementById('st-bio').value.trim() : (document.getElementById('settings-bio') ? document.getElementById('settings-bio').value.trim() : '');
+  const handleRaw = document.getElementById('st-handle') ? document.getElementById('st-handle').value.trim() : '';
+  const handle = handleRaw.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const payload = { fullName: name, phone, bio };
+  if (handleRaw) {
+    if (handle.length < 3) { showToast('⚠️ Handle must be at least 3 characters.'); return; }
+    try {
+      const q = window._fns.query(window._fns.collection(db, 'users'), window._fns.where('handle', '==', handle));
+      const snap = await window._fns.getDocs(q);
+      const takenByOther = snap.docs.some(d => d.id !== user.uid);
+      if (takenByOther) { showToast('❌ @' + handle + ' is already taken.'); return; }
+      payload.handle = handle;
+    } catch(e) { console.error(e); showToast('❌ Could not verify handle availability.'); return; }
+  }
   try {
-    await window._fns.setDoc(doc(db, 'users', user.uid), { fullName: name, phone, bio }, { merge: true });
-    if (window._currentUser) { window._currentUser.fullName = name; window._currentUser.phone = phone; window._currentUser.bio = bio; }
+    await window._fns.setDoc(doc(db, 'users', user.uid), payload, { merge: true });
+    if (window._currentUser) Object.assign(window._currentUser, payload);
     const nameEl = document.getElementById('profile-name');
     if (nameEl && name) nameEl.textContent = name;
+    if (typeof loadProfileV2 === 'function') loadProfileV2();
     showToast('✅ Account updated!');
   } catch(e) { showToast('❌ Could not save. Try again.'); }
+};
+
+var _stHandleCheckTimer = null;
+window.stCheckHandleAvailability = function(val) {
+  var statusEl = document.getElementById('st-handle-status');
+  if (!statusEl) return;
+  clearTimeout(_stHandleCheckTimer);
+  var handle = (val || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+  if (!val) { statusEl.textContent = 'Letters, numbers, and underscores only.'; statusEl.style.color = 'var(--text3)'; return; }
+  if (handle.length < 3) { statusEl.textContent = 'Handle must be at least 3 characters.'; statusEl.style.color = 'var(--red)'; return; }
+  statusEl.textContent = 'Checking availability…';
+  statusEl.style.color = 'var(--text3)';
+  _stHandleCheckTimer = setTimeout(async function() {
+    try {
+      var user = auth.currentUser;
+      var q = window._fns.query(window._fns.collection(db, 'users'), window._fns.where('handle', '==', handle));
+      var snap = await window._fns.getDocs(q);
+      var takenByOther = snap.docs.some(function(d) { return !user || d.id !== user.uid; });
+      if (takenByOther) {
+        statusEl.textContent = '❌ @' + handle + ' is already taken.';
+        statusEl.style.color = 'var(--red)';
+      } else {
+        statusEl.textContent = '✅ @' + handle + ' is available.';
+        statusEl.style.color = 'var(--green)';
+      }
+    } catch(e) { statusEl.textContent = 'Could not check availability.'; statusEl.style.color = 'var(--text3)'; }
+  }, 500);
 };
 
 // ── 1. PASSWORD CHANGE — wired to Firebase Auth ───────────────────
@@ -5808,6 +5864,7 @@ window.viewPeerProfile = async function(uid) {
       else el('owner-avatar').textContent = initials;
     }
     if (el('owner-name'))   el('owner-name').textContent   = fullName;
+    if (el('owner-handle')) el('owner-handle').textContent = u.handle ? '@'+u.handle : '';
     const joined = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '';
     if (el('owner-meta'))  el('owner-meta').textContent  = (u.location ? '📍 '+u.location+' · ' : '') + (joined ? 'Member since '+joined : '');
     if (el('owner-bio'))   el('owner-bio').textContent   = u.bio || 'No bio yet.';
@@ -6113,6 +6170,8 @@ window.loadProfileV2 = async function() {
     }
   }
   if (el('pv2-name'))    el('pv2-name').textContent     = fullName;
+  if (el('pv2-handle'))  el('pv2-handle').textContent   = profile.handle ? '@' + profile.handle : '';
+  if (el('pv2-bio'))     el('pv2-bio').textContent      = profile.bio || '';
   if (el('pv2-email'))   el('pv2-email').textContent    = user.email + ' · ' + joined;
   if (el('pv2-location')) el('pv2-location').textContent = profile.location ? '📍 ' + profile.location : '📍 Location not set';
   if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
@@ -6181,6 +6240,7 @@ window.loadMyProfile = async function() {
     else el('owner-avatar').textContent = initials;
   }
   if (el('owner-name'))   el('owner-name').textContent   = fullName;
+  if (el('owner-handle')) el('owner-handle').textContent = profile.handle ? '@'+profile.handle : '';
   if (el('nav-avatar-myprofile') && currentAuthUser) {
     const myProfile = window._currentUser || {};
     const myInitials = myProfile.firstName ? myProfile.firstName[0].toUpperCase() : currentAuthUser.email[0].toUpperCase();
@@ -6294,6 +6354,7 @@ function showPage(name) {
     if(el('st-name') && profile.fullName)  el('st-name').value  = profile.fullName;
     if(el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
     if(el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
+    if(el('st-handle') && profile.handle)  el('st-handle').value = profile.handle;
     if(el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
   }
   if (name === 'notifications') {
@@ -7450,6 +7511,8 @@ window.submitProduct = async function() {
       platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(productType) : 0.10,
       sellerId:     user.uid,
       sellerName:   profile.fullName || profile.firstName || user.displayName || 'ZÚLA Seller',
+      sellerPhoto:  profile.photoUrl || '',
+      sellerHandle: profile.handle || '',
       sellerVerified: profile.sellerVerified || false,
       createdAt:    fns.serverTimestamp(),
       status,
@@ -12000,6 +12063,39 @@ window.filterProducts = function(query) {
     ? _allProducts.filter(function(p){ return (p.name||'').toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q) || (p.sellerName||'').toLowerCase().includes(q); })
     : _allProducts;
   applyActiveFilters(filtered);
+  mktSearchPeople(q);
+};
+
+// Search for people (sellers) by name or handle among known sellers derived
+// from the public product catalog, and show them as clickable result chips
+// above the grid. Clicking opens that person's storefront/profile.
+window.mktSearchPeople = function(q) {
+  var wrap = document.getElementById('mkt-people-results');
+  var list = document.getElementById('mkt-people-list');
+  if (!wrap || !list) return;
+  if (!q || q.length < 2) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  var seen = {};
+  var matches = [];
+  (_allProducts||[]).forEach(function(p) {
+    var name = p.sellerName || '';
+    var handle = (p.sellerHandle || '').toLowerCase();
+    if (!p.sellerId || seen[p.sellerId]) return;
+    if (name.toLowerCase().includes(q) || handle.includes(q.replace('@',''))) {
+      seen[p.sellerId] = true;
+      matches.push({ id: p.sellerId, name: name || 'ZÚLA Seller', photo: p.sellerPhoto || '', handle: p.sellerHandle || '' });
+    }
+  });
+  if (!matches.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  wrap.style.display = '';
+  list.innerHTML = matches.slice(0, 8).map(function(m) {
+    var avatar = m.photo
+      ? '<img src="'+m.photo+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">'
+      : '<div style="width:36px;height:36px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;">'+(m.name[0]||'?').toUpperCase()+'</div>';
+    return '<div onclick="viewPeerProfile(\''+m.id+'\')" style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 16px 6px 6px;cursor:pointer;transition:.15s;" onmouseover="this.style.borderColor=\'var(--border2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+      avatar +
+      '<div><div style="font-size:13px;font-weight:700;">'+m.name+'</div>' + (m.handle ? '<div style="font-size:11px;color:#a78bfa;">@'+m.handle+'</div>' : '') + '</div>' +
+    '</div>';
+  }).join('');
 };
 
 window.applyFilters = function() {
