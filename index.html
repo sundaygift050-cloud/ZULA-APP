@@ -186,48 +186,68 @@ p{color:var(--text2);margin:0 0 1em;}
 }
 
 /* ══════════════════════════════════════════
-   FLOATING BOTTOM DOCK (post-login navigation)
+   APP SIDEBAR (replaces the old floating bottom dock)
+   Desktop: fixed left rail, collapsible 240px ⇄ 72px.
+   Mobile (≤720px): off-canvas drawer, opened via hamburger button.
    ══════════════════════════════════════════ */
-.floating-dock{
-  position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(140%);
-  z-index:500;display:flex;justify-content:center;pointer-events:none;
-  opacity:0;transition:opacity .25s ease,transform .25s ease;
+.app-sidebar{
+  position:fixed;top:0;left:0;height:100vh;width:240px;z-index:600;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:width .22s ease,transform .22s ease;
 }
-.floating-dock.dock-visible{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
-.dock-inner{
-  display:flex;align-items:center;gap:14px;padding:10px 18px;
-  background:rgba(20,20,24,.72);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
-  border:1px solid rgba(255,255,255,.08);border-radius:999px;
-  box-shadow:0 12px 40px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);
+.app-sidebar.collapsed{width:72px;}
+.sidebar-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:18px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sidebar-logo{font-family:var(--font-display);font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;}
+.sidebar-logo span{color:var(--accent);}
+.app-sidebar.collapsed .sidebar-logo{display:none;}
+.sidebar-collapse-btn,.sidebar-close-btn{width:30px;height:30px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text2);font-size:14px;transition:.15s;}
+.sidebar-collapse-btn:hover,.sidebar-close-btn:hover{color:var(--text);border-color:var(--border2);}
+.app-sidebar.collapsed .sidebar-hd{justify-content:center;padding:18px 8px;}
+.sidebar-close-btn{display:none;}
+.sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 12px;display:flex;flex-direction:column;gap:3px;}
+.sidebar-item{display:flex;align-items:center;gap:13px;padding:11px 13px;border-radius:11px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:600;white-space:nowrap;transition:background .15s,color .15s;position:relative;}
+.sidebar-item .ic{font-size:19px;flex-shrink:0;width:22px;text-align:center;}
+.sidebar-item .lbl{overflow:hidden;text-overflow:ellipsis;}
+.app-sidebar.collapsed .sidebar-item{justify-content:center;padding:11px;}
+.app-sidebar.collapsed .sidebar-item .lbl{display:none;}
+.sidebar-item:hover{background:rgba(124,58,237,.1);color:var(--text);}
+.sidebar-item.active{background:rgba(124,58,237,.16);color:#a78bfa;font-weight:700;}
+.sidebar-item .badge{position:absolute;top:7px;right:10px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:1px 6px;min-width:15px;text-align:center;}
+.app-sidebar.collapsed .sidebar-item .badge{top:4px;right:4px;}
+.sidebar-footer{border-top:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:pointer;}
+.app-sidebar.collapsed .sidebar-footer{justify-content:center;padding:14px 8px;}
+.sidebar-footer-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;}
+.sidebar-footer-info{overflow:hidden;}
+.app-sidebar.collapsed .sidebar-footer-info{display:none;}
+.sidebar-footer-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-footer-status{font-size:11px;color:var(--green);white-space:nowrap;}
+
+/* Push page content over to make room for the fixed sidebar */
+body.sidebar-push-240{padding-left:240px;}
+body.sidebar-push-72{padding-left:72px;}
+body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
+
+/* Hamburger + overlay (mobile only) */
+.sidebar-hamburger{display:none;position:fixed;top:14px;left:14px;z-index:700;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.35);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:590;opacity:0;transition:opacity .22s ease;}
+.sidebar-overlay.open{display:block;opacity:1;}
+
+@media(max-width:720px){
+  body.sidebar-push-240,body.sidebar-push-72{padding-left:0;}
+  .app-sidebar{width:260px;transform:translateX(-100%);box-shadow:0 0 40px rgba(0,0,0,.5);}
+  .app-sidebar.mobile-open{transform:translateX(0);}
+  .app-sidebar.collapsed{width:260px;}
+  .app-sidebar.collapsed .sidebar-logo{display:block;}
+  .app-sidebar.collapsed .sidebar-item{justify-content:flex-start;padding:11px 13px;}
+  .app-sidebar.collapsed .sidebar-item .lbl{display:block;}
+  .app-sidebar.collapsed .sidebar-footer{justify-content:flex-start;padding:14px 16px;}
+  .app-sidebar.collapsed .sidebar-footer-info{display:block;}
+  .sidebar-hamburger{display:flex;}
+  .sidebar-collapse-btn{display:none;}
+  .sidebar-close-btn{display:flex !important;}
 }
-.dock-item{
-  position:relative;display:flex;align-items:center;justify-content:center;
-  width:46px;height:46px;min-width:44px;min-height:44px;border-radius:50%;
-  background:rgba(255,255,255,.04);border:1px solid transparent;cursor:pointer;
-  transition:transform .18s cubic-bezier(.34,1.56,.64,1),background .18s;
-  transform-origin:bottom center;
-}
-.dock-item:hover{background:rgba(124,92,252,.16);}
-.dock-item:active{transform:scale(.88);}
-.dock-icon{font-size:19px;line-height:1;color:var(--text);filter:grayscale(0);}
-.dock-badge{position:absolute;top:0;right:0;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:15px;text-align:center;line-height:1.5;border:1.5px solid var(--bg2);}
-/* Tooltip — desktop / cursor devices only */
-.dock-item::after{
-  content:attr(data-tooltip);position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);
-  background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:11px;font-weight:600;
-  padding:5px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;
-}
-@media (hover:hover) and (pointer:fine){
-  .dock-item:hover::after{opacity:1;transform:translateX(-50%) translateY(0);}
-}
-/* Cart & Affiliate live in the dock on desktop only; on mobile they move to the header/dropdown */
-@media(max-width:760px){
-  .dock-desktop-only{display:none !important;}
-  .dock-item{width:48px;height:48px;}
-}
-/* Give room at the bottom of every page so content isn't hidden behind the dock */
-body.dock-active .page.active{padding-bottom:104px;}
-/* Mobile-only affiliate entry inside the profile dropdown */
+/* Mobile-only affiliate entry inside the profile dropdown (still used by some pages) */
 .dd-affiliate-mobile{display:none;}
 @media(max-width:760px){ .dd-affiliate-mobile{display:flex !important;} }
 /* Cart stays in the header on mobile only (hidden in header on desktop, lives in dock instead) */
@@ -1402,37 +1422,36 @@ body.dock-active .page.active{padding-bottom:104px;}
 <div class="toast" id="toast"></div>
 
 <!-- ================================================================
-     FLOATING BOTTOM DOCK — persistent post-login navigation
-     Shown/hidden and role-filtered by dockSync() in the main script.
+     APP SIDEBAR — persistent post-login navigation (replaces old
+     floating bottom dock). Shown/hidden and role-filtered by
+     sidebarSync() in the main script.
      ================================================================ -->
-<nav class="floating-dock" id="floating-dock">
-  <div class="dock-inner" id="dock-inner">
-    <button class="dock-item" data-tooltip="Marketplace" onclick="showPage('marketplace')">
-      <span class="dock-icon">🛍️</span>
-    </button>
-    <button class="dock-item" data-tooltip="Seller" onclick="showPage('seller-dashboard')">
-      <span class="dock-icon">🏪</span>
-    </button>
-    <button class="dock-item" data-tooltip="Profile" onclick="showPage('profile-v2')">
-      <span class="dock-icon">👤</span>
-    </button>
-    <button class="dock-item" data-tooltip="Chat" onclick="showPage('messaging')" style="position:relative;">
-      <span class="dock-icon">💬</span>
-      <span class="dock-badge" id="nav-msg-badge" style="display:none;"></span>
-    </button>
-    <button class="dock-item dock-desktop-only" data-tooltip="Cart" onclick="openCart()" style="position:relative;">
-      <span class="dock-icon">🛒</span>
-      <span class="dock-badge" id="dock-cart-badge" style="display:none;"></span>
-    </button>
-    <button class="dock-item dock-desktop-only" data-tooltip="Affiliate" onclick="affNavClick()">
-      <span class="dock-icon">💰</span>
-    </button>
-    <button class="dock-item" data-tooltip="Settings" onclick="showPage('settings')">
-      <span class="dock-icon">⚙️</span>
-    </button>
-    <button class="dock-item" id="dock-admin-item" data-tooltip="Admin" onclick="goAdmin()" style="display:none;">
-      <span class="dock-icon">🛡</span>
-    </button>
+<button class="sidebar-hamburger" id="sidebar-hamburger" onclick="sidebarOpenMobile()" style="display:none;">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="sidebarCloseMobile()"></div>
+<nav class="app-sidebar" id="app-sidebar" style="display:none;">
+  <div class="sidebar-hd">
+    <div class="sidebar-logo">ZÚ<span>LA</span></div>
+    <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" onclick="sidebarToggleCollapse()" title="Collapse sidebar">‹</button>
+    <button class="sidebar-close-btn" id="sidebar-close-btn" onclick="sidebarCloseMobile()" title="Close menu">✕</button>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sidebar-item" data-page="marketplace" onclick="sidebarNav('marketplace')"><span class="ic">🛍️</span><span class="lbl">Marketplace</span></div>
+    <div class="sidebar-item" data-page="seller-dashboard" onclick="sidebarNav('seller-dashboard')"><span class="ic">🏪</span><span class="lbl">Seller</span></div>
+    <div class="sidebar-item" data-page="profile-v2" onclick="sidebarNav('profile-v2')"><span class="ic">👤</span><span class="lbl">Profile</span></div>
+    <div class="sidebar-item" data-page="messaging" onclick="sidebarNav('messaging')">
+      <span class="ic">💬</span><span class="lbl">Messenger</span>
+      <span class="badge" id="nav-msg-badge" style="display:none;"></span>
+    </div>
+    <div class="sidebar-item" onclick="sidebarCloseMobile();affNavClick()"><span class="ic">💰</span><span class="lbl">Affiliate</span></div>
+    <div class="sidebar-item" data-page="settings" onclick="sidebarNav('settings')"><span class="ic">⚙️</span><span class="lbl">Settings</span></div>
+    <div class="sidebar-item" id="sidebar-admin-item" onclick="sidebarCloseMobile();goAdmin()" style="display:none;"><span class="ic">🛡</span><span class="lbl">Admin</span></div>
+  </div>
+  <div class="sidebar-footer" onclick="sidebarNav('profile-v2')">
+    <div class="sidebar-footer-avatar" id="sidebar-footer-avatar">?</div>
+    <div class="sidebar-footer-info">
+      <div class="sidebar-footer-name" id="sidebar-footer-name">—</div>
+      <div class="sidebar-footer-status" id="sidebar-footer-status"></div>
+    </div>
   </div>
 </nav>
 
@@ -1469,8 +1488,8 @@ body.dock-active .page.active{padding-bottom:104px;}
     <div class="grid-veil"></div>
     <div class="wrap">
       <div class="hero-eyebrow">🌍 The world's all-in-one marketplace</div>
-      <h1>Buy anything.<br>Sell everything.<br><em>Earn on every share.</em></h1>
-      <p class="lede">Physical goods, digital downloads, online courses — all in one place, in your currency. Real sellers, real products, escrow-protected payments.</p>
+      <h1>Buy. Sell.<br><em>Earn.</em> Together.</h1>
+      <p class="lede">Discover unique products, support independent creators, and earn while you share.</p>
       <div class="hero-cta">
         <button class="btn btn-primary btn-glow" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
         <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-signin')">Become an affiliate</button>
@@ -1486,22 +1505,23 @@ body.dock-active .page.active{padding-bottom:104px;}
 
   <section class="how-section">
     <div class="wrap">
-      <h2 style="font-size:24px;font-weight:700;">How ZÚLA works</h2>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:8px;">What is ZÚLA?</h2>
+      <p style="font-size:15px;color:var(--text2);max-width:640px;margin-bottom:24px;">ZÚLA is a social-commerce marketplace where buyers, sellers, and affiliates connect. Discover unique products, support independent creators, and earn while you share.</p>
       <div class="how-grid">
         <div class="how-card" data-glow>
           <div class="hc-num">For buyers</div>
-          <h3>🛍 Browse & buy safely</h3>
-          <p>Discover products from verified sellers. Your payment is held in escrow until you confirm receipt.</p>
+          <h3>🛍️ Shop Anything</h3>
+          <p>Browse thousands of products from independent sellers worldwide. Your payment is held in escrow until you confirm receipt.</p>
         </div>
         <div class="how-card" data-glow>
           <div class="hc-num">For sellers</div>
-          <h3>🏪 List & get paid</h3>
-          <p>Verify your account, list your products, and get paid. Physical goods, digital files, courses — all supported.</p>
+          <h3>💳 Sell &amp; Earn</h3>
+          <p>List your products and reach buyers across the globe. Physical goods, digital files, courses — all supported.</p>
         </div>
         <div class="how-card" data-glow>
           <div class="hc-num">For affiliates</div>
-          <h3>💰 Share & earn</h3>
-          <p>Share any product with your unique link. Earn 5–20% commission on every sale you drive. No investment needed.</p>
+          <h3>🔗 Affiliate Links</h3>
+          <p>Share links and earn commission on every sale you drive. No investment, no inventory needed.</p>
         </div>
       </div>
     </div>
@@ -1513,8 +1533,23 @@ body.dock-active .page.active{padding-bottom:104px;}
         <div class="aff-glow"></div>
         <h2>Earn up to 20% on every sale you share</h2>
         <p>Join ZÚLA's affiliate programme free. Get your unique link for any product and earn every time someone buys through it.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:18px auto 22px;max-width:380px;text-align:left;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="color:var(--green);font-weight:800;">✓</span>Free to join — no upfront cost</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="color:var(--green);font-weight:800;">✓</span>Earn up to 20% commission per sale</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="color:var(--green);font-weight:800;">✓</span>Real-time earnings dashboard</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="color:var(--green);font-weight:800;">✓</span>Fast payout once you hit the minimum</div>
+        </div>
         <button class="btn btn-primary btn-glow" style="font-size:15px;padding:14px 28px;" onclick="showPage('signup')">Join free and start earning →</button>
       </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding:20px 24px 50px;">
+    <div style="max-width:520px;margin:0 auto;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 28px;box-shadow:var(--shadow-card);">
+      <div style="font-size:30px;margin-bottom:10px;">❓</div>
+      <h4 style="font-size:17px;font-weight:700;margin-bottom:10px;">Have questions? We're here to help.</h4>
+      <div style="font-size:14px;color:#a78bfa;margin-bottom:18px;">✉️ hello@zula.market</div>
+      <button class="btn btn-ghost" onclick="showToast('We\'ll have a full help center here soon!')">Learn More</button>
     </div>
   </section>
 
@@ -4546,7 +4581,7 @@ onAuthStateChanged(auth, async (user) => {
     updateNavAvatar();
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
-    setTimeout(function(){ if (typeof dockSync === 'function') dockSync(); }, 600);
+    setTimeout(function(){ if (typeof sidebarSync === 'function') sidebarSync(); }, 600);
     setTimeout(function(){ if (typeof affUpdateNav === 'function') affUpdateNav(); }, 600);
     const adminLink = document.getElementById('admin-nav-link');
     const isAdminUser = ['sundaygift050@gmail.com','okoroaugustine050@gmail.com'].includes(user.email.toLowerCase());
@@ -6799,7 +6834,7 @@ function _showAdminNavIfNeeded() {
   if (!isAdmin()) return;
   const adminLink = document.getElementById('admin-nav-link');
   const ddAdmin   = document.getElementById('dd-admin-item');
-  const dockAdmin = document.getElementById('dock-admin-item');
+  const dockAdmin = document.getElementById('sidebar-admin-item');
   if (adminLink) adminLink.style.display = 'inline';
   if (ddAdmin)   ddAdmin.style.display   = 'block';
   if (dockAdmin) dockAdmin.style.display = 'flex';
@@ -7028,7 +7063,7 @@ window.toggleAdminDropdown = function(e) {
     // Show admin panel item for admins
     const ddAdmin = document.getElementById('dd-admin-item');
     if (ddAdmin) ddAdmin.style.display = isAdmin() ? 'block' : 'none';
-    const dockAdminDD = document.getElementById('dock-admin-item');
+    const dockAdminDD = document.getElementById('sidebar-admin-item');
     if (dockAdminDD) dockAdminDD.style.display = isAdmin() ? 'flex' : 'none';
     // Close when clicking outside
     setTimeout(() => document.addEventListener('click', closeDropdown, { once: true }), 50);
@@ -15429,51 +15464,135 @@ document.querySelectorAll('[data-glow]').forEach(function(card){
 });
 
 // ══════════════════════════════════════════════════
-// FLOATING BOTTOM DOCK — visibility, role-gating, page sync
+// APP SIDEBAR — visibility, active-route highlighting, collapse state,
+// mobile drawer, role-gating, footer identity. Replaces the old dock.
 // ══════════════════════════════════════════════════
-var ZULA_DOCK_PUBLIC_PAGES = ['home','login','signup','verify-email','forgot','affiliate-info','affiliate-signin'];
+var ZULA_SIDEBAR_PUBLIC_PAGES = ['home','login','signup','verify-email','forgot','affiliate-info','affiliate-signin'];
+// Nav items that map to more than one underlying page (so e.g. the
+// Marketplace item stays highlighted while viewing a product or cart).
+var ZULA_SIDEBAR_PAGE_MAP = {
+  marketplace: ['marketplace','product','cart','checkout','wishlist'],
+  'seller-dashboard': ['seller-dashboard','addproduct'],
+  'profile-v2': ['profile-v2','myprofile'],
+  messaging: ['messaging','messages'],
+  settings: ['settings']
+};
 
-function dockSync() {
+function sidebarToggleCollapse() {
+  var sb = document.getElementById('app-sidebar');
+  if (!sb) return;
+  var collapsed = sb.classList.toggle('collapsed');
+  localStorage.setItem('zula_sidebar_collapsed', collapsed ? '1' : '0');
+  document.body.classList.remove('sidebar-push-240','sidebar-push-72');
+  if (window.innerWidth > 720) document.body.classList.add(collapsed ? 'sidebar-push-72' : 'sidebar-push-240');
+  var btn = document.getElementById('sidebar-collapse-btn');
+  if (btn) btn.textContent = collapsed ? '›' : '‹';
+}
+
+function sidebarOpenMobile() {
+  var sb = document.getElementById('app-sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  if (sb) sb.classList.add('mobile-open');
+  if (ov) ov.classList.add('open');
+}
+function sidebarCloseMobile() {
+  var sb = document.getElementById('app-sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  if (sb) sb.classList.remove('mobile-open');
+  if (ov) ov.classList.remove('open');
+}
+function sidebarNav(pageName) {
+  sidebarCloseMobile();
+  showPage(pageName);
+}
+window.sidebarToggleCollapse = sidebarToggleCollapse;
+window.sidebarOpenMobile = sidebarOpenMobile;
+window.sidebarCloseMobile = sidebarCloseMobile;
+window.sidebarNav = sidebarNav;
+
+function sidebarSync() {
   try {
-    var dock = document.getElementById('floating-dock');
-    if (!dock) return;
+    var sb = document.getElementById('app-sidebar');
+    if (!sb) return;
     var activeEl = document.querySelector('.page.active');
     var pageName = activeEl ? activeEl.id.replace('page-', '') : 'home';
-    var isPublicPage = ZULA_DOCK_PUBLIC_PAGES.indexOf(pageName) !== -1;
+    var isPublicPage = ZULA_SIDEBAR_PUBLIC_PAGES.indexOf(pageName) !== -1;
     var user = window._auth && window._auth.currentUser;
     var shouldShow = !!user && !isPublicPage;
 
+    var hamburger = document.getElementById('sidebar-hamburger');
+    document.body.classList.remove('sidebar-push-240','sidebar-push-72');
+
     if (shouldShow) {
-      dock.classList.add('dock-visible');
-      document.body.classList.add('dock-active');
+      sb.style.display = 'flex';
+      if (hamburger) hamburger.style.display = '';
+      var collapsed = localStorage.getItem('zula_sidebar_collapsed') === '1';
+      sb.classList.toggle('collapsed', collapsed);
+      var btn = document.getElementById('sidebar-collapse-btn');
+      if (btn) btn.textContent = collapsed ? '›' : '‹';
+      if (window.innerWidth > 720) document.body.classList.add(collapsed ? 'sidebar-push-72' : 'sidebar-push-240');
     } else {
-      dock.classList.remove('dock-visible');
-      document.body.classList.remove('dock-active');
+      sb.style.display = 'none';
+      if (hamburger) hamburger.style.display = 'none';
+      sidebarCloseMobile();
     }
 
-    // Role-gated icons — reuses the same isAdmin() check that drives the
-    // profile-dropdown "Admin panel" item. Add more role-gated dock icons
-    // here later following the same pattern.
-    var dockAdmin = document.getElementById('dock-admin-item');
-    if (dockAdmin) dockAdmin.style.display = (typeof isAdmin === 'function' && isAdmin()) ? 'flex' : 'none';
-  } catch (e) { /* never let dock housekeeping break navigation */ }
-}
+    // Active-route highlighting
+    var mappedActive = null;
+    Object.keys(ZULA_SIDEBAR_PAGE_MAP).forEach(function(navKey) {
+      if (ZULA_SIDEBAR_PAGE_MAP[navKey].indexOf(pageName) !== -1) mappedActive = navKey;
+    });
+    sb.querySelectorAll('.sidebar-item[data-page]').forEach(function(item) {
+      item.classList.toggle('active', item.getAttribute('data-page') === mappedActive);
+    });
 
-// Wrap the final showPage so the dock always stays in sync after navigation,
-// without touching any existing page-swap logic.
+    // Role-gated Admin item — reuses the same isAdmin() check the profile
+    // dropdown already uses.
+    var sidebarAdmin = document.getElementById('sidebar-admin-item');
+    if (sidebarAdmin) sidebarAdmin.style.display = (typeof isAdmin === 'function' && isAdmin()) ? 'flex' : 'none';
+
+    // Footer identity — avatar, name, verified-seller status
+    if (user) {
+      var profile = window._currentUser || {};
+      var fAvatar = document.getElementById('sidebar-footer-avatar');
+      var fName   = document.getElementById('sidebar-footer-name');
+      var fStatus = document.getElementById('sidebar-footer-status');
+      if (fAvatar) {
+        if (profile.photoUrl) fAvatar.innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        else fAvatar.textContent = ((profile.firstName||profile.fullName||user.email||'?')[0]||'?').toUpperCase();
+      }
+      if (fName) fName.textContent = profile.fullName || profile.firstName || user.email.split('@')[0];
+      if (fStatus) fStatus.textContent = profile.sellerVerified ? '✅ Verified seller' : '';
+    }
+  } catch (e) { /* never let sidebar housekeeping break navigation */ }
+}
+window.sidebarSync = sidebarSync;
+
+window.addEventListener('resize', function() {
+  var sb = document.getElementById('app-sidebar');
+  if (!sb || sb.style.display === 'none') return;
+  document.body.classList.remove('sidebar-push-240','sidebar-push-72');
+  if (window.innerWidth > 720) {
+    document.body.classList.add(sb.classList.contains('collapsed') ? 'sidebar-push-72' : 'sidebar-push-240');
+    sidebarCloseMobile();
+  }
+});
+
+// Wrap the final showPage so the sidebar always stays in sync after
+// navigation, without touching any existing page-swap logic.
 (function() {
-  var _prevShowPageForDock = window.showPage;
+  var _prevShowPageForSidebar = window.showPage;
   window.showPage = function(name) {
-    _prevShowPageForDock.apply(this, arguments);
-    dockSync();
+    _prevShowPageForSidebar.apply(this, arguments);
+    sidebarSync();
   };
 })();
 
-document.addEventListener('DOMContentLoaded', function() { setTimeout(dockSync, 300); });
+document.addEventListener('DOMContentLoaded', function() { setTimeout(sidebarSync, 300); });
 
 // Shared storefront links (?seller=uid) should open straight to that seller's
 // public profile on first load, whether or not the visitor is signed in —
-// dockSync() above still governs the floating dock's own visibility separately.
+// sidebarSync() above still governs the sidebar's own visibility separately.
 // Re-asserted a few times over the first couple seconds (not just once) because
 // other startup logic (auth-state resolution, admin auto-redirect, etc.) can
 // still be settling at that point — re-firing showPage('myprofile') is cheap
