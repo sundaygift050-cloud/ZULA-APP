@@ -903,7 +903,7 @@ body.dock-active .page.active{padding-bottom:104px;}
 .mm-actions{display:flex;gap:8px;flex-wrap:wrap;}
 
 /* ── ADMIN: VERIFICATION QUEUE (redesigned) ── */
-.avq-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.avq-stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;}
 @media(max-width:700px){.avq-stat-row{grid-template-columns:repeat(2,1fr);}}
 .avq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:14px;}
 .avq-card.flagged{border-color:rgba(240,82,82,.4);}
@@ -3518,6 +3518,7 @@ if (_kycOrigShowPage) {
           <div class="stat-card"><div class="stat-ic" style="background:rgba(34,197,94,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div><div class="stat-lbl">Approved today</div><div class="stat-val" style="color:var(--green);" id="avq-stat-approved">—</div></div></div>
           <div class="stat-card"><div class="stat-ic" style="background:rgba(239,68,68,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div><div><div class="stat-lbl">Rejected today</div><div class="stat-val" style="color:var(--red);" id="avq-stat-rejected">—</div></div></div>
           <div class="stat-card"><div class="stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="stat-lbl">Avg review time</div><div class="stat-val" id="avq-stat-time">—</div></div></div>
+          <div class="stat-card"><div class="stat-ic" style="background:rgba(168,85,247,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z"/><path d="M9 12l2 2 4-4"/></svg></div><div><div class="stat-lbl">Total verified (all-time)</div><div class="stat-val" id="avq-stat-total-verified">—</div></div></div>
         </div>
         <div id="admin-verif-list">
           <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
@@ -4568,7 +4569,8 @@ function updateNavAvatar() {
   const initials = ((u.firstName||'')[0]||'') + ((u.lastName||'')[0]||'');
   ['nav-avatar','nav-avatar-product','nav-avatar-add','nav-avatar-msgs',
    'nav-avatar-chat','nav-avatar-settings','nav-avatar-notif',
-   'nav-avatar-verif','nav-avatar-v2','nav-avatar-myprofile'].forEach(id => {
+   'nav-avatar-verif','nav-avatar-v2','nav-avatar-myprofile',
+   'nav-avatar-seller-dash','nav-avatar-myorders','nav-avatar-wish','nav-avatar-cart'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (u.photoUrl) {
@@ -5328,6 +5330,16 @@ window.avatarApplyPhoto = function(url) {
       el.textContent = initials || '?';
     }
   });
+  // Also update the big Profile page hero avatar, if present
+  var pv2Av = document.getElementById('pv2-avatar');
+  if (pv2Av) {
+    if (url) {
+      pv2Av.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      var u2 = window._currentUser || {};
+      pv2Av.textContent = ((u2.firstName||u2.fullName||'')[0]||'?').toUpperCase();
+    }
+  }
 };
 
 // ── 5. SOCIAL SHARING on product detail page ────────────────────
@@ -6093,7 +6105,13 @@ window.loadProfileV2 = async function() {
     ? 'Member since ' + new Date(profile.joinedAt.seconds*1000).toLocaleDateString('en-GB',{month:'short',year:'numeric'})
     : 'Recently joined';
 
-  if (el('pv2-avatar'))  el('pv2-avatar').textContent  = initials;
+  if (el('pv2-avatar')) {
+    if (profile.photoUrl) {
+      el('pv2-avatar').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      el('pv2-avatar').textContent = initials;
+    }
+  }
   if (el('pv2-name'))    el('pv2-name').textContent     = fullName;
   if (el('pv2-email'))   el('pv2-email').textContent    = user.email + ' · ' + joined;
   if (el('pv2-location')) el('pv2-location').textContent = profile.location ? '📍 ' + profile.location : '📍 Location not set';
@@ -6217,7 +6235,7 @@ window.loadMyProfile = async function() {
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────────
-function timeSince(date) {
+window.timeSince = function timeSince(date) {
   const secs = Math.floor((new Date() - date) / 1000);
   if (secs < 60) return 'just now';
   if (secs < 3600) return Math.floor(secs/60) + 'm ago';
@@ -14960,12 +14978,32 @@ window.loadAdminVerifQueue = async function() {
     var pending = users.filter(function(u){ return !u.sellerVerified && !u.verifRejected; });
     var approvedToday = users.filter(function(u){ return u.sellerVerified && u.sellerVerifiedAt && u.sellerVerifiedAt.toDate && isToday(u.sellerVerifiedAt.toDate()); }).length;
     var rejectedToday = users.filter(function(u){ return u.verifRejected && u.verifRejectedAt && u.verifRejectedAt.toDate && isToday(u.verifRejectedAt.toDate()); }).length;
+    var totalVerifiedAllTime = users.filter(function(u){ return u.sellerVerified; }).length;
+
+    // Average review time: mean duration between verifSubmittedAt and the decision
+    // timestamp (sellerVerifiedAt for approvals, verifRejectedAt for rejections),
+    // across everyone who has been decided on.
+    var decidedDurations = [];
+    users.forEach(function(u) {
+      var decidedAt = u.sellerVerified ? u.sellerVerifiedAt : (u.verifRejected ? u.verifRejectedAt : null);
+      if (decidedAt && decidedAt.toDate && u.verifSubmittedAt && u.verifSubmittedAt.toDate) {
+        var ms = decidedAt.toDate() - u.verifSubmittedAt.toDate();
+        if (ms > 0) decidedDurations.push(ms);
+      }
+    });
+    var avgReviewLabel = '—';
+    if (decidedDurations.length) {
+      var avgMs = decidedDurations.reduce(function(a,b){ return a+b; }, 0) / decidedDurations.length;
+      var avgHrs = avgMs / 3600000;
+      avgReviewLabel = avgHrs < 1 ? Math.round(avgMs/60000) + 'm' : avgHrs < 48 ? avgHrs.toFixed(1) + 'h' : (avgHrs/24).toFixed(1) + 'd';
+    }
 
     var e = function(id){ return document.getElementById(id); };
     if (e('avq-stat-pending'))  e('avq-stat-pending').textContent  = pending.length;
     if (e('avq-stat-approved')) e('avq-stat-approved').textContent = approvedToday;
     if (e('avq-stat-rejected')) e('avq-stat-rejected').textContent = rejectedToday;
-    if (e('avq-stat-time'))     e('avq-stat-time').textContent     = '—';
+    if (e('avq-stat-time'))     e('avq-stat-time').textContent     = avgReviewLabel;
+    if (e('avq-stat-total-verified')) e('avq-stat-total-verified').textContent = totalVerifiedAllTime;
     if (e('astat-verif'))       e('astat-verif').textContent       = pending.length;
 
     var docLabels = { id:'ID document', selfie:'Selfie', reg:'Proof of address / registration', ownership:'Ownership proof' };
