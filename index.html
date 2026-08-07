@@ -8046,6 +8046,9 @@ window.saveManualLocation = async function() {
         <button class="sd-nav-item" id="sdnav-settings" onclick="sdTab('settings')">
           <span class="sd-nav-icon">⚙️</span> Settings
         </button>
+        <button class="sd-nav-item" id="sdnav-integrations" onclick="sdTab('integrations')">
+          <span class="sd-nav-icon">🔌</span> Integrations
+        </button>
       </div>
 
       <div class="sd-nav-divider"></div>
@@ -8306,6 +8309,24 @@ window.saveManualLocation = async function() {
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="if(confirm('Deactivate your seller account? You can reactivate later.'))showToast('Account deactivated')">Deactivate seller account</button>
           </div>
+        </div>
+      </div>
+
+      <!-- ── INTEGRATIONS ── -->
+      <div class="sd-section" id="sd-sec-integrations">
+        <div class="sd-page-hd">Integrations</div>
+        <div class="sd-page-sub">Connect analytics and marketing tools — ZÚLA notifies them automatically on page views, cart activity, and purchases.</div>
+
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start;" id="sdint-layout">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow-card);" id="sdint-provider-list">
+            <div style="color:var(--text3);font-size:13px;padding:30px 16px;text-align:center;">Loading…</div>
+          </div>
+          <div class="dash-card" id="sdint-detail-card" style="min-height:320px;">
+            <div style="color:var(--text3);font-size:13px;text-align:center;padding:60px 20px;">Select an integration on the left to configure it.</div>
+          </div>
+        </div>
+        <div id="sdint-config-note" style="display:none;margin-top:16px;font-size:12px;color:var(--text3);background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-xs);padding:10px 14px;">
+          ⚠️ Integrations backend URL isn't configured yet — set <code>window.ZULA_INTEGRATIONS_API_BASE</code> before this script runs.
         </div>
       </div>
 
@@ -12627,6 +12648,194 @@ var _origSdTab2 = window.sdTab;
 window.sdTab = function(name) {
   _origSdTab2(name);
   if (name === 'analytics') sdLoadAnalytics();
+  if (name === 'integrations') sdLoadIntegrations();
+};
+
+// ══════════════════════════════════════════════════
+// SELLER INTEGRATIONS TAB — GTM / Facebook / TikTok / Telegram / Mailchimp.
+// Talks to a separate backend service (see integrations-backend/) because
+// "secrets encrypted at rest, never sent to the frontend" genuinely needs a
+// real server holding the encryption key — Firestore rules can't hide
+// individual field values from a client that can read the document.
+// Set window.ZULA_INTEGRATIONS_API_BASE to your deployed backend's URL.
+// ══════════════════════════════════════════════════
+var _sdIntSchema = {};
+var _sdIntData = [];
+var _sdIntActiveProvider = null;
+
+function sdIntApiBase() { return window.ZULA_INTEGRATIONS_API_BASE || ''; }
+
+async function sdIntFetch(path, opts) {
+  opts = opts || {};
+  var user = auth.currentUser;
+  var res = await fetch(sdIntApiBase() + path, Object.assign({}, opts, {
+    headers: Object.assign(
+      { 'Content-Type': 'application/json', 'x-seller-id': user ? user.uid : '' },
+      opts.headers || {}
+    ),
+  }));
+  var json = await res.json().catch(function () { return null; });
+  if (!res.ok) throw new Error((json && json.error) || ('Request failed (' + res.status + ')'));
+  return json;
+}
+
+window.sdLoadIntegrations = async function() {
+  var note = document.getElementById('sdint-config-note');
+  if (!sdIntApiBase()) {
+    if (note) note.style.display = '';
+    var listEl0 = document.getElementById('sdint-provider-list');
+    if (listEl0) listEl0.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 16px;text-align:center;">Integrations backend not configured yet.</div>';
+    return;
+  }
+  if (note) note.style.display = 'none';
+  try {
+    var results = await Promise.all([
+      sdIntFetch('/api/integrations/schema'),
+      sdIntFetch('/api/integrations'),
+    ]);
+    _sdIntSchema = results[0];
+    _sdIntData = results[1];
+    sdIntRenderList();
+    if (!_sdIntActiveProvider && _sdIntData.length) sdIntSelect(_sdIntData[0].provider);
+  } catch (e) {
+    var listEl = document.getElementById('sdint-provider-list');
+    if (listEl) listEl.innerHTML = '<div style="color:var(--red);font-size:13px;padding:30px 16px;text-align:center;">Couldn\'t load integrations.<br>' + e.message + '</div>';
+  }
+};
+
+function sdIntRenderList() {
+  var list = document.getElementById('sdint-provider-list');
+  if (!list) return;
+  list.innerHTML = _sdIntData.map(function(p) {
+    var active = p.provider === _sdIntActiveProvider;
+    return '' +
+      '<div onclick="sdIntSelect(\'' + p.provider + '\')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);position:relative;' +
+        (active ? 'background:rgba(124,58,237,.12);' : '') + '">' +
+        (active ? '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent-grad);"></div>' : '') +
+        '<div style="font-size:20px;width:30px;text-align:center;flex-shrink:0;">' + p.icon + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.label + '</div>' +
+          '<div style="display:flex;align-items:center;gap:6px;margin-top:2px;">' +
+            '<span style="width:7px;height:7px;border-radius:50%;background:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';' + (p.connected ? 'box-shadow:0 0 0 3px rgba(34,197,94,.18);' : '') + '"></span>' +
+            '<span style="font-size:11px;color:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';">' + (p.connected ? 'Connected' : 'Not connected') + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+}
+
+window.sdIntSelect = function(provider) {
+  _sdIntActiveProvider = provider;
+  sdIntRenderList();
+  sdIntRenderDetail();
+};
+
+function sdIntRenderDetail() {
+  var card = document.getElementById('sdint-detail-card');
+  if (!card) return;
+  var p = _sdIntData.find(function(x) { return x.provider === _sdIntActiveProvider; });
+  var s = _sdIntSchema[_sdIntActiveProvider];
+  if (!p || !s) { card.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:60px 20px;">Select an integration on the left to configure it.</div>'; return; }
+
+  var fieldsHtml = s.fields.map(function(f) {
+    var currentValue = p.fields[f.key];
+    var hasStoredNonSecret = !f.secret && currentValue;
+    var secretAlreadySet = f.secret && p.connected;
+    return '' +
+      '<div style="margin-bottom:16px;max-width:420px;">' +
+        '<label style="display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;">' + f.label +
+          (f.secret ? '<span style="font-size:10px;font-weight:700;color:var(--gold);background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;">🔒 secret</span>' : '') +
+        '</label>' +
+        '<input type="' + (f.secret ? 'password' : 'text') + '" id="sdint-fld-' + f.key + '" autocomplete="off" ' +
+          'placeholder="' + (secretAlreadySet ? '•••••••••••• (saved — leave blank to keep)' : (f.placeholder || '')) + '" ' +
+          'value="' + (hasStoredNonSecret ? String(currentValue).replace(/"/g,'&quot;') : '') + '" ' +
+          'style="width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);outline:none;">' +
+        (secretAlreadySet ? '<div style="font-size:11.5px;color:var(--text3);margin-top:5px;">A value is already saved. Leave blank to keep it, or enter a new one to replace it.</div>' : '') +
+      '</div>';
+  }).join('');
+
+  card.innerHTML = '' +
+    '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:6px;">' +
+      '<div style="font-size:30px;width:48px;height:48px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + s.icon + '</div>' +
+      '<div style="flex:1;">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+          '<h3 style="font-size:18px;font-family:var(--font-display);font-weight:700;">' + s.label + '</h3>' +
+          '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;' +
+            (p.connected ? 'background:rgba(34,197,94,.14);color:var(--green);border:1px solid rgba(34,197,94,.3);' : 'background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border);') + '">' +
+            '<span style="width:6px;height:6px;border-radius:50%;background:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';"></span>' +
+            (p.connected ? 'Connected' : 'Not connected') +
+          '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<p style="color:var(--text2);font-size:13.5px;margin:10px 0 24px;max-width:520px;">' + s.description + '</p>' +
+    '<form onsubmit="return false;">' +
+      fieldsHtml +
+      '<div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" id="sdint-connect-btn" onclick="sdIntConnect()">' + (p.connected ? 'Save changes' : 'Connect') + '</button>' +
+        (p.connected ? '<button type="button" class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="sdIntDisconnect()">Disconnect</button>' : '') +
+        (p.connected ? '<button type="button" class="btn btn-ghost" onclick="sdIntTestEvent()">Send test event</button>' : '') +
+      '</div>' +
+    '</form>';
+}
+
+window.sdIntConnect = async function() {
+  var s = _sdIntSchema[_sdIntActiveProvider];
+  var btn = document.getElementById('sdint-connect-btn');
+  var body = {};
+  s.fields.forEach(function(f) {
+    var el = document.getElementById('sdint-fld-' + f.key);
+    var val = el ? el.value.trim() : '';
+    if (val) body[f.key] = val;
+  });
+  btn.disabled = true;
+  var original = btn.textContent;
+  btn.textContent = 'Connecting…';
+  try {
+    var result = await sdIntFetch('/api/integrations/' + _sdIntActiveProvider + '/connect', {
+      method: 'POST', body: JSON.stringify(body),
+    });
+    var idx = _sdIntData.findIndex(function(x) { return x.provider === _sdIntActiveProvider; });
+    _sdIntData[idx] = Object.assign({}, _sdIntData[idx], { connected: result.connected, fields: result.fields });
+    sdIntRenderList();
+    sdIntRenderDetail();
+    showToast('✅ ' + s.label + ' connected.');
+  } catch (e) {
+    showToast('❌ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+};
+
+window.sdIntDisconnect = async function() {
+  var s = _sdIntSchema[_sdIntActiveProvider];
+  if (!confirm('Disconnect ' + s.label + '? Stored credentials will be permanently cleared.')) return;
+  try {
+    var result = await sdIntFetch('/api/integrations/' + _sdIntActiveProvider + '/disconnect', { method: 'POST' });
+    var idx = _sdIntData.findIndex(function(x) { return x.provider === _sdIntActiveProvider; });
+    _sdIntData[idx] = Object.assign({}, _sdIntData[idx], { connected: result.connected, fields: result.fields });
+    sdIntRenderList();
+    sdIntRenderDetail();
+    showToast(s.label + ' disconnected.');
+  } catch (e) {
+    showToast('❌ ' + e.message);
+  }
+};
+
+window.sdIntTestEvent = async function() {
+  try {
+    var result = await sdIntFetch('/api/integrations/test-event', {
+      method: 'POST',
+      body: JSON.stringify({ eventType: 'page_view', payload: { productName: 'Test Product', amount: 0 } }),
+    });
+    var mine = result.results.find(function(r) { return r.provider === _sdIntActiveProvider; });
+    if (!mine) { showToast('No test result for this provider.'); return; }
+    if (mine.ok) showToast('✅ Test event sent to ' + _sdIntSchema[_sdIntActiveProvider].label + '.');
+    else showToast('❌ Test event failed: ' + mine.error);
+  } catch (e) {
+    showToast('❌ ' + e.message);
+  }
 };
 
 // --------------------------------------------------
