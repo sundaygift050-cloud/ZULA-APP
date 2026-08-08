@@ -372,6 +372,11 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 /* Filters slide-over panel (was a fixed sidebar, now a toggleable drawer) */
 #page-marketplace .mkt-filter-modal{position:fixed;top:0;right:-360px;width:340px;height:100vh;background:var(--bg2);z-index:900;overflow-y:auto;padding:20px;box-shadow:-10px 0 40px rgba(0,0,0,.2);transition:right .25s ease;}
 #page-marketplace .mkt-filter-modal.open{right:0;}
+@media(min-width:861px){
+  #page-marketplace .mkt-filter-modal{position:static;top:auto;right:auto;width:auto;height:auto;background:var(--surface);box-shadow:var(--shadow-card);padding:20px;order:1;}
+  #mkt-layout-grid > .wrap{order:2;min-width:0;}
+  #page-marketplace #filter-panel > div:first-child > div > button:last-child{display:none;}
+}
 @media(max-width:600px){ #page-marketplace .mkt-filter-modal{width:88vw;right:-88vw;} }
 @media(max-width:860px){
   #page-marketplace .mkt-promo-row{grid-template-columns:1fr;}
@@ -568,7 +573,62 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 .empty-state p{font-size:14px;max-width:340px;margin:0 auto 20px;}
 .mkt-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--border);}
 .mkt-topbar h2{font-size:19px;font-weight:800;letter-spacing:-.01em;}
-.result-count{font-size:13px;color:var(--text3);}
+.result-count{font-size:13px;color:var(--text3);font-weight:400;margin-left:6px;}
+.mkt-sort-select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;}
+.mkt-pagination{display:flex;justify-content:flex-end;gap:8px;margin-top:30px;}
+.mkt-page-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+.mkt-page-btn:hover{border-color:var(--border2);}
+.mkt-page-btn.active{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
+
+/* ══════════════════════════════════════════════════
+   MARKETPLACE — light theme, matching the approved reference screenshot
+   exactly (white surfaces, soft off-white page background, purple accent
+   unchanged). Wins over the dark #page-marketplace rules above via normal
+   CSS cascade (same selectors, declared later). Everything below this
+   still reads from the shared var(--x) tokens, so redeclaring the
+   variables here is enough to re-theme the whole page — no component
+   rewrite needed.
+   ══════════════════════════════════════════════════ */
+#page-marketplace{
+  --bg:#f5f5f9; --bg2:#ffffff; --bg3:#f0f0f5;
+  --surface:#ffffff; --surface2:#ffffff;
+  --border:#ececf1; --border2:#e0e0ea;
+  --text:#15151f; --text2:#6b6b78; --text3:#9a9aa8;
+  --accent:#7c3aed; --accent2:#6d28d9;
+  --accent-grad:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);
+  --gold:#f5a623; --gold-grad:linear-gradient(135deg,#fbbf24,#f5a623);
+  --green:#16a34a; --red:#ef4444;
+  --hdr-bg:#ffffff;
+  --shadow-card:0 1px 3px rgba(20,20,40,.06),0 1px 2px rgba(20,20,40,.04);
+  background:var(--bg);
+}
+#page-marketplace .hdr{box-shadow:0 1px 0 rgba(20,20,40,.04);}
+#page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);}
+#page-marketplace .logo{color:var(--text);}
+#page-marketplace .logo span{color:var(--accent);}
+#page-marketplace .mkt-hdr-link{color:var(--text2);}
+
+#page-marketplace .mkt-cat-pill,
+#page-marketplace .mkt-cat-icon-item{background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-card);}
+
+#page-marketplace .filter-panel{box-shadow:var(--shadow-card);}
+#page-marketplace .mkt-hist{display:none;} /* not part of the reference design */
+
+#page-marketplace .pcard{box-shadow:var(--shadow-card);}
+#page-marketplace .pcard:hover{box-shadow:0 10px 24px rgba(20,20,40,.12);}
+#page-marketplace .pcard-heart{background:#fff;border:1px solid var(--border2);color:var(--text3);box-shadow:0 1px 3px rgba(20,20,40,.08);}
+#page-marketplace .pcard-heart.saved{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
+#page-marketplace .pcard-price-row .pcard-price,
+#page-marketplace .pcard-price{color:var(--text);}
+#page-marketplace .pcard-seller{color:var(--text3);}
+#page-marketplace .pcard-seller .verified-check{color:var(--green);}
+#page-marketplace .pcard-cart-btn{color:var(--text2);border-color:var(--border2);}
+#page-marketplace .pcard-cart-btn:hover{background:var(--bg3);color:var(--text);}
+
+#page-marketplace .mkt-sort-select,
+#page-marketplace .mkt-page-btn{box-shadow:var(--shadow-card);}
+
+@media(max-width:860px){ #page-marketplace .mkt-cat-pills{padding-bottom:10px;} }
 
 /* PROFILE / DASHBOARD */
 .dash-wrap{max-width:960px;margin:0 auto;padding:32px 24px 60px;}
@@ -1763,6 +1823,7 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
     </div>
   </div>
 
+  <div class="mkt-layout" id="mkt-layout-grid">
   <div class="wrap" style="padding:10px 28px 50px;">
 
     <!-- Promo banner carousel — ported from reference app, laptop-width (3 visible at once) -->
@@ -1797,17 +1858,24 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
       <div id="mkt-people-list" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
     </div>
     <div class="mkt-topbar">
-      <h2>All products</h2>
-      <div class="result-count" id="result-count"></div>
+      <h2>All products <span class="result-count" id="result-count" style="font-weight:400;"></span></h2>
+      <select id="filter-sort-top" class="mkt-sort-select" onchange="document.getElementById('filter-sort').value=this.value;applyFilters();">
+        <option value="newest">Most Popular</option>
+        <option value="newest">Newest first</option>
+        <option value="price_asc">Price: low to high</option>
+        <option value="price_desc">Price: high to low</option>
+        <option value="rating">Highest rated</option>
+        <option value="name">Name A–Z</option>
+      </select>
     </div>
     <div class="pgrid" id="products-grid"></div>
+    <div class="mkt-pagination" id="mkt-pagination"></div>
     <div class="empty-state" id="empty-state" style="display:none;">
       <div class="es-icon">🛍</div>
       <h3>No products yet</h3>
       <p>Be the first to list a product on ZÚLA. Verify your account and start selling.</p>
       <button class="btn btn-primary" onclick="goAddProduct()">List a product →</button>
     </div>
-  </div>
   </div>
 
   <!-- Filters slide-over panel -->
@@ -1898,6 +1966,8 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
       </div>
     </div>
   </aside>
+  </div><!-- /mkt-layout-grid -->
+  </div><!-- /mkt-frame -->
 </div>
 
 <!-- ================================================================
@@ -6126,7 +6196,7 @@ window.toggleMobileFilter = function() {
 // Show filter toggle only on mobile
 function _updateFilterToggleVisibility() {
   const btn = document.getElementById('filter-toggle-btn');
-  if (btn) btn.style.display = window.innerWidth <= 1024 ? 'inline-flex' : 'none';
+  if (btn) btn.style.display = window.innerWidth <= 860 ? 'inline-flex' : 'none';
 }
 window.addEventListener('resize', _updateFilterToggleVisibility);
 _updateFilterToggleVisibility();
@@ -12159,6 +12229,7 @@ window.applyFilters = function() {
 };
 
 function applyActiveFilters(products) {
+  window._mktCurrentPage = 1;
   var _rate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
   var priceMinRaw = parseFloat(document.getElementById('filter-price-min')?.value) || 0;
   var priceMaxRaw = parseFloat(document.getElementById('filter-price-max')?.value) || Infinity;
@@ -12273,7 +12344,7 @@ window.zulaBuildProductCard = function(p, id, opts) {
   }
 
   var catLabel = (opts.showCategory && p.category) ? '<div class="pcard-cat-label">' + p.category + '</div>' : '';
-  var sellerLine = opts.showSeller ? '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + '</div>' : '';
+  var sellerLine = opts.showSeller ? '<div style="font-size:11.5px;color:var(--text3);margin-bottom:2px;">by ' + (p.sellerName||'Seller') + (p.sellerVerified ? ' <span style="color:var(--green);">✓</span>' : '') + '</div>' : '';
   var ratingHtml = '';
   if (opts.showRating && Number(p.avgRating) > 0) {
     var full = Math.round(Number(p.avgRating));
@@ -12305,18 +12376,50 @@ function renderProductGrid(products) {
   var empty = document.getElementById('empty-state');
   var count = document.getElementById('result-count');
   if (!grid) return;
-  if (count) count.textContent = products.length + ' product' + (products.length===1?'':'s');
   if (!products.length) {
+    if (count) count.textContent = '';
     grid.innerHTML = '';
     if (empty) empty.style.display = '';
+    var pag0 = document.getElementById('mkt-pagination');
+    if (pag0) pag0.innerHTML = '';
     return;
   }
   if (empty) empty.style.display = 'none';
-  grid.innerHTML = products.map(function(p) {
+
+  var PAGE_SIZE = 12;
+  window._mktLastProducts = products; // so page clicks can re-slice without re-filtering
+  var totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  if (!window._mktCurrentPage || window._mktCurrentPage > totalPages) window._mktCurrentPage = 1;
+  var page = window._mktCurrentPage;
+  var start = (page - 1) * PAGE_SIZE;
+  var pageItems = products.slice(start, start + PAGE_SIZE);
+
+  if (count) count.textContent = 'Showing ' + pageItems.length + ' of ' + products.length + ' product' + (products.length===1?'':'s');
+
+  grid.innerHTML = pageItems.map(function(p) {
     var _pid = p._id || p.id || '';
     return zulaBuildProductCard(p, _pid, { showHeart:true, showBuyPill:true, showSeller:true, showCategory:true, showDiscountBadge:true, showRating:true });
   }).join('');
+
+  var pag = document.getElementById('mkt-pagination');
+  if (pag) {
+    if (totalPages <= 1) { pag.innerHTML = ''; }
+    else {
+      var btns = [];
+      for (var i = 1; i <= totalPages; i++) {
+        btns.push('<button class="mkt-page-btn' + (i===page?' active':'') + '" onclick="mktGoToPage(' + i + ')">' + i + '</button>');
+      }
+      pag.innerHTML = btns.join('');
+    }
+  }
 }
+
+window.mktGoToPage = function(n) {
+  window._mktCurrentPage = n;
+  renderProductGrid(window._mktLastProducts || []);
+  var gridEl = document.getElementById('products-grid');
+  if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 // ── Marketplace grid quick-actions: save to wishlist / add to cart,
 // both without navigating into the product detail page ──
@@ -12478,12 +12581,12 @@ window.mktSwitchTrendTab = function(sort, btn) {
 // ── Filters slide-over panel (was an always-visible sidebar) ──
 window.mktOpenFilterModal = function() {
   var panel = document.getElementById('filter-panel'), overlay = document.getElementById('mkt-filter-overlay');
-  if (panel) panel.classList.add('open');
+  if (panel) { panel.classList.add('open'); panel.classList.add('mobile-open'); }
   if (overlay) overlay.style.display = 'block';
 };
 window.mktCloseFilterModal = function() {
   var panel = document.getElementById('filter-panel'), overlay = document.getElementById('mkt-filter-overlay');
-  if (panel) panel.classList.remove('open');
+  if (panel) { panel.classList.remove('open'); panel.classList.remove('mobile-open'); }
   if (overlay) overlay.style.display = 'none';
 };
 
