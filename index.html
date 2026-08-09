@@ -432,6 +432,31 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 @media(max-width:900px){#page-marketplace .mkt-banner-track{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:640px){#page-marketplace .mkt-banner-track{grid-template-columns:1fr;}#page-marketplace .mkt-banner{height:150px;}}
 
+/* Rotating top-5 leaderboard banner — replaces the promo carousel once
+   admin has published one. Cycles entries every 5s (mktStartLeaderboardRotation). */
+#page-marketplace .mkt-leaderboard-banner{
+  position:relative;display:flex;align-items:center;gap:20px;height:160px;padding:0 32px;
+  margin-bottom:24px;border-radius:18px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);
+  background:linear-gradient(120deg,#1a1030 0%,#3b1d6b 45%,#7c3aed 100%);
+}
+#page-marketplace .mkt-leaderboard-banner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 85% 20%,rgba(245,158,11,.35),transparent 55%),
+             radial-gradient(circle at 15% 80%,rgba(168,85,247,.3),transparent 55%);
+}
+#page-marketplace .mkt-lb-rank{position:relative;z-index:1;font-size:34px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
+#page-marketplace .mkt-lb-avatar{position:relative;z-index:1;width:64px;height:64px;border-radius:50%;flex-shrink:0;overflow:hidden;border:3px solid rgba(255,255,255,.5);box-shadow:0 6px 20px rgba(0,0,0,.35);}
+#page-marketplace .mkt-lb-avatar img{width:100%;height:100%;object-fit:cover;}
+#page-marketplace .mkt-lb-avatar .fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--accent-grad);color:#fff;font-weight:800;font-size:24px;}
+#page-marketplace .mkt-lb-info{position:relative;z-index:1;min-width:0;}
+#page-marketplace .mkt-lb-eyebrow{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fbbf24;margin-bottom:4px;}
+#page-marketplace .mkt-lb-name{font-size:22px;font-weight:800;color:#fff;font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#page-marketplace .mkt-lb-stat{font-size:13px;color:rgba(255,255,255,.85);margin-top:2px;}
+#page-marketplace .mkt-lb-dots{position:absolute;bottom:14px;right:20px;z-index:1;display:flex;gap:6px;}
+#page-marketplace .mkt-lb-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .2s,transform .2s;}
+#page-marketplace .mkt-lb-dot.active{background:#fff;transform:scale(1.3);}
+@media(max-width:640px){#page-marketplace .mkt-leaderboard-banner{height:140px;padding:0 20px;gap:14px;}#page-marketplace .mkt-lb-name{font-size:18px;}#page-marketplace .mkt-lb-avatar{width:52px;height:52px;}}
+
 /* Product cards — laptop grid, more columns than the phone version */
 #page-marketplace .mkt-topbar{margin-bottom:18px;padding-bottom:14px;}
 #page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:20px;}
@@ -1826,8 +1851,21 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
   <div class="mkt-layout" id="mkt-layout-grid">
   <div class="wrap" style="padding:10px 28px 50px;">
 
-    <!-- Promo banner carousel — ported from reference app, laptop-width (3 visible at once) -->
-    <div class="mkt-banner-wrap">
+    <!-- Top-5 seller leaderboard — rotates one entry every 5s. Published by
+         admin (Admin → Leaderboard → Publish to Marketplace). Falls back to
+         the promo banner carousel if nothing has been published yet. -->
+    <div class="mkt-leaderboard-banner" id="mkt-leaderboard-banner" style="display:none;" onclick="showPage('marketplace')">
+      <div class="mkt-lb-rank" id="mkt-lb-rank">🥇</div>
+      <div class="mkt-lb-avatar" id="mkt-lb-avatar"></div>
+      <div class="mkt-lb-info">
+        <div class="mkt-lb-eyebrow">🏆 Top Seller on ZÚLA</div>
+        <div class="mkt-lb-name" id="mkt-lb-name">—</div>
+        <div class="mkt-lb-stat" id="mkt-lb-stat">—</div>
+      </div>
+      <div class="mkt-lb-dots" id="mkt-lb-dots"></div>
+    </div>
+
+    <div class="mkt-banner-wrap" id="mkt-banner-fallback">
       <div class="mkt-banner-track" id="mkt-banner-track">
         <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80');">
           <div class="mkt-banner-tag">50% OFF</div>
@@ -1842,14 +1880,17 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
       </div>
     </div>
 
-    <!-- Flash sale urgency bar (real countdown to midnight, no fake timer) -->
-    <div class="mkt-flash-bar">
+    <!-- Flash sale urgency bar (real countdown to midnight, no fake timer).
+         Visibility is controlled entirely by admin's platform-wide toggle
+         (mktSyncPlatformFlags). Clicking it filters the grid to flash-sale
+         products only. -->
+    <div class="mkt-flash-bar" id="mkt-flash-bar-el" onclick="mktToggleFlashFilter()" style="cursor:pointer;" title="Click to see all flash sale products">
       <div class="mkt-flash-icon">⚡</div>
       <div><div class="mkt-flash-lbl">FLASH SALE</div>
       <div class="mkt-flash-clock" id="mkt-countdown-wrap">
         <span id="mkt-countdown">00:00:00</span>
       </div></div>
-      <div class="mkt-flash-sub">Prices this low won't last — grab it before it's gone</div>
+      <div class="mkt-flash-sub" id="mkt-flash-sub-text">Prices this low won't last — grab it before it's gone</div>
     </div>
 
     <!-- All products -->
@@ -3247,6 +3288,7 @@ if (_kycOrigShowPage) {
         <a id="anav-products"   onclick="adminTab('products')">📦 Products</a>
         <a id="anav-users"      onclick="adminTab('users')">👥 Users</a>
         <a id="anav-sellers"    onclick="adminGoSellers()">🏪 Sellers</a>
+        <a id="anav-leaderboard" onclick="adminTab('leaderboard')">🏆 Leaderboard</a>
         <a id="anav-orders"     onclick="adminTab('orders')">🛍 Orders</a>
         <a id="anav-viewings"   onclick="adminTab('viewings')">🏠 Viewings</a>
         <a id="anav-payouts"    onclick="adminTab('payouts')">💸 Payouts</a>
@@ -3327,6 +3369,22 @@ if (_kycOrigShowPage) {
       <div class="admin-section" id="asec-user-detail">
         <button class="btn btn-ghost btn-sm" style="margin-bottom:16px;" onclick="adminTab('users')">← Back to users</button>
         <div id="aud-content"><div style="color:var(--text3);font-size:13px;padding:30px;">Loading…</div></div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="admin-section" id="asec-leaderboard">
+        <div class="dash-h1">Top Sellers Leaderboard</div>
+        <div class="dash-sub">Ranked by revenue from completed orders. Publish the current top 5 to show them on the marketplace, rotating every 5 seconds.</div>
+        <div class="dash-card" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div style="font-size:13px;color:var(--text3);" id="alb-status-line">Not published yet.</div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-ghost btn-sm" onclick="adminLoadLeaderboard()">↻ Recalculate</button>
+              <button class="btn btn-primary btn-sm" id="alb-publish-btn" onclick="adminPublishLeaderboard()">📣 Publish to Marketplace</button>
+            </div>
+          </div>
+        </div>
+        <div id="alb-list"><div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">Loading…</div></div>
       </div>
 
       <!-- ORDERS -->
@@ -7745,19 +7803,31 @@ function sdProductRow(id, p, compact) {
   const price = Number(p.price||0).toLocaleString();
   const status = p.status || 'active';
   const statusColor = status === 'active' ? 'var(--green)' : 'var(--text3)';
-  return '<div class="sd-product-row">' +
+  const isFlash = p.isFlashSale === true;
+  return '<div class="sd-product-row" data-status="' + status + '">' +
     '<div class="sd-product-thumb">' + icon + '<\/div>' +
     '<div class="sd-product-info">' +
-      '<div class="sd-product-name">' + (p.name || '(Untitled)') + '<\/div>' +
+      '<div class="sd-product-name">' + (p.name || '(Untitled)') + (isFlash ? ' <span style="font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#f43f5e,#e11d48);padding:2px 7px;border-radius:999px;vertical-align:middle;">⚡ FLASH<\/span>' : '') + '<\/div>' +
       '<div class="sd-product-meta">' + (p.category || p.type || '-') + ' · <span style="color:' + statusColor + ';">' + status + '<\/span><\/div>' +
     '<\/div>' +
     '<div class="sd-product-price">\u20a6' + price + '<\/div>' +
     '<div class="sd-product-actions">' +
+      '<button class="sd-btn-edit" style="' + (isFlash ? 'background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;border-color:transparent;' : '') + '" onclick="sdToggleFlashSale(\x27' + id + '\x27,' + isFlash + ',this)" title="' + (isFlash ? 'Remove from Flash Sale' : 'Add to Flash Sale') + '">⚡<\/button>' +
       '<button class="sd-btn-edit" onclick="sdEditProduct(\x27' + id + '\x27)">Edit<\/button>' +
       '<button class="sd-btn-del" onclick="sdDeleteProduct(\x27' + id + '\x27,this)">\u{1F5D1}<\/button>' +
     '<\/div>' +
   '<\/div>';
 }
+
+window.sdToggleFlashSale = async function(id, currentlyOn, btn) {
+  try {
+    const fns = window._fns, db = window._db;
+    const newVal = !currentlyOn;
+    await fns.updateDoc(fns.doc(db, 'products', id), { isFlashSale: newVal });
+    showToast(newVal ? '⚡ Added to Flash Sale' : 'Removed from Flash Sale');
+    sdLoadProducts();
+  } catch(e) { console.error(e); showToast('❌ Could not update flash sale status.'); }
+};
 
 window.sdLoadProducts = async function() {
   const auth = window._auth;
@@ -10627,6 +10697,112 @@ window.adminSavePlatformSettings = async function() {
   }
 };
 
+// ══════════════════════════════════════════════════
+// ADMIN LEADERBOARD — top 5 sellers by revenue (completed orders only).
+// Admin computes/reviews this, then "publishes" it to a public-readable
+// doc (leaderboard/top_sellers) that the marketplace reads to drive the
+// rotating banner. Buyers never query orders/users directly for this —
+// keeps the marketplace's read surface minimal and avoids needing broad
+// read permissions on sensitive collections for anonymous/buyer sessions.
+// ══════════════════════════════════════════════════
+window._adminLeaderboardData = [];
+
+window.adminLoadLeaderboard = async function() {
+  var db = window._db, fns = window._fns;
+  var list = document.getElementById('alb-list');
+  if (!db || !fns || !list) return;
+  list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">Calculating…</div>';
+  try {
+    var [ordersSnap, usersSnap] = await Promise.all([
+      fns.getDocs(fns.collection(db, 'orders')),
+      fns.getDocs(fns.collection(db, 'users')),
+    ]);
+    var orders = ordersSnap.docs.map(function(d){ return d.data(); });
+    var usersById = {};
+    usersSnap.docs.forEach(function(d){ usersById[d.id] = d.data(); });
+
+    var revenueBySeller = {};
+    orders.forEach(function(o) {
+      if (o.status !== 'completed' || !o.sellerId) return;
+      revenueBySeller[o.sellerId] = (revenueBySeller[o.sellerId] || 0) + Number(o.price || 0);
+    });
+
+    var ranked = Object.keys(revenueBySeller).map(function(uid) {
+      var u = usersById[uid] || {};
+      return {
+        uid: uid,
+        name: u.fullName || u.firstName || 'ZÚLA Seller',
+        photoUrl: u.photoUrl || '',
+        handle: u.handle || '',
+        revenue: revenueBySeller[uid],
+      };
+    }).sort(function(a, b) { return b.revenue - a.revenue; }).slice(0, 5);
+
+    window._adminLeaderboardData = ranked;
+
+    if (!ranked.length) {
+      list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px;text-align:center;">No completed orders yet — the leaderboard will populate once sellers start making sales.</div>';
+      var pubBtn0 = document.getElementById('alb-publish-btn');
+      if (pubBtn0) pubBtn0.disabled = true;
+      return;
+    }
+
+    var pubBtn = document.getElementById('alb-publish-btn');
+    if (pubBtn) pubBtn.disabled = false;
+
+    list.innerHTML = ranked.map(function(r, i) {
+      var medal = ['🥇','🥈','🥉','4️⃣','5️⃣'][i] || (i+1);
+      var avatar = r.photoUrl
+        ? '<img src="' + r.photoUrl + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">'
+        : '<div style="width:44px;height:44px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">' + (r.name[0]||'?').toUpperCase() + '</div>';
+      return '<div class="dash-card" style="display:flex;align-items:center;gap:16px;margin-bottom:10px;">' +
+        '<div style="font-size:22px;width:32px;text-align:center;">' + medal + '</div>' +
+        avatar +
+        '<div style="flex:1;"><div style="font-weight:700;font-size:14px;">' + r.name + '</div>' +
+        (r.handle ? '<div style="font-size:12px;color:#a78bfa;">@' + r.handle + '</div>' : '') + '</div>' +
+        '<div style="font-weight:800;color:var(--green);font-family:var(--font-display);">₦' + r.revenue.toLocaleString() + '</div>' +
+      '</div>';
+    }).join('');
+
+    // Reflect last-published state
+    try {
+      var pubSnap = await fns.getDoc(fns.doc(db, 'leaderboard', 'top_sellers'));
+      var statusLine = document.getElementById('alb-status-line');
+      if (statusLine) {
+        statusLine.textContent = pubSnap.exists() && pubSnap.data().updatedAt
+          ? 'Last published: ' + new Date(pubSnap.data().updatedAt.seconds * 1000).toLocaleString()
+          : 'Not published yet — buyers won\'t see this until you publish.';
+      }
+    } catch(e) { /* non-fatal */ }
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = '<div style="color:var(--red);font-size:13px;padding:30px;text-align:center;">Couldn\'t calculate the leaderboard.</div>';
+  }
+};
+
+window.adminPublishLeaderboard = async function() {
+  var db = window._db, fns = window._fns;
+  var btn = document.getElementById('alb-publish-btn');
+  if (!window._adminLeaderboardData.length) { showToast('Nothing to publish yet — recalculate first.'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
+  try {
+    var entries = window._adminLeaderboardData.map(function(r) {
+      return { uid: r.uid, name: r.name, photoUrl: r.photoUrl, handle: r.handle, revenue: r.revenue };
+    });
+    await fns.setDoc(fns.doc(db, 'leaderboard', 'top_sellers'), {
+      entries: entries,
+      updatedAt: fns.serverTimestamp(),
+    });
+    showToast('📣 Leaderboard published — now live on the marketplace.');
+    adminLoadLeaderboard();
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not publish leaderboard.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📣 Publish to Marketplace'; }
+  }
+};
+
 window.adminBanUser = async function(userId, email, name) {
   var reason = prompt('Reason for banning ' + (name||email) + ':');
   if (!reason) return;
@@ -12327,6 +12503,8 @@ window.zulaBuildProductCard = function(p, id, opts) {
       : '<span class="pcard-top-badge" style="background:var(--green,#27c97a);color:#fff;">Live</span>';
   } else if (p.productType === 'realestate') {
     topBadge = '<span class="pcard-top-badge" style="background:var(--accent-grad);color:#fff;">🏠 Property</span>';
+  } else if (opts.showDiscountBadge && p.isFlashSale === true && window._mktFlashSalesEnabled !== false) {
+    topBadge = '<span class="pcard-hot-badge" style="background:linear-gradient(135deg,#f43f5e,#e11d48);">⚡ FLASH</span>';
   } else if (opts.showDiscountBadge && p.featured) {
     topBadge = '<span class="pcard-hot-badge">HOT!</span>';
   } else if (opts.showDiscountBadge && hasDiscount) {
@@ -12700,8 +12878,124 @@ window.loadProducts = async function() {
     if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
     if (typeof mktLoadFeaturedDeals === 'function') mktLoadFeaturedDeals();
     if (typeof mktLoadTrending === 'function') mktLoadTrending('newest');
+    if (typeof mktSyncPlatformFlags === 'function') mktSyncPlatformFlags();
+    if (typeof mktLoadLeaderboard === 'function') mktLoadLeaderboard();
   } catch(e) { console.error('loadProducts error', e); }
 };
+
+// ══════════════════════════════════════════════════
+// MARKETPLACE — platform-controlled flash sale visibility.
+// Admin's "Flash Sales" toggle (Settings → Platform Features) is the single
+// source of truth: when off, the bar (and the ability to filter to flash
+// items) disappears from the marketplace entirely — not just visually
+// hidden with data still reachable, actually gated.
+// ══════════════════════════════════════════════════
+window.mktSyncPlatformFlags = async function() {
+  var db = window._db, fns = window._fns;
+  var bar = document.getElementById('mkt-flash-bar-el');
+  if (!db || !fns || !bar) return;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'settings', 'platform'));
+    var enabled = snap.exists() ? (snap.data().flashSalesEnabled !== false) : true;
+    bar.style.display = enabled ? '' : 'none';
+    window._mktFlashSalesEnabled = enabled;
+    if (!enabled && window._mktFlashOnlyMode) mktClearFlashFilter();
+  } catch (e) {
+    console.error('mktSyncPlatformFlags error', e);
+  }
+};
+
+window._mktFlashOnlyMode = false;
+window.mktToggleFlashFilter = function() {
+  if (!window._mktFlashSalesEnabled) return; // admin has flash sales off platform-wide
+  window._mktFlashOnlyMode = !window._mktFlashOnlyMode;
+  var h2 = document.querySelector('#page-marketplace .mkt-topbar h2');
+  if (window._mktFlashOnlyMode) {
+    var flashProducts = _allProducts.filter(function(p){ return p.isFlashSale === true; });
+    renderProductGrid(flashProducts);
+    if (h2) h2.innerHTML = '⚡ Flash Sale Products <span class="result-count" id="result-count"></span> <a onclick="event.stopPropagation();mktClearFlashFilter()" style="font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;margin-left:8px;">✕ Clear</a>';
+    var rc = document.getElementById('result-count');
+    if (rc) rc.textContent = flashProducts.length + ' product' + (flashProducts.length===1?'':'s');
+  } else {
+    mktClearFlashFilter();
+  }
+};
+window.mktClearFlashFilter = function() {
+  window._mktFlashOnlyMode = false;
+  var h2 = document.querySelector('#page-marketplace .mkt-topbar h2');
+  if (h2) h2.innerHTML = 'All products <span class="result-count" id="result-count" style="font-weight:400;"></span>';
+  applyActiveFilters(_allProducts);
+};
+
+// ══════════════════════════════════════════════════
+// MARKETPLACE — top-5 seller leaderboard banner, published by admin.
+// Reads a single public doc (no orders/users query needed client-side —
+// admin already did that math and published the result), rotates through
+// up to 5 entries every 5 seconds. Falls back to the promo banner carousel
+// when nothing has been published yet.
+// ══════════════════════════════════════════════════
+var _mktLbTimer = null;
+var _mktLbIndex = 0;
+var _mktLbEntries = [];
+
+window.mktLoadLeaderboard = async function() {
+  var db = window._db, fns = window._fns;
+  var banner = document.getElementById('mkt-leaderboard-banner');
+  var fallback = document.getElementById('mkt-banner-fallback');
+  if (!db || !fns || !banner || !fallback) return;
+  try {
+    var snap = await fns.getDoc(fns.doc(db, 'leaderboard', 'top_sellers'));
+    var entries = (snap.exists() && Array.isArray(snap.data().entries)) ? snap.data().entries.slice(0, 5) : [];
+    if (!entries.length) {
+      banner.style.display = 'none';
+      fallback.style.display = '';
+      if (_mktLbTimer) { clearInterval(_mktLbTimer); _mktLbTimer = null; }
+      return;
+    }
+    _mktLbEntries = entries;
+    _mktLbIndex = 0;
+    banner.style.display = 'flex';
+    fallback.style.display = 'none';
+    mktRenderLeaderboardEntry(0);
+    if (_mktLbTimer) clearInterval(_mktLbTimer);
+    if (entries.length > 1) {
+      _mktLbTimer = setInterval(function() {
+        var pageEl = document.getElementById('page-marketplace');
+        if (!pageEl || !pageEl.classList.contains('active')) { clearInterval(_mktLbTimer); _mktLbTimer = null; return; }
+        _mktLbIndex = (_mktLbIndex + 1) % _mktLbEntries.length;
+        mktRenderLeaderboardEntry(_mktLbIndex);
+      }, 5000);
+    }
+  } catch (e) {
+    console.error('mktLoadLeaderboard error', e);
+    banner.style.display = 'none';
+    fallback.style.display = '';
+  }
+};
+
+function mktRenderLeaderboardEntry(i) {
+  var r = _mktLbEntries[i];
+  if (!r) return;
+  var medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  var rankEl = document.getElementById('mkt-lb-rank');
+  var avatarEl = document.getElementById('mkt-lb-avatar');
+  var nameEl = document.getElementById('mkt-lb-name');
+  var statEl = document.getElementById('mkt-lb-stat');
+  var dotsEl = document.getElementById('mkt-lb-dots');
+  if (rankEl) rankEl.textContent = medals[i] || (i + 1);
+  if (avatarEl) {
+    avatarEl.innerHTML = r.photoUrl
+      ? '<img src="' + r.photoUrl + '">'
+      : '<div class="fallback">' + ((r.name||'?')[0]||'?').toUpperCase() + '</div>';
+  }
+  if (nameEl) nameEl.textContent = r.name || 'ZÚLA Seller';
+  if (statEl) statEl.textContent = (r.handle ? '@' + r.handle + ' · ' : '') + '₦' + Number(r.revenue||0).toLocaleString() + ' in sales';
+  if (dotsEl) {
+    dotsEl.innerHTML = _mktLbEntries.map(function(_, idx) {
+      return '<span class="mkt-lb-dot' + (idx === i ? ' active' : '') + '"></span>';
+    }).join('');
+  }
+}
 
 // --------------------------------------------------
 // SELLER ANALYTICS - real chart data
@@ -15762,6 +16056,7 @@ window.adminTab = function(name) {
   _origAdminTabEng(name);
   if (name === 'engagement') engLoadData();
   if (name === 'settings') adminLoadPlatformSettings();
+  if (name === 'leaderboard') adminLoadLeaderboard();
 };
 
 console.log('✅ ZÚLA — all features loaded.');
