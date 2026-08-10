@@ -12532,9 +12532,11 @@ window.zulaBuildProductCard = function(p, id, opts) {
   var origPriceHtml = (opts.showDiscountBadge && hasDiscount) ? '<span class="pcard-orig-price">' + origPriceDisplay + '</span>' : '';
   var priceRow = '<div class="pcard-price-row"><span class="pcard-price">' + priceDisplay + '</span>' + origPriceHtml + '</div>';
 
-  var actionRow = opts.showBuyPill
-    ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>'
-    : '';
+  var isRealEstate = p.productType === 'realestate';
+  var actionRow = !opts.showBuyPill ? '' :
+    isRealEstate
+      ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="event.stopPropagation();viewProduct(\''+id+'\')" style="flex:1;">View</button></div>'
+      : '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>';
 
   return '<div class="pcard" onclick="viewProduct(\''+id+'\');" style="position:relative;">' +
     topBadge + heartHtml +
@@ -12657,6 +12659,47 @@ window.mktSelectCategoryIcon = function(cat, el) {
 
 // ── Today's Featured Deals — real products, real "already sold" counts ──
 // computed from actual completed orders (not fabricated numbers).
+window.mktLoadTopBanners = async function() {
+  var track = document.getElementById('mkt-banner-track');
+  var wrap = document.getElementById('mkt-banner-fallback');
+  if (!track || !wrap) return;
+  var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft' && ((p.photos && p.photos.length) || p.photo); });
+  if (!products.length) return; // keep the static banners if there's genuinely nothing to show yet
+
+  var soldMap = {};
+  try {
+    var db = window._db, fns = window._fns;
+    if (db && fns) {
+      var osnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('status','==','completed')));
+      osnap.docs.forEach(function(d) {
+        var o = d.data();
+        var pid = o.productId;
+        if (pid) soldMap[pid] = (soldMap[pid] || 0) + 1;
+      });
+    }
+  } catch(e) { /* soldMap stays empty — falls back to newest below, no fake numbers used */ }
+
+  var ranked = products.slice().sort(function(a, b) {
+    var aid = a._id || a.id, bid = b._id || b.id;
+    return (soldMap[bid] || 0) - (soldMap[aid] || 0);
+  });
+  // If nobody has sold anything yet, sold-count sort is a no-op tie, so this
+  // naturally falls back to whatever order _allProducts came in (newest first).
+  var top3 = ranked.slice(0, 3);
+  if (!top3.length) return;
+
+  var labels = ['🔥 Top Seller', '⭐ Fan Favourite', '📈 Trending Now'];
+  track.innerHTML = top3.map(function(p, i) {
+    var id = p._id || p.id;
+    var photo = (p.photos && p.photos[0]) || p.photo || '';
+    var sold = soldMap[id] || 0;
+    var tagHtml = sold > 0 ? '<div class="mkt-banner-tag">' + sold + ' sold</div>' : '';
+    return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');" onclick="viewProduct(\'' + id + '\')">' +
+      tagHtml +
+      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
+    '</div>';
+  }).join('');
+};
 window.mktLoadFeaturedDeals = async function() {
   var section = document.getElementById('mkt-deals-section');
   var row = document.getElementById('mkt-deals-row');
@@ -12877,6 +12920,7 @@ window.loadProducts = async function() {
     renderProductGrid(_allProducts);
     if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
     if (typeof mktLoadFeaturedDeals === 'function') mktLoadFeaturedDeals();
+    if (typeof mktLoadTopBanners === 'function') mktLoadTopBanners();
     if (typeof mktLoadTrending === 'function') mktLoadTrending('newest');
     if (typeof mktSyncPlatformFlags === 'function') mktSyncPlatformFlags();
     if (typeof mktLoadLeaderboard === 'function') mktLoadLeaderboard();
@@ -12890,19 +12934,37 @@ window.loadProducts = async function() {
 // items) disappears from the marketplace entirely — not just visually
 // hidden with data still reachable, actually gated.
 // ══════════════════════════════════════════════════
-window.mktSyncPlatformFlags = async function() {
+var _mktPlatformFlagsUnsub = null;
+window.mktSyncPlatformFlags = function() {
   var db = window._db, fns = window._fns;
   var bar = document.getElementById('mkt-flash-bar-el');
   if (!db || !fns || !bar) return;
-  try {
-    var snap = await fns.getDoc(fns.doc(db, 'settings', 'platform'));
+  // Use a live listener, not a one-time read — so if admin flips the toggle
+  // while a buyer already has the marketplace open, it updates immediately
+  // instead of only taking effect on the next full page load.
+  if (_mktPlatformFlagsUnsub) { try { _mktPlatformFlagsUnsub(); } catch(e){} }
+  if (!fns.onSnapshot) {
+    // Fallback for any environment without onSnapshot wired up
+    fns.getDoc(fns.doc(db, 'settings', 'platform')).then(function(snap) {
+      var enabled = snap.exists() ? (snap.data().flashSalesEnabled !== false) : true;
+      bar.style.display = enabled ? '' : 'none';
+      window._mktFlashSalesEnabled = enabled;
+      if (!enabled && window._mktFlashOnlyMode) mktClearFlashFilter();
+    }).catch(function(e){ console.error('mktSyncPlatformFlags (getDoc) error — if this says permission-denied, settings/platform needs public read access in your Firestore rules:', e); });
+    return;
+  }
+  _mktPlatformFlagsUnsub = fns.onSnapshot(fns.doc(db, 'settings', 'platform'), function(snap) {
     var enabled = snap.exists() ? (snap.data().flashSalesEnabled !== false) : true;
     bar.style.display = enabled ? '' : 'none';
     window._mktFlashSalesEnabled = enabled;
     if (!enabled && window._mktFlashOnlyMode) mktClearFlashFilter();
-  } catch (e) {
-    console.error('mktSyncPlatformFlags error', e);
-  }
+  }, function(err) {
+    // If this fires with "permission-denied", the fix is in your Firestore
+    // security rules, not this code: settings/platform must allow public
+    // READ (writes should stay admin-only). Something like:
+    //   match /settings/platform { allow read: if true; allow write: if isAdmin(); }
+    console.error('mktSyncPlatformFlags listener error — likely a Firestore rules issue (settings/platform needs public read access):', err);
+  });
 };
 
 window._mktFlashOnlyMode = false;
