@@ -614,7 +614,7 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
    variables here is enough to re-theme the whole page — no component
    rewrite needed.
    ══════════════════════════════════════════════════ */
-#page-marketplace{
+html[data-theme="light"] #page-marketplace{
   --bg:#f5f5f9; --bg2:#ffffff; --bg3:#f0f0f5;
   --surface:#ffffff; --surface2:#ffffff;
   --border:#ececf1; --border2:#e0e0ea;
@@ -627,33 +627,33 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
   --shadow-card:0 1px 3px rgba(20,20,40,.06),0 1px 2px rgba(20,20,40,.04);
   background:var(--bg);
 }
-#page-marketplace .hdr{box-shadow:0 1px 0 rgba(20,20,40,.04);}
-#page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);}
-#page-marketplace .logo{color:var(--text);}
-#page-marketplace .logo span{color:var(--accent);}
-#page-marketplace .mkt-hdr-link{color:var(--text2);}
+html[data-theme="light"] #page-marketplace .hdr{box-shadow:0 1px 0 rgba(20,20,40,.04);}
+html[data-theme="light"] #page-marketplace .hdr-search{background:var(--bg3);border:1px solid var(--border);}
+html[data-theme="light"] #page-marketplace .logo{color:var(--text);}
+html[data-theme="light"] #page-marketplace .logo span{color:var(--accent);}
+html[data-theme="light"] #page-marketplace .mkt-hdr-link{color:var(--text2);}
 
-#page-marketplace .mkt-cat-pill,
-#page-marketplace .mkt-cat-icon-item{background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-card);}
+html[data-theme="light"] #page-marketplace .mkt-cat-pill,
+html[data-theme="light"] #page-marketplace .mkt-cat-icon-item{background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-card);}
 
-#page-marketplace .filter-panel{box-shadow:var(--shadow-card);}
-#page-marketplace .mkt-hist{display:none;} /* not part of the reference design */
+html[data-theme="light"] #page-marketplace .filter-panel{box-shadow:var(--shadow-card);}
+html[data-theme="light"] #page-marketplace .mkt-hist{display:none;} /* not part of the reference design */
 
-#page-marketplace .pcard{box-shadow:var(--shadow-card);}
-#page-marketplace .pcard:hover{box-shadow:0 10px 24px rgba(20,20,40,.12);}
-#page-marketplace .pcard-heart{background:#fff;border:1px solid var(--border2);color:var(--text3);box-shadow:0 1px 3px rgba(20,20,40,.08);}
-#page-marketplace .pcard-heart.saved{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
-#page-marketplace .pcard-price-row .pcard-price,
-#page-marketplace .pcard-price{color:var(--text);}
-#page-marketplace .pcard-seller{color:var(--text3);}
-#page-marketplace .pcard-seller .verified-check{color:var(--green);}
-#page-marketplace .pcard-cart-btn{color:var(--text2);border-color:var(--border2);}
-#page-marketplace .pcard-cart-btn:hover{background:var(--bg3);color:var(--text);}
+html[data-theme="light"] #page-marketplace .pcard{box-shadow:var(--shadow-card);}
+html[data-theme="light"] #page-marketplace .pcard:hover{box-shadow:0 10px 24px rgba(20,20,40,.12);}
+html[data-theme="light"] #page-marketplace .pcard-heart{background:#fff;border:1px solid var(--border2);color:var(--text3);box-shadow:0 1px 3px rgba(20,20,40,.08);}
+html[data-theme="light"] #page-marketplace .pcard-heart.saved{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
+html[data-theme="light"] #page-marketplace .pcard-price-row .pcard-price,
+html[data-theme="light"] #page-marketplace .pcard-price{color:var(--text);}
+html[data-theme="light"] #page-marketplace .pcard-seller{color:var(--text3);}
+html[data-theme="light"] #page-marketplace .pcard-seller .verified-check{color:var(--green);}
+html[data-theme="light"] #page-marketplace .pcard-cart-btn{color:var(--text2);border-color:var(--border2);}
+html[data-theme="light"] #page-marketplace .pcard-cart-btn:hover{background:var(--bg3);color:var(--text);}
 
-#page-marketplace .mkt-sort-select,
-#page-marketplace .mkt-page-btn{box-shadow:var(--shadow-card);}
+html[data-theme="light"] #page-marketplace .mkt-sort-select,
+html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow-card);}
 
-@media(max-width:860px){ #page-marketplace .mkt-cat-pills{padding-bottom:10px;} }
+@media(max-width:860px){ html[data-theme="light"] #page-marketplace .mkt-cat-pills{padding-bottom:10px;} }
 
 /* PROFILE / DASHBOARD */
 .dash-wrap{max-width:960px;margin:0 auto;padding:32px 24px 60px;}
