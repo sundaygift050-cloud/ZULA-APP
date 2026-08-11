@@ -409,15 +409,25 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
 
 /* Flash-sale bar — ported 1:1 from the reference app: solid purple
-   gradient pill, icon chip on the left, label+timer stacked, subtext right */
-#page-marketplace .mkt-flash-bar{margin:6px 0 24px;background:var(--accent-grad);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;color:#fff;box-shadow:var(--shadow-btn);}
+   gradient pill, icon chip on the left, label+timer stacked, subtext right.
+   Starts collapsed (tiny pressable pill); click expands to show the
+   countdown/subtext/view-all link. */
+#page-marketplace .mkt-flash-bar{margin:6px 0 24px;background:var(--accent-grad);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;color:#fff;box-shadow:var(--shadow-btn);cursor:pointer;transition:padding .2s ease,border-radius .2s ease,gap .2s ease;}
 #page-marketplace .mkt-flash-icon{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 #page-marketplace .mkt-flash-lbl{font-weight:800;font-size:11px;letter-spacing:.04em;white-space:nowrap;opacity:.92;}
 #page-marketplace .mkt-flash-clock{font-family:'Courier New',monospace;font-weight:800;font-size:15px;letter-spacing:1px;background:rgba(0,0,0,.28);border-radius:8px;padding:4px 10px;display:inline-block;margin-top:2px;}
 #page-marketplace .mkt-flash-sub{font-size:12px;opacity:.85;margin-left:auto;white-space:nowrap;}
+#page-marketplace .mkt-flash-view-link{font-size:12px;font-weight:800;color:#fff;text-decoration:underline;white-space:nowrap;cursor:pointer;margin-left:14px;flex-shrink:0;}
+/* Collapsed state — tiny pill, only the icon + label show */
+#page-marketplace .mkt-flash-bar.collapsed{display:inline-flex;width:auto;padding:9px 18px 9px 9px;border-radius:999px;margin-bottom:24px;}
+#page-marketplace .mkt-flash-bar.collapsed .mkt-flash-icon{width:26px;height:26px;font-size:13px;border-radius:8px;}
+#page-marketplace .mkt-flash-bar.collapsed .mkt-flash-clock,
+#page-marketplace .mkt-flash-bar.collapsed .mkt-flash-sub,
+#page-marketplace .mkt-flash-bar.collapsed .mkt-flash-view-link{display:none;}
 @media(max-width:640px){
-  #page-marketplace .mkt-flash-bar{flex-wrap:wrap;}
-  #page-marketplace .mkt-flash-sub{margin-left:0;}
+  #page-marketplace .mkt-flash-bar:not(.collapsed){flex-wrap:wrap;}
+  #page-marketplace .mkt-flash-bar:not(.collapsed) .mkt-flash-sub{margin-left:0;}
+  #page-marketplace .mkt-flash-bar:not(.collapsed) .mkt-flash-view-link{margin-left:0;}
 }
 
 /* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
@@ -1880,17 +1890,19 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       </div>
     </div>
 
-    <!-- Flash sale urgency bar (real countdown to midnight, no fake timer).
-         Visibility is controlled entirely by admin's platform-wide toggle
-         (mktSyncPlatformFlags). Clicking it filters the grid to flash-sale
-         products only. -->
-    <div class="mkt-flash-bar" id="mkt-flash-bar-el" onclick="mktToggleFlashFilter()" style="cursor:pointer;" title="Click to see all flash sale products">
+    <!-- Flash sale urgency bar — starts as a tiny pressable pill; clicking
+         expands it to show the countdown, subtext, and a link to filter
+         the grid down to flash-sale products only. Visibility of the
+         whole thing is controlled by admin's platform-wide toggle
+         (mktSyncPlatformFlags). -->
+    <div class="mkt-flash-bar collapsed" id="mkt-flash-bar-el" onclick="mktToggleFlashBarExpand()" title="Click for flash sale details">
       <div class="mkt-flash-icon">⚡</div>
       <div><div class="mkt-flash-lbl">FLASH SALE</div>
       <div class="mkt-flash-clock" id="mkt-countdown-wrap">
         <span id="mkt-countdown">00:00:00</span>
       </div></div>
       <div class="mkt-flash-sub" id="mkt-flash-sub-text">Prices this low won't last — grab it before it's gone</div>
+      <a class="mkt-flash-view-link" id="mkt-flash-view-link" onclick="event.stopPropagation();mktToggleFlashFilter()">View all →</a>
     </div>
 
     <!-- All products -->
@@ -1923,13 +1935,16 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   <div id="mkt-filter-overlay" onclick="mktCloseFilterModal()" style="display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:800;"></div>
   <aside class="filter-panel mkt-filter-modal" id="filter-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding:0 2px;">
-      <h3 style="margin:0;color:var(--text);">Filters</h3>
+      <h3 style="margin:0;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;" onclick="mktToggleFiltersCollapse()">
+        <span id="filter-collapse-chevron" style="display:inline-block;transition:transform .2s ease;font-size:12px;">▾</span> Filters
+      </h3>
       <div style="display:flex;align-items:center;gap:10px;">
         <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()" id="filter-clear-btn" style="display:none;font-size:11.5px;padding:4px 10px;">Clear all</button>
         <button onclick="mktCloseFilterModal()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;">×</button>
       </div>
     </div>
 
+    <div id="filter-collapsible-content">
     <!-- Price Range -->
     <div class="filter-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
@@ -2006,6 +2021,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <button class="mkt-delivery-btn" id="mkt-delivery-pickup" onclick="mktSelectDelivery('pickup',this)">Pick Up</button>
       </div>
     </div>
+    </div><!-- /filter-collapsible-content -->
   </aside>
   </div><!-- /mkt-layout-grid -->
   </div><!-- /mkt-frame -->
@@ -12811,6 +12827,15 @@ window.mktCloseFilterModal = function() {
   if (overlay) overlay.style.display = 'none';
 };
 
+window.mktToggleFiltersCollapse = function() {
+  var content = document.getElementById('filter-collapsible-content');
+  var chevron = document.getElementById('filter-collapse-chevron');
+  if (!content) return;
+  var collapsed = content.style.display === 'none';
+  content.style.display = collapsed ? '' : 'none';
+  if (chevron) chevron.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof mktStartCountdown === 'function') mktStartCountdown();
 });
@@ -12965,6 +12990,11 @@ window.mktSyncPlatformFlags = function() {
     //   match /settings/platform { allow read: if true; allow write: if isAdmin(); }
     console.error('mktSyncPlatformFlags listener error — likely a Firestore rules issue (settings/platform needs public read access):', err);
   });
+};
+
+window.mktToggleFlashBarExpand = function() {
+  var bar = document.getElementById('mkt-flash-bar-el');
+  if (bar) bar.classList.toggle('collapsed');
 };
 
 window._mktFlashOnlyMode = false;
