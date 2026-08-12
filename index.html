@@ -5057,7 +5057,7 @@ window.viewProduct = function(id) {
   var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
   setText('pd-title',  p.name);
   setText('pd-seller', 'By ' + (p.sellerName || 'ZÚLA Seller'));
-  setText('pd-price',  typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
+  setText('pd-price',  typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
   setText('pd-desc',   p.description || '');
 
   var tagsEl = document.getElementById('pd-tags');
@@ -5174,7 +5174,7 @@ window.loadMyListings = async function() {
     container.innerHTML = mine.map(p => {
       const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
       const imgHtml = photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : (p.emoji || '📦');
-      const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : 'NGN ' + Number(p.price).toLocaleString();
+      const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : 'NGN ' + Number(p.price).toLocaleString();
       return `<div class="pcard" onclick="viewProduct('${p.id}')" style="cursor:pointer;">
         <div class="pcard-img" style="overflow:hidden;height:130px;">${imgHtml}</div>
         <div class="pcard-body" style="padding:10px 12px;">
@@ -6055,6 +6055,10 @@ window.viewPeerProfile = async function(uid) {
     const msgBtn = document.querySelector('[onclick="openMsgWithSelf()"]');
     if (msgBtn) msgBtn.setAttribute('onclick', `showPage('messaging')`);
 
+    // Tell loadMyProfile (which showPage('myprofile') is about to trigger)
+    // to show THIS person, not auto-default back to the signed-in user's
+    // own profile — that was overwriting everything we just set above.
+    window._pendingProfileViewUid = uid;
     showPage('myprofile');
   } catch(e) { showToast('Could not load profile.'); }
 };
@@ -6388,8 +6392,13 @@ window.loadMyProfile = async function() {
   const params = new URLSearchParams(window.location.search);
   const sellerParam = params.get('seller');
   // Viewing a shared storefront link (?seller=uid) always shows that seller,
-  // even to a visitor who isn't signed in. With no param, it's your own profile.
-  const targetUid = sellerParam || (currentAuthUser && currentAuthUser.uid) || null;
+  // even to a visitor who isn't signed in. viewPeerProfile() (e.g. "View
+  // profile" from a chat) takes priority over both — it just navigated
+  // here specifically to show someone else, so that wins even if a stale
+  // ?seller= param is still in the URL. With neither, it's your own profile.
+  const pendingPeerUid = window._pendingProfileViewUid;
+  window._pendingProfileViewUid = null; // consume it — only applies to this one navigation
+  const targetUid = pendingPeerUid || sellerParam || (currentAuthUser && currentAuthUser.uid) || null;
   const isOwnProfile = !!currentAuthUser && currentAuthUser.uid === targetUid;
   const el = id => document.getElementById(id);
 
@@ -6631,7 +6640,7 @@ window.loadSellerDashboard = async function() {
         : '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:14px;">' + mine.map(p => {
             const photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
             const imgHtml = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
-            const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : 'NGN ' + Number(p.price).toLocaleString();
+            const priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : 'NGN ' + Number(p.price).toLocaleString();
             return '<div class="pcard" onclick="viewProduct(\''+p.id+'\')" style="cursor:pointer;">' +
               '<div class="pcard-img" style="overflow:hidden;height:130px;">'+imgHtml+'</div>' +
               '<div class="pcard-body" style="padding:10px 12px;">' +
@@ -11755,15 +11764,27 @@ window.cartRemove = function(idx) {
 };
 
 window.cartCalcTotals = function() {
-  var sub = _cart.reduce(function(s,i){ return s + (Number(i.price||0) * (i.qty||1)); }, 0);
-  var currency = (_cart[0] && _cart[0].currency) || 'NGN';
-  var fee = (typeof window.calcPaystackFee === 'function') ? window.calcPaystackFee(sub, currency) : Math.round(sub * 0.02);
+  // Normalize every item to NGN first (each item may be priced in a
+  // different currency by its seller), THEN convert the NGN total to
+  // whatever currency the buyer has chosen to view prices in.
+  var subNgn = _cart.reduce(function(s,i){
+    var itemNgn = window.toNgn ? window.toNgn(i.price, i.currency) : Number(i.price||0);
+    return s + (itemNgn * (i.qty||1));
+  }, 0);
+  var displayRate = (window._CURRENCY_RATES && window._CURRENCY_RATES[window._displayCurrency]) || 1;
+  var symbol = window._displaySymbol || '₦';
+  var sub = Math.round(subNgn * displayRate * 100) / 100;
+  var fee = (typeof window.calcPaystackFee === 'function') ? window.calcPaystackFee(sub, window._displayCurrency) : Math.round(sub * 0.02);
   var total = sub + fee;
   var e = function(id){ return document.getElementById(id); };
-  if (e('cart-subtotal')) e('cart-subtotal').textContent = '₦' + sub.toLocaleString();
-  if (e('cart-fee')) e('cart-fee').textContent = '₦' + fee.toLocaleString();
+  if (e('cart-subtotal')) e('cart-subtotal').textContent = symbol + sub.toLocaleString();
+  if (e('cart-fee')) e('cart-fee').textContent = symbol + fee.toLocaleString();
   if (e('cart-fee-label')) e('cart-fee-label').textContent = 'Service fee' + (sub > 0 ? ' (' + ((fee/sub)*100).toFixed(1) + '%)' : '');
-  if (e('cart-total')) e('cart-total').textContent = '₦' + total.toLocaleString();
+  if (e('cart-total')) e('cart-total').textContent = symbol + total.toLocaleString();
+  // Real charge amount — always the true NGN total of what was actually
+  // priced, independent of how it's currently being displayed. This is
+  // what checkout should actually bill, not the display-currency figure.
+  window._cartChargeNgn = subNgn + (subNgn * 0.02);
 };
 
 window.cartCheckout = function() {
@@ -12462,7 +12483,7 @@ function applyActiveFilters(products) {
   var filtered = products.filter(function(p) {
     var catMatch = activeCat === 'all' || productMatchesCat(p, activeCat);
     var typeMatch = !types.length || types.some(function(t){ return (p.type||p.productType||'').toLowerCase().includes(t); });
-    var price = Number(p.price || 0);
+    var price = window.toNgn ? window.toNgn(p.price, p.currency) : Number(p.price || 0);
     if (price < priceMin) return false;
     if (priceMax !== Infinity && price > priceMax) return false;
     if (minRating > 0 && (Number(p.avgRating)||0) < minRating) return false;
@@ -12473,8 +12494,10 @@ function applyActiveFilters(products) {
 
   // Sort
   filtered = filtered.slice().sort(function(a, b) {
-    if (sort === 'price_asc')  return Number(a.price||0) - Number(b.price||0);
-    if (sort === 'price_desc') return Number(b.price||0) - Number(a.price||0);
+    var aNgn = window.toNgn ? window.toNgn(a.price, a.currency) : Number(a.price||0);
+    var bNgn = window.toNgn ? window.toNgn(b.price, b.currency) : Number(b.price||0);
+    if (sort === 'price_asc')  return aNgn - bNgn;
+    if (sort === 'price_desc') return bNgn - aNgn;
     if (sort === 'rating')     return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
     if (sort === 'name')       return (a.name||'').localeCompare(b.name||'');
     return 0; // newest: Firestore already returns newest-first
@@ -12501,7 +12524,7 @@ window.zulaBuildProductCard = function(p, id, opts) {
   opts = opts || {};
   var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
   var img = photoSrc ? '<img src="'+photoSrc+'" style="width:100%;height:100%;object-fit:cover;">' : (p.emoji||'📦');
-  var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+  var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
 
   // Discount % (only when a real originalPrice was set higher than price) —
   // used to show the "-XX%" tag and the strikethrough price, both gated
@@ -12509,7 +12532,7 @@ window.zulaBuildProductCard = function(p, id, opts) {
   var hasDiscount = Number(p.originalPrice) > Number(p.price || 0);
   var discountPct = hasDiscount ? Math.round((1 - (Number(p.price||0) / Number(p.originalPrice))) * 100) : 0;
   var origPriceDisplay = hasDiscount
-    ? (typeof formatPrice === 'function' ? formatPrice(p.originalPrice) : (p.currency||'NGN') + ' ' + Number(p.originalPrice).toLocaleString())
+    ? (typeof formatPrice === 'function' ? formatPrice(p.originalPrice, p.currency) : (p.currency||'NGN') + ' ' + Number(p.originalPrice).toLocaleString())
     : '';
 
   var topBadge = '';
@@ -12745,7 +12768,7 @@ window.mktLoadFeaturedDeals = async function() {
     var id = p._id || p.id;
     var photoSrc = (p.photos && p.photos.length) ? p.photos[0] : (p.photo || '');
     var img = photoSrc ? '<img src="'+photoSrc+'">' : (p.emoji || '📦');
-    var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+    var priceDisplay = typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     var sold = soldMap[id] || 0;
     var stock = Number(p.stock) || 0;
     var barHtml = '';
@@ -12844,7 +12867,7 @@ window.mktBuildPriceHistogram = function() {
   var hist = document.getElementById('mkt-price-hist');
   var avgLbl = document.getElementById('mkt-price-avg-lbl');
   if (!hist) return;
-  var prices = (window._allProducts || []).map(function(p){ return Number(p.price)||0; }).filter(function(n){ return n > 0; });
+  var prices = (window._allProducts || []).map(function(p){ return window.toNgn ? window.toNgn(p.price, p.currency) : (Number(p.price)||0); }).filter(function(n){ return n > 0; });
   if (!prices.length) { hist.innerHTML = ''; return; }
   var max = Math.max.apply(null, prices);
   var avg = Math.round(prices.reduce(function(a,b){ return a+b; },0) / prices.length);
@@ -13873,7 +13896,7 @@ window.submitProduct = async function() {
     window._apPhotos = [];
     showToast('✅ Product updated!');
     setTimeout(function(){ showPage('seller-dashboard'); if(typeof sdTab==='function') sdTab('products'); }, 600);
-  } catch(e) { console.error(e); showToast('❌ Could not update product.'); }
+  } catch(e) { console.error('Product update failed:', e); showToast('❌ Could not update product: ' + (e.message || 'unknown error')); }
   finally { if (publishBtn) { publishBtn.textContent = 'Update listing →'; publishBtn.disabled = false; } }
 };
 
@@ -14370,18 +14393,41 @@ window._displayCurrency = localStorage.getItem('zula_display_currency') || 'NGN'
 window._displaySymbol   = window._CURRENCY_SYMBOLS[window._displayCurrency] || '₦';
 document.addEventListener('DOMContentLoaded', function() { if (typeof updateFilterCurrencyLabels === 'function') updateFilterCurrencyLabels(); });
 
-// Convert an NGN amount to the user's chosen display currency
-window.convertPrice = function(ngnAmount) {
-  var rate = window._CURRENCY_RATES[window._displayCurrency] || 1;
-  return Math.round(Number(ngnAmount || 0) * rate * 100) / 100;
+// Convert an amount FROM its own stored currency (e.g. a seller priced a
+// product in USD) INTO NGN, our common base unit for all conversions.
+window.toNgn = function(amount, fromCurrency) {
+  var rate = window._CURRENCY_RATES[fromCurrency || 'NGN'] || 1; // rate = (that currency) per 1 NGN
+  return Number(amount || 0) / rate;
 };
 
-// Format a price for display: converts + adds the right symbol
-window.formatPrice = function(ngnAmount) {
-  var converted = window.convertPrice(ngnAmount);
+// Convert an amount from ITS OWN currency to the buyer's chosen display
+// currency. fromCurrency defaults to NGN for any old call sites that don't
+// pass it — but every price shown to a buyer should pass the product's
+// real p.currency so a $150 listing doesn't render as "₦150".
+window.convertPrice = function(amount, fromCurrency) {
+  var ngnAmount = window.toNgn(amount, fromCurrency);
+  var rate = window._CURRENCY_RATES[window._displayCurrency] || 1;
+  return Math.round(ngnAmount * rate * 100) / 100;
+};
+
+// Format a price for display: converts from its real currency + adds the
+// right symbol for whatever currency the buyer has chosen to view prices in.
+window.formatPrice = function(amount, fromCurrency) {
+  var converted = window.convertPrice(amount, fromCurrency);
   var symbol = window._displaySymbol;
   // Whole numbers for most currencies, 2dp only if there's a meaningful fraction
   var formatted = converted % 1 === 0 ? converted.toLocaleString() : converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return symbol + formatted;
+};
+
+// The ORIGINAL price+currency the seller actually set — used at checkout/
+// payout time where what matters is the real transaction amount, not the
+// buyer's display preference. Formats using the product's own currency
+// symbol regardless of window._displayCurrency.
+window.formatOriginalPrice = function(amount, currency) {
+  var symbol = window._CURRENCY_SYMBOLS[currency || 'NGN'] || '₦';
+  var n = Number(amount || 0);
+  var formatted = n % 1 === 0 ? n.toLocaleString() : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return symbol + formatted;
 };
 
