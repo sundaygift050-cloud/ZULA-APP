@@ -373,7 +373,7 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 #page-marketplace .mkt-filter-modal{position:fixed;top:0;right:-360px;width:340px;height:100vh;background:var(--bg2);z-index:900;overflow-y:auto;padding:20px;box-shadow:-10px 0 40px rgba(0,0,0,.2);transition:right .25s ease;}
 #page-marketplace .mkt-filter-modal.open{right:0;}
 @media(min-width:861px){
-  #page-marketplace .mkt-filter-modal{position:static;top:auto;right:auto;width:auto;height:auto;background:var(--surface);box-shadow:var(--shadow-card);padding:20px;order:1;}
+  #page-marketplace .mkt-filter-modal{position:static;top:auto;right:auto;width:auto;height:fit-content;align-self:start;background:var(--surface);box-shadow:var(--shadow-card);padding:20px;order:1;}
   #mkt-layout-grid > .wrap{order:2;min-width:0;}
   #page-marketplace #filter-panel > div:first-child > div > button:last-child{display:none;}
 }
@@ -431,16 +431,29 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 }
 
 /* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
-#page-marketplace .mkt-banner-wrap{margin-bottom:24px;overflow:hidden;}
-#page-marketplace .mkt-banner-track{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-#page-marketplace .mkt-banner{position:relative;height:160px;border-radius:18px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
+#page-marketplace .mkt-banner-wrap{margin-bottom:24px;}
+/* True one-slide-at-a-time swipeable carousel — same pattern on desktop
+   and mobile: native scroll-snap so it responds to drag/swipe as well as
+   the auto-advance timer, with dot pagination underneath. */
+#page-marketplace .mkt-banner-track{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  border-radius:18px;
+}
+#page-marketplace .mkt-banner-track::-webkit-scrollbar{display:none;}
+#page-marketplace .mkt-banner{position:relative;flex:0 0 100%;scroll-snap-align:center;height:280px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
 #page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 55%);}
-#page-marketplace .mkt-banner-tag{position:absolute;top:12px;left:12px;background:var(--gold-grad);color:#1a1206;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:2;}
-#page-marketplace .mkt-banner-content{position:absolute;bottom:14px;left:16px;right:16px;z-index:2;}
-#page-marketplace .mkt-banner-title{font-size:17px;font-weight:800;color:#fff;font-family:var(--font-display);}
-#page-marketplace .mkt-banner-sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;}
-@media(max-width:900px){#page-marketplace .mkt-banner-track{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:640px){#page-marketplace .mkt-banner-track{grid-template-columns:1fr;}#page-marketplace .mkt-banner{height:150px;}}
+#page-marketplace .mkt-banner-tag{position:absolute;top:16px;right:16px;background:var(--gold-grad);color:#1a1206;font-size:13px;font-weight:800;padding:6px 16px;border-radius:999px;z-index:2;}
+#page-marketplace .mkt-banner-content{position:absolute;bottom:22px;left:24px;right:24px;z-index:2;}
+#page-marketplace .mkt-banner-title{font-size:26px;font-weight:800;color:#fff;font-family:var(--font-display);}
+#page-marketplace .mkt-banner-sub{font-size:14px;color:rgba(255,255,255,.85);margin-top:4px;}
+#page-marketplace .mkt-carousel-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;}
+#page-marketplace .mkt-carousel-dots .dot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:.2s ease;flex-shrink:0;}
+#page-marketplace .mkt-carousel-dots .dot.active{background:var(--accent);width:22px;border-radius:4px;}
+@media(max-width:640px){#page-marketplace .mkt-banner{height:220px;}#page-marketplace .mkt-banner-title{font-size:21px;}}
 
 /* Rotating top-5 leaderboard banner — replaces the promo carousel once
    admin has published one. Cycles entries every 5s (mktStartLeaderboardRotation). */
@@ -1906,17 +1919,18 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 
     <div class="mkt-banner-wrap" id="mkt-banner-fallback">
       <div class="mkt-banner-track" id="mkt-banner-track">
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80');">
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80');">
           <div class="mkt-banner-tag">50% OFF</div>
-          <div class="mkt-banner-content"><div class="mkt-banner-title">Selected Items</div><div class="mkt-banner-sub">Limited time only</div></div>
+          <div class="mkt-banner-content"><div class="mkt-banner-title">Summer Sale</div><div class="mkt-banner-sub">Up to 50% off selected items</div></div>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&q=80');">
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80');">
           <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&q=80');">
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80');">
           <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
         </div>
       </div>
+      <div class="mkt-carousel-dots" id="mkt-spotlight-dots"></div>
     </div>
 
     <!-- Flash sale urgency bar — starts as a tiny pressable pill; clicking
@@ -12838,15 +12852,23 @@ window.mktSelectCategoryIcon = function(cat, el) {
 };
 
 // ── Today's Featured Deals — real products, real "already sold" counts ──
-// computed from actual completed orders (not fabricated numbers).
+// computed from actual completed orders (not fabricated numbers). Renders
+// as a true one-slide-at-a-time swipeable carousel with dot pagination
+// (native scroll-snap, so it responds to drag/swipe too, not just the
+// timer) — same behaviour on desktop and mobile — auto-advancing every
+// 3 seconds and looping back to the start.
 window.mktLoadTopBanners = async function() {
   var track = document.getElementById('mkt-banner-track');
   var wrap = document.getElementById('mkt-banner-fallback');
+  var dotsEl = document.getElementById('mkt-spotlight-dots');
   if (!track || !wrap) return;
 
-  // Clear any leftover rotation timer from a previous version of this
-  // function, if one is still running.
+  // Clear any previous rotation timer/listener before (re)computing — this
+  // function can be called again on filter/category changes, and without
+  // this guard every call would stack another one on top.
   if (window._mktSpotlightTimer) { clearInterval(window._mktSpotlightTimer); window._mktSpotlightTimer = null; }
+  if (window._mktSpotlightScrollHandler) { track.removeEventListener('scroll', window._mktSpotlightScrollHandler); window._mktSpotlightScrollHandler = null; }
+  if (dotsEl) dotsEl.innerHTML = '';
 
   var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft' && ((p.photos && p.photos.length) || p.photo); });
   if (!products.length) return; // keep the static banners if there's genuinely nothing to show yet
@@ -12870,20 +12892,71 @@ window.mktLoadTopBanners = async function() {
   });
   // If nobody has sold anything yet, sold-count sort is a no-op tie, so this
   // naturally falls back to whatever order _allProducts came in (newest first).
-  var top3 = ranked.slice(0, 3);
-  if (!top3.length) return;
+  var pool = ranked.slice(0, 8);
+  if (!pool.length) return;
 
   var labels = ['🔥 Top Seller', '⭐ Fan Favourite', '📈 Trending Now'];
-  track.innerHTML = top3.map(function(p, i) {
+
+  track.innerHTML = pool.map(function(p, i) {
     var id = p._id || p.id;
     var photo = (p.photos && p.photos[0]) || p.photo || '';
     var sold = soldMap[id] || 0;
     var tagHtml = sold > 0 ? '<div class="mkt-banner-tag">' + sold + ' sold</div>' : '';
     return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');" onclick="viewProduct(\'' + id + '\')">' +
       tagHtml +
-      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
+      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i % 3] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
     '</div>';
   }).join('');
+
+  if (dotsEl) {
+    dotsEl.innerHTML = pool.map(function(_, i) {
+      return '<span class="dot' + (i===0?' active':'') + '" onclick="mktSpotlightGoTo(' + i + ')"></span>';
+    }).join('');
+  }
+
+  window._mktSpotlightIdx = 0;
+  var updateDots = function(idx) {
+    if (!dotsEl) return;
+    Array.prototype.forEach.call(dotsEl.querySelectorAll('.dot'), function(d, i) { d.classList.toggle('active', i === idx); });
+  };
+
+  window.mktSpotlightGoTo = function(idx) {
+    var t = document.getElementById('mkt-banner-track');
+    if (!t || !t.children[idx]) return;
+    t.children[idx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    window._mktSpotlightIdx = idx;
+    updateDots(idx);
+  };
+
+  // Auto-advance one slide at a time, looping back to the start — only
+  // worth running if there's genuinely more than one slide to cycle through.
+  if (pool.length > 1) {
+    window._mktSpotlightTimer = setInterval(function() {
+      var t = document.getElementById('mkt-banner-track');
+      if (!t) { clearInterval(window._mktSpotlightTimer); window._mktSpotlightTimer = null; return; }
+      window.mktSpotlightGoTo((window._mktSpotlightIdx + 1) % pool.length);
+    }, 3000);
+  }
+
+  // Keep the dots in sync when the person swipes/drags manually
+  var scrollTimeout;
+  window._mktSpotlightScrollHandler = function() {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(function() {
+      var t = document.getElementById('mkt-banner-track');
+      if (!t) return;
+      var children = Array.prototype.slice.call(t.children);
+      var center = t.scrollLeft + t.clientWidth / 2;
+      var closest = 0, closestDist = Infinity;
+      children.forEach(function(c, i) {
+        var d = Math.abs((c.offsetLeft + c.offsetWidth / 2) - center);
+        if (d < closestDist) { closestDist = d; closest = i; }
+      });
+      window._mktSpotlightIdx = closest;
+      updateDots(closest);
+    }, 120);
+  };
+  track.addEventListener('scroll', window._mktSpotlightScrollHandler, { passive: true });
 };
 window.mktLoadFeaturedDeals = async function() {
   var section = document.getElementById('mkt-deals-section');
