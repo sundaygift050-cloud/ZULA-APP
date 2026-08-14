@@ -432,15 +432,10 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 
 /* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
 #page-marketplace .mkt-banner-wrap{margin-bottom:24px;overflow:hidden;}
-#page-marketplace .mkt-banner-track{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-#page-marketplace .mkt-banner{position:relative;height:160px;border-radius:18px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
-#page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 55%);}
-#page-marketplace .mkt-banner-tag{position:absolute;top:12px;left:12px;background:var(--gold-grad);color:#1a1206;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:2;}
-#page-marketplace .mkt-banner-content{position:absolute;bottom:14px;left:16px;right:16px;z-index:2;}
-#page-marketplace .mkt-banner-title{font-size:17px;font-weight:800;color:#fff;font-family:var(--font-display);}
-#page-marketplace .mkt-banner-sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;}
-@media(max-width:900px){#page-marketplace .mkt-banner-track{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:640px){#page-marketplace .mkt-banner-track{grid-template-columns:1fr;}#page-marketplace .mkt-banner{height:150px;}}
+#page-marketplace .mkt-spotlight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;transition:opacity .25s ease;}
+#page-marketplace .mkt-spotlight-grid .pcard-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:900px){#page-marketplace .mkt-spotlight-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){#page-marketplace .mkt-spotlight-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
 
 /* Rotating top-5 leaderboard banner — replaces the promo carousel once
    admin has published one. Cycles entries every 5s (mktStartLeaderboardRotation). */
@@ -1905,16 +1900,19 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
 
     <div class="mkt-banner-wrap" id="mkt-banner-fallback">
-      <div class="mkt-banner-track" id="mkt-banner-track">
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80');">
-          <div class="mkt-banner-tag">50% OFF</div>
-          <div class="mkt-banner-content"><div class="mkt-banner-title">Selected Items</div><div class="mkt-banner-sub">Limited time only</div></div>
+      <div class="mkt-spotlight-grid" id="mkt-banner-track">
+        <div class="pcard" style="position:relative;">
+          <span class="pcard-top-badge" style="background:var(--gold-grad);color:#1a1a1a;">50% OFF</span>
+          <div class="pcard-img"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="pcard-body"><div class="pcard-name">Selected Items</div><div class="pcard-seller">Limited time only</div></div>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&q=80');">
-          <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
+        <div class="pcard" style="position:relative;">
+          <div class="pcard-img"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&q=80" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="pcard-body"><div class="pcard-name">New Arrivals</div><div class="pcard-seller">Fresh drops from top sellers</div></div>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&q=80');">
-          <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
+        <div class="pcard" style="position:relative;">
+          <div class="pcard-img"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&q=80" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="pcard-body"><div class="pcard-name">Top Sellers</div><div class="pcard-seller">Shop the most loved stores</div></div>
         </div>
       </div>
     </div>
@@ -12675,7 +12673,9 @@ window.zulaBuildProductCard = function(p, id, opts) {
     : '';
 
   var topBadge = '';
-  if (opts.showStatus) {
+  if (opts.customBadge) {
+    topBadge = '<span class="pcard-top-badge" style="background:var(--gold-grad);color:#1a1a1a;">' + opts.customBadge + '</span>';
+  } else if (opts.showStatus) {
     topBadge = p.status === 'draft'
       ? '<span class="pcard-top-badge" style="background:var(--bg3);color:var(--text3);">Draft</span>'
       : '<span class="pcard-top-badge" style="background:var(--green,#27c97a);color:#fff;">Live</span>';
@@ -12836,13 +12836,23 @@ window.mktSelectCategoryIcon = function(cat, el) {
 };
 
 // ── Today's Featured Deals — real products, real "already sold" counts ──
-// computed from actual completed orders (not fabricated numbers).
+// computed from actual completed orders (not fabricated numbers). Renders
+// as real product cards (image, badge, name, seller, rating, price, Buy/Cart
+// — the same zulaBuildProductCard used everywhere else) and auto-rotates
+// through the top-ranked pool every 3 seconds when there are more than 3
+// candidates, so the spotlight keeps surfacing different products.
 window.mktLoadTopBanners = async function() {
   var track = document.getElementById('mkt-banner-track');
   var wrap = document.getElementById('mkt-banner-fallback');
   if (!track || !wrap) return;
+
+  // Always clear any previous rotation timer before (re)computing — this
+  // function can be called again on filter/category changes, and without
+  // this guard every call would stack another setInterval on top.
+  if (window._mktSpotlightTimer) { clearInterval(window._mktSpotlightTimer); window._mktSpotlightTimer = null; }
+
   var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft' && ((p.photos && p.photos.length) || p.photo); });
-  if (!products.length) return; // keep the static banners if there's genuinely nothing to show yet
+  if (!products.length) return; // keep the static fallback cards if there's genuinely nothing to show yet
 
   var soldMap = {};
   try {
@@ -12863,20 +12873,44 @@ window.mktLoadTopBanners = async function() {
   });
   // If nobody has sold anything yet, sold-count sort is a no-op tie, so this
   // naturally falls back to whatever order _allProducts came in (newest first).
-  var top3 = ranked.slice(0, 3);
-  if (!top3.length) return;
+  var pool = ranked.slice(0, 12); // rotate through up to 12 candidates, 3 at a time
+  if (!pool.length) return;
 
   var labels = ['🔥 Top Seller', '⭐ Fan Favourite', '📈 Trending Now'];
-  track.innerHTML = top3.map(function(p, i) {
-    var id = p._id || p.id;
-    var photo = (p.photos && p.photos[0]) || p.photo || '';
-    var sold = soldMap[id] || 0;
-    var tagHtml = sold > 0 ? '<div class="mkt-banner-tag">' + sold + ' sold</div>' : '';
-    return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');" onclick="viewProduct(\'' + id + '\')">' +
-      tagHtml +
-      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
-    '</div>';
-  }).join('');
+
+  function renderFrame(startIdx) {
+    var slice = [];
+    for (var i = 0; i < 3 && i < pool.length; i++) {
+      slice.push(pool[(startIdx + i) % pool.length]);
+    }
+    var html = slice.map(function(p, i) {
+      var id = p._id || p.id;
+      var sold = soldMap[id] || 0;
+      var badge = labels[i] || 'Featured';
+      if (sold > 0) badge += ' · ' + sold + ' sold';
+      return zulaBuildProductCard(p, id, { showHeart:true, showBuyPill:true, showSeller:true, showRating:true, customBadge: badge });
+    }).join('');
+    track.innerHTML = html;
+  }
+
+  // First paint, no fade needed
+  window._mktSpotlightIdx = 0;
+  renderFrame(0);
+
+  // Only rotate if there's genuinely more than 3 products to cycle through
+  if (pool.length > 3) {
+    window._mktSpotlightTimer = setInterval(function() {
+      // Re-check the container still exists (user may have navigated away)
+      var t = document.getElementById('mkt-banner-track');
+      if (!t) { clearInterval(window._mktSpotlightTimer); window._mktSpotlightTimer = null; return; }
+      window._mktSpotlightIdx = (window._mktSpotlightIdx + 3) % pool.length;
+      t.style.opacity = '0';
+      setTimeout(function() {
+        renderFrame(window._mktSpotlightIdx);
+        t.style.opacity = '1';
+      }, 250);
+    }, 3000);
+  }
 };
 window.mktLoadFeaturedDeals = async function() {
   var section = document.getElementById('mkt-deals-section');
