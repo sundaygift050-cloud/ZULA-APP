@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=1280"/>
 <title>ZÚLA — Everything in One Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -715,7 +715,11 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .pdetail-wrap{max-width:1000px;margin:0 auto;padding:32px 24px 60px;}
 .pdetail-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 @media(max-width:760px){.pdetail-layout{grid-template-columns:1fr;}}
-.pdetail-img{aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:80px;}
+.pdetail-img{aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:80px;overflow:hidden;}
+.pdetail-thumbs{width:64px;flex-shrink:0;max-height:520px;overflow-y:auto;}
+.pdetail-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid var(--border);display:block;transition:.15s;}
+.pdetail-thumbs img:hover{border-color:var(--accent2,var(--accent));}
+.pdetail-thumbs img.active{border-color:var(--accent);}
 .pdetail-title{font-size:24px;font-weight:700;margin-bottom:6px;}
 .pdetail-seller{font-size:13px;color:var(--text3);margin-bottom:16px;}
 .pdetail-price{font-size:28px;font-weight:700;color:var(--accent);margin-bottom:20px;}
@@ -2044,8 +2048,14 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     <div class="pdetail-layout">
       <!-- Photo gallery -->
       <div>
-        <div class="pdetail-img" id="pd-img">📦</div>
-        <div id="pd-photo-thumbs" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;"></div>
+        <div class="pdetail-gallery" style="display:flex;gap:12px;">
+          <div id="pd-photo-thumbs" class="pdetail-thumbs" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div class="pdetail-img" id="pd-img" style="flex:1;min-width:0;">📦</div>
+        </div>
+        <div id="pd-video-wrap" style="display:none;margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Product video</div>
+          <div id="pd-video-embed" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--radius-sm);overflow:hidden;"></div>
+        </div>
       </div>
       <div>
         <div id="pd-tags" style="margin-bottom:12px;"></div>
@@ -2070,6 +2080,9 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         </div>
 
         <div class="pdetail-desc" id="pd-desc">Description</div>
+
+        <!-- Product details (condition, stock, variants, what's included) -->
+        <div id="pd-product-details" style="display:none;margin-bottom:20px;"></div>
 
         <!-- Real estate details -->
         <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
@@ -2386,10 +2399,10 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
           <div class="ap-field"><label>Fuel type</label><select><option>Petrol</option><option>Diesel</option><option>Electric</option><option>Hybrid</option><option>CNG</option></select></div>
         </div>
         <div class="ap-field-row">
-          <div class="ap-field"><label>Colour</label><input placeholder="e.g. Midnight Black"></div>
-          <div class="ap-field"><label>Condition</label><select><option>Foreign used (Tokunbo)</option><option>Nigerian used</option><option>Brand new</option><option>For parts</option></select></div>
+          <div class="ap-field"><label>Colour</label><input placeholder="e.g. Midnight Black" id="ap-field-colour"></div>
+          <div class="ap-field"><label>Condition</label><select id="ap-field-condition-vehicle"><option>Foreign used (Tokunbo)</option><option>Nigerian used</option><option>Brand new</option><option>For parts</option></select></div>
         </div>
-        <div class="ap-field"><label>Location of vehicle</label><input placeholder="e.g. Lagos Island, Lagos"></div>
+        <div class="ap-field"><label>Location of vehicle</label><input placeholder="e.g. Lagos Island, Lagos" id="ap-field-vehicle-location"></div>
       </div>
 
       <!-- PHYSICAL -->
@@ -2397,7 +2410,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <div class="ap-card-hd">Physical product details</div>
         <div class="ap-card-sub">Size, material, condition — anything a buyer can't see through a photo.</div>
         <div class="ap-field-row">
-          <div class="ap-field"><label>Condition</label><select><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
+          <div class="ap-field"><label>Condition</label><select id="ap-field-condition-physical"><option>Brand new</option><option>Like new</option><option>Used — good condition</option><option>Used — fair condition</option></select></div>
           <div class="ap-field"><label>Available stock</label><input type="number" id="ap-field-stock" placeholder="e.g. 10" min="1"></div>
         </div>
         <div class="ap-field-row">
@@ -2512,6 +2525,12 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         </div>
         <div style="font-size:11.5px;color:var(--text3);margin-top:6px;margin-bottom:4px;" id="ap-photo-count">0 / 20 photos added</div>
         <div id="ap-photo-upload-status" style="display:none;font-size:12.5px;color:var(--accent);margin-bottom:4px;"></div>
+
+        <div class="ap-field" style="margin-top:16px;">
+          <label>🎬 Product video (optional)</label>
+          <input type="text" id="ap-field-video-url" placeholder="Paste a YouTube, Vimeo, or direct video link">
+          <div class="ap-field-hint">Buyers will be able to watch this video right on the product page.</div>
+        </div>
 
         <div id="ap-digital-file-section" style="display:none;margin-top:16px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📎 Your delivery file</div>
@@ -3906,41 +3925,39 @@ if (_kycOrigShowPage) {
       </nav>
     </div>
   </header>
-  <div class="wrap" style="max-width:860px;padding-top:28px;padding-bottom:60px;">
-    <!-- PUBLIC PROFILE CARD -->
-    <div class="pub-profile-card">
-      <div class="pub-profile-cover"></div>
-      <div class="pub-profile-body">
-        <div class="pub-avatar-wrap">
-          <div class="pub-avatar" id="owner-avatar">?</div>
-          <div class="pub-online"></div>
+  <div class="dash-wrap" style="max-width:740px;">
+    <div id="myprofile-preview-note" style="display:none;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);color:#a990ff;font-size:12.5px;font-weight:600;padding:10px 14px;border-radius:var(--radius-xs);margin-bottom:16px;">👁 This is a preview of your public profile — here's what other ZÚLA users see.</div>
+
+    <!-- PROFILE HERO — same layout as the real profile page -->
+    <div class="p-hero">
+      <div class="p-top-row">
+        <div class="p-avatar-wrap">
+          <div class="p-avatar" id="owner-avatar">?</div>
+          <div class="p-online"></div>
         </div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div style="font-size:22px;font-weight:700;margin-bottom:2px;" id="owner-name">Loading…</div>
-            <div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:4px;" id="owner-handle"></div>
-            <div style="font-size:13px;color:var(--text3);margin-bottom:10px;" id="owner-meta">—</div>
-            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;" id="owner-badges">
-              <span class="tag tag-green">✅ Verified buyer</span>
-            </div>
-            <div style="font-size:13.5px;color:var(--text2);line-height:1.6;max-width:440px;" id="owner-bio">—</div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost btn-sm" id="owner-msg-btn" onclick="openMsgWithSelf()">✉️ Message</button>
-            <button class="btn btn-primary btn-sm" id="owner-view-listings-btn" onclick="document.getElementById('owner-listings-grid').scrollIntoView({behavior:'smooth'})">View listings</button>
-          </div>
-        </div>
-        <div class="pub-stats-row">
-          <div class="pub-stat"><div class="pub-stat-val" id="owner-listings-count">—</div><div class="pub-stat-lbl">Listings</div></div>
-          <div class="pub-stat"><div class="pub-stat-val" id="owner-followers-count">0</div><div class="pub-stat-lbl">Followers</div></div>
-          <div class="pub-stat"><div class="pub-stat-val" id="owner-following-count">0</div><div class="pub-stat-lbl">Following</div></div>
-          <div class="pub-stat"><div class="pub-stat-val" id="owner-joined">—</div><div class="pub-stat-lbl">Member since</div></div>
+        <div class="p-stats">
+          <div style="cursor:pointer;" onclick="document.getElementById('owner-listings-grid').scrollIntoView({behavior:'smooth'})"><div class="n" id="owner-listings-count">0</div><div class="l">Listings</div></div>
+          <div style="cursor:pointer;" onclick="showFollowModal('followers', window._myprofileTargetUid)"><div class="n" id="owner-followers-count">0</div><div class="l">Followers</div></div>
+          <div style="cursor:pointer;" onclick="showFollowModal('following', window._myprofileTargetUid)"><div class="n" id="owner-following-count">0</div><div class="l">Following</div></div>
         </div>
       </div>
+      <div class="p-name" id="owner-name">Loading…</div>
+      <div class="p-bio-line" id="owner-handle" style="color:#a78bfa;font-weight:600;"></div>
+      <div class="p-bio-line" id="owner-meta">—</div>
+      <div class="p-bio-line" id="owner-bio" style="margin-top:6px;color:var(--text);"></div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;" id="owner-badges">
+        <span class="tag tag-green">✅ Verified buyer</span>
+      </div>
+
+      <div class="p-btn-row">
+        <button class="primary-btn" id="owner-follow-btn" onclick="myProfileToggleFollow()">➕ Follow</button>
+        <div class="ghost-outline-btn" id="owner-msg-btn" onclick="myProfileMessageUser()">✉️ Message</div>
+      </div>
     </div>
-    <!-- SELLER'S LISTINGS -->
-    <div class="dash-card">
-      <h3 style="margin-bottom:16px;">Active listings</h3>
+
+    <!-- SELLER'S LISTINGS / POSTS -->
+    <div class="dash-card" style="margin-top:20px;">
+      <h3 style="margin-bottom:16px;">Listings</h3>
       <div class="pgrid" id="owner-listings-grid">
         <div style="color:var(--text3);font-size:13px;">Loading listings…</div>
       </div>
@@ -5760,9 +5777,10 @@ window.getFollowing = async function(uid) {
   return snap.docs.map(d => d.data());
 };
 
-window.showFollowModal = async function(type) {
+window.showFollowModal = async function(type, targetUidArg) {
   const user = auth.currentUser;
-  if (!user) return;
+  const targetUid = targetUidArg || (user && user.uid);
+  if (!targetUid) return;
   const modal = document.getElementById('follow-modal');
   const title = document.getElementById('follow-modal-title');
   const list  = document.getElementById('follow-modal-list');
@@ -5771,11 +5789,12 @@ window.showFollowModal = async function(type) {
   title.textContent = type === 'followers' ? 'Followers' : 'Following';
   list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Loading…</div>';
   try {
-    const items = type === 'followers' ? await getFollowers(user.uid) : await getFollowing(user.uid);
+    const items = type === 'followers' ? await getFollowers(targetUid) : await getFollowing(targetUid);
     if (items.length === 0) {
       list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">None yet.</div>';
       return;
     }
+    const isOwn = user && user.uid === targetUid;
     list.innerHTML = items.map(f => {
       const name = type === 'followers' ? f.followerName : f.followedName;
       const uid  = type === 'followers' ? f.followerId   : f.followedId;
@@ -5783,7 +5802,7 @@ window.showFollowModal = async function(type) {
       return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
         <div class="conv-avatar" style="width:36px;height:36px;font-size:12px;">${initials}</div>
         <div style="flex:1;font-size:13.5px;font-weight:600;color:var(--text);">${name || uid}</div>
-        ${type==='following' ? `<button class="btn btn-ghost btn-sm" onclick="unfollowFromModal('${uid}','${name}',this)">Unfollow</button>` : ''}
+        ${(isOwn && type==='following') ? `<button class="btn btn-ghost btn-sm" onclick="unfollowFromModal('${uid}','${name}',this)">Unfollow</button>` : ''}
       </div>`;
     }).join('');
   } catch(e) {
@@ -6050,10 +6069,6 @@ window.viewPeerProfile = async function(uid) {
     if (el('owner-joined')) el('owner-joined').textContent = joined || '—';
     if (el('owner-followers-count')) el('owner-followers-count').textContent = u.followersCount || 0;
     if (el('owner-following-count')) el('owner-following-count').textContent = u.followingCount || 0;
-
-    // Message button goes straight back to this chat
-    const msgBtn = document.querySelector('[onclick="openMsgWithSelf()"]');
-    if (msgBtn) msgBtn.setAttribute('onclick', `showPage('messaging')`);
 
     // Tell loadMyProfile (which showPage('myprofile') is about to trigger)
     // to show THIS person, not auto-default back to the signed-in user's
@@ -6323,6 +6338,45 @@ window.msgSeller = async function() {
 
 window.openMsgWithSelf = function() { showPage('messaging'); };
 
+// ── Publish View Profile (public "myprofile" page) — Follow + Message ──
+window.myProfileToggleFollow = async function() {
+  const uid  = window._myprofileTargetUid;
+  const name = window._myprofileTargetName || 'this user';
+  if (!uid) return;
+  if (!auth.currentUser) { showToast('⚠️ Sign in to follow users.'); showPage('login'); return; }
+  const btn = document.getElementById('owner-follow-btn');
+  if (btn) { btn.disabled = true; }
+  const result = await followUser(uid, name);
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = result ? '✓ Following' : '➕ Follow';
+  }
+  // Refresh the follower count shown on the page
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    const d = snap.exists() ? snap.data() : {};
+    const fc = document.getElementById('owner-followers-count');
+    if (fc) fc.textContent = d.followersCount || 0;
+  } catch(e) {}
+};
+
+window.myProfileMessageUser = function() {
+  const uid  = window._myprofileTargetUid;
+  const name = window._myprofileTargetName || 'Seller';
+  if (!uid) return;
+  const user = auth.currentUser;
+  if (!user) { showPage('login'); return; }
+  if (uid === user.uid) { showToast('⚠️ This is your own profile.'); return; }
+  showPage('messaging');
+  setTimeout(() => {
+    const cid = convId(user.uid, uid);
+    openConversation(cid, uid, name);
+    window._activeConvId   = cid;
+    window._activePeerId   = uid;
+    window._activePeerName = name;
+  }, 400);
+};
+
 window.toggleFollowFromChat = async function() {
   const btn = document.getElementById('chat-follow-btn');
   if (!btn) return;
@@ -6453,12 +6507,22 @@ window.loadMyProfile = async function() {
     badgesEl.innerHTML = badges;
   }
 
-  // Storefront action buttons — messaging yourself makes no sense, and
-  // "View listings" is redundant on this page since listings are shown
-  // right below, so both are scoped to whether this is your own profile.
-  const msgBtn = el('owner-msg-btn'), viewBtn = el('owner-view-listings-btn');
-  if (msgBtn)  msgBtn.style.display  = isOwnProfile ? 'none' : '';
-  if (viewBtn) viewBtn.style.display = isOwnProfile ? '' : 'none';
+  // Storefront action buttons — messaging/following yourself makes no sense,
+  // so both are scoped to whether this is your own profile. A preview note
+  // explains the page to the owner when they open their own public view.
+  window._myprofileTargetUid  = targetUid;
+  window._myprofileTargetName = fullName;
+  const msgBtn = el('owner-msg-btn'), followBtn = el('owner-follow-btn'), noteEl = el('myprofile-preview-note');
+  if (noteEl) noteEl.style.display = isOwnProfile ? 'block' : 'none';
+  if (msgBtn)    msgBtn.style.display    = isOwnProfile ? 'none' : '';
+  if (followBtn) followBtn.style.display = isOwnProfile ? 'none' : '';
+  if (!isOwnProfile && followBtn) {
+    followBtn.textContent = '…';
+    isFollowing(targetUid).then(function(f) {
+      followBtn.textContent = f ? '✓ Following' : '➕ Follow';
+      followBtn.dataset.following = f ? '1' : '0';
+    });
+  }
 
   // Counts
   try {
@@ -7432,6 +7496,31 @@ window.apAddVariant = function() {
 };
 window.apRemoveVariant = function(btn) { btn.closest('.ap-variant-row').remove(); };
 
+window.apGetFeatures = function() {
+  var out = [];
+  document.querySelectorAll('#ap-features-list .ap-variant-row input[type="text"]').forEach(function(inp) {
+    var v = (inp.value || '').trim();
+    if (v) out.push(v);
+  });
+  return out;
+};
+window.apGetVariants = function() {
+  var out = [];
+  document.querySelectorAll('#ap-variants-list .ap-variant-row').forEach(function(row) {
+    var inputs = row.querySelectorAll('input[type="text"]');
+    var name = inputs[0] ? (inputs[0].value || '').trim() : '';
+    var price = inputs[1] ? (inputs[1].value || '').trim() : '';
+    if (name) out.push({ name: name, price: price });
+  });
+  return out;
+};
+window.apGetCondition = function() {
+  var type = window._apType || 'physical';
+  if (type === 'vehicle') return (document.getElementById('ap-field-condition-vehicle')||{}).value || '';
+  if (type === 'physical') return (document.getElementById('ap-field-condition-physical')||{}).value || '';
+  return '';
+};
+
 window.apAddModule = function() {
   var num = document.querySelectorAll('#ap-modules-list .ap-module-item').length + 1;
   var item = document.createElement('div');
@@ -7712,7 +7801,19 @@ window.submitProduct = async function() {
       deliveryFee: (productType === 'physical' || productType === 'vehicle') ? deliveryFee : 0,
       shipsFrom: shipsFrom || null,
       viewCount: 0,
+      videoUrl: (document.getElementById('ap-field-video-url')?.value || '').trim() || null,
+      whatsIncluded: (typeof apGetFeatures === 'function') ? apGetFeatures() : [],
+      variants: (typeof apGetVariants === 'function') ? apGetVariants() : [],
+      condition: (typeof apGetCondition === 'function') ? apGetCondition() : '',
     };
+
+    // Vehicle-specific extra fields
+    if (productType === 'vehicle') {
+      productData.vehicle = {
+        colour:   (document.getElementById('ap-field-colour')||{}).value || '',
+        location: (document.getElementById('ap-field-vehicle-location')||{}).value || '',
+      };
+    }
 
     // Attach lessons if this is a course
     if (productType === 'course' && window._pendingLessons && window._pendingLessons.length > 0) {
@@ -7826,6 +7927,7 @@ function sdProductRow(id, p, compact) {
   const typeIcons = {course:'🎓',ebook:'📚',template:'🎨',software:'💻',audio:'🎵',coaching:'🧑‍💼',vehicle:'🚗',physical:'📦'};
   const icon = typeIcons[p.type] || p.emoji || '📦';
   const price = Number(p.price||0).toLocaleString();
+  const currSym = (window._CURRENCY_SYMBOLS && window._CURRENCY_SYMBOLS[p.currency]) || {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[p.currency] || '₦';
   const status = p.status || 'active';
   const statusColor = status === 'active' ? 'var(--green)' : 'var(--text3)';
   const isFlash = p.isFlashSale === true;
@@ -7835,7 +7937,7 @@ function sdProductRow(id, p, compact) {
       '<div class="sd-product-name">' + (p.name || '(Untitled)') + (isFlash ? ' <span style="font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#f43f5e,#e11d48);padding:2px 7px;border-radius:999px;vertical-align:middle;">⚡ FLASH<\/span>' : '') + '<\/div>' +
       '<div class="sd-product-meta">' + (p.category || p.type || '-') + ' · <span style="color:' + statusColor + ';">' + status + '<\/span><\/div>' +
     '<\/div>' +
-    '<div class="sd-product-price">\u20a6' + price + '<\/div>' +
+    '<div class="sd-product-price">' + currSym + price + '<\/div>' +
     '<div class="sd-product-actions">' +
       '<button class="sd-btn-edit" style="' + (isFlash ? 'background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;border-color:transparent;' : '') + '" onclick="sdToggleFlashSale(\x27' + id + '\x27,' + isFlash + ',this)" title="' + (isFlash ? 'Remove from Flash Sale' : 'Add to Flash Sale') + '">⚡<\/button>' +
       '<button class="sd-btn-edit" onclick="sdEditProduct(\x27' + id + '\x27)">Edit<\/button>' +
@@ -9964,22 +10066,86 @@ window.openProduct = async function(productId) {
     if (el('pd-price')) el('pd-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     if (el('pd-desc')) el('pd-desc').textContent = p.description || '';
 
+    // Product details: condition, stock, sizes/variants, what's included
+    var pdDetailsEl = el('pd-product-details');
+    if (pdDetailsEl) {
+      var symLocal = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
+      var blocks = [];
+      if (p.condition) {
+        blocks.push('<div><div style="font-size:11px;color:var(--text3);">Condition</div><div style="font-size:13px;font-weight:600;">' + p.condition + '</div></div>');
+      }
+      if (p.productType === 'physical' || p.productType === 'vehicle') {
+        blocks.push('<div><div style="font-size:11px;color:var(--text3);">Available stock</div><div style="font-size:13px;font-weight:600;">' + (Number(p.stock||0) > 0 ? Number(p.stock).toLocaleString() : 'Out of stock') + '</div></div>');
+      }
+      var topGrid = blocks.length ? '<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:' + ((p.variants&&p.variants.length)||(p.whatsIncluded&&p.whatsIncluded.length) ? '14px' : '0') + ';">' + blocks.join('') + '</div>' : '';
+
+      var variantsHtml = '';
+      if (p.variants && p.variants.length) {
+        variantsHtml = '<div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:700;margin-bottom:8px;">Sizes / Variants</div><div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+          p.variants.map(function(v) {
+            var priceLabel = v.price ? ' — ' + symLocal + Number(v.price).toLocaleString() : '';
+            return '<span style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:12.5px;padding:5px 12px;border-radius:999px;">' + v.name + priceLabel + '</span>';
+          }).join('') + '</div></div>';
+      }
+
+      var featuresHtml = '';
+      if (p.whatsIncluded && p.whatsIncluded.length) {
+        featuresHtml = '<div><div style="font-size:13px;font-weight:700;margin-bottom:8px;">What\'s included</div><div style="display:flex;flex-direction:column;gap:6px;">' +
+          p.whatsIncluded.map(function(f) { return '<div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);flex-shrink:0;">✓</span>' + f + '</div>'; }).join('') + '</div></div>';
+      }
+
+      var fullHtml = topGrid + variantsHtml + featuresHtml;
+      if (fullHtml.trim()) { pdDetailsEl.innerHTML = fullHtml; pdDetailsEl.style.display = 'block'; }
+      else { pdDetailsEl.innerHTML = ''; pdDetailsEl.style.display = 'none'; }
+    }
+
     // Original price
     if (p.originalPrice && p.originalPrice > p.price) {
       if (el('pd-original-price')) { el('pd-original-price').textContent = (p.currency||'NGN') + ' ' + Number(p.originalPrice).toLocaleString(); el('pd-original-price').style.display = 'block'; }
     } else { if (el('pd-original-price')) el('pd-original-price').style.display = 'none'; }
 
-    // Photos
+    // Photos — main image + side thumbnail strip (click a thumb to swap the main image)
     var imgEl = el('pd-img');
-    if (imgEl) {
-      if (p.photos && p.photos.length > 0) { imgEl.innerHTML = '<img src="' + p.photos[0] + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">'; }
-      else if (p.photo) { imgEl.innerHTML = '<img src="' + p.photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">'; }
-      else { imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦'); imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex'; imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center'; }
-    }
-    // Thumbnail strip
     var thumbs = el('pd-photo-thumbs');
-    if (thumbs && p.photos && p.photos.length > 1) {
-      thumbs.innerHTML = p.photos.map(function(ph,i){ return '<img src="'+ph+'" onclick="document.getElementById(\'pd-img\').innerHTML=\'<img src=\\\'' + ph + '\\\' style=\\\"width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);\\\">\';" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid '+(i===0?'var(--accent)':'var(--border)')+'" >'; }).join('');
+    window._pdPhotos = (p.photos && p.photos.length) ? p.photos.slice() : (p.photo ? [p.photo] : []);
+    function pdSetMainPhoto(idx) {
+      var photos = window._pdPhotos || [];
+      if (imgEl) {
+        if (photos[idx]) imgEl.innerHTML = '<img src="' + photos[idx] + '" style="width:100%;height:100%;object-fit:cover;">';
+        else { imgEl.innerHTML = ''; imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦'); imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex'; imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center'; }
+      }
+      if (thumbs) {
+        thumbs.querySelectorAll('img').forEach(function(t,i){ t.classList.toggle('active', i === idx); });
+      }
+    }
+    window.pdSetMainPhoto = pdSetMainPhoto;
+    if (thumbs) {
+      if (window._pdPhotos.length > 1) {
+        thumbs.style.display = 'flex';
+        thumbs.innerHTML = window._pdPhotos.map(function(ph,i){ return '<img src="'+ph+'" class="'+(i===0?'active':'')+'" onclick="pdSetMainPhoto('+i+')">'; }).join('');
+      } else {
+        thumbs.style.display = 'none';
+        thumbs.innerHTML = '';
+      }
+    }
+    pdSetMainPhoto(0);
+
+    // Product video (YouTube / Vimeo / direct link)
+    var videoWrap = el('pd-video-wrap'), videoEmbed = el('pd-video-embed');
+    if (videoWrap && videoEmbed) {
+      if (p.videoUrl) {
+        var isEmbeddable = /youtu\.be|youtube\.com|vimeo\.com|drive\.google\.com|firebasestorage\.googleapis/.test(p.videoUrl);
+        if (isEmbeddable) {
+          var embedUrl = (typeof cpToEmbedUrl === 'function') ? cpToEmbedUrl(p.videoUrl) : p.videoUrl;
+          videoEmbed.innerHTML = '<iframe src="'+embedUrl+'" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>';
+        } else {
+          videoEmbed.innerHTML = '<video src="'+p.videoUrl+'" controls style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>';
+        }
+        videoWrap.style.display = 'block';
+      } else {
+        videoWrap.style.display = 'none';
+        videoEmbed.innerHTML = '';
+      }
     }
 
     // Tags
@@ -10109,7 +10275,7 @@ window.pdBookViewing = function() {
 
 window.pdViewSellerProfile = function() {
   var p = window._currentProduct;
-  if (p && p.sellerId) { window._viewingSellerId = p.sellerId; showPage('profile-v2'); }
+  if (p && p.sellerId) { viewPeerProfile(p.sellerId); }
 };
 
 // --------------------------------------------------
@@ -10132,11 +10298,18 @@ window.pdLoadReviews = async function(productId) {
   var el = document.getElementById('pd-reviews-list');
   if (!el) return;
   try {
-    var snap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('productId','==',productId), fns.orderBy('createdAt','desc')));
+    // Avoid composite-index requirement: filter only, sort client-side
+    // (same safe pattern used for comments/notifications elsewhere in this file).
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('productId','==',productId)));
     if (snap.empty) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No reviews yet.</div>'; pdUpdateStars(0,0); return; }
-    var total = 0; var count = snap.size;
+    var docs = snap.docs.slice().sort(function(a,b){
+      var at = a.data().createdAt, bt = b.data().createdAt;
+      if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
+      return 0;
+    });
+    var total = 0; var count = docs.length;
     el.innerHTML = '';
-    snap.docs.forEach(function(d) {
+    docs.forEach(function(d) {
       var r = d.data();
       total += (r.rating||0);
       var stars = '';
@@ -10144,12 +10317,12 @@ window.pdLoadReviews = async function(productId) {
       var card = document.createElement('div');
       card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;';
       card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;">' + (r.reviewerName||'Buyer') + '</div><div style="font-size:14px;">' + stars + '</div></div>' +
-        '<div style="font-size:13px;color:var(--text2);line-height:1.5;">' + (r.text||'') + '</div>' +
+        '<div style="font-size:13px;color:var(--text2);line-height:1.5;">' + escapeHtml(r.text||'') + '</div>' +
         '<div style="font-size:11px;color:var(--text3);margin-top:6px;">' + (r.createdAt&&r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '') + '</div>';
       el.appendChild(card);
     });
     pdUpdateStars(total/count, count);
-  } catch(e) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load reviews.</div>'; }
+  } catch(e) { console.error('pdLoadReviews:', e); el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load reviews.</div>'; }
 };
 
 function pdUpdateStars(avg, count) {
@@ -13835,6 +14008,41 @@ window.sdEditProduct = async function(productId) {
       if (e('ap-field-stock'))    e('ap-field-stock').value    = p.stock||'';
       if (e('ap-field-delivery-fee')) e('ap-field-delivery-fee').value = p.deliveryFee||'';
       if (e('ap-field-ships-from'))   e('ap-field-ships-from').value   = p.shipsFrom||'';
+      if (e('ap-field-video-url'))    e('ap-field-video-url').value    = p.videoUrl||'';
+      if (p.condition) {
+        if (e('ap-field-condition-physical')) e('ap-field-condition-physical').value = p.condition;
+        if (e('ap-field-condition-vehicle'))  e('ap-field-condition-vehicle').value  = p.condition;
+      }
+      if (p.vehicle) {
+        if (e('ap-field-colour'))          e('ap-field-colour').value = p.vehicle.colour||'';
+        if (e('ap-field-vehicle-location')) e('ap-field-vehicle-location').value = p.vehicle.location||'';
+      }
+      // Pre-fill "What's included" features
+      if (p.whatsIncluded && p.whatsIncluded.length) {
+        var featList = e('ap-features-list');
+        if (featList) {
+          featList.innerHTML = '';
+          p.whatsIncluded.forEach(function(f) {
+            var row = document.createElement('div');
+            row.className = 'ap-variant-row';
+            row.innerHTML = '<input placeholder="Add a feature or benefit" type="text" value="'+f.replace(/"/g,'&quot;')+'"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button>';
+            featList.appendChild(row);
+          });
+        }
+      }
+      // Pre-fill sizes/variants
+      if (p.variants && p.variants.length) {
+        var varList = e('ap-variants-list');
+        if (varList) {
+          varList.innerHTML = '';
+          p.variants.forEach(function(v) {
+            var row = document.createElement('div');
+            row.className = 'ap-variant-row';
+            row.innerHTML = '<input placeholder="Size or variant name" type="text" value="'+(v.name||'').replace(/"/g,'&quot;')+'"><input placeholder="Price (if different)" type="text" style="max-width:160px;" value="'+(v.price||'').toString().replace(/"/g,'&quot;')+'"><button class="ap-variant-rm" onclick="apRemoveVariant(this)">×</button>';
+            varList.appendChild(row);
+          });
+        }
+      }
       // Select the correct product type card (apSelectType expects the clicked element, not a string)
       if (p.productType) {
         var typeEl = document.querySelector('.ap-type-opt[data-type="' + p.productType + '"]');
@@ -13889,7 +14097,17 @@ window.submitProduct = async function() {
     }
     var allPhotos = existingUrls.concat(uploadedUrls);
     if (publishBtn) publishBtn.textContent = 'Saving…';
-    var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active', platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(window._apType || 'physical') : 0.10 };
+    var videoUrl = (document.getElementById('ap-field-video-url')?.value || '').trim() || null;
+    var whatsIncluded = (typeof apGetFeatures === 'function') ? apGetFeatures() : [];
+    var variants = (typeof apGetVariants === 'function') ? apGetVariants() : [];
+    var condition = (typeof apGetCondition === 'function') ? apGetCondition() : '';
+    var updateData = { name, description:desc, price:Number(price), category, currency, stock, deliveryFee, shipsFrom: shipsFrom||null, updatedAt:fns.serverTimestamp(), status:'active', platformFeeRate: (typeof getCategoryFeeRate === 'function') ? getCategoryFeeRate(window._apType || 'physical') : 0.10, videoUrl, whatsIncluded, variants, condition };
+    if (window._apType === 'vehicle') {
+      updateData.vehicle = {
+        colour:   (document.getElementById('ap-field-colour')||{}).value || '',
+        location: (document.getElementById('ap-field-vehicle-location')||{}).value || '',
+      };
+    }
     if (allPhotos.length) { updateData.photos = allPhotos; updateData.photo = allPhotos[0]; }
     await fns.updateDoc(fns.doc(db,'products',window._editingProductId), updateData);
     window._editingProductId = null;
