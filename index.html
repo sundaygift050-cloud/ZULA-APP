@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=1280"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ZÚLA — Everything in One Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -804,6 +804,15 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   .pdetail-price{ font-size:22px; }
   .pdetail-actions{ flex-direction:column; }
   .pdetail-actions .btn{ width:100%; }
+  .pdetail-thumbs img{ width:52px; height:52px; }
+  #pd-product-details > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important; padding:12px !important; gap:8px !important;
+  }
+  #pd-video-wrap{ margin-top:14px; }
+
+  /* Publish View Profile hero — button row stacks, avatar/stats keep wrapping */
+  .p-btn-row{ flex-wrap:wrap; }
+  .p-btn-row .primary-btn, .p-btn-row .ghost-outline-btn{ min-width:120px; }
 
   /* Dash wrap padding */
   .dash-wrap{ padding:20px 14px 48px; }
@@ -907,6 +916,22 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   .preview-modal{ padding:16px; }
   .preview-modal-box{ padding:16px; }
   .pdetail-layout{ grid-template-columns:1fr; gap:20px; }
+
+  /* Product gallery — stack thumbs as a horizontal scroll strip below the
+     main image instead of a cramped vertical column beside it */
+  .pdetail-gallery{ flex-direction:column; }
+  .pdetail-thumbs{
+    width:100%; max-height:none; overflow-y:visible;
+    flex-direction:row !important; overflow-x:auto; padding-bottom:2px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pdetail-thumbs img{ flex-shrink:0; }
+
+  /* Product details grid — single column on narrower phones handled below;
+     tighten padding here for tablets/large phones */
+  #pd-product-details > div[style*="grid-template-columns:1fr 1fr"]{
+    padding:14px !important;
+  }
 }
 
 /* ── Laptop / Desktop (≥ 1024px) — enhance layout ── */
@@ -5042,75 +5067,16 @@ window.clearAllFilters = function() {
 };
 
 window.viewProduct = function(id) {
+  // Delegate to openProduct for a single, consistent code path — it does a
+  // fresh Firestore fetch and renders the gallery, video, product-details
+  // section, and (crucially) actually loads reviews. This function used to
+  // duplicate all of that from the local _allProducts cache and had drifted
+  // out of sync — most importantly it never called pdLoadReviews at all,
+  // which is why reviews silently never loaded when opening a product from
+  // the marketplace grid (the most common entry point).
+  if (typeof openProduct === 'function') { openProduct(id); return; }
   const p = (window._allProducts||[]).find(x => x.id === id);
-  if (!p) { if (typeof openProduct === 'function') openProduct(id); return; }
-  window._currentProduct = p;
-
-  // ── PHOTO / EMOJI ──────────────────────────────────────────────
-  var imgEl = document.getElementById('pd-img');
-  if (imgEl) {
-    var photoSrc = (p.photos && p.photos.length > 0) ? p.photos[0] : (p.photo || '');
-    if (photoSrc) {
-      imgEl.innerHTML = '<img src="' + photoSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">';
-    } else {
-      imgEl.textContent = p.emoji || (p.productType === 'realestate' ? '🏠' : '📦');
-      imgEl.style.fontSize = '80px'; imgEl.style.display = 'flex';
-      imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center';
-    }
-  }
-  // Thumbnail strip
-  var thumbs = document.getElementById('pd-photo-thumbs');
-  if (thumbs) {
-    if (p.photos && p.photos.length > 1) {
-      thumbs.innerHTML = p.photos.map(function(ph, i) {
-        return '<img src="' + ph + '" onclick="pdSwapPhoto(\'' + ph + '\')" style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ' + (i===0?'var(--accent)':'var(--border)') + '">';
-      }).join('');
-    } else {
-      thumbs.innerHTML = '';
-    }
-  }
-
-  // ── TEXT FIELDS ────────────────────────────────────────────────
-  var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
-  setText('pd-title',  p.name);
-  setText('pd-seller', 'By ' + (p.sellerName || 'ZÚLA Seller'));
-  setText('pd-price',  typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : (p.currency || 'NGN') + ' ' + Number(p.price).toLocaleString());
-  setText('pd-desc',   p.description || '');
-
-  var tagsEl = document.getElementById('pd-tags');
-  if (tagsEl) tagsEl.innerHTML =
-    '<span class="tag tag-gold">' + (p.type||'Physical') + '</span>' +
-    (p.commission ? ' <span class="tag tag-green">Affiliate · ' + p.commission + '%</span>' : '') +
-    (p.sellerVerified ? ' <span class="tag" style="background:rgba(39,201,122,.1);color:var(--green);">🛡 Verified seller</span>' : '');
-
-  // ── SELLER MESSAGE BUTTON ──────────────────────────────────────
-  var msgBtn = document.getElementById('pd-msg-seller-btn');
-  if (msgBtn) {
-    var user = window._auth && window._auth.currentUser;
-    msgBtn.style.display = (p.sellerId && (!user || p.sellerId !== user.uid)) ? 'inline-flex' : 'none';
-  }
-
-  // ── AFFILIATE SECTION ──────────────────────────────────────────
-  var affWrap = document.getElementById('pd-affiliate-wrap');
-  var affLink = document.getElementById('pd-affiliate-link');
-  var affPct  = document.getElementById('pd-commission-pct');
-  if (affWrap) {
-    if (p.commission && p.commission > 0) {
-      affWrap.style.display = '';
-      if (affPct) affPct.textContent = p.commission;
-      var user2 = window._auth && window._auth.currentUser;
-      if (affLink && user2) affLink.value = window.location.origin + window.location.pathname + '?ref=' + user2.uid + '&p=' + p.id;
-    } else { affWrap.style.display = 'none'; }
-  }
-
-  // ── SOCIAL SHARE ROW ──────────────────────────────────────────
-  if (typeof pdRenderShareRow === 'function') pdRenderShareRow();
-
-  // ── ENGAGEMENT (views/likes/comments) — called directly, not left to
-  // race against the async showPage hook, so counts never stick at 0 ──
-  if (typeof pdLoadEngagement === 'function') pdLoadEngagement(p.id, p.sellerId);
-
-  showPage('product');
+  if (p) { window._currentProduct = p; showPage('product'); }
 };
 
 // Swap main product photo when thumbnail clicked
