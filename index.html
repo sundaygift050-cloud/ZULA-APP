@@ -10344,7 +10344,7 @@ window.pdShowReviewForm = function() {
 };
 
 window.pdLoadReviews = async function(productId) {
-  var db = window._db, fns = window._fns;
+  var db = window._db, fns = window._fns, auth = window._auth;
   var el = document.getElementById('pd-reviews-list');
   if (!el) return;
   try {
@@ -10358,21 +10358,72 @@ window.pdLoadReviews = async function(productId) {
       return 0;
     });
     var total = 0; var count = docs.length;
+    var user = auth && auth.currentUser;
+    var p = window._currentProduct;
+    var isOwner = !!(user && p && p.sellerId === user.uid);
     el.innerHTML = '';
     docs.forEach(function(d) {
       var r = d.data();
+      var reviewId = d.id;
       total += (r.rating||0);
       var stars = '';
       for (var i=1;i<=5;i++) stars += '<span style="color:'+(i<=r.rating?'#f5c842':'var(--border2)')+';">★</span>';
       var card = document.createElement('div');
       card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;';
+
+      var replyHtml = '';
+      if (r.sellerReply && r.sellerReply.text) {
+        replyHtml = '<div style="margin-top:10px;margin-left:16px;padding:10px 12px;background:var(--bg3);border-left:2px solid var(--accent);border-radius:0 8px 8px 0;">' +
+          '<div style="font-size:11.5px;font-weight:700;color:var(--accent);margin-bottom:3px;">↩ Seller\'s response</div>' +
+          '<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">' + escapeHtml(r.sellerReply.text) + '</div>' +
+        '</div>';
+      } else if (isOwner) {
+        replyHtml = '<div style="margin-top:10px;">' +
+          '<button class="btn btn-ghost btn-sm" onclick="pdShowReplyForm(\'' + reviewId + '\', this)">↩ Reply to this review</button>' +
+          '<div id="pd-reply-form-' + reviewId + '" style="display:none;margin-top:8px;">' +
+            '<textarea id="pd-reply-text-' + reviewId + '" rows="2" placeholder="Write a public reply…" style="width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:12.5px;font-family:var(--font-body);outline:none;resize:vertical;"></textarea>' +
+            '<div style="display:flex;gap:8px;margin-top:6px;">' +
+              '<button class="btn btn-primary btn-sm" onclick="pdSubmitSellerReply(\'' + reviewId + '\')">Post reply</button>' +
+              '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'pd-reply-form-' + reviewId + '\').style.display=\'none\';">Cancel</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }
+
       card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;">' + (r.reviewerName||'Buyer') + '</div><div style="font-size:14px;">' + stars + '</div></div>' +
         '<div style="font-size:13px;color:var(--text2);line-height:1.5;">' + escapeHtml(r.text||'') + '</div>' +
-        '<div style="font-size:11px;color:var(--text3);margin-top:6px;">' + (r.createdAt&&r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '') + '</div>';
+        '<div style="font-size:11px;color:var(--text3);margin-top:6px;">' + (r.createdAt&&r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString() : '') + '</div>' +
+        replyHtml;
       el.appendChild(card);
     });
     pdUpdateStars(total/count, count);
   } catch(e) { console.error('pdLoadReviews:', e); el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load reviews.</div>'; }
+};
+
+window.pdShowReplyForm = function(reviewId, btn) {
+  var form = document.getElementById('pd-reply-form-' + reviewId);
+  if (form) { form.style.display = 'block'; var ta = document.getElementById('pd-reply-text-' + reviewId); if (ta) ta.focus(); }
+  if (btn) btn.style.display = 'none';
+};
+
+window.pdSubmitSellerReply = async function(reviewId) {
+  var db = window._db, fns = window._fns, auth = window._auth;
+  var user = auth && auth.currentUser;
+  var p = window._currentProduct;
+  if (!user || !p || p.sellerId !== user.uid) { showToast('Only the seller can reply to reviews.'); return; }
+  var ta = document.getElementById('pd-reply-text-' + reviewId);
+  var text = ta ? ta.value.trim() : '';
+  if (!text) { showToast('Write something before posting.'); return; }
+  try {
+    await fns.updateDoc(fns.doc(db, 'reviews', reviewId), {
+      sellerReply: { text: text, repliedAt: fns.serverTimestamp() },
+    });
+    showToast('✅ Reply posted.');
+    pdLoadReviews(p.id);
+  } catch(e) {
+    console.error('pdSubmitSellerReply:', e);
+    showToast('❌ Could not post reply. Try again.');
+  }
 };
 
 function pdUpdateStars(avg, count) {
