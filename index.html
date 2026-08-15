@@ -431,78 +431,29 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 }
 
 /* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
-#page-marketplace .mkt-banner-wrap{margin-bottom:28px;}
-/* Split hero — big headline/CTA on the left, product photo on the right,
-   like a classic ecommerce homepage banner. True one-slide-at-a-time
-   swipeable carousel underneath: native scroll-snap so it responds to
-   drag/swipe as well as the auto-advance timer, with dot pagination and
-   left/right arrow buttons. Same behaviour on desktop and mobile. */
-#page-marketplace .mkt-hero-shell{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-card);}
-#page-marketplace .mkt-banner-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+#page-marketplace .mkt-banner-wrap{margin-bottom:24px;}
+/* True one-slide-at-a-time swipeable carousel — same pattern on desktop
+   and mobile: native scroll-snap so it responds to drag/swipe as well as
+   the auto-advance timer, with dot pagination underneath. */
+#page-marketplace .mkt-banner-track{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  border-radius:18px;
+}
 #page-marketplace .mkt-banner-track::-webkit-scrollbar{display:none;}
-#page-marketplace .mkt-hero-slide{position:relative;flex:0 0 100%;scroll-snap-align:center;display:grid;grid-template-columns:1fr 1fr;align-items:center;min-height:320px;gap:20px;cursor:pointer;}
-#page-marketplace .mkt-hero-text{padding:36px 10px 36px 40px;}
-#page-marketplace .mkt-hero-eyebrow{font-size:12.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
-#page-marketplace .mkt-hero-text h1{font-size:38px;font-weight:800;line-height:1.15;font-family:var(--font-display);color:var(--text);margin-bottom:12px;}
-#page-marketplace .mkt-hero-text h1 span{color:var(--accent);}
-#page-marketplace .mkt-hero-text p{font-size:14.5px;color:var(--text3);margin-bottom:20px;}
-#page-marketplace .mkt-hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent-grad);color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14px;font-weight:700;font-family:var(--font-body);cursor:pointer;box-shadow:var(--shadow-btn);}
-#page-marketplace .mkt-hero-cta.small{padding:10px 18px;font-size:13px;margin-top:14px;}
-#page-marketplace .mkt-hero-img{height:100%;min-height:320px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg3);}
-#page-marketplace .mkt-hero-img img{width:100%;height:100%;object-fit:cover;}
-#page-marketplace .mkt-hero-arrow{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-card);color:var(--text);font-size:18px;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;}
-#page-marketplace .mkt-hero-arrow.left{left:14px;}
-#page-marketplace .mkt-hero-arrow.right{right:14px;}
-#page-marketplace .mkt-carousel-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:14px;}
+#page-marketplace .mkt-banner{position:relative;flex:0 0 100%;scroll-snap-align:center;height:280px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
+#page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 55%);}
+#page-marketplace .mkt-banner-tag{position:absolute;top:16px;right:16px;background:var(--gold-grad);color:#1a1206;font-size:13px;font-weight:800;padding:6px 16px;border-radius:999px;z-index:2;}
+#page-marketplace .mkt-banner-content{position:absolute;bottom:22px;left:24px;right:24px;z-index:2;}
+#page-marketplace .mkt-banner-title{font-size:26px;font-weight:800;color:#fff;font-family:var(--font-display);}
+#page-marketplace .mkt-banner-sub{font-size:14px;color:rgba(255,255,255,.85);margin-top:4px;}
+#page-marketplace .mkt-carousel-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;}
 #page-marketplace .mkt-carousel-dots .dot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:.2s ease;flex-shrink:0;}
 #page-marketplace .mkt-carousel-dots .dot.active{background:var(--accent);width:22px;border-radius:4px;}
-@media(max-width:760px){
-  #page-marketplace .mkt-hero-slide{grid-template-columns:1fr;min-height:0;}
-  #page-marketplace .mkt-hero-text{padding:26px 20px 16px;text-align:center;}
-  #page-marketplace .mkt-hero-text h1{font-size:26px;}
-  #page-marketplace .mkt-hero-img{min-height:180px;order:-1;}
-  #page-marketplace .mkt-hero-arrow{display:none;}
-}
-
-/* Quick shortcut row — Best Sellers / New Arrivals / Top Rated / On Sale */
-#page-marketplace .mkt-quick-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
-#page-marketplace .mkt-quick-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;box-shadow:var(--shadow-card);transition:.15s;}
-#page-marketplace .mkt-quick-card:hover{transform:translateY(-2px);}
-#page-marketplace .mkt-quick-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;color:#fff;}
-#page-marketplace .mkt-quick-lbl{font-size:13.5px;font-weight:700;color:var(--text);}
-#page-marketplace .mkt-quick-sub{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:1px;}
-@media(max-width:760px){#page-marketplace .mkt-quick-row{grid-template-columns:repeat(2,1fr);gap:10px;}}
-
-/* Featured Products / Just Arrived home sections */
-#page-marketplace .mkt-home-section{margin-bottom:30px;}
-#page-marketplace .mkt-home-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
-#page-marketplace .mkt-home-hd h2{font-size:20px;font-weight:800;font-family:var(--font-display);color:var(--text);}
-#page-marketplace .mkt-home-pills{display:flex;gap:8px;flex-wrap:wrap;}
-#page-marketplace .mkt-home-pill{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
-#page-marketplace .mkt-home-pill.active{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
-#page-marketplace .mkt-home-viewall{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;}
-#page-marketplace .mkt-home-split{display:grid;grid-template-columns:2.2fr 1fr;gap:20px;align-items:stretch;}
-#page-marketplace .mkt-home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
-@media(min-width:640px){#page-marketplace .mkt-home-grid{grid-template-columns:repeat(2,1fr);}}
-@media(min-width:1000px){#page-marketplace .mkt-home-grid{grid-template-columns:repeat(2,1fr);}}
-#page-marketplace .mkt-promo-card{position:relative;border-radius:16px;background:linear-gradient(160deg,var(--accent2),var(--accent));color:#fff;padding:26px 22px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;min-height:220px;}
-#page-marketplace .mkt-promo-card.alt{background:linear-gradient(160deg,#1d4ed8,#3b82f6);}
-#page-marketplace .mkt-promo-tag{align-self:flex-start;background:rgba(255,255,255,.18);font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px;margin-bottom:14px;}
-#page-marketplace .mkt-promo-title{font-size:19px;font-weight:800;font-family:var(--font-display);line-height:1.25;margin-bottom:8px;}
-#page-marketplace .mkt-promo-sub{font-size:12px;opacity:.85;}
-#page-marketplace .mkt-promo-price{font-size:24px;font-weight:800;margin-top:2px;}
-#page-marketplace .mkt-promo-card img{position:absolute;right:-10px;bottom:-10px;width:64%;max-width:180px;object-fit:contain;filter:drop-shadow(0 12px 20px rgba(0,0,0,.3));}
-@media(max-width:900px){#page-marketplace .mkt-home-split{grid-template-columns:1fr;}#page-marketplace .mkt-promo-card{min-height:140px;}}
-@media(max-width:480px){#page-marketplace .mkt-home-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
-
-/* 3-column category banner row */
-#page-marketplace .mkt-cat-banner-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
-#page-marketplace .mkt-cat-banner{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;overflow:hidden;min-height:90px;box-shadow:var(--shadow-card);}
-#page-marketplace .mkt-cat-banner-title{font-size:16px;font-weight:800;color:var(--text);font-family:var(--font-display);}
-#page-marketplace .mkt-cat-banner-sub{font-size:11.5px;color:var(--text3);margin-top:2px;}
-#page-marketplace .mkt-cat-banner-link{font-size:11.5px;font-weight:700;color:var(--accent);margin-top:8px;display:inline-block;}
-#page-marketplace .mkt-cat-banner-emoji{position:absolute;right:14px;bottom:10px;font-size:40px;opacity:.9;}
-@media(max-width:760px){#page-marketplace .mkt-cat-banner-row{grid-template-columns:1fr;}}
+@media(max-width:640px){#page-marketplace .mkt-banner{height:220px;}#page-marketplace .mkt-banner-title{font-size:21px;}}
 
 /* Rotating top-5 leaderboard banner — replaces the promo carousel once
    admin has published one. Cycles entries every 5s (mktStartLeaderboardRotation). */
@@ -1980,68 +1931,20 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
 
     <div class="mkt-banner-wrap" id="mkt-banner-fallback">
-      <div class="mkt-hero-shell">
-        <button class="mkt-hero-arrow left" onclick="mktSpotlightGoTo((window._mktSpotlightIdx||0)-1 < 0 ? (window._mktHeroPoolLen||1)-1 : (window._mktSpotlightIdx||0)-1)">‹</button>
-        <div class="mkt-banner-track" id="mkt-banner-track">
-          <div class="mkt-hero-slide">
-            <div class="mkt-hero-text">
-              <div class="mkt-hero-eyebrow">Welcome to ZÚLA</div>
-              <h1>Hot deals<br>Up to <span>50% off</span></h1>
-              <p>The best finds. The best sellers.</p>
-              <button class="mkt-hero-cta" onclick="showPage('marketplace')">Shop now <span>→</span></button>
-            </div>
-            <div class="mkt-hero-img"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80" alt=""></div>
-          </div>
+      <div class="mkt-banner-track" id="mkt-banner-track">
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80');">
+          <div class="mkt-banner-tag">50% OFF</div>
+          <div class="mkt-banner-content"><div class="mkt-banner-title">Summer Sale</div><div class="mkt-banner-sub">Up to 50% off selected items</div></div>
         </div>
-        <button class="mkt-hero-arrow right" onclick="mktSpotlightGoTo(((window._mktSpotlightIdx||0)+1) % (window._mktHeroPoolLen||1))">›</button>
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80');">
+          <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
+        </div>
+        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80');">
+          <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
+        </div>
       </div>
       <div class="mkt-carousel-dots" id="mkt-spotlight-dots"></div>
     </div>
-
-    <!-- Quick shortcut row — Best Sellers / New Arrivals / Top Rated / On Sale -->
-    <div class="mkt-quick-row">
-      <div class="mkt-quick-card" onclick="mktQuickShortcut('bestsellers')"><div class="mkt-quick-ico" style="background:linear-gradient(135deg,#f59e0b,#ea580c);">🏆</div><div><div class="mkt-quick-lbl">Best Sellers</div><div class="mkt-quick-sub">Shop now ›</div></div></div>
-      <div class="mkt-quick-card" onclick="mktQuickShortcut('newest')"><div class="mkt-quick-ico" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">📬</div><div><div class="mkt-quick-lbl">New Arrivals</div><div class="mkt-quick-sub">Shop now ›</div></div></div>
-      <div class="mkt-quick-card" onclick="mktQuickShortcut('toprated')"><div class="mkt-quick-ico" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">⭐</div><div><div class="mkt-quick-lbl">Top Rated</div><div class="mkt-quick-sub">Shop now ›</div></div></div>
-      <div class="mkt-quick-card" onclick="mktQuickShortcut('onsale')"><div class="mkt-quick-ico" style="background:linear-gradient(135deg,#f97316,#ea580c);">🏷️</div><div><div class="mkt-quick-lbl">On Sale</div><div class="mkt-quick-sub">Shop now ›</div></div></div>
-    </div>
-
-    <!-- Featured Products — pill filters + grid + side promo card -->
-    <div class="mkt-home-section">
-      <div class="mkt-home-hd">
-        <h2>Featured Products</h2>
-        <div class="mkt-home-pills" id="mkt-featured-pills"></div>
-      </div>
-      <div class="mkt-home-split">
-        <div class="mkt-home-grid" id="mkt-featured-grid"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
-        <div class="mkt-promo-card" id="mkt-promo-card-1" onclick="showPage('marketplace')">
-          <div class="mkt-promo-tag">Featured</div>
-          <div class="mkt-promo-title" id="mkt-promo-1-title">—</div>
-          <div class="mkt-promo-sub">Starting at</div>
-          <div class="mkt-promo-price" id="mkt-promo-1-price">—</div>
-          <img id="mkt-promo-1-img" src="" alt="">
-        </div>
-      </div>
-    </div>
-
-    <!-- Just Arrived — newest listings + side promo card -->
-    <div class="mkt-home-section">
-      <div class="mkt-home-hd">
-        <h2>Just Arrived</h2>
-        <a class="mkt-home-viewall" onclick="mktQuickShortcut('newest')">View all</a>
-      </div>
-      <div class="mkt-home-split">
-        <div class="mkt-home-grid" id="mkt-newest-grid"><div style="color:var(--text3);font-size:13px;">Loading…</div></div>
-        <div class="mkt-promo-card alt" id="mkt-promo-card-2" onclick="mktQuickShortcut('onsale')">
-          <div class="mkt-promo-tag">Save big</div>
-          <div class="mkt-promo-title">Save up to 35%<br>on weekly deals</div>
-          <button class="mkt-hero-cta small">Shop now <span>→</span></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3-column category banner row -->
-    <div class="mkt-cat-banner-row" id="mkt-cat-banner-row"></div>
 
     <!-- Flash sale urgency bar — starts as a tiny pressable pill; clicking
          expands it to show the countdown, subtext, and a link to filter
@@ -13113,24 +13016,18 @@ window.mktLoadTopBanners = async function() {
   var pool = ranked.slice(0, 8);
   if (!pool.length) return;
 
-  var labels = ['Hot deals', 'New this week', 'Trending now'];
+  var labels = ['🔥 Top Seller', '⭐ Fan Favourite', '📈 Trending Now'];
 
   track.innerHTML = pool.map(function(p, i) {
     var id = p._id || p.id;
     var photo = (p.photos && p.photos[0]) || p.photo || '';
     var sold = soldMap[id] || 0;
-    var symLocal = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
-    return '<div class="mkt-hero-slide" onclick="viewProduct(\'' + id + '\')">' +
-      '<div class="mkt-hero-text">' +
-        '<div class="mkt-hero-eyebrow">' + (labels[i % 3] || 'Featured') + (sold > 0 ? ' · ' + sold + ' sold' : '') + '</div>' +
-        '<h1>' + (p.name || 'Featured item') + '</h1>' +
-        '<p>by ' + (p.sellerName || 'ZÚLA Seller') + ' · <span style="color:var(--accent);font-weight:700;">' + symLocal + Number(p.price||0).toLocaleString() + '</span></p>' +
-        '<button class="mkt-hero-cta" onclick="event.stopPropagation();viewProduct(\'' + id + '\')">Shop now <span>→</span></button>' +
-      '</div>' +
-      '<div class="mkt-hero-img"><img src="' + photo + '" alt=""></div>' +
+    var tagHtml = sold > 0 ? '<div class="mkt-banner-tag">' + sold + ' sold</div>' : '';
+    return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');" onclick="viewProduct(\'' + id + '\')">' +
+      tagHtml +
+      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i % 3] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
     '</div>';
   }).join('');
-  window._mktHeroPoolLen = pool.length;
 
   if (dotsEl) {
     dotsEl.innerHTML = pool.map(function(_, i) {
@@ -13189,105 +13086,6 @@ window.mktLoadTopBanners = async function() {
   track.addEventListener('scroll', window._mktSpotlightScrollHandler, { passive: true });
 };
 
-// ── Homepage sections: Featured Products (with category pills + promo
-// card), Just Arrived (newest + promo card), and a 3-column category
-// banner row — all built from real product data, no placeholder content. ──
-window._mktFeaturedPill = window._mktFeaturedPill || 'all';
-
-window.mktQuickShortcut = function(kind) {
-  // Jump straight to the full filterable grid further down the page,
-  // pre-sorted to match what was clicked.
-  var sortTop = document.getElementById('filter-sort-top');
-  var sortHidden = document.getElementById('filter-sort');
-  var sortValue = kind === 'toprated' ? 'rating' : 'newest';
-  if (kind === 'onsale' && typeof mktToggleFlashFilter === 'function') { mktToggleFlashFilter(); return; }
-  if (sortTop) sortTop.value = sortValue;
-  if (sortHidden) sortHidden.value = sortValue;
-  if (typeof applyFilters === 'function') applyFilters();
-  var grid = document.getElementById('products-grid');
-  if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
-window.mktRenderHomeSections = function() {
-  var products = (window._allProducts || []).filter(function(p){ return p.status !== 'draft' && ((p.photos && p.photos.length) || p.photo); });
-  if (!products.length) return;
-
-  var symbolFor = function(p) { return {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || ''; };
-
-  // ── Featured Products: category pills + grid ──
-  var pillsEl = document.getElementById('mkt-featured-pills');
-  var featuredCats = ['all', 'fashion', 'electronics', 'realestate', 'beauty'];
-  var catLabels = { all: 'All', fashion: 'Fashion', electronics: 'Electronics', realestate: 'Real Estate', beauty: 'Beauty' };
-  if (pillsEl) {
-    pillsEl.innerHTML = featuredCats.map(function(c) {
-      return '<button class="mkt-home-pill' + (c === window._mktFeaturedPill ? ' active' : '') + '" onclick="mktSetFeaturedPill(\'' + c + '\')">' + catLabels[c] + '</button>';
-    }).join('');
-  }
-  window.mktSetFeaturedPill = function(c) {
-    window._mktFeaturedPill = c;
-    mktRenderHomeSections();
-  };
-
-  var featuredPool = products.filter(function(p) {
-    return window._mktFeaturedPill === 'all' || (p.category || '').toLowerCase() === window._mktFeaturedPill;
-  }).slice(0, 4);
-  if (!featuredPool.length) featuredPool = products.slice(0, 4);
-
-  var featuredGrid = document.getElementById('mkt-featured-grid');
-  if (featuredGrid) {
-    featuredGrid.innerHTML = featuredPool.map(function(p) {
-      var id = p._id || p.id;
-      return (typeof zulaBuildProductCard === 'function')
-        ? zulaBuildProductCard(p, id, { showHeart: true, showBuyPill: true, showSeller: true, showRating: true })
-        : '';
-    }).join('');
-  }
-
-  var promo1 = products[Math.min(3, products.length - 1)];
-  if (promo1) {
-    var t1 = document.getElementById('mkt-promo-1-title'), pr1 = document.getElementById('mkt-promo-1-price'), img1 = document.getElementById('mkt-promo-1-img'), card1 = document.getElementById('mkt-promo-card-1');
-    if (t1) t1.textContent = promo1.name || 'Featured pick';
-    if (pr1) pr1.textContent = symbolFor(promo1) + Number(promo1.price || 0).toLocaleString();
-    if (img1) img1.src = (promo1.photos && promo1.photos[0]) || promo1.photo || '';
-    if (card1) card1.onclick = function() { viewProduct(promo1._id || promo1.id); };
-  }
-
-  // ── Just Arrived: newest 4 products ──
-  var newest = products.slice().sort(function(a, b) {
-    var at = a.createdAt, bt = b.createdAt;
-    if (at && bt && at.toMillis) return bt.toMillis() - at.toMillis();
-    return 0;
-  }).slice(0, 4);
-  var newestGrid = document.getElementById('mkt-newest-grid');
-  if (newestGrid) {
-    newestGrid.innerHTML = newest.map(function(p) {
-      var id = p._id || p.id;
-      return (typeof zulaBuildProductCard === 'function')
-        ? zulaBuildProductCard(p, id, { showHeart: true, showBuyPill: true, showSeller: true, showRating: true })
-        : '';
-    }).join('');
-  }
-
-  // ── 3-column category banner row — links straight into the category filter ──
-  var bannerCats = [
-    { cat: 'electronics', label: 'Electronics', sub: 'Gadgets & devices', emoji: '💻' },
-    { cat: 'fashion', label: 'Fashion', sub: 'Clothing & accessories', emoji: '👗' },
-    { cat: 'realestate', label: 'Real Estate', sub: 'Land, homes & rentals', emoji: '🏠' },
-  ];
-  var bannerRow = document.getElementById('mkt-cat-banner-row');
-  if (bannerRow) {
-    bannerRow.innerHTML = bannerCats.map(function(b) {
-      var cheapest = products.filter(function(p) { return (p.category || '').toLowerCase() === b.cat; }).sort(function(a, c) { return (a.price || 0) - (c.price || 0); })[0];
-      var fromPrice = cheapest ? symbolFor(cheapest) + Number(cheapest.price || 0).toLocaleString() : '';
-      return '<div class="mkt-cat-banner" onclick="mktSelectCategoryIcon(\'' + b.cat + '\', null)">' +
-        '<div class="mkt-cat-banner-title">' + b.label + '</div>' +
-        '<div class="mkt-cat-banner-sub">' + (fromPrice ? 'From ' + fromPrice : b.sub) + '</div>' +
-        '<div class="mkt-cat-banner-link">Shop now ›</div>' +
-        '<div class="mkt-cat-banner-emoji">' + b.emoji + '</div>' +
-      '</div>';
-    }).join('');
-  }
-};
 window.mktLoadFeaturedDeals = async function() {
   var section = document.getElementById('mkt-deals-section');
   var row = document.getElementById('mkt-deals-row');
@@ -13518,7 +13316,6 @@ window.loadProducts = async function() {
     if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
     if (typeof mktLoadFeaturedDeals === 'function') mktLoadFeaturedDeals();
     if (typeof mktLoadTopBanners === 'function') mktLoadTopBanners();
-    if (typeof mktRenderHomeSections === 'function') mktRenderHomeSections();
     if (typeof mktLoadTrending === 'function') mktLoadTrending('newest');
     if (typeof mktSyncPlatformFlags === 'function') mktSyncPlatformFlags();
     if (typeof mktLoadLeaderboard === 'function') mktLoadLeaderboard();
