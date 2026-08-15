@@ -12922,8 +12922,14 @@ window.mktLoadTopBanners = async function() {
 
   window.mktSpotlightGoTo = function(idx) {
     var t = document.getElementById('mkt-banner-track');
-    if (!t || !t.children[idx]) return;
-    t.children[idx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    var slide = t && t.children[idx];
+    if (!t || !slide) return;
+    // Scroll only the carousel's own horizontal track — never use
+    // scrollIntoView here. Even with block:'nearest', scrollIntoView will
+    // still scroll the whole page vertically back to the banner if the
+    // person has scrolled down past it, which yanks them away from
+    // whatever product they were browsing every time the slide advances.
+    t.scrollTo({ left: slide.offsetLeft - (t.clientWidth - slide.clientWidth) / 2, behavior: 'smooth' });
     window._mktSpotlightIdx = idx;
     updateDots(idx);
   };
