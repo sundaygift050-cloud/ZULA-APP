@@ -13062,7 +13062,7 @@ window.mktLoadTopBanners = async function() {
       var t = document.getElementById('mkt-banner-track');
       if (!t) { clearInterval(window._mktSpotlightTimer); window._mktSpotlightTimer = null; return; }
       window.mktSpotlightGoTo((window._mktSpotlightIdx + 1) % pool.length);
-    }, 3000);
+    }, 35000);
   }
 
   // Keep the dots in sync when the person swipes/drags manually
