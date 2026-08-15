@@ -122,6 +122,49 @@ p{color:var(--text2);margin:0 0 1em;}
 .how-card .hc-num{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
 .how-card h3{font-size:16px;font-weight:700;margin-bottom:8px;}
 .how-card p{font-size:13.5px;margin:0;}
+
+/* Hero split layout — copy left, real-product photo collage right */
+.lp-hero-split{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;position:relative;z-index:1;}
+.lp-hero-visual{position:relative;height:380px;}
+.lp-hero-tile{position:absolute;border-radius:18px;background:var(--surface) center/cover no-repeat;border:1px solid var(--border);box-shadow:var(--shadow-card);}
+.lp-hero-tile.main{top:0;right:0;width:78%;height:78%;}
+.lp-hero-tile.small1{bottom:0;left:0;width:46%;height:46%;box-shadow:0 14px 30px rgba(0,0,0,.35);}
+.lp-hero-tile.small2{top:10%;left:-4%;width:34%;height:34%;box-shadow:0 14px 30px rgba(0,0,0,.35);}
+.lp-hero-badge{position:absolute;bottom:8%;right:4%;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-card);border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:700;color:var(--text);z-index:2;}
+@media(max-width:900px){.lp-hero-split{grid-template-columns:1fr;}.lp-hero-visual{height:260px;order:-1;margin-bottom:10px;}}
+
+/* Step-by-step how-it-works tabs */
+.lp-steps-tabs{display:flex;justify-content:center;gap:10px;margin-bottom:28px;}
+.lp-steps-tab{padding:9px 20px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+.lp-steps-tab.active{background:var(--accent-grad);border-color:var(--accent);color:#fff;}
+.lp-steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.lp-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:24px;position:relative;}
+.lp-step-num{width:32px;height:32px;border-radius:50%;background:var(--accent-grad);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.lp-step h4{font-size:15px;font-weight:700;margin-bottom:6px;}
+.lp-step p{font-size:13px;color:var(--text3);line-height:1.5;margin:0;}
+@media(max-width:760px){.lp-steps-grid{grid-template-columns:1fr;}}
+
+/* Trust / policy cards */
+.lp-trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.lp-trust-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:22px;text-align:center;}
+.lp-trust-ico{font-size:26px;margin-bottom:10px;}
+.lp-trust-card h4{font-size:14.5px;font-weight:700;margin-bottom:6px;}
+.lp-trust-card p{font-size:12.5px;color:var(--text3);line-height:1.5;margin:0;}
+@media(max-width:900px){.lp-trust-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.lp-trust-grid{grid-template-columns:1fr;}}
+
+/* Richer footer */
+.lp-footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding-top:10px;}
+.lp-footer-col a{display:block;font-size:13px;color:var(--text3);cursor:pointer;margin-bottom:10px;text-decoration:none;}
+.lp-footer-col a:hover{color:var(--accent);}
+.lp-footer-hd{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+@media(max-width:700px){.lp-footer-grid{grid-template-columns:1fr 1fr;}}
+
+/* Policy pages */
+.lp-policy-body h3{font-size:16px;font-weight:700;margin:26px 0 8px;}
+.lp-policy-body h3:first-child{margin-top:0;}
+.lp-policy-body p{font-size:14px;color:var(--text2);line-height:1.7;}
+
 .aff-section{padding:64px 0;}
 .aff-box{background:linear-gradient(135deg,rgba(124,92,252,.12),rgba(91,63,219,.06));border:1px solid rgba(124,92,252,.25);border-radius:var(--radius);padding:48px;text-align:center;}
 .aff-box h2{font-size:28px;font-weight:800;margin-bottom:12px;}
@@ -1636,19 +1679,27 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       <div class="aurora-blob b3"></div>
     </div>
     <div class="grid-veil"></div>
-    <div class="wrap">
-      <div class="hero-eyebrow">🌍 The world's all-in-one marketplace</div>
-      <h1>Buy. Sell.<br><em>Earn.</em> Together.</h1>
-      <p class="lede">Discover unique products, support independent creators, and earn while you share.</p>
-      <div class="hero-cta">
-        <button class="btn btn-primary btn-glow" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
-        <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-signin')">Become an affiliate</button>
+    <div class="wrap lp-hero-split">
+      <div class="lp-hero-copy">
+        <div class="hero-eyebrow">🌍 The world's all-in-one marketplace</div>
+        <h1>Buy. Sell.<br><em>Earn.</em> Together.</h1>
+        <p class="lede">Discover unique products, support independent creators, and earn while you share.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-glow" style="font-size:15px;padding:14px 28px;" onclick="requireAuth('marketplace')">Start shopping →</button>
+          <button class="btn btn-ghost" style="font-size:15px;padding:14px 28px;" onclick="showPage('affiliate-signin')">Become an affiliate</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="hstat-num" id="lp-stat-products">—</div><div class="hstat-lbl">Live listings</div></div>
+          <div><div class="hstat-num" id="lp-stat-sellers">—</div><div class="hstat-lbl">Active sellers</div></div>
+          <div><div class="hstat-num" id="lp-stat-categories">—</div><div class="hstat-lbl">Categories</div></div>
+          <div><div class="hstat-num">Escrow</div><div class="hstat-lbl">Protected payments</div></div>
+        </div>
       </div>
-      <div class="hero-stats">
-        <div><div class="hstat-num">Free</div><div class="hstat-lbl">To join</div></div>
-        <div><div class="hstat-num">Escrow</div><div class="hstat-lbl">Protected payments</div></div>
-        <div><div class="hstat-num">5–20%</div><div class="hstat-lbl">Affiliate commission</div></div>
-        <div><div class="hstat-num">150+</div><div class="hstat-lbl">Countries</div></div>
+      <div class="lp-hero-visual" id="lp-hero-visual">
+        <div class="lp-hero-tile main"></div>
+        <div class="lp-hero-tile small1"></div>
+        <div class="lp-hero-tile small2"></div>
+        <div class="lp-hero-badge">🔒 Escrow protected</div>
       </div>
     </div>
   </section>
@@ -1674,6 +1725,50 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
           <p>Share links and earn commission on every sale you drive. No investment, no inventory needed.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Step-by-step "how it works" — separate buyer / seller flows -->
+  <section class="wrap" style="padding:10px 24px 50px;">
+    <h2 style="font-size:24px;font-weight:700;margin-bottom:22px;text-align:center;">How it works</h2>
+    <div class="lp-steps-tabs">
+      <button class="lp-steps-tab active" id="lp-steps-tab-buy" onclick="lpStepsTab('buy')">I want to buy</button>
+      <button class="lp-steps-tab" id="lp-steps-tab-sell" onclick="lpStepsTab('sell')">I want to sell</button>
+    </div>
+    <div class="lp-steps-grid" id="lp-steps-buy">
+      <div class="lp-step"><div class="lp-step-num">1</div><h4>Browse &amp; find it</h4><p>Search or explore categories to find what you need — physical goods, digital products, even real estate.</p></div>
+      <div class="lp-step"><div class="lp-step-num">2</div><h4>Pay safely</h4><p>Checkout securely. Your money is held in escrow — the seller never touches it until you're satisfied.</p></div>
+      <div class="lp-step"><div class="lp-step-num">3</div><h4>Confirm &amp; enjoy</h4><p>Once you receive your order, confirm receipt to release payment. Something wrong? Open a dispute — we'll step in.</p></div>
+    </div>
+    <div class="lp-steps-grid" id="lp-steps-sell" style="display:none;">
+      <div class="lp-step"><div class="lp-step-num">1</div><h4>List in minutes</h4><p>Create an account, add your product with photos, price, and details. Physical, digital, vehicle, or property.</p></div>
+      <div class="lp-step"><div class="lp-step-num">2</div><h4>Get discovered</h4><p>Your listing goes live on the marketplace instantly. Buyers can message you, ask questions, and buy.</p></div>
+      <div class="lp-step"><div class="lp-step-num">3</div><h4>Get paid</h4><p>Once the buyer confirms receipt, funds move to your payout balance. Withdraw to your bank whenever you're ready.</p></div>
+    </div>
+  </section>
+
+  <!-- Real live listings preview — no placeholder content -->
+  <section class="wrap" style="padding:0 24px 50px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+      <h2 style="font-size:24px;font-weight:700;">What's on ZÚLA right now</h2>
+      <a onclick="requireAuth('marketplace')" style="font-size:13.5px;font-weight:700;color:var(--accent);cursor:pointer;">Browse all →</a>
+    </div>
+    <div class="pgrid" id="lp-preview-grid"><div style="color:var(--text3);font-size:13px;">Loading live listings…</div></div>
+  </section>
+
+  <!-- Trust & policy section -->
+  <section class="wrap" style="padding:0 24px 50px;">
+    <h2 style="font-size:24px;font-weight:700;margin-bottom:22px;text-align:center;">Built for trust</h2>
+    <div class="lp-trust-grid">
+      <div class="lp-trust-card"><div class="lp-trust-ico">🔒</div><h4>Escrow protection</h4><p>Every payment is held safely until the buyer confirms they received what they paid for. Sellers never get paid before delivery is confirmed.</p></div>
+      <div class="lp-trust-card"><div class="lp-trust-ico">✅</div><h4>Verified sellers</h4><p>Sellers can go through identity &amp; business verification for a "Verified Seller" badge — shown wherever their name appears.</p></div>
+      <div class="lp-trust-card"><div class="lp-trust-ico">⚖️</div><h4>Dispute resolution</h4><p>If something goes wrong, either side can open a dispute. Our team reviews the evidence and resolves it fairly.</p></div>
+      <div class="lp-trust-card"><div class="lp-trust-ico">⭐</div><h4>Real reviews</h4><p>Only verified buyers can leave a star rating and review — and sellers can publicly reply to any review.</p></div>
+    </div>
+    <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--text3);">
+      Read our full <a onclick="showPage('policy-terms')" style="color:var(--accent);cursor:pointer;">Terms of Service</a>,
+      <a onclick="showPage('policy-privacy')" style="color:var(--accent);cursor:pointer;">Privacy Policy</a>, and
+      <a onclick="showPage('policy-escrow')" style="color:var(--accent);cursor:pointer;">Escrow &amp; Refund Policy</a>.
     </div>
   </section>
 
@@ -1703,20 +1798,96 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
   </section>
 
-  <footer class="footer">
+  <footer class="footer lp-footer">
     <div class="wrap">
-      <div class="footer-inner">
-        <div class="footer-logo">ZÚ<span>LA</span></div>
-        <div class="footer-links">
-          <a onclick="showPage('home')" style="color:var(--text3);cursor:pointer;">Home</a>
-          <a onclick="requireAuth('marketplace')" style="color:var(--text3);cursor:pointer;">Browse</a>
-          <a onclick="showPage('affiliate-signin')" style="color:var(--text3);cursor:pointer;">Affiliate</a>
-          <a onclick="showPage('signup')" style="color:var(--text3);cursor:pointer;">Sign up</a>
+      <div class="lp-footer-grid">
+        <div class="lp-footer-col lp-footer-brand">
+          <div class="footer-logo">ZÚ<span>LA</span></div>
+          <p style="font-size:13px;color:var(--text3);margin-top:10px;max-width:220px;">The world's all-in-one marketplace — buy, sell, and earn together.</p>
         </div>
-        <div class="footer-copy">© 2026 ZÚLA Marketplace Ltd.</div>
+        <div class="lp-footer-col">
+          <div class="lp-footer-hd">Marketplace</div>
+          <a onclick="requireAuth('marketplace')">Browse products</a>
+          <a onclick="goAddProduct()">Start selling</a>
+          <a onclick="showPage('affiliate-signin')">Affiliate programme</a>
+          <a onclick="showPage('signup')">Sign up</a>
+        </div>
+        <div class="lp-footer-col">
+          <div class="lp-footer-hd">Company</div>
+          <a onclick="showPage('home')">About ZÚLA</a>
+          <a onclick="showToast('We\'ll have a full help center here soon!')">Help centre</a>
+          <a href="mailto:hello@zula.market">Contact us</a>
+        </div>
+        <div class="lp-footer-col">
+          <div class="lp-footer-hd">Legal</div>
+          <a onclick="showPage('policy-terms')">Terms of Service</a>
+          <a onclick="showPage('policy-privacy')">Privacy Policy</a>
+          <a onclick="showPage('policy-escrow')">Escrow &amp; Refund Policy</a>
+        </div>
       </div>
+      <div class="footer-copy" style="margin-top:26px;padding-top:20px;border-top:1px solid var(--border);">© 2026 ZÚLA Marketplace Ltd. All rights reserved.</div>
     </div>
   </footer>
+</div>
+
+<!-- ================================================================
+     POLICY PAGES (Terms / Privacy / Escrow) — simple static content,
+     reachable from the homepage footer and trust section
+     ================================================================ -->
+<div class="page" id="page-policy-terms">
+  <header class="hdr"><div class="wrap hdr-inner"><div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div><a onclick="showPage('home')" class="btn btn-ghost btn-sm">← Back home</a></div></header>
+  <div class="wrap" style="max-width:760px;padding:40px 24px 80px;">
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">Terms of Service</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:30px;">Last updated: 2026</p>
+    <div class="lp-policy-body">
+      <h3>1. Using ZÚLA</h3>
+      <p>By creating an account, you agree to use ZÚLA honestly — accurate listings, real products, and truthful communication with other users.</p>
+      <h3>2. Buying &amp; selling</h3>
+      <p>Sellers are responsible for the accuracy of their listings and for fulfilling orders as described. Buyers are responsible for reading listings carefully before purchasing.</p>
+      <h3>3. Escrow</h3>
+      <p>Payments are held in escrow until the buyer confirms receipt or a dispute is resolved. See our full Escrow &amp; Refund Policy for details.</p>
+      <h3>4. Prohibited items</h3>
+      <p>Illegal goods, counterfeit items, and anything violating local law may not be listed.</p>
+      <h3>5. Account suspension</h3>
+      <p>ZÚLA may suspend accounts that violate these terms, commit fraud, or repeatedly receive valid disputes.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-policy-privacy">
+  <header class="hdr"><div class="wrap hdr-inner"><div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div><a onclick="showPage('home')" class="btn btn-ghost btn-sm">← Back home</a></div></header>
+  <div class="wrap" style="max-width:760px;padding:40px 24px 80px;">
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">Privacy Policy</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:30px;">Last updated: 2026</p>
+    <div class="lp-policy-body">
+      <h3>What we collect</h3>
+      <p>Account details (name, email, phone), listing content you provide, and order/transaction history needed to operate the marketplace.</p>
+      <h3>How we use it</h3>
+      <p>To run your account, process orders and payouts, show you relevant listings, and keep the platform safe (fraud/dispute prevention).</p>
+      <h3>Sharing</h3>
+      <p>We share only what's needed with payment processors (e.g. Paystack) to complete transactions. We don't sell your personal data.</p>
+      <h3>Your controls</h3>
+      <p>You can edit your profile, adjust notification preferences, and request account deletion at any time from Settings.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-policy-escrow">
+  <header class="hdr"><div class="wrap hdr-inner"><div class="logo" onclick="showPage('home')">ZÚ<span>LA</span></div><a onclick="showPage('home')" class="btn btn-ghost btn-sm">← Back home</a></div></header>
+  <div class="wrap" style="max-width:760px;padding:40px 24px 80px;">
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">Escrow &amp; Refund Policy</h1>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:30px;">Last updated: 2026</p>
+    <div class="lp-policy-body">
+      <h3>How escrow works</h3>
+      <p>When you pay for an order, funds are held by ZÚLA — not sent to the seller. They're only released once you confirm you received your order.</p>
+      <h3>Confirming receipt</h3>
+      <p>Once your order arrives (or your digital product/service is delivered), open the order and tap "Confirm receipt" to release payment to the seller.</p>
+      <h3>Disputes</h3>
+      <p>If an order never arrives, doesn't match its description, or something else goes wrong, open a dispute before confirming receipt. Our team reviews evidence from both sides and decides how funds are released.</p>
+      <h3>Refunds</h3>
+      <p>If a dispute is resolved in the buyer's favor, the held escrow funds are refunded. Refund timing depends on the original payment method.</p>
+    </div>
+  </div>
 </div>
 
 <!-- ================================================================
@@ -6615,6 +6786,7 @@ function showPage(name) {
 
   // Page-specific loaders
   if (name === 'marketplace')      { if(typeof loadProducts==='function') loadProducts(); }
+  if (name === 'home')             { if(typeof loadHomePage==='function') loadHomePage(); }
   if (name === 'profile')          { if(typeof loadProfilePage==='function') loadProfilePage(); }
   if (name === 'seller-dashboard') { if(typeof loadSellerDashboardPage==='function') loadSellerDashboardPage(); }
   if (name === 'profile-v2')       { if(typeof loadProfileV2==='function') loadProfileV2(); }
@@ -12853,7 +13025,7 @@ window.zulaBuildProductCard = function(p, id, opts) {
       ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="event.stopPropagation();viewProduct(\''+id+'\')" style="flex:1;">View</button></div>'
       : '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>';
 
-  return '<div class="pcard" onclick="viewProduct(\''+id+'\');" style="position:relative;">' +
+  return '<div class="pcard" onclick="'+(opts.onClickOverride || ("viewProduct('"+id+"');"))+'" style="position:relative;">' +
     topBadge + heartHtml +
     '<div class="pcard-img" style="overflow:hidden;">' + img + '</div>' +
     '<div class="pcard-body">' +
@@ -13301,6 +13473,65 @@ window.mktSelectCategoryPill = function(cat, btn) {
 // entirely (it used to call the old renderer first, then immediately overwrite
 // it with this one — a wasteful double-render that risked the old-style cards
 // winning if anything interrupted the second render).
+// ── Public homepage: live stats + real listings preview + step tabs ──
+window.lpStepsTab = function(which) {
+  document.getElementById('lp-steps-tab-buy').classList.toggle('active', which === 'buy');
+  document.getElementById('lp-steps-tab-sell').classList.toggle('active', which === 'sell');
+  document.getElementById('lp-steps-buy').style.display = which === 'buy' ? 'grid' : 'none';
+  document.getElementById('lp-steps-sell').style.display = which === 'sell' ? 'grid' : 'none';
+};
+
+window.loadHomePage = async function() {
+  var db = window._db, fns = window._fns;
+  if (!db || !fns) return;
+  try {
+    var snap = await fns.getDocs(fns.collection(db, 'products'));
+    var products = [];
+    snap.docs.forEach(function(d) {
+      var p = d.data();
+      if (p.status === 'draft') return;
+      products.push(Object.assign({ id: d.id }, p));
+    });
+
+    // Real stat bar — no placeholder numbers
+    var sellerIds = {};
+    var categories = {};
+    products.forEach(function(p) { if (p.sellerId) sellerIds[p.sellerId] = true; if (p.category) categories[p.category] = true; });
+    var elP = document.getElementById('lp-stat-products'), elS = document.getElementById('lp-stat-sellers'), elC = document.getElementById('lp-stat-categories');
+    if (elP) elP.textContent = products.length.toLocaleString();
+    if (elS) elS.textContent = Object.keys(sellerIds).length.toLocaleString();
+    if (elC) elC.textContent = Object.keys(categories).length.toLocaleString();
+
+    // Hero visual — real product photos as a small collage, if available
+    var withPhotos = products.filter(function(p) { return (p.photos && p.photos[0]) || p.photo; });
+    var visual = document.getElementById('lp-hero-visual');
+    if (visual && withPhotos.length >= 3) {
+      var pick = function(i) { return (withPhotos[i].photos && withPhotos[i].photos[0]) || withPhotos[i].photo; };
+      var main = visual.querySelector('.main'), s1 = visual.querySelector('.small1'), s2 = visual.querySelector('.small2');
+      if (main) main.style.backgroundImage = 'url(\'' + pick(0) + '\')';
+      if (s1) s1.style.backgroundImage = 'url(\'' + pick(1) + '\')';
+      if (s2) s2.style.backgroundImage = 'url(\'' + pick(2) + '\')';
+    }
+
+    // Live listings preview grid
+    var grid = document.getElementById('lp-preview-grid');
+    if (grid) {
+      var pool = withPhotos.slice(0, 8);
+      if (pool.length) {
+        grid.innerHTML = pool.map(function(p) {
+          return (typeof zulaBuildProductCard === 'function')
+            ? zulaBuildProductCard(p, p.id, { showHeart: false, showBuyPill: false, showSeller: true, showRating: true, onClickOverride: "requireAuth('marketplace')" })
+            : '';
+        }).join('');
+      } else {
+        grid.innerHTML = '<div style="color:var(--text3);font-size:13px;">No live listings yet — be the first to sell on ZÚLA!</div>';
+      }
+    }
+  } catch (e) {
+    console.error('loadHomePage:', e);
+  }
+};
+
 window.loadProducts = async function() {
   var db = window._db, fns = window._fns;
   if (!db || !fns) return;
