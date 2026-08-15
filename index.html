@@ -4014,6 +4014,16 @@ if (_kycOrigShowPage) {
         <div style="color:var(--text3);font-size:13px;">Loading listings…</div>
       </div>
     </div>
+
+    <!-- Newsletter signup — only shown when this seller has connected Mailchimp -->
+    <div class="dash-card" id="owner-newsletter-card" style="margin-top:20px;display:none;">
+      <h3 style="margin-bottom:6px;">📬 Stay in the loop</h3>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Get an email when <span id="owner-newsletter-name">this seller</span> lists something new.</p>
+      <form id="owner-newsletter-form" method="post" target="_blank" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="email" name="EMAIL" required placeholder="you@example.com" style="flex:1;min-width:180px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);outline:none;">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -6537,6 +6547,26 @@ window.loadMyProfile = async function() {
     showBuyPill: true,
     emptyMsg: 'No active listings yet.'
   });
+
+  // Newsletter signup — only shown if this seller connected Mailchimp under
+  // Seller Dashboard → Integrations. Classic Mailchimp embedded-form POST,
+  // no API key needed since the form URL itself isn't a secret.
+  var newsletterCard = el('owner-newsletter-card');
+  if (newsletterCard) {
+    try {
+      var intSnap = await getDoc(doc(db, 'sellerIntegrations', targetUid));
+      var intData = intSnap.exists() ? intSnap.data() : {};
+      var formUrl = intData.mailchimp && intData.mailchimp.formUrl;
+      if (formUrl) {
+        newsletterCard.style.display = 'block';
+        if (el('owner-newsletter-name')) el('owner-newsletter-name').textContent = fullName;
+        var formEl = el('owner-newsletter-form');
+        if (formEl) formEl.action = formUrl;
+      } else {
+        newsletterCard.style.display = 'none';
+      }
+    } catch(e) { newsletterCard.style.display = 'none'; }
+  }
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────────
@@ -7864,6 +7894,16 @@ window.sdTab = function(name) {
   if (navEl) navEl.classList.add('active');
   // Update mobile tabs
   document.querySelectorAll('.sd-mobile-tab').forEach(t => t.classList.remove('active'));
+  const mobEl = document.querySelector('.sd-mobile-tab[data-tab="' + name + '"]');
+  if (mobEl) {
+    mobEl.classList.add('active');
+    // Scroll only the tab bar's own horizontal strip into view — never
+    // scrollIntoView here, since (even with block:'nearest') it can still
+    // move the whole page vertically in some browsers, which is exactly
+    // the kind of jump we fixed for the marketplace carousel.
+    const navBar = mobEl.closest('.sd-mobile-nav');
+    if (navBar) navBar.scrollTo({ left: mobEl.offsetLeft - (navBar.clientWidth - mobEl.clientWidth) / 2, behavior: 'smooth' });
+  }
   // Show section
   document.querySelectorAll('.sd-section').forEach(s => s.classList.remove('active'));
   const sec = document.getElementById('sd-sec-' + name);
@@ -8242,12 +8282,16 @@ window.saveManualLocation = async function() {
 
   <!-- MOBILE TAB BAR -->
   <div class="sd-mobile-nav">
-    <button class="sd-mobile-tab active" onclick="sdTab('overview')">📊 Overview</button>
-    <button class="sd-mobile-tab" onclick="sdTab('products')">📦 Products</button>
-    <button class="sd-mobile-tab" onclick="sdTab('orders')">🛍 Orders</button>
-    <button class="sd-mobile-tab" onclick="sdTab('payout')">💸 Payout</button>
-    <button class="sd-mobile-tab" onclick="sdTab('verification')">🛡 Verification</button>
-    <button class="sd-mobile-tab" onclick="sdTab('settings')">⚙️ Settings</button>
+    <button class="sd-mobile-tab active" data-tab="overview" onclick="sdTab('overview')">📊 Overview</button>
+    <button class="sd-mobile-tab" data-tab="products" onclick="sdTab('products')">📦 Products</button>
+    <button class="sd-mobile-tab" data-tab="orders" onclick="sdTab('orders')">🛍 Orders</button>
+    <button class="sd-mobile-tab" data-tab="viewings" onclick="sdTab('viewings')">🏠 Viewings</button>
+    <button class="sd-mobile-tab" data-tab="analytics" onclick="sdTab('analytics')">📈 Analytics</button>
+    <button class="sd-mobile-tab" data-tab="payout" onclick="sdTab('payout')">💸 Payout</button>
+    <button class="sd-mobile-tab" data-tab="affiliate" onclick="sdTab('affiliate')">🔗 Affiliate</button>
+    <button class="sd-mobile-tab" data-tab="verification" onclick="sdTab('verification')">🛡 Verification</button>
+    <button class="sd-mobile-tab" data-tab="settings" onclick="sdTab('settings')">⚙️ Settings</button>
+    <button class="sd-mobile-tab" data-tab="integrations" onclick="sdTab('integrations')">🔌 Integrations</button>
   </div>
 
   <div class="sd-layout">
@@ -8586,7 +8630,7 @@ window.saveManualLocation = async function() {
           </div>
         </div>
         <div id="sdint-config-note" style="display:none;margin-top:16px;font-size:12px;color:var(--text3);background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-xs);padding:10px 14px;">
-          ⚠️ Integrations backend URL isn't configured yet — set <code>window.ZULA_INTEGRATIONS_API_BASE</code> before this script runs.
+          🔒 Telegram order notifications aren't offered here — a bot token is a real secret and this app has no server to protect it from the browser. Use the in-app Notifications panel for order alerts instead.
         </div>
       </div>
 
@@ -10027,6 +10071,12 @@ async function coSaveOrder(p, user, profile, payRef, status) {
       body: (profile.fullName||'A buyer') + ' purchased ' + p.name + '. Payment: ' + (p.currency||'NGN') + ' ' + Number(p.price).toLocaleString(),
       orderId: orderRef.id, read: false, createdAt: fns.serverTimestamp(),
     });
+    // Fire the seller's configured tracking pixels for a real completed
+    // sale — only on 'paid', never on a 'pending' manual-checkout fallback,
+    // since that hasn't actually converted yet.
+    if (status === 'paid' && typeof zulaFireSellerPixels === 'function') {
+      zulaFireSellerPixels(p.sellerId, 'purchase', { content_name: p.name, value: p.price, currency: p.currency, order_id: orderRef.id });
+    }
     showToast('🎉 Order confirmed! Check My Orders for details.');
     document.getElementById('checkout-modal').style.display = 'none';
   } catch(e) { console.error(e); showToast('Could not save order. Contact support.'); }
@@ -10051,6 +10101,13 @@ window.openProduct = async function(productId) {
     if (!snap.exists()) { showToast('Product not found.'); showPage('marketplace'); return; }
     var p = Object.assign({ id: productId }, snap.data());
     window._currentProduct = p;
+
+    // Fire the seller's configured tracking pixels (if any) for this view.
+    // Wrapped separately and never awaited — a slow/broken pixel provider
+    // must never delay or break the product page rendering below.
+    if (typeof zulaFireSellerPixels === 'function') {
+      zulaFireSellerPixels(p.sellerId, 'view_content', { content_name: p.name, value: p.price, currency: p.currency });
+    }
 
     // Basic fields
     var el = function(id){ return document.getElementById(id); };
@@ -13393,81 +13450,84 @@ window.sdLoadAnalytics = async function() {
   } catch(e) { console.error(e); }
 };
 
-// Wire analytics tab
-var _origSdTab2 = window.sdTab;
-window.sdTab = function(name) {
-  _origSdTab2(name);
-  if (name === 'analytics') sdLoadAnalytics();
-  if (name === 'integrations') sdLoadIntegrations();
+// ══════════════════════════════════════════════════
+// SELLER INTEGRATIONS TAB — Google Tag Manager / Facebook Pixel / TikTok
+// Pixel / Mailchimp, stored directly on the seller's own Firestore doc and
+// actually wired into product views + purchases below. This works fully
+// client-side because these four are all meant to be public/embeddable —
+// a GTM container ID, ad pixel ID, or Mailchimp form URL isn't a secret;
+// it's literally designed to sit in a page's HTML source.
+//
+// Telegram bot notifications are NOT offered here on purpose: a bot token
+// genuinely is a secret (anyone holding it can send messages as that bot
+// to any chat), and this file has no server to keep it off the client, so
+// faking that connection would mean either lying about security or shipping
+// a real credential leak. The in-app notification system already covers
+// the "notify me about new orders" need without that risk.
+// ══════════════════════════════════════════════════
+var ZULA_INT_SCHEMA = {
+  gtm: {
+    label: 'Google Tag Manager', icon: '🏷️',
+    description: 'Fires product-view and purchase events into your GTM container so you can wire up Google Analytics, Ads conversion tracking, and anything else through GTM — no extra code.',
+    fields: [{ key: 'containerId', label: 'GTM Container ID', placeholder: 'GTM-XXXXXXX' }],
+  },
+  fbPixel: {
+    label: 'Facebook Pixel', icon: '📘',
+    description: 'Sends ViewContent and Purchase events to Meta for retargeting audiences and ad performance measurement on your ZÚLA listings.',
+    fields: [{ key: 'pixelId', label: 'Facebook Pixel ID', placeholder: 'e.g. 123456789012345' }],
+  },
+  tiktokPixel: {
+    label: 'TikTok Pixel', icon: '🎵',
+    description: 'Sends ViewContent and CompletePayment events to TikTok for ads measurement and retargeting.',
+    fields: [{ key: 'pixelId', label: 'TikTok Pixel ID', placeholder: 'e.g. C4A1B2C3D4E5F6G7H8I9' }],
+  },
+  mailchimp: {
+    label: 'Mailchimp', icon: '✉️',
+    description: 'Adds a newsletter signup form to your public seller profile using your Mailchimp embedded-form link — no API key needed.',
+    fields: [{ key: 'formUrl', label: 'Mailchimp embedded-form URL', placeholder: 'https://yourname.usX.list-manage.com/subscribe/post?u=...&id=...' }],
+  },
 };
-
-// ══════════════════════════════════════════════════
-// SELLER INTEGRATIONS TAB — GTM / Facebook / TikTok / Telegram / Mailchimp.
-// Talks to a separate backend service (see integrations-backend/) because
-// "secrets encrypted at rest, never sent to the frontend" genuinely needs a
-// real server holding the encryption key — Firestore rules can't hide
-// individual field values from a client that can read the document.
-// Set window.ZULA_INTEGRATIONS_API_BASE to your deployed backend's URL.
-// ══════════════════════════════════════════════════
-var _sdIntSchema = {};
-var _sdIntData = [];
+var _sdIntData = {};      // { gtm: {containerId}, fbPixel: {pixelId}, ... } — this seller's saved values
 var _sdIntActiveProvider = null;
 
-function sdIntApiBase() { return window.ZULA_INTEGRATIONS_API_BASE || ''; }
-
-async function sdIntFetch(path, opts) {
-  opts = opts || {};
-  var user = auth.currentUser;
-  var res = await fetch(sdIntApiBase() + path, Object.assign({}, opts, {
-    headers: Object.assign(
-      { 'Content-Type': 'application/json', 'x-seller-id': user ? user.uid : '' },
-      opts.headers || {}
-    ),
-  }));
-  var json = await res.json().catch(function () { return null; });
-  if (!res.ok) throw new Error((json && json.error) || ('Request failed (' + res.status + ')'));
-  return json;
+function sdIntConnected(provider) {
+  var d = _sdIntData[provider];
+  if (!d) return false;
+  return Object.keys(ZULA_INT_SCHEMA[provider].fields.reduce(function(acc, f) { if (d[f.key]) acc[f.key] = d[f.key]; return acc; }, {})).length > 0;
 }
 
 window.sdLoadIntegrations = async function() {
   var note = document.getElementById('sdint-config-note');
-  if (!sdIntApiBase()) {
-    if (note) note.style.display = '';
-    var listEl0 = document.getElementById('sdint-provider-list');
-    if (listEl0) listEl0.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 16px;text-align:center;">Integrations backend not configured yet.</div>';
-    return;
-  }
-  if (note) note.style.display = 'none';
+  if (note) { note.style.display = ''; note.innerHTML = '🔒 Telegram order notifications aren\'t offered here — a bot token is a real secret and this app has no server to protect it from the browser. Use the in-app Notifications panel for order alerts instead.'; }
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  var listEl = document.getElementById('sdint-provider-list');
+  if (!user) { if (listEl) listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 16px;text-align:center;">Sign in to manage integrations.</div>'; return; }
   try {
-    var results = await Promise.all([
-      sdIntFetch('/api/integrations/schema'),
-      sdIntFetch('/api/integrations'),
-    ]);
-    _sdIntSchema = results[0];
-    _sdIntData = results[1];
-    sdIntRenderList();
-    if (!_sdIntActiveProvider && _sdIntData.length) sdIntSelect(_sdIntData[0].provider);
-  } catch (e) {
-    var listEl = document.getElementById('sdint-provider-list');
-    if (listEl) listEl.innerHTML = '<div style="color:var(--red);font-size:13px;padding:30px 16px;text-align:center;">Couldn\'t load integrations.<br>' + e.message + '</div>';
-  }
+    var snap = await fns.getDoc(fns.doc(db, 'sellerIntegrations', user.uid));
+    _sdIntData = snap.exists() ? snap.data() : {};
+  } catch (e) { _sdIntData = {}; }
+  sdIntRenderList();
+  if (!_sdIntActiveProvider) sdIntSelect(Object.keys(ZULA_INT_SCHEMA)[0]);
 };
 
 function sdIntRenderList() {
   var list = document.getElementById('sdint-provider-list');
   if (!list) return;
-  list.innerHTML = _sdIntData.map(function(p) {
-    var active = p.provider === _sdIntActiveProvider;
+  list.innerHTML = Object.keys(ZULA_INT_SCHEMA).map(function(provider) {
+    var s = ZULA_INT_SCHEMA[provider];
+    var connected = sdIntConnected(provider);
+    var active = provider === _sdIntActiveProvider;
     return '' +
-      '<div onclick="sdIntSelect(\'' + p.provider + '\')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);position:relative;' +
+      '<div onclick="sdIntSelect(\'' + provider + '\')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);position:relative;' +
         (active ? 'background:rgba(124,58,237,.12);' : '') + '">' +
         (active ? '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent-grad);"></div>' : '') +
-        '<div style="font-size:20px;width:30px;text-align:center;flex-shrink:0;">' + p.icon + '</div>' +
+        '<div style="font-size:20px;width:30px;text-align:center;flex-shrink:0;">' + s.icon + '</div>' +
         '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.label + '</div>' +
+          '<div style="font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.label + '</div>' +
           '<div style="display:flex;align-items:center;gap:6px;margin-top:2px;">' +
-            '<span style="width:7px;height:7px;border-radius:50%;background:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';' + (p.connected ? 'box-shadow:0 0 0 3px rgba(34,197,94,.18);' : '') + '"></span>' +
-            '<span style="font-size:11px;color:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';">' + (p.connected ? 'Connected' : 'Not connected') + '</span>' +
+            '<span style="width:7px;height:7px;border-radius:50%;background:' + (connected ? 'var(--green)' : 'var(--text3)') + ';' + (connected ? 'box-shadow:0 0 0 3px rgba(34,197,94,.18);' : '') + '"></span>' +
+            '<span style="font-size:11px;color:' + (connected ? 'var(--green)' : 'var(--text3)') + ';">' + (connected ? 'Connected' : 'Not connected') + '</span>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -13483,24 +13543,20 @@ window.sdIntSelect = function(provider) {
 function sdIntRenderDetail() {
   var card = document.getElementById('sdint-detail-card');
   if (!card) return;
-  var p = _sdIntData.find(function(x) { return x.provider === _sdIntActiveProvider; });
-  var s = _sdIntSchema[_sdIntActiveProvider];
-  if (!p || !s) { card.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:60px 20px;">Select an integration on the left to configure it.</div>'; return; }
+  var s = ZULA_INT_SCHEMA[_sdIntActiveProvider];
+  if (!s) { card.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:60px 20px;">Select an integration on the left to configure it.</div>'; return; }
+  var d = _sdIntData[_sdIntActiveProvider] || {};
+  var connected = sdIntConnected(_sdIntActiveProvider);
 
   var fieldsHtml = s.fields.map(function(f) {
-    var currentValue = p.fields[f.key];
-    var hasStoredNonSecret = !f.secret && currentValue;
-    var secretAlreadySet = f.secret && p.connected;
+    var currentValue = d[f.key] || '';
     return '' +
       '<div style="margin-bottom:16px;max-width:420px;">' +
-        '<label style="display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;">' + f.label +
-          (f.secret ? '<span style="font-size:10px;font-weight:700;color:var(--gold);background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;">🔒 secret</span>' : '') +
-        '</label>' +
-        '<input type="' + (f.secret ? 'password' : 'text') + '" id="sdint-fld-' + f.key + '" autocomplete="off" ' +
-          'placeholder="' + (secretAlreadySet ? '•••••••••••• (saved — leave blank to keep)' : (f.placeholder || '')) + '" ' +
-          'value="' + (hasStoredNonSecret ? String(currentValue).replace(/"/g,'&quot;') : '') + '" ' +
+        '<label style="display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;">' + f.label + '</label>' +
+        '<input type="text" id="sdint-fld-' + f.key + '" autocomplete="off" ' +
+          'placeholder="' + (f.placeholder || '') + '" ' +
+          'value="' + String(currentValue).replace(/"/g,'&quot;') + '" ' +
           'style="width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13.5px;font-family:var(--font-body);outline:none;">' +
-        (secretAlreadySet ? '<div style="font-size:11.5px;color:var(--text3);margin-top:5px;">A value is already saved. Leave blank to keep it, or enter a new one to replace it.</div>' : '') +
       '</div>';
   }).join('');
 
@@ -13511,9 +13567,9 @@ function sdIntRenderDetail() {
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
           '<h3 style="font-size:18px;font-family:var(--font-display);font-weight:700;">' + s.label + '</h3>' +
           '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;' +
-            (p.connected ? 'background:rgba(34,197,94,.14);color:var(--green);border:1px solid rgba(34,197,94,.3);' : 'background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border);') + '">' +
-            '<span style="width:6px;height:6px;border-radius:50%;background:' + (p.connected ? 'var(--green)' : 'var(--text3)') + ';"></span>' +
-            (p.connected ? 'Connected' : 'Not connected') +
+            (connected ? 'background:rgba(34,197,94,.14);color:var(--green);border:1px solid rgba(34,197,94,.3);' : 'background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border);') + '">' +
+            '<span style="width:6px;height:6px;border-radius:50%;background:' + (connected ? 'var(--green)' : 'var(--text3)') + ';"></span>' +
+            (connected ? 'Connected' : 'Not connected') +
           '</span>' +
         '</div>' +
       '</div>' +
@@ -13522,70 +13578,145 @@ function sdIntRenderDetail() {
     '<form onsubmit="return false;">' +
       fieldsHtml +
       '<div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;">' +
-        '<button type="button" class="btn btn-primary" id="sdint-connect-btn" onclick="sdIntConnect()">' + (p.connected ? 'Save changes' : 'Connect') + '</button>' +
-        (p.connected ? '<button type="button" class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="sdIntDisconnect()">Disconnect</button>' : '') +
-        (p.connected ? '<button type="button" class="btn btn-ghost" onclick="sdIntTestEvent()">Send test event</button>' : '') +
+        '<button type="button" class="btn btn-primary" id="sdint-connect-btn" onclick="sdIntConnect()">' + (connected ? 'Save changes' : 'Connect') + '</button>' +
+        (connected ? '<button type="button" class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;" onclick="sdIntDisconnect()">Disconnect</button>' : '') +
       '</div>' +
     '</form>';
 }
 
 window.sdIntConnect = async function() {
-  var s = _sdIntSchema[_sdIntActiveProvider];
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  if (!user) { showToast('Sign in first.'); return; }
+  var s = ZULA_INT_SCHEMA[_sdIntActiveProvider];
   var btn = document.getElementById('sdint-connect-btn');
-  var body = {};
+  var values = {};
   s.fields.forEach(function(f) {
     var el = document.getElementById('sdint-fld-' + f.key);
-    var val = el ? el.value.trim() : '';
-    if (val) body[f.key] = val;
+    values[f.key] = el ? el.value.trim() : '';
   });
-  btn.disabled = true;
-  var original = btn.textContent;
-  btn.textContent = 'Connecting…';
+  if (btn) { btn.disabled = true; var original = btn.textContent; btn.textContent = 'Saving…'; }
   try {
-    var result = await sdIntFetch('/api/integrations/' + _sdIntActiveProvider + '/connect', {
-      method: 'POST', body: JSON.stringify(body),
-    });
-    var idx = _sdIntData.findIndex(function(x) { return x.provider === _sdIntActiveProvider; });
-    _sdIntData[idx] = Object.assign({}, _sdIntData[idx], { connected: result.connected, fields: result.fields });
+    var update = {}; update[_sdIntActiveProvider] = values; update.updatedAt = fns.serverTimestamp();
+    await fns.setDoc(fns.doc(db, 'sellerIntegrations', user.uid), update, { merge: true });
+    _sdIntData[_sdIntActiveProvider] = values;
+    // Clear the tracking-pixel cache so the new ID takes effect on the next
+    // product view / purchase instead of the stale (or absent) one.
+    if (window._sellerPixelCache) delete window._sellerPixelCache[user.uid];
     sdIntRenderList();
     sdIntRenderDetail();
-    showToast('✅ ' + s.label + ' connected.');
+    showToast('✅ ' + s.label + ' saved.');
   } catch (e) {
-    showToast('❌ ' + e.message);
+    console.error(e);
+    showToast('❌ Could not save. Try again.');
   } finally {
-    btn.disabled = false;
-    btn.textContent = original;
+    if (btn) { btn.disabled = false; btn.textContent = original; }
   }
 };
 
 window.sdIntDisconnect = async function() {
-  var s = _sdIntSchema[_sdIntActiveProvider];
-  if (!confirm('Disconnect ' + s.label + '? Stored credentials will be permanently cleared.')) return;
+  var auth = window._auth, db = window._db, fns = window._fns;
+  var user = auth && auth.currentUser;
+  var s = ZULA_INT_SCHEMA[_sdIntActiveProvider];
+  if (!user || !confirm('Disconnect ' + s.label + '? Saved values will be cleared.')) return;
   try {
-    var result = await sdIntFetch('/api/integrations/' + _sdIntActiveProvider + '/disconnect', { method: 'POST' });
-    var idx = _sdIntData.findIndex(function(x) { return x.provider === _sdIntActiveProvider; });
-    _sdIntData[idx] = Object.assign({}, _sdIntData[idx], { connected: result.connected, fields: result.fields });
+    var update = {}; update[_sdIntActiveProvider] = {}; update.updatedAt = fns.serverTimestamp();
+    await fns.setDoc(fns.doc(db, 'sellerIntegrations', user.uid), update, { merge: true });
+    _sdIntData[_sdIntActiveProvider] = {};
+    if (window._sellerPixelCache) delete window._sellerPixelCache[user.uid];
     sdIntRenderList();
     sdIntRenderDetail();
     showToast(s.label + ' disconnected.');
   } catch (e) {
-    showToast('❌ ' + e.message);
+    console.error(e);
+    showToast('❌ Could not disconnect. Try again.');
   }
 };
 
-window.sdIntTestEvent = async function() {
-  try {
-    var result = await sdIntFetch('/api/integrations/test-event', {
-      method: 'POST',
-      body: JSON.stringify({ eventType: 'page_view', payload: { productName: 'Test Product', amount: 0 } }),
-    });
-    var mine = result.results.find(function(r) { return r.provider === _sdIntActiveProvider; });
-    if (!mine) { showToast('No test result for this provider.'); return; }
-    if (mine.ok) showToast('✅ Test event sent to ' + _sdIntSchema[_sdIntActiveProvider].label + '.');
-    else showToast('❌ Test event failed: ' + mine.error);
-  } catch (e) {
-    showToast('❌ ' + e.message);
+// ── Pixel loaders + event firing — used by product views and purchases ──
+window._zulaLoadedPixels = window._zulaLoadedPixels || {};
+window._sellerPixelCache = window._sellerPixelCache || {};
+
+window.zulaLoadGtm = function(containerId) {
+  if (!containerId || window._zulaLoadedPixels['gtm_' + containerId]) return;
+  window._zulaLoadedPixels['gtm_' + containerId] = true;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  var f = document.getElementsByTagName('script')[0], j = document.createElement('script');
+  j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + containerId;
+  f.parentNode.insertBefore(j, f);
+};
+
+window.zulaLoadFbPixel = function(pixelId) {
+  if (!pixelId) return;
+  if (!window.fbq) {
+    (function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   }
+  if (!window._zulaLoadedPixels['fb_' + pixelId]) {
+    window._zulaLoadedPixels['fb_' + pixelId] = true;
+    if (window.fbq) fbq('init', pixelId);
+  }
+};
+
+window.zulaLoadTtPixel = function(pixelId) {
+  if (!pixelId || window._zulaLoadedPixels['tt_' + pixelId]) return;
+  window._zulaLoadedPixels['tt_' + pixelId] = true;
+  (function (w, d, t) {
+    w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || [];
+    ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
+    ttq.setAndDefer = function(t,e){ t[e] = function(){ t.push([e].concat(Array.prototype.slice.call(arguments,0))); }; };
+    for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+    ttq.instance = function(t){ for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++) ttq.setAndDefer(e, ttq.methods[n]); return e; };
+    ttq.load = function(e){ var r = "https://analytics.tiktok.com/i18n/pixel/events.js";
+      ttq._i = ttq._i || {}; ttq._i[e] = []; ttq._i[e]._u = r; ttq._t = ttq._t || {}; ttq._t[e] = +new Date();
+      var s = document.createElement("script"); s.type = "text/javascript"; s.async = true; s.src = r + "?sdkid=" + e + "&lib=" + t;
+      var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(s, a);
+    };
+    ttq.load(pixelId); ttq.page();
+  })(window, document, 'ttq');
+};
+
+// Fires the given event across whichever integrations a seller has
+// configured. Tracking must never be able to break the buying/browsing
+// flow, so every step here is wrapped and failures are swallowed silently.
+window.zulaFireSellerPixels = async function(sellerId, eventType, params) {
+  if (!sellerId) return;
+  try {
+    var cfg = window._sellerPixelCache[sellerId];
+    if (!cfg) {
+      var db = window._db, fns = window._fns;
+      if (!db || !fns) return;
+      var snap = await fns.getDoc(fns.doc(db, 'sellerIntegrations', sellerId));
+      cfg = snap.exists() ? snap.data() : {};
+      window._sellerPixelCache[sellerId] = cfg;
+    }
+    params = params || {};
+    if (cfg.gtm && cfg.gtm.containerId) {
+      zulaLoadGtm(cfg.gtm.containerId);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'zula_' + eventType, content_name: params.content_name, value: params.value, currency: params.currency || 'NGN' });
+    }
+    if (cfg.fbPixel && cfg.fbPixel.pixelId) {
+      zulaLoadFbPixel(cfg.fbPixel.pixelId);
+      var fbEventMap = { purchase: 'Purchase', add_to_cart: 'AddToCart', view_content: 'ViewContent' };
+      var fbEvent = fbEventMap[eventType] || 'ViewContent';
+      if (window.fbq) fbq('trackSingle', cfg.fbPixel.pixelId, fbEvent, { content_name: params.content_name, value: params.value, currency: params.currency || 'NGN' });
+    }
+    if (cfg.tiktokPixel && cfg.tiktokPixel.pixelId) {
+      zulaLoadTtPixel(cfg.tiktokPixel.pixelId);
+      var ttEventMap = { purchase: 'CompletePayment', add_to_cart: 'AddToCart', view_content: 'ViewContent' };
+      var ttEvent = ttEventMap[eventType] || 'ViewContent';
+      if (window.ttq && window.ttq.instance) ttq.instance(cfg.tiktokPixel.pixelId).track(ttEvent, { content_name: params.content_name, value: params.value, currency: params.currency || 'NGN' });
+    }
+  } catch (e) { /* tracking failures must stay invisible to the buyer */ }
+};
+
+// Wire analytics + integrations tabs
+var _origSdTab2 = window.sdTab;
+window.sdTab = function(name) {
+  _origSdTab2(name);
+  if (name === 'analytics') sdLoadAnalytics();
+  if (name === 'integrations') sdLoadIntegrations();
 };
 
 // --------------------------------------------------
@@ -14553,6 +14684,9 @@ window.pdAddToCart = function() {
   }
   cartSave();
   showToast('🛒 Added to cart!');
+  if (typeof zulaFireSellerPixels === 'function') {
+    zulaFireSellerPixels(p.sellerId, 'add_to_cart', { content_name: p.name, value: p.price, currency: p.currency });
+  }
 };
 
 // ══════════════════════════════════════════════════
