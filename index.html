@@ -4357,6 +4357,35 @@ if (_kycOrigShowPage) {
   </div>
 </div>
 
+<!-- Flash Sale setup modal — % off + auto-expiring duration -->
+<div class="modal-bg" id="flash-sale-modal">
+  <div class="modal-box" style="max-width:380px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <h3 style="font-size:17px;margin:0;">⚡ Start Flash Sale</h3>
+      <button onclick="document.getElementById('flash-sale-modal').classList.remove('open')" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">×</button>
+    </div>
+    <p style="font-size:12.5px;color:var(--text3);margin-bottom:18px;">It'll automatically turn off on its own once the timer runs out — no need to remember to switch it off.</p>
+
+    <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;">Discount</label>
+    <div style="position:relative;margin-bottom:16px;">
+      <input type="number" id="flash-sale-pct" min="1" max="90" value="20" style="width:100%;padding:11px 34px 11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);outline:none;">
+      <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;">%</span>
+    </div>
+
+    <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;">Runs for</label>
+    <div style="display:flex;gap:8px;margin-bottom:22px;">
+      <input type="number" id="flash-sale-duration" min="1" value="24" style="flex:1;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);outline:none;">
+      <select id="flash-sale-unit" style="flex:1;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;font-family:var(--font-body);outline:none;">
+        <option value="minutes">Minutes</option>
+        <option value="hours" selected>Hours</option>
+        <option value="days">Days</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;" onclick="sdConfirmFlashSale()">Start Flash Sale</button>
+  </div>
+</div>
+
 <!-- page-messages: just a redirect shell to the real chat UI -->
 <div class="page" id="page-messages">
   <!-- new-msg inputs kept here so startNewConversation() still works -->
@@ -8305,13 +8334,70 @@ function sdProductRow(id, p, compact) {
 }
 
 window.sdToggleFlashSale = async function(id, currentlyOn, btn) {
+  // Turning OFF is a direct one-click action — no need for a form. Turning
+  // ON opens the setup modal so the seller picks a discount % and how long
+  // it should run before it automatically switches itself back off.
+  if (currentlyOn) {
+    try {
+      const fns = window._fns, db = window._db;
+      await fns.updateDoc(fns.doc(db, 'products', id), { isFlashSale: false, flashSaleDiscount: fns.deleteField(), flashSaleEndsAt: fns.deleteField() });
+      showToast('Removed from Flash Sale');
+      sdLoadProducts();
+    } catch(e) { console.error(e); showToast('❌ Could not update flash sale status.'); }
+    return;
+  }
+  window._flashSaleTargetId = id;
+  var modal = document.getElementById('flash-sale-modal');
+  if (modal) modal.classList.add('open');
+};
+
+window.sdConfirmFlashSale = async function() {
+  var id = window._flashSaleTargetId;
+  if (!id) return;
+  var pct = Number(document.getElementById('flash-sale-pct').value);
+  var duration = Number(document.getElementById('flash-sale-duration').value);
+  var unit = document.getElementById('flash-sale-unit').value;
+  if (!pct || pct < 1 || pct > 90) { showToast('Enter a discount between 1% and 90%.'); return; }
+  if (!duration || duration < 1) { showToast('Enter how long the sale should run.'); return; }
+
+  var msPerUnit = { minutes: 60000, hours: 3600000, days: 86400000 }[unit] || 3600000;
+  var endsAt = new Date(Date.now() + duration * msPerUnit);
+
   try {
     const fns = window._fns, db = window._db;
-    const newVal = !currentlyOn;
-    await fns.updateDoc(fns.doc(db, 'products', id), { isFlashSale: newVal });
-    showToast(newVal ? '⚡ Added to Flash Sale' : 'Removed from Flash Sale');
+    await fns.updateDoc(fns.doc(db, 'products', id), {
+      isFlashSale: true,
+      flashSaleDiscount: pct,
+      flashSaleEndsAt: endsAt,
+    });
+    document.getElementById('flash-sale-modal').classList.remove('open');
+    showToast('⚡ Flash Sale started — ' + pct + '% off for ' + duration + ' ' + unit + '.');
     sdLoadProducts();
-  } catch(e) { console.error(e); showToast('❌ Could not update flash sale status.'); }
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Could not start flash sale.');
+  }
+};
+
+// Lazy expiry — there's no background server here to flip the flag the
+// instant a timer runs out, so instead: whenever a flash-sale product's
+// data is actually loaded (seller dashboard, marketplace, product page),
+// check whether flashSaleEndsAt has already passed and, if so, turn the
+// flag off right then. This keeps expired sales from lingering visible
+// indefinitely without needing the seller to remember to switch them off.
+window.checkFlashSaleExpiry = function(products) {
+  var db = window._db, fns = window._fns;
+  if (!db || !fns || !products) return;
+  products.forEach(function(p) {
+    if (!p.isFlashSale || !p.flashSaleEndsAt) return;
+    var endsAt = p.flashSaleEndsAt.toDate ? p.flashSaleEndsAt.toDate() : new Date(p.flashSaleEndsAt);
+    if (endsAt.getTime() <= Date.now()) {
+      var id = p._id || p.id;
+      if (!id) return;
+      fns.updateDoc(fns.doc(db, 'products', id), { isFlashSale: false, flashSaleDiscount: fns.deleteField(), flashSaleEndsAt: fns.deleteField() }).catch(function(){});
+      p.isFlashSale = false; // reflect immediately in the in-memory copy too
+    }
+  });
 };
 
 window.sdLoadProducts = async function() {
@@ -8325,9 +8411,11 @@ window.sdLoadProducts = async function() {
     const fns = window._fns;
     const db = window._db;
     const snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.where('sellerId','==',user.uid), fns.orderBy('createdAt','desc')));
+    const productsList = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+    if (typeof checkFlashSaleExpiry === 'function') checkFlashSaleExpiry(productsList);
     el.innerHTML = snap.empty
       ? '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center;">No products yet. <a onclick="goAddProduct()" style="color:var(--accent);cursor:pointer;">Add your first product →<\/a><\/div>'
-      : snap.docs.map(d => sdProductRow(d.id, d.data(), false)).join('');
+      : productsList.map(p => sdProductRow(p._id, p, false)).join('');
   } catch(e) { console.error(e); el.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px 0;text-align:center;">Failed to load products.<\/div>'; }
 };
 
@@ -10426,6 +10514,7 @@ window.openProduct = async function(productId) {
     if (!snap.exists()) { showToast('Product not found.'); showPage('marketplace'); return; }
     var p = Object.assign({ id: productId }, snap.data());
     window._currentProduct = p;
+    if (typeof checkFlashSaleExpiry === 'function') checkFlashSaleExpiry([p]);
 
     // Fire the seller's configured tracking pixels (if any) for this view.
     // Wrapped separately and never awaited — a slow/broken pixel provider
@@ -13813,6 +13902,7 @@ window.loadProducts = async function() {
     // or inconsistent, which is exactly what was causing listings to vanish from view.
     var snap = await fns.getDocs(fns.query(fns.collection(db,'products'), fns.orderBy('createdAt','desc')));
     _allProducts = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); }).filter(function(p){ return p.status !== 'draft'; });
+    if (typeof checkFlashSaleExpiry === 'function') checkFlashSaleExpiry(_allProducts);
     renderProductGrid(_allProducts);
     if (typeof mktBuildPriceHistogram === 'function') mktBuildPriceHistogram();
     if (typeof mktLoadFeaturedDeals === 'function') mktLoadFeaturedDeals();
