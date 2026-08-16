@@ -25,27 +25,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 
-/* ══════════════════════════════════════════════════
-   Marketplace + Product Detail — scoped gold/amber theme.
-   Rather than touching the global purple --accent (which every other
-   page in the app relies on), --accent/--accent-grad are redefined only
-   inside these two pages. Any element already built with var(--accent)
-   picks this up automatically; a few spots use a hardcoded purple hex
-   instead of the variable, so those get explicit overrides below too.
-   ══════════════════════════════════════════════════ */
-#page-marketplace, #page-product{
-  --accent:#f59e0b; --accent2:#d97706;
-  --accent-grad:linear-gradient(135deg,#fbbf24,#f59e0b);
-  --shadow-btn:0 8px 22px rgba(245,158,11,.35);
-}
-#page-marketplace .pcard-price,
-#page-marketplace .pcard-price-row .pcard-price,
-#page-marketplace .mkt-hist span,
-#page-product .pdetail-price,
-#page-product #pd-price{ color:#f59e0b !important; }
-#page-marketplace .mkt-hist span{ background:linear-gradient(180deg,#fbbf24,#f59e0b) !important; }
-#page-marketplace a, #page-product a{ color:#f59e0b; }
-
 body{font-family:var(--font-body);background:
     radial-gradient(circle at 15% 0%,rgba(124,58,237,.16),transparent 55%),
     radial-gradient(circle at 85% 15%,rgba(245,158,11,.08),transparent 50%),
@@ -517,14 +496,14 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 #page-marketplace .mkt-banner-content{position:absolute;top:64px;left:28px;right:28px;max-width:420px;z-index:2;}
 #page-marketplace .mkt-banner-title{font-size:27px;font-weight:800;color:#fff;font-family:var(--font-display);line-height:1.2;}
 #page-marketplace .mkt-banner-sub{font-size:13.5px;color:rgba(255,255,255,.8);margin-top:8px;}
-#page-marketplace .mkt-banner-price{font-size:26px;font-weight:800;color:#f59e0b;margin-top:14px;}
-#page-marketplace .mkt-banner-cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--gold-grad);color:#1a1206;border:none;padding:11px 22px;border-radius:10px;font-size:13.5px;font-weight:800;font-family:var(--font-body);cursor:pointer;}
+#page-marketplace .mkt-banner-price{font-size:26px;font-weight:800;color:var(--accent);margin-top:14px;}
+#page-marketplace .mkt-banner-cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--accent-grad);color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:13.5px;font-weight:800;font-family:var(--font-body);cursor:pointer;}
 #page-marketplace .mkt-hero-nav{position:absolute;left:28px;bottom:24px;display:flex;gap:8px;z-index:3;}
 #page-marketplace .mkt-hero-arrow{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 #page-marketplace .mkt-hero-arrow:hover{background:rgba(255,255,255,.22);}
 #page-marketplace .mkt-carousel-dots{position:absolute;right:24px;bottom:24px;display:flex;align-items:center;gap:6px;z-index:3;margin-top:0;}
 #page-marketplace .mkt-carousel-dots .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:.2s ease;flex-shrink:0;}
-#page-marketplace .mkt-carousel-dots .dot.active{background:#f59e0b;width:22px;border-radius:4px;}
+#page-marketplace .mkt-carousel-dots .dot.active{background:var(--accent);width:22px;border-radius:4px;}
 @media(max-width:640px){
   #page-marketplace .mkt-banner{height:280px;}
   #page-marketplace .mkt-banner::after{background:linear-gradient(0deg,rgba(0,0,0,.75) 20%,rgba(0,0,0,.15) 60%);}
@@ -810,7 +789,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .pd-breadcrumb a{color:var(--text3);cursor:pointer;}
 .pd-breadcrumb a:hover{color:var(--accent);}
 .pd-breadcrumb span{margin:0 6px;}
-.pd-trust-pill{font-size:11.5px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);padding:5px 12px;border-radius:999px;}
+.pd-trust-pill{font-size:11.5px;font-weight:700;color:var(--accent);background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.3);padding:5px 12px;border-radius:999px;}
 .pdetail-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 @media(max-width:760px){.pdetail-layout{grid-template-columns:1fr;}}
 .pdetail-img{aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:80px;overflow:hidden;}
@@ -2315,8 +2294,6 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       </div>
       <nav class="hdr-nav" style="gap:22px;">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <a onclick="goAddProduct()">Sell on ZÚLA</a>
-        <a onclick="showPage('home')">How it Works</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="openWishlist()" title="Wishlist">🤍</a>
         <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔<span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
@@ -2364,12 +2341,6 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 
         <div class="pdetail-desc" id="pd-desc">Description</div>
 
-        <!-- Product details (condition, stock, variants, what's included) -->
-        <div id="pd-product-details" style="display:none;margin-bottom:20px;"></div>
-
-        <!-- Real estate details -->
-        <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
-
         <!-- Quantity stepper — only meaningful for stocked physical/vehicle items -->
         <div id="pd-qty-row" style="display:none;align-items:center;gap:14px;margin-bottom:16px;">
           <span style="font-size:13px;font-weight:700;color:var(--text2);">Qty:</span>
@@ -2390,7 +2361,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
           <button class="btn btn-ghost" id="pd-watch-btn" onclick="pdWatchCourse()" style="display:none;">▶ Watch course</button>
         </div>
 
-        <div style="margin-top:16px;padding:16px 18px;background:var(--bg3);border:1px solid rgba(245,158,11,.18);border-radius:var(--radius-xs);">
+        <div style="margin-top:16px;margin-bottom:20px;padding:16px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);">
           <div style="display:flex;gap:10px;">
             <div style="font-size:16px;flex-shrink:0;">🛡</div>
             <div>
@@ -2404,6 +2375,12 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
             <span class="pd-trust-pill">⏱ 48hr Resolution</span>
           </div>
         </div>
+
+        <!-- Product details (condition, stock, variants, what's included) -->
+        <div id="pd-product-details" style="display:none;margin-bottom:20px;"></div>
+
+        <!-- Real estate details -->
+        <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
 
         <!-- Affiliate link -->
         <div id="pd-affiliate-wrap" style="display:none;margin-top:16px;padding:16px 18px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius-sm);">
