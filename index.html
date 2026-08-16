@@ -449,6 +449,13 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 #page-marketplace .hdr{background:var(--hdr-bg);border-bottom:1px solid var(--border);backdrop-filter:blur(16px) saturate(140%);}
 #page-marketplace .mkt-layout, #page-marketplace > .wrap{max-width:1320px;}
 
+/* When the sidebar is collapsed, the extra freed-up width shouldn't just
+   sit empty — let the marketplace and seller-dashboard content areas grow
+   into it instead of staying capped at their "sidebar expanded" width. */
+body.sidebar-push-72 #page-marketplace .mkt-layout,
+body.sidebar-push-72 #page-marketplace > .wrap{max-width:1560px;}
+body.sidebar-push-72 .sd-content{max-width:1120px;}
+
 /* Everything below the cat carousel keeps its normal side padding */
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
 
