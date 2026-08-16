@@ -24,6 +24,28 @@
   --hdr-bg:rgba(8,8,13,.85);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
+
+/* ══════════════════════════════════════════════════
+   Marketplace + Product Detail — scoped gold/amber theme.
+   Rather than touching the global purple --accent (which every other
+   page in the app relies on), --accent/--accent-grad are redefined only
+   inside these two pages. Any element already built with var(--accent)
+   picks this up automatically; a few spots use a hardcoded purple hex
+   instead of the variable, so those get explicit overrides below too.
+   ══════════════════════════════════════════════════ */
+#page-marketplace, #page-product{
+  --accent:#f59e0b; --accent2:#d97706;
+  --accent-grad:linear-gradient(135deg,#fbbf24,#f59e0b);
+  --shadow-btn:0 8px 22px rgba(245,158,11,.35);
+}
+#page-marketplace .pcard-price,
+#page-marketplace .pcard-price-row .pcard-price,
+#page-marketplace .mkt-hist span,
+#page-product .pdetail-price,
+#page-product #pd-price{ color:#f59e0b !important; }
+#page-marketplace .mkt-hist span{ background:linear-gradient(180deg,#fbbf24,#f59e0b) !important; }
+#page-marketplace a, #page-product a{ color:#f59e0b; }
+
 body{font-family:var(--font-body);background:
     radial-gradient(circle at 15% 0%,rgba(124,58,237,.16),transparent 55%),
     radial-gradient(circle at 85% 15%,rgba(245,158,11,.08),transparent 50%),
@@ -473,11 +495,13 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
   #page-marketplace .mkt-flash-bar:not(.collapsed) .mkt-flash-view-link{margin-left:0;}
 }
 
-/* Promo banner carousel — laptop shows 3 across (reference shows 1 full-width on phone) */
+/* Hero carousel — badge/title/seller/price/CTA block sits top-left over
+   the product photo (like a real hero banner), with small circular
+   prev/next arrows and pill-dash pagination bottom-right — true
+   one-slide-at-a-time swipeable carousel via native scroll-snap, so it
+   also responds to drag/swipe, not just the auto-advance timer. */
 #page-marketplace .mkt-banner-wrap{margin-bottom:24px;}
-/* True one-slide-at-a-time swipeable carousel — same pattern on desktop
-   and mobile: native scroll-snap so it responds to drag/swipe as well as
-   the auto-advance timer, with dot pagination underneath. */
+#page-marketplace .mkt-hero-shell{position:relative;}
 #page-marketplace .mkt-banner-track{
   display:flex;
   overflow-x:auto;
@@ -487,16 +511,27 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
   border-radius:18px;
 }
 #page-marketplace .mkt-banner-track::-webkit-scrollbar{display:none;}
-#page-marketplace .mkt-banner{position:relative;flex:0 0 100%;scroll-snap-align:center;height:280px;background-size:cover;background-position:center;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-card);}
-#page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 55%);}
-#page-marketplace .mkt-banner-tag{position:absolute;top:16px;right:16px;background:var(--gold-grad);color:#1a1206;font-size:13px;font-weight:800;padding:6px 16px;border-radius:999px;z-index:2;}
-#page-marketplace .mkt-banner-content{position:absolute;bottom:22px;left:24px;right:24px;z-index:2;}
-#page-marketplace .mkt-banner-title{font-size:26px;font-weight:800;color:#fff;font-family:var(--font-display);}
-#page-marketplace .mkt-banner-sub{font-size:14px;color:rgba(255,255,255,.85);margin-top:4px;}
-#page-marketplace .mkt-carousel-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;}
-#page-marketplace .mkt-carousel-dots .dot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:.2s ease;flex-shrink:0;}
-#page-marketplace .mkt-carousel-dots .dot.active{background:var(--accent);width:22px;border-radius:4px;}
-@media(max-width:640px){#page-marketplace .mkt-banner{height:220px;}#page-marketplace .mkt-banner-title{font-size:21px;}}
+#page-marketplace .mkt-banner{position:relative;flex:0 0 100%;scroll-snap-align:center;height:340px;background-size:cover;background-position:center;overflow:hidden;box-shadow:var(--shadow-card);}
+#page-marketplace .mkt-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.05) 70%);}
+#page-marketplace .mkt-banner-tag{position:absolute;top:24px;left:28px;background:var(--gold-grad);color:#1a1206;font-size:12.5px;font-weight:800;padding:6px 14px;border-radius:999px;z-index:2;}
+#page-marketplace .mkt-banner-content{position:absolute;top:64px;left:28px;right:28px;max-width:420px;z-index:2;}
+#page-marketplace .mkt-banner-title{font-size:27px;font-weight:800;color:#fff;font-family:var(--font-display);line-height:1.2;}
+#page-marketplace .mkt-banner-sub{font-size:13.5px;color:rgba(255,255,255,.8);margin-top:8px;}
+#page-marketplace .mkt-banner-price{font-size:26px;font-weight:800;color:#f59e0b;margin-top:14px;}
+#page-marketplace .mkt-banner-cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--gold-grad);color:#1a1206;border:none;padding:11px 22px;border-radius:10px;font-size:13.5px;font-weight:800;font-family:var(--font-body);cursor:pointer;}
+#page-marketplace .mkt-hero-nav{position:absolute;left:28px;bottom:24px;display:flex;gap:8px;z-index:3;}
+#page-marketplace .mkt-hero-arrow{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+#page-marketplace .mkt-hero-arrow:hover{background:rgba(255,255,255,.22);}
+#page-marketplace .mkt-carousel-dots{position:absolute;right:24px;bottom:24px;display:flex;align-items:center;gap:6px;z-index:3;margin-top:0;}
+#page-marketplace .mkt-carousel-dots .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:.2s ease;flex-shrink:0;}
+#page-marketplace .mkt-carousel-dots .dot.active{background:#f59e0b;width:22px;border-radius:4px;}
+@media(max-width:640px){
+  #page-marketplace .mkt-banner{height:280px;}
+  #page-marketplace .mkt-banner::after{background:linear-gradient(0deg,rgba(0,0,0,.75) 20%,rgba(0,0,0,.15) 60%);}
+  #page-marketplace .mkt-banner-title{font-size:21px;}
+  #page-marketplace .mkt-banner-content{top:auto;bottom:70px;max-width:none;}
+  #page-marketplace .mkt-hero-nav{display:none;}
+}
 
 /* Rotating top-5 leaderboard banner — replaces the promo carousel once
    admin has published one. Cycles entries every 5s (mktStartLeaderboardRotation). */
@@ -525,9 +560,9 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 
 /* Product cards — laptop grid, more columns than the phone version */
 #page-marketplace .mkt-topbar{margin-bottom:18px;padding-bottom:14px;}
-#page-marketplace .pgrid{grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:20px;}
-@media(min-width:1400px){#page-marketplace .pgrid{grid-template-columns:repeat(6,1fr);}}
-@media(min-width:1100px) and (max-width:1399px){#page-marketplace .pgrid{grid-template-columns:repeat(5,1fr);}}
+#page-marketplace .pgrid{grid-template-columns:repeat(4,1fr);gap:20px;}
+@media(min-width:1400px){#page-marketplace .pgrid{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:1100px) and (max-width:1399px){#page-marketplace .pgrid{grid-template-columns:repeat(4,1fr);}}
 
 /* Split BUY / CART buttons, styled like the reference app's rounded pill CTA */
 #page-marketplace .pcard-btn-row{display:flex;gap:6px;}
@@ -769,6 +804,13 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 
 /* PRODUCT DETAIL */
 .pdetail-wrap{max-width:1000px;margin:0 auto;padding:32px 24px 60px;}
+.pd-qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+@media(max-width:760px){.pd-qa-grid{grid-template-columns:1fr;gap:32px;}}
+.pd-breadcrumb{font-size:12.5px;color:var(--text3);margin-bottom:18px;}
+.pd-breadcrumb a{color:var(--text3);cursor:pointer;}
+.pd-breadcrumb a:hover{color:var(--accent);}
+.pd-breadcrumb span{margin:0 6px;}
+.pd-trust-pill{font-size:11.5px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);padding:5px 12px;border-radius:999px;}
 .pdetail-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
 @media(max-width:760px){.pdetail-layout{grid-template-columns:1fr;}}
 .pdetail-img{aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:80px;overflow:hidden;}
@@ -2102,19 +2144,25 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
 
     <div class="mkt-banner-wrap" id="mkt-banner-fallback">
-      <div class="mkt-banner-track" id="mkt-banner-track">
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80');">
-          <div class="mkt-banner-tag">50% OFF</div>
-          <div class="mkt-banner-content"><div class="mkt-banner-title">Summer Sale</div><div class="mkt-banner-sub">Up to 50% off selected items</div></div>
+      <div class="mkt-hero-shell">
+        <div class="mkt-banner-track" id="mkt-banner-track">
+          <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80');">
+            <div class="mkt-banner-tag">50% OFF</div>
+            <div class="mkt-banner-content"><div class="mkt-banner-title">Summer Sale</div><div class="mkt-banner-sub">Up to 50% off selected items</div></div>
+          </div>
+          <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80');">
+            <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
+          </div>
+          <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80');">
+            <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
+          </div>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80');">
-          <div class="mkt-banner-content"><div class="mkt-banner-title">New Arrivals</div><div class="mkt-banner-sub">Fresh drops from top sellers</div></div>
+        <div class="mkt-hero-nav">
+          <button class="mkt-hero-arrow" onclick="mktSpotlightGoTo((window._mktSpotlightIdx||0)-1 < 0 ? (window._mktSpotlightPoolLen||1)-1 : (window._mktSpotlightIdx||0)-1)">‹</button>
+          <button class="mkt-hero-arrow" onclick="mktSpotlightGoTo(((window._mktSpotlightIdx||0)+1) % (window._mktSpotlightPoolLen||1))">›</button>
         </div>
-        <div class="mkt-banner" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80');">
-          <div class="mkt-banner-content"><div class="mkt-banner-title">Top Sellers</div><div class="mkt-banner-sub">Shop the most loved stores</div></div>
-        </div>
+        <div class="mkt-carousel-dots" id="mkt-spotlight-dots"></div>
       </div>
-      <div class="mkt-carousel-dots" id="mkt-spotlight-dots"></div>
     </div>
 
     <!-- Flash sale urgency bar — starts as a tiny pressable pill; clicking
@@ -2260,14 +2308,26 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 <div class="page" id="page-product">
   <header class="hdr">
     <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
-        <a onclick="showPage('marketplace')">← Back to marketplace</a>
+      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">🏠 ZÚ<span>LA</span></div>
+      <div class="hdr-search">
+        <span class="hdr-search-icon">🔍</span>
+        <input placeholder="Search products, sellers, categories…" oninput="filterProducts(this.value)" onfocus="showPage('marketplace')">
+      </div>
+      <nav class="hdr-nav" style="gap:22px;">
+        <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="goAddProduct()">Sell on ZÚLA</a>
+        <a onclick="showPage('home')">How it Works</a>
+        <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
+        <a onclick="openWishlist()" title="Wishlist">🤍</a>
+        <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔<span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile-v2')">?</div>
       </nav>
     </div>
   </header>
   <div class="pdetail-wrap">
+    <div class="pd-breadcrumb" id="pd-breadcrumb">
+      <a onclick="showPage('marketplace')">Marketplace</a> <span>›</span> <span id="pd-breadcrumb-cat">Category</span> <span>›</span> <span id="pd-breadcrumb-name">Product</span>
+    </div>
     <div class="pdetail-layout">
       <!-- Photo gallery -->
       <div>
@@ -2310,6 +2370,17 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <!-- Real estate details -->
         <div id="pd-realestate-details" style="display:none;margin-bottom:16px;"></div>
 
+        <!-- Quantity stepper — only meaningful for stocked physical/vehicle items -->
+        <div id="pd-qty-row" style="display:none;align-items:center;gap:14px;margin-bottom:16px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text2);">Qty:</span>
+          <div style="display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:999px;overflow:hidden;">
+            <button onclick="pdChangeQty(-1)" style="width:32px;height:32px;background:var(--bg3);border:none;color:var(--text);font-size:16px;cursor:pointer;">−</button>
+            <span id="pd-qty-val" style="width:34px;text-align:center;font-size:14px;font-weight:700;">1</span>
+            <button onclick="pdChangeQty(1)" style="width:32px;height:32px;background:var(--bg3);border:none;color:var(--text);font-size:16px;cursor:pointer;">+</button>
+          </div>
+          <span id="pd-qty-stock" style="font-size:12px;color:var(--text3);"></span>
+        </div>
+
         <div class="pdetail-actions">
           <button class="btn btn-primary" id="pd-buy-btn" onclick="pdBuyNow()">Buy now</button>
           <button class="btn btn-ghost" id="pd-cart-btn" onclick="pdAddToCart()">🛒 Add to cart</button>
@@ -2319,17 +2390,31 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
           <button class="btn btn-ghost" id="pd-watch-btn" onclick="pdWatchCourse()" style="display:none;">▶ Watch course</button>
         </div>
 
-        <div style="margin-top:16px;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-xs);font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px;">
-          🔒 Payment held in escrow until you confirm receipt. Fully protected.
+        <div style="margin-top:16px;padding:16px 18px;background:var(--bg3);border:1px solid rgba(245,158,11,.18);border-radius:var(--radius-xs);">
+          <div style="display:flex;gap:10px;">
+            <div style="font-size:16px;flex-shrink:0;">🛡</div>
+            <div>
+              <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:4px;">🔒 Payment held in escrow until you confirm receipt. Fully protected.</div>
+              <div style="font-size:12.5px;color:var(--text3);line-height:1.5;">Your ₦ payment is secured by ZÚLA escrow. The seller only receives funds after you confirm you got exactly what you paid for. Open a dispute anytime if there's an issue.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <span class="pd-trust-pill">🛡 Buyer Protected</span>
+            <span class="pd-trust-pill">⚖️ Instant Disputes</span>
+            <span class="pd-trust-pill">⏱ 48hr Resolution</span>
+          </div>
         </div>
 
         <!-- Affiliate link -->
-        <div id="pd-affiliate-wrap" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(124,92,252,.07);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-xs);">
-          <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:6px;">🔗 Earn as an affiliate</div>
-          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Share this product and earn <span id="pd-commission-pct"></span>% commission on every sale.</div>
-          <div style="display:flex;gap:8px;">
-            <input id="pd-affiliate-link" readonly style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-size:12px;" value="">
-            <button class="btn btn-sm" style="background:var(--accent-grad);color:#fff;border:none;" onclick="pdCopyAffLink()">Copy</button>
+        <div id="pd-affiliate-wrap" style="display:none;margin-top:16px;padding:16px 18px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius-sm);">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="font-size:16px;flex-shrink:0;">🔗</div>
+            <div style="flex:1;">
+              <div style="font-size:13.5px;font-weight:700;color:var(--green);margin-bottom:3px;">Earn <span id="pd-commission-pct"></span>% commission</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Share this product and earn <span id="pd-commission-amount"></span> per sale</div>
+              <button class="btn btn-sm" style="width:100%;background:transparent;border:1px solid rgba(34,197,94,.4);color:var(--green);font-weight:700;" onclick="pdCopyAffLink()">🔗 Generate My Referral Link</button>
+              <input id="pd-affiliate-link" readonly style="width:100%;margin-top:8px;display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:7px 10px;color:var(--text);font-size:12px;" value="">
+            </div>
           </div>
         </div>
 
@@ -2341,47 +2426,70 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       </div>
     </div>
 
-    <!-- Reviews section -->
-    <div style="max-width:800px;margin:32px auto 0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <h3 style="font-size:16px;font-weight:700;">Reviews</h3>
-        <button class="btn btn-ghost btn-sm" id="pd-write-review-btn" onclick="pdShowReviewForm()" style="display:none;">✍ Write a review</button>
-      </div>
-      <div id="pd-reviews-list" style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
-        <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No reviews yet — be the first!</div>
+    <!-- Reviews (left) + Questions & Comments (right) — two-column, side by side -->
+    <div class="pd-qa-grid" style="max-width:1000px;margin:36px auto 0;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 style="font-size:17px;font-weight:700;">Reviews</h3>
+          <button class="btn btn-ghost btn-sm" id="pd-write-review-btn" onclick="pdShowReviewForm()" style="display:none;">Write a Review</button>
+        </div>
+        <div id="pd-reviews-list" style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">No reviews yet — be the first!</div>
+        </div>
+
+        <!-- Review form -->
+        <div id="pd-review-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px;">Leave a review</div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:12.5px;color:var(--text3);margin-bottom:6px;">Your rating</div>
+            <div id="pd-star-picker" style="display:flex;gap:4px;font-size:28px;cursor:pointer;">
+              <span onclick="pdSetStar(1)" class="rv-star">★</span>
+              <span onclick="pdSetStar(2)" class="rv-star">★</span>
+              <span onclick="pdSetStar(3)" class="rv-star">★</span>
+              <span onclick="pdSetStar(4)" class="rv-star">★</span>
+              <span onclick="pdSetStar(5)" class="rv-star">★</span>
+            </div>
+          </div>
+          <textarea id="pd-review-text" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:80px;resize:vertical;margin-bottom:10px;" placeholder="Share your experience with this product…"></textarea>
+          <button class="btn btn-primary btn-sm" onclick="pdSubmitReview()">Submit review</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pd-review-form').style.display='none'">Cancel</button>
+        </div>
       </div>
 
-      <!-- Review form -->
-      <div id="pd-review-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:20px;">
-        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">Leave a review</div>
-        <div style="margin-bottom:12px;">
-          <div style="font-size:12.5px;color:var(--text3);margin-bottom:6px;">Your rating</div>
-          <div id="pd-star-picker" style="display:flex;gap:4px;font-size:28px;cursor:pointer;">
-            <span onclick="pdSetStar(1)" class="rv-star">★</span>
-            <span onclick="pdSetStar(2)" class="rv-star">★</span>
-            <span onclick="pdSetStar(3)" class="rv-star">★</span>
-            <span onclick="pdSetStar(4)" class="rv-star">★</span>
-            <span onclick="pdSetStar(5)" class="rv-star">★</span>
-          </div>
+      <!-- Questions & Comments — open engagement, anyone signed in can comment -->
+      <div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:16px;">Questions &amp; Comments (<span id="pd-comment-count-hd">0</span>)</h3>
+        <div style="margin-bottom:14px;">
+          <input type="text" id="pd-comment-input" placeholder="Ask a question about this product…" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;" onkeydown="if(event.key==='Enter')pdSubmitComment()">
         </div>
-        <textarea id="pd-review-text" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;min-height:80px;resize:vertical;margin-bottom:10px;" placeholder="Share your experience with this product…"></textarea>
-        <button class="btn btn-primary btn-sm" onclick="pdSubmitReview()">Submit review</button>
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pd-review-form').style.display='none'">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="pdSubmitComment()" style="margin-bottom:20px;">▷ Post Comment</button>
+        <div id="pd-comments-list" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No comments yet — be the first!</div>
+        </div>
       </div>
     </div>
 
-    <!-- Comments section — open engagement, anyone signed in can comment -->
-    <div style="max-width:800px;margin:32px auto 0;">
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">💬 Comments (<span id="pd-comment-count-hd">0</span>)</h3>
-      <div style="display:flex;gap:10px;margin-bottom:20px;">
-        <input type="text" id="pd-comment-input" placeholder="Ask a question or leave a comment…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:13.5px;" onkeydown="if(event.key==='Enter')pdSubmitComment()">
-        <button class="btn btn-primary btn-sm" onclick="pdSubmitComment()">Post</button>
-      </div>
-      <div id="pd-comments-list" style="display:flex;flex-direction:column;gap:12px;">
-        <div style="color:var(--text3);font-size:13px;text-align:center;padding:16px;">No comments yet — be the first!</div>
-      </div>
+    <!-- You might also like — same category, real live products -->
+    <div id="pd-related-wrap" style="max-width:1000px;margin:40px auto 0;display:none;">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">You might also like</h3>
+      <div class="pgrid" id="pd-related-grid"></div>
     </div>
   </div>
+
+  <footer class="footer" style="margin-top:40px;">
+    <div class="wrap">
+      <div class="footer-inner">
+        <div class="footer-logo">ZÚ<span>LA</span></div>
+        <div class="footer-links">
+          <a onclick="showPage('policy-privacy')" style="color:var(--text3);cursor:pointer;">Privacy</a>
+          <a onclick="showPage('policy-terms')" style="color:var(--text3);cursor:pointer;">Terms</a>
+          <a onclick="showToast('We\'ll have a full help center here soon!')" style="color:var(--text3);cursor:pointer;">Help Centre</a>
+          <a onclick="goAddProduct()" style="color:var(--text3);cursor:pointer;">Seller Guide</a>
+        </div>
+        <div class="footer-copy">© 2026 ZÚLA Inc.</div>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <!-- ================================================================
@@ -10295,22 +10403,57 @@ window.openProduct = async function(productId) {
     if (el('pd-price')) el('pd-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     if (el('pd-desc')) el('pd-desc').textContent = p.description || '';
 
+    // Breadcrumb
+    if (el('pd-breadcrumb-cat')) el('pd-breadcrumb-cat').textContent = p.category || p.productType || 'Marketplace';
+    if (el('pd-breadcrumb-name')) el('pd-breadcrumb-name').textContent = p.name || '';
+
+    // Quantity stepper — only meaningful for stocked physical/vehicle items
+    window._pdQty = 1;
+    var qtyRow = el('pd-qty-row');
+    if (qtyRow) {
+      var stockNum = Number(p.stock || 0);
+      if ((p.productType === 'physical' || p.productType === 'vehicle') && stockNum > 0) {
+        qtyRow.style.display = 'flex';
+        window._pdMaxQty = stockNum;
+        if (el('pd-qty-val')) el('pd-qty-val').textContent = '1';
+        if (el('pd-qty-stock')) el('pd-qty-stock').textContent = stockNum.toLocaleString() + ' in stock';
+      } else {
+        qtyRow.style.display = 'none';
+      }
+    }
+
     // Product details: condition, stock, sizes/variants, what's included
     var pdDetailsEl = el('pd-product-details');
     if (pdDetailsEl) {
       var symLocal = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
-      var blocks = [];
-      if (p.condition) {
-        blocks.push('<div><div style="font-size:11px;color:var(--text3);">Condition</div><div style="font-size:13px;font-weight:600;">' + p.condition + '</div></div>');
-      }
+
+      // Product Details table — label/value rows, real seller-provided data only
+      var rows = [];
+      if (p.condition) rows.push(['Condition', p.condition]);
       if (p.productType === 'physical' || p.productType === 'vehicle') {
-        blocks.push('<div><div style="font-size:11px;color:var(--text3);">Available stock</div><div style="font-size:13px;font-weight:600;">' + (Number(p.stock||0) > 0 ? Number(p.stock).toLocaleString() : 'Out of stock') + '</div></div>');
+        rows.push(['Stock Available', Number(p.stock||0) > 0 ? Number(p.stock).toLocaleString() + ' units' : 'Out of stock']);
       }
-      var topGrid = blocks.length ? '<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:' + ((p.variants&&p.variants.length)||(p.whatsIncluded&&p.whatsIncluded.length) ? '14px' : '0') + ';">' + blocks.join('') + '</div>' : '';
+      if (p.shipsFrom) rows.push(['Ships From', p.shipsFrom]);
+      if (p.deliveryFee != null && p.deliveryFee !== '' && Number(p.deliveryFee) >= 0) {
+        rows.push(['Delivery Fee', Number(p.deliveryFee) > 0 ? symLocal + Number(p.deliveryFee).toLocaleString() : 'Free']);
+      }
+      if (p.category) rows.push(['Category', p.category]);
+
+      var tableHtml = '';
+      if (rows.length) {
+        tableHtml = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:16px;">' +
+          '<div style="padding:14px 18px;font-size:14.5px;font-weight:700;border-bottom:1px solid var(--border);">Product Details</div>' +
+          '<div>' + rows.map(function(r) {
+            return '<div style="display:flex;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);font-size:13px;">' +
+              '<span style="color:var(--text3);">' + r[0] + '</span><span style="font-weight:700;color:var(--text);">' + r[1] + '</span>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '</div>';
+      }
 
       var variantsHtml = '';
       if (p.variants && p.variants.length) {
-        variantsHtml = '<div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:700;margin-bottom:8px;">Sizes / Variants</div><div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+        variantsHtml = '<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:700;margin-bottom:8px;">Sizes / Variants</div><div style="display:flex;flex-wrap:wrap;gap:8px;">' +
           p.variants.map(function(v) {
             var priceLabel = v.price ? ' — ' + symLocal + Number(v.price).toLocaleString() : '';
             return '<span style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:12.5px;padding:5px 12px;border-radius:999px;">' + v.name + priceLabel + '</span>';
@@ -10319,11 +10462,12 @@ window.openProduct = async function(productId) {
 
       var featuresHtml = '';
       if (p.whatsIncluded && p.whatsIncluded.length) {
-        featuresHtml = '<div><div style="font-size:13px;font-weight:700;margin-bottom:8px;">What\'s included</div><div style="display:flex;flex-direction:column;gap:6px;">' +
+        featuresHtml = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;">' +
+          '<div style="font-size:13.5px;font-weight:700;margin-bottom:10px;">✓ What\'s Included</div><div style="display:flex;flex-direction:column;gap:8px;">' +
           p.whatsIncluded.map(function(f) { return '<div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);flex-shrink:0;">✓</span>' + f + '</div>'; }).join('') + '</div></div>';
       }
 
-      var fullHtml = topGrid + variantsHtml + featuresHtml;
+      var fullHtml = tableHtml + variantsHtml + featuresHtml;
       if (fullHtml.trim()) { pdDetailsEl.innerHTML = fullHtml; pdDetailsEl.style.display = 'block'; }
       else { pdDetailsEl.innerHTML = ''; pdDetailsEl.style.display = 'none'; }
     }
@@ -10427,13 +10571,20 @@ window.openProduct = async function(productId) {
     // Affiliate section
     if (p.affiliateEnabled && user && user.uid !== p.sellerId) {
       if (el('pd-affiliate-wrap')) el('pd-affiliate-wrap').style.display = 'block';
-      if (el('pd-commission-pct')) el('pd-commission-pct').textContent = p.commission || 20;
+      var commissionPct = p.commission || 20;
+      if (el('pd-commission-pct')) el('pd-commission-pct').textContent = commissionPct;
+      var symAff = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
+      var earnAmount = Math.round(Number(p.price||0) * (commissionPct/100));
+      if (el('pd-commission-amount')) el('pd-commission-amount').textContent = symAff + earnAmount.toLocaleString();
       var affLink = window.location.origin + '?ref=' + user.uid + '&product=' + productId;
       if (el('pd-affiliate-link')) el('pd-affiliate-link').value = affLink;
     }
 
     // Load reviews
     pdLoadReviews(productId);
+
+    // "You might also like" — real live products from the same category
+    if (typeof pdLoadRelated === 'function') pdLoadRelated(p);
 
     // Write review button - only if buyer has purchased
     if (user && user.uid !== p.sellerId) {
@@ -10457,7 +10608,10 @@ window.openProduct = async function(productId) {
 
 window.pdCopyAffLink = function() {
   var inp = document.getElementById('pd-affiliate-link');
-  if (inp) { navigator.clipboard.writeText(inp.value); showToast('Affiliate link copied!'); }
+  if (!inp) return;
+  inp.style.display = 'block';
+  navigator.clipboard.writeText(inp.value);
+  showToast('🔗 Referral link generated and copied!');
 };
 
 // ── SOCIAL SHARING ────────────────────────────────────────────────
@@ -10520,6 +10674,24 @@ window.pdShowReviewForm = function() {
   if (form) form.style.display = 'block';
   _pdCurrentRating = 0;
   document.querySelectorAll('.rv-star').forEach(function(s){ s.style.color = 'var(--border2)'; });
+};
+
+window.pdLoadRelated = function(p) {
+  var wrap = document.getElementById('pd-related-wrap');
+  var grid = document.getElementById('pd-related-grid');
+  if (!wrap || !grid || !p) return;
+  var pool = (window._allProducts || []).filter(function(x) {
+    var id = x._id || x.id;
+    return id !== p.id && x.status !== 'draft' && (x.category || '').toLowerCase() === (p.category || '').toLowerCase() && ((x.photos && x.photos.length) || x.photo);
+  }).slice(0, 4);
+  if (!pool.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  grid.innerHTML = pool.map(function(x) {
+    var id = x._id || x.id;
+    return (typeof zulaBuildProductCard === 'function')
+      ? zulaBuildProductCard(x, id, { showHeart: true, showBuyPill: true, showSeller: true, showRating: true, singleBuyBtn: true })
+      : '';
+  }).join('');
 };
 
 window.pdLoadReviews = async function(productId) {
@@ -13028,9 +13200,11 @@ window.zulaBuildProductCard = function(p, id, opts) {
 
   var isRealEstate = p.productType === 'realestate';
   var actionRow = !opts.showBuyPill ? '' :
-    isRealEstate
-      ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="event.stopPropagation();viewProduct(\''+id+'\')" style="flex:1;">View</button></div>'
-      : '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>';
+    opts.singleBuyBtn
+      ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)" style="flex:1;">Buy Now</button></div>'
+      : isRealEstate
+        ? '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="event.stopPropagation();viewProduct(\''+id+'\')" style="flex:1;">View</button></div>'
+        : '<div class="pcard-btn-row"><button class="pcard-buy-btn" onclick="mktBuyNow(\''+id+'\',event)">Buy</button><button class="pcard-cart-btn" onclick="mktAddToCart(\''+id+'\',event)">🛒 Cart</button></div>';
 
   return '<div class="pcard" onclick="'+(opts.onClickOverride || ("viewProduct('"+id+"');"))+'" style="position:relative;">' +
     topBadge + heartHtml +
@@ -13201,12 +13375,19 @@ window.mktLoadTopBanners = async function() {
     var id = p._id || p.id;
     var photo = (p.photos && p.photos[0]) || p.photo || '';
     var sold = soldMap[id] || 0;
-    var tagHtml = sold > 0 ? '<div class="mkt-banner-tag">' + sold + ' sold</div>' : '';
-    return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');" onclick="viewProduct(\'' + id + '\')">' +
-      tagHtml +
-      '<div class="mkt-banner-content"><div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div><div class="mkt-banner-sub">' + (labels[i % 3] || 'Featured') + ' · by ' + (p.sellerName || 'ZÚLA Seller') + '</div></div>' +
+    var symLocal = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
+    var soldLine = sold > 0 ? ' · ' + sold + ' sold' : '';
+    return '<div class="mkt-banner" style="background-image:url(\'' + photo + '\');">' +
+      '<div class="mkt-banner-tag">' + (labels[i % 3] || 'Featured') + '</div>' +
+      '<div class="mkt-banner-content">' +
+        '<div class="mkt-banner-title">' + (p.name || 'Featured item') + '</div>' +
+        '<div class="mkt-banner-sub">by ' + (p.sellerName || 'ZÚLA Seller') + soldLine + '</div>' +
+        '<div class="mkt-banner-price">' + symLocal + Number(p.price||0).toLocaleString() + '</div>' +
+        '<button class="mkt-banner-cta" onclick="event.stopPropagation();viewProduct(\'' + id + '\')">View Product <span>→</span></button>' +
+      '</div>' +
     '</div>';
   }).join('');
+  window._mktSpotlightPoolLen = pool.length;
 
   if (dotsEl) {
     dotsEl.innerHTML = pool.map(function(_, i) {
@@ -14969,13 +15150,22 @@ window.adminRejectVerif = async function(userId) {
 // ══════════════════════════════════════════════════
 // 12. FIX pdBuyNow to use the real checkout page
 // ══════════════════════════════════════════════════
+window.pdChangeQty = function(delta) {
+  var maxQty = window._pdMaxQty || 99;
+  var cur = window._pdQty || 1;
+  var next = Math.max(1, Math.min(maxQty, cur + delta));
+  window._pdQty = next;
+  var el = document.getElementById('pd-qty-val');
+  if (el) el.textContent = next;
+};
+
 window.pdBuyNow = function() {
   var p = window._currentProduct;
   if (!p) return;
   var auth = window._auth;
   if (!auth || !auth.currentUser) { showToast('Please sign in to buy.'); showPage('login'); return; }
   var item = Object.assign({}, p, {
-    qty: 1,
+    qty: window._pdQty || 1,
     photo: (p.photos && p.photos[0]) || p.photo || '',
   });
   openCheckoutPage([item]);
@@ -14985,11 +15175,12 @@ window.pdBuyNow = function() {
 window.pdAddToCart = function() {
   var p = window._currentProduct;
   if (!p) return;
+  var qty = window._pdQty || 1;
   var existing = _cart.find(function(i){ return i.id === p.id; });
-  if (existing) { existing.qty = (existing.qty||1) + 1; } else {
+  if (existing) { existing.qty = (existing.qty||1) + qty; } else {
     _cart.push({
       id: p.id, name: p.name, price: p.price, currency: p.currency||'NGN',
-      sellerId: p.sellerId, sellerName: p.sellerName, qty: 1,
+      sellerId: p.sellerId, sellerName: p.sellerName, qty: qty,
       photo: (p.photos&&p.photos[0])||p.photo||'', emoji: p.emoji||'📦',
       productType: p.productType||'physical', deliveryFee: p.deliveryFee!=null ? Number(p.deliveryFee) : null,
     });
