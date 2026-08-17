@@ -1045,6 +1045,15 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   .logo{ font-size:24px; }
   .hdr-nav{ gap:24px; font-size:14px; }
   .dash-wrap{ padding:40px 32px 80px; }
+
+  /* Profile / public-profile pages read as too narrow on wide screens —
+     stretch them out so the sidebar-pushed content actually fills the space */
+  #page-profile-v2 .dash-wrap, #page-myprofile .dash-wrap{ max-width:1040px !important; }
+  .affhub-wrap{ max-width:1200px !important; }
+}
+@media(min-width:1440px){
+  #page-profile-v2 .dash-wrap, #page-myprofile .dash-wrap{ max-width:1160px !important; }
+  .affhub-wrap{ max-width:1320px !important; }
 }
 
 /* ANALYTICS TABS */
