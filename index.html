@@ -473,7 +473,7 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
    into it instead of staying capped at their "sidebar expanded" width. */
 body.sidebar-push-72 #page-marketplace .mkt-layout,
 body.sidebar-push-72 #page-marketplace > .wrap{max-width:1560px;}
-body.sidebar-push-72 .sd-content{max-width:1360px;}
+body.sidebar-push-72 .sd-content{max-width:1720px;}
 
 /* Everything below the cat carousel keeps its normal side padding */
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
@@ -1491,7 +1491,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .sd-nav-item .sd-nav-badge{margin-left:auto;background:var(--accent-grad);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;}
 .sd-nav-item .sd-nav-badge.gold{background:var(--gold-grad);color:#000;}
 .sd-nav-divider{height:1px;background:var(--border);margin:8px 16px;}
-.sd-content{padding:32px 28px;max-width:1160px;margin:0 auto;width:100%;}
+.sd-content{padding:32px 28px;max-width:1500px;margin:0 auto;width:100%;min-width:0;}
 @media(max-width:700px){.sd-content{padding:20px 16px;}}
 .sd-section{display:none;}
 .sd-section.active{display:block;}
@@ -1570,7 +1570,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 
 /* Horizontal tab bar — visible at ALL widths now (replaces the old
    vertical sidebar navigation entirely, matching the reference design). */
-.sd-mobile-nav{display:flex;gap:8px;background:transparent;border-bottom:none;padding:0 0 20px;overflow-x:auto;white-space:nowrap;}
+.sd-mobile-nav{display:flex;gap:8px;background:transparent;border-bottom:none;padding:0 0 20px;overflow-x:auto;white-space:nowrap;max-width:100%;}
 .sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:1px solid var(--border);background:var(--surface);font-family:var(--font-body);white-space:nowrap;flex-shrink:0;transition:.15s;}
 .sd-mobile-tab:hover{border-color:var(--accent);}
 .sd-mobile-tab.active{background:rgba(124,92,252,.14);color:var(--accent);border-color:var(--accent);font-weight:700;}
@@ -4315,10 +4315,14 @@ if (_kycOrigShowPage) {
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav">
+      <nav class="hdr-nav" id="myprofile-nav-loggedin" style="display:none;">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('profile-v2')">My Account</a>
         <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile-v2')">?</div>
+      </nav>
+      <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
+        <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Join free</button>
       </nav>
     </div>
   </header>
@@ -6827,6 +6831,10 @@ window.loadProfileV2 = async function() {
 // ── LOAD MY PUBLIC PROFILE (myprofile page) ───────────────────────
 window.loadMyProfile = async function() {
   const currentAuthUser = auth.currentUser;
+  const loggedInNav = document.getElementById('myprofile-nav-loggedin');
+  const guestNav = document.getElementById('myprofile-nav-guest');
+  if (loggedInNav) loggedInNav.style.display = currentAuthUser ? 'flex' : 'none';
+  if (guestNav) guestNav.style.display = currentAuthUser ? 'none' : 'flex';
   const params = new URLSearchParams(window.location.search);
   const sellerParam = params.get('seller');
   // Viewing a shared storefront link (?seller=uid) always shows that seller,
@@ -6898,9 +6906,12 @@ window.loadMyProfile = async function() {
   window._myprofileTargetName = fullName;
   const msgBtn = el('owner-msg-btn'), followBtn = el('owner-follow-btn'), noteEl = el('myprofile-preview-note');
   if (noteEl) noteEl.style.display = isOwnProfile ? 'block' : 'none';
-  if (msgBtn)    msgBtn.style.display    = isOwnProfile ? 'none' : '';
-  if (followBtn) followBtn.style.display = isOwnProfile ? 'none' : '';
-  if (!isOwnProfile && followBtn) {
+  // Following/messaging need an account — for an anonymous visitor, hide
+  // both rather than showing buttons that would just fail when tapped.
+  // They can still browse and buy everything below as a guest.
+  if (msgBtn)    msgBtn.style.display    = (isOwnProfile || !currentAuthUser) ? 'none' : '';
+  if (followBtn) followBtn.style.display = (isOwnProfile || !currentAuthUser) ? 'none' : '';
+  if (!isOwnProfile && currentAuthUser && followBtn) {
     followBtn.textContent = '…';
     isFollowing(targetUid).then(function(f) {
       followBtn.textContent = f ? '✓ Following' : '➕ Follow';
