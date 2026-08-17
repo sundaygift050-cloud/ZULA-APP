@@ -473,7 +473,7 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
    into it instead of staying capped at their "sidebar expanded" width. */
 body.sidebar-push-72 #page-marketplace .mkt-layout,
 body.sidebar-push-72 #page-marketplace > .wrap{max-width:1560px;}
-body.sidebar-push-72 .sd-content{max-width:1120px;}
+body.sidebar-push-72 .sd-content{max-width:1360px;}
 
 /* Everything below the cat carousel keeps its normal side padding */
 #page-marketplace .wrap{padding-left:28px;padding-right:28px;}
@@ -1480,10 +1480,8 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .ap-uf-remove:hover{color:var(--red);}
 
 /* ── SELLER DASHBOARD LAYOUT ── */
-.sd-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
-@media(max-width:700px){.sd-layout{grid-template-columns:1fr;}}
-.sd-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
-@media(max-width:700px){.sd-sidebar{display:none;}}
+.sd-layout{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 58px);}
+.sd-sidebar{display:none;}
 .sd-sidebar-section{padding:0 16px;margin-bottom:24px;}
 .sd-sidebar-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:8px;}
 .sd-nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-xs);font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;border:none;background:none;font-family:var(--font-body);width:100%;text-align:left;}
@@ -1493,7 +1491,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .sd-nav-item .sd-nav-badge{margin-left:auto;background:var(--accent-grad);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;}
 .sd-nav-item .sd-nav-badge.gold{background:var(--gold-grad);color:#000;}
 .sd-nav-divider{height:1px;background:var(--border);margin:8px 16px;}
-.sd-content{padding:32px 28px;max-width:860px;}
+.sd-content{padding:32px 28px;max-width:1160px;margin:0 auto;width:100%;}
 @media(max-width:700px){.sd-content{padding:20px 16px;}}
 .sd-section{display:none;}
 .sd-section.active{display:block;}
@@ -1548,10 +1546,34 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .sd-stat-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
 .sd-bank-row{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px 16px;margin-bottom:10px;}
 .sd-bank-icon{font-size:24px;width:40px;height:40px;background:var(--surface);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sd-mobile-nav{display:none;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;white-space:nowrap;}
-@media(max-width:700px){.sd-mobile-nav{display:flex;gap:4px;padding:8px 16px;}}
-.sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-xs);font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font-body);white-space:nowrap;}
-.sd-mobile-tab.active{background:rgba(124,92,252,.12);color:var(--accent);}
+
+/* Profile page — 3-dot menu (copy public profile link) */
+.pv2-menu-btn{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.pv2-menu-btn:hover{color:var(--text);border-color:var(--accent);}
+.pv2-menu-dd{display:none;position:absolute;top:40px;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-xs);box-shadow:var(--shadow-card);min-width:200px;padding:6px;z-index:20;}
+.pv2-menu-dd.open{display:block;}
+
+/* Overview — 4 stat cards + quick-action row (matches reference layout) */
+.sd-stat-grid-v2{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.sd-stat-card-v2{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;}
+.sd-stat-v2-val{font-size:22px;font-weight:800;font-family:var(--font-display);margin-top:14px;}
+.sd-stat-v2-lbl{font-size:12.5px;color:var(--text3);margin-top:2px;}
+.sd-stat-badge{font-size:11px;font-weight:700;color:var(--green);background:rgba(34,197,94,.12);border-radius:999px;padding:2px 9px;}
+@media(max-width:900px){.sd-stat-grid-v2{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.sd-stat-grid-v2{grid-template-columns:1fr;}}
+
+.sd-quick-actions-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.sd-quick-action-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:.15s;}
+.sd-quick-action-btn:hover{border-color:var(--accent);color:var(--accent);}
+@media(max-width:900px){.sd-quick-actions-row{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.sd-quick-actions-row{grid-template-columns:1fr;}}
+
+/* Horizontal tab bar — visible at ALL widths now (replaces the old
+   vertical sidebar navigation entirely, matching the reference design). */
+.sd-mobile-nav{display:flex;gap:8px;background:transparent;border-bottom:none;padding:0 0 20px;overflow-x:auto;white-space:nowrap;}
+.sd-mobile-tab{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:1px solid var(--border);background:var(--surface);font-family:var(--font-body);white-space:nowrap;flex-shrink:0;transition:.15s;}
+.sd-mobile-tab:hover{border-color:var(--accent);}
+.sd-mobile-tab.active{background:rgba(124,92,252,.14);color:var(--accent);border-color:var(--accent);font-weight:700;}
 
 /* ── ORDER FULFILLMENT (seller) ── */
 .sdf-tabs-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
@@ -4167,7 +4189,13 @@ if (_kycOrigShowPage) {
     </div>
 
     <!-- PROFILE HERO — ported 1:1 from reference app -->
-    <div class="p-hero">
+    <div class="p-hero" style="position:relative;">
+      <div class="pv2-menu-wrap" style="position:absolute;top:0;right:0;">
+        <button class="pv2-menu-btn" onclick="pv2ToggleMenu(event)" title="More">⋮</button>
+        <div class="pv2-menu-dd" id="pv2-menu-dd">
+          <div class="dd-item" onclick="copyStoreLink();pv2ToggleMenu()">🔗 Copy profile link</div>
+        </div>
+      </div>
       <div class="p-top-row">
         <div class="p-avatar-wrap">
           <div class="p-avatar" id="pv2-avatar">?</div>
@@ -7472,6 +7500,19 @@ window.closePv2ListingsMenu = function() {
 // Builds a public, shareable link to the current seller's storefront —
 // every active listing they have, viewable (and buyable) by anyone who
 // opens it, signed in or not. Works from any social platform.
+window.pv2ToggleMenu = function(event) {
+  if (event) event.stopPropagation();
+  var dd = document.getElementById('pv2-menu-dd');
+  if (!dd) return;
+  var willOpen = !dd.classList.contains('open');
+  document.querySelectorAll('.pv2-menu-dd.open').forEach(function(d){ d.classList.remove('open'); });
+  if (willOpen) dd.classList.add('open');
+};
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('pv2-menu-dd');
+  if (dd && dd.classList.contains('open') && !e.target.closest('.pv2-menu-wrap')) dd.classList.remove('open');
+});
+
 window.copyStoreLink = function() {
   var auth = window._auth, user = auth && auth.currentUser;
   if (!user) { showToast('Please sign in first.'); return; }
@@ -8328,7 +8369,7 @@ function sdProductRow(id, p, compact) {
     '<div class="sd-product-actions">' +
       '<button class="sd-btn-edit" style="' + (isFlash ? 'background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;border-color:transparent;' : '') + '" onclick="sdToggleFlashSale(\x27' + id + '\x27,' + isFlash + ',this)" title="' + (isFlash ? 'Remove from Flash Sale' : 'Add to Flash Sale') + '">⚡<\/button>' +
       '<button class="sd-btn-edit" onclick="sdEditProduct(\x27' + id + '\x27)">Edit<\/button>' +
-      '<button class="sd-btn-del" onclick="sdDeleteProduct(\x27' + id + '\x27,this)">\u{1F5D1}<\/button>' +
+      '<button class="sd-btn-del" style="border:1px solid var(--red);color:var(--red);font-weight:700;" onclick="sdDeleteProduct(\x27' + id + '\x27,this)">Delete<\/button>' +
     '<\/div>' +
   '<\/div>';
 }
@@ -8693,24 +8734,10 @@ window.saveManualLocation = async function() {
     </div>
   </header>
 
-  <!-- MOBILE TAB BAR -->
-  <div class="sd-mobile-nav">
-    <button class="sd-mobile-tab active" data-tab="overview" onclick="sdTab('overview')">📊 Overview</button>
-    <button class="sd-mobile-tab" data-tab="products" onclick="sdTab('products')">📦 Products</button>
-    <button class="sd-mobile-tab" data-tab="orders" onclick="sdTab('orders')">🛍 Orders</button>
-    <button class="sd-mobile-tab" data-tab="viewings" onclick="sdTab('viewings')">🏠 Viewings</button>
-    <button class="sd-mobile-tab" data-tab="analytics" onclick="sdTab('analytics')">📈 Analytics</button>
-    <button class="sd-mobile-tab" data-tab="payout" onclick="sdTab('payout')">💸 Payout</button>
-    <button class="sd-mobile-tab" data-tab="affiliate" onclick="sdTab('affiliate')">🔗 Affiliate</button>
-    <button class="sd-mobile-tab" data-tab="verification" onclick="sdTab('verification')">🛡 Verification</button>
-    <button class="sd-mobile-tab" data-tab="settings" onclick="sdTab('settings')">⚙️ Settings</button>
-    <button class="sd-mobile-tab" data-tab="integrations" onclick="sdTab('integrations')">🔌 Integrations</button>
-  </div>
-
   <div class="sd-layout">
 
-    <!-- SIDEBAR -->
-    <aside class="sd-sidebar">
+    <!-- SIDEBAR (hidden — replaced by the horizontal tab bar below) -->
+    <aside class="sd-sidebar" style="display:none;">
       <div style="padding:0 20px 20px;">
         <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Seller account</div>
         <div style="font-size:15px;font-weight:700;" id="sd-sidebar-name">—</div>
@@ -8780,27 +8807,68 @@ window.saveManualLocation = async function() {
     <!-- MAIN CONTENT -->
     <div class="sd-content">
 
+      <!-- Page header — shared across every tab -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;">
+        <div>
+          <h1 style="font-size:24px;font-weight:800;font-family:var(--font-display);">Seller Dashboard</h1>
+          <div style="font-size:13.5px;color:var(--text3);margin-top:2px;">Manage your listings, orders, and earnings</div>
+        </div>
+        <button class="btn btn-primary" onclick="goAddProduct()">+ Add Product</button>
+      </div>
+
+      <!-- Horizontal tab bar — replaces the old vertical sidebar nav -->
+      <div class="sd-mobile-nav">
+        <button class="sd-mobile-tab active" data-tab="overview" onclick="sdTab('overview')">📊 Overview</button>
+        <button class="sd-mobile-tab" data-tab="products" onclick="sdTab('products')">📦 My Products</button>
+        <button class="sd-mobile-tab" data-tab="orders" onclick="sdTab('orders')">🛍 Orders</button>
+        <button class="sd-mobile-tab" data-tab="viewings" onclick="sdTab('viewings')">🏠 Viewings</button>
+        <button class="sd-mobile-tab" data-tab="analytics" onclick="sdTab('analytics')">📈 Analytics</button>
+        <button class="sd-mobile-tab" data-tab="payout" onclick="sdTab('payout')">💸 Payout</button>
+        <button class="sd-mobile-tab" data-tab="affiliate" onclick="sdTab('affiliate')">🔗 Affiliate Earnings</button>
+        <button class="sd-mobile-tab" data-tab="verification" onclick="sdTab('verification')">🛡 Verification</button>
+        <button class="sd-mobile-tab" data-tab="settings" onclick="sdTab('settings')">⚙️ Settings</button>
+        <button class="sd-mobile-tab" data-tab="integrations" onclick="sdTab('integrations')">🔌 Integrations</button>
+      </div>
+
       <!-- ── OVERVIEW ── -->
       <div class="sd-section active" id="sd-sec-overview">
-        <div class="sd-page-hd">Dashboard</div>
-        <div class="sd-page-sub">Welcome back — here's how your store is doing</div>
 
-        <!-- Hero revenue card — ported 1:1 from reference app -->
-        <div class="sd-hero-card">
-          <div class="sd-hero-top"><span class="sd-hero-label">Available Revenue</span><span class="sd-hero-pill">All Time</span></div>
-          <div class="sd-hero-value" id="sd-stat-revenue">₦0</div>
-          <div class="sd-hero-sub-row">
-            <div class="sd-hero-sub-item"><div class="n" id="sd-stat-escrow">₦0</div><div class="l">🔒 In escrow</div></div>
-            <div class="sd-hero-sub-item"><div class="n" id="sd-stat-aff">₦0</div><div class="l">Affiliate earned</div></div>
+        <!-- 4 stat cards -->
+        <div class="sd-stat-grid-v2">
+          <div class="sd-stat-card-v2">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:20px;">💰</div>
+              <span id="sd-stat-sales-badge" class="sd-stat-badge" style="display:none;"></span>
+            </div>
+            <div class="sd-stat-v2-val" id="sd-stat-total-sales">₦0</div>
+            <div class="sd-stat-v2-lbl">Total Sales</div>
+          </div>
+          <div class="sd-stat-card-v2">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:20px;">⏳</div>
+            </div>
+            <div class="sd-stat-v2-val" id="sd-stat-pending-payout">₦0</div>
+            <div class="sd-stat-v2-lbl">Pending Payout</div>
+          </div>
+          <div class="sd-stat-card-v2">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:20px;">📦</div>
+              <span id="sd-stat-listings-badge" class="sd-stat-badge" style="display:none;"></span>
+            </div>
+            <div class="sd-stat-v2-val" id="sd-stat-active-listings">0</div>
+            <div class="sd-stat-v2-lbl">Active Listings</div>
+          </div>
+          <div class="sd-stat-card-v2">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:20px;">📈</div>
+              <span id="sd-stat-month-badge" class="sd-stat-badge" style="display:none;"></span>
+            </div>
+            <div class="sd-stat-v2-val" id="sd-stat-this-month">₦0</div>
+            <div class="sd-stat-v2-lbl">This Month</div>
           </div>
         </div>
 
-        <!-- Icon-chip stat cards — ported 1:1 from reference app -->
-        <div class="sd-stat-grid-icon">
-          <div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(59,130,246,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/></svg></div><div class="sd-stat-val" id="sd-stat-listings">—</div><div class="sd-stat-lbl">Listings</div></div>
-          <div class="sd-stat-card-icon"><div class="sd-stat-ic" style="background:rgba(245,158,11,.15);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 2v4M16 2v4M4 10h16"/></svg></div><div class="sd-stat-val" id="sd-stat-orders">—</div><div class="sd-stat-lbl">Orders</div></div>
-        </div>
-        <div id="sd-escrow-note" style="display:none;font-size:12px;color:var(--text3);margin:-8px 0 16px;padding:10px 14px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);">
+        <div id="sd-escrow-note" style="display:none;font-size:12px;color:var(--text3);margin:-8px 0 20px;padding:10px 14px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--radius-xs);">
           🔒 Funds in escrow are held until the buyer confirms they've received their order. You can only withdraw <strong>Available revenue</strong> — escrowed funds aren't withdrawable yet.
         </div>
 
@@ -8815,38 +8883,22 @@ window.saveManualLocation = async function() {
           </div>
         </div>
 
-        <!-- Recent products -->
+        <!-- 4 quick action buttons -->
+        <div class="sd-quick-actions-row">
+          <button class="sd-quick-action-btn" onclick="sdTab('payout')">Request Payout</button>
+          <button class="sd-quick-action-btn" onclick="sdTab('analytics')">View Analytics</button>
+          <button class="sd-quick-action-btn" onclick="sdTab('orders')">Manage Orders</button>
+          <button class="sd-quick-action-btn" onclick="goAddProduct()">Add Product</button>
+        </div>
+
+        <!-- Recent Listings -->
         <div class="dash-card" style="margin-bottom:16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <h3 style="font-size:15px;font-weight:700;">Recent listings</h3>
+            <h3 style="font-size:15px;font-weight:700;">Recent Listings</h3>
             <button class="btn btn-ghost btn-sm" onclick="sdTab('products')">View all →</button>
           </div>
           <div id="sd-overview-products">
             <div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center;">Loading…</div>
-          </div>
-        </div>
-
-        <!-- Quick actions -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="goAddProduct()" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-            <div style="font-size:24px;margin-bottom:8px;">➕</div>
-            <div style="font-size:13.5px;font-weight:700;">New listing</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Add a product to sell</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('payout')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
-            <div style="font-size:24px;margin-bottom:8px;">💸</div>
-            <div style="font-size:13.5px;font-weight:700;">Request payout</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Withdraw your earnings</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="sdTab('analytics')" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
-            <div style="font-size:24px;margin-bottom:8px;">📈</div>
-            <div style="font-size:13.5px;font-weight:700;">View analytics</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Sales & traffic data</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:.15s;" onclick="showPage('messaging')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-            <div style="font-size:24px;margin-bottom:8px;">💬</div>
-            <div style="font-size:13.5px;font-weight:700;">Messages</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:3px;">Chat with buyers</div>
           </div>
         </div>
       </div>
@@ -11913,6 +11965,16 @@ window.sdTab = function(name) {
 
       <!-- LEFT COLUMN -->
       <div>
+        <!-- Guest contact card — only needed when checking out without an account -->
+        <div class="co-card" id="co2-guest-card" style="display:none;">
+          <div class="co-card-hd">📧 Your contact info</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">We'll email your receipt here. Sign up later with this same email to see this order in "My Orders".</div>
+          <div class="co-field-row">
+            <div class="co-field"><label>Full name</label><input id="co2-guest-name" placeholder="Ada Okafor"></div>
+            <div class="co-field"><label>Email</label><input id="co2-guest-email" type="email" placeholder="you@example.com"></div>
+          </div>
+        </div>
+
         <div class="co-card" id="co2-delivery-card">
           <div class="co-card-hd">📦 Delivery address</div>
           <div class="co-field-row">
@@ -12580,6 +12642,26 @@ window.myOrdersLoad = async function() {
   if (!el || !user) return;
   el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px;">Loading…</div>';
   try {
+    // Claim any guest-checkout orders placed with this exact email before
+    // signing up — a one-time upgrade from "found by email" to "actually
+    // owned by this account" (buyerId set), so normal buyerId-based rules
+    // (confirm receipt, etc.) work on them from here on, not just viewing.
+    if (user.email) {
+      try {
+        var guestSnap = await fns.getDocs(fns.query(
+          fns.collection(db,'orders'),
+          fns.where('buyerEmail','==',user.email),
+          fns.where('buyerId','==',null)
+        ));
+        if (!guestSnap.empty) {
+          var claims = guestSnap.docs.map(function(d) {
+            return fns.updateDoc(fns.doc(db,'orders',d.id), { buyerId: user.uid });
+          });
+          await Promise.all(claims);
+          if (guestSnap.size > 0) showToast('🎉 Found ' + guestSnap.size + ' past order' + (guestSnap.size===1?'':'s') + ' from this email!');
+        }
+      } catch(claimErr) { console.error('guest order claim:', claimErr); }
+    }
     var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',user.uid), fns.orderBy('createdAt','desc')));
     _myAllOrders = snap.docs.map(function(d){ return Object.assign({ _id:d.id }, d.data()); });
     myOrdersRender(_myAllOrders);
@@ -13137,6 +13219,50 @@ window.sdLoadOverview = async function() {
     var inEscrow = oSnap.docs.filter(function(d){ var st=d.data().status; return st!=='completed' && terminalBad.indexOf(st)===-1; }).reduce(function(s,d){ return s+sellerNetOf(d.data()); },0);
     if (e('sd-stat-escrow')) e('sd-stat-escrow').textContent = '₦' + inEscrow.toLocaleString();
     if (e('sd-stat-revenue')) e('sd-stat-revenue').textContent = '₦' + revenue.toLocaleString();
+
+    // ── Overview page v2 stat cards — real numbers only; a % badge only
+    // shows when there's an honest baseline to compare against (never a
+    // fabricated delta). ──
+    if (e('sd-stat-total-sales')) e('sd-stat-total-sales').textContent = '₦' + revenue.toLocaleString();
+    if (e('sd-stat-pending-payout')) e('sd-stat-pending-payout').textContent = '₦' + inEscrow.toLocaleString();
+
+    var activeListings = pSnap.docs.filter(function(d){ return (d.data().status||'active') === 'active'; });
+    if (e('sd-stat-active-listings')) e('sd-stat-active-listings').textContent = activeListings.length;
+    var now = new Date();
+    var startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    var listingsAddedThisMonth = pSnap.docs.filter(function(d){
+      var c = d.data().createdAt;
+      var cd = c && c.toDate ? c.toDate() : (c ? new Date(c) : null);
+      return cd && cd >= startOfThisMonth;
+    }).length;
+    var listingsBadge = e('sd-stat-listings-badge');
+    if (listingsBadge) { if (listingsAddedThisMonth > 0) { listingsBadge.textContent = '+' + listingsAddedThisMonth; listingsBadge.style.display = ''; } else listingsBadge.style.display = 'none'; }
+
+    // This month's revenue vs last month's — a genuine month-over-month
+    // comparison, only shown when last month actually has data to compare to.
+    var startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    var completedOrders = oSnap.docs.filter(function(d){ return d.data().status === 'completed'; });
+    var revenueThisMonth = completedOrders.filter(function(d){
+      var c = d.data().createdAt; var cd = c && c.toDate ? c.toDate() : (c ? new Date(c) : null);
+      return cd && cd >= startOfThisMonth;
+    }).reduce(function(s,d){ return s + sellerNetOf(d.data()); }, 0);
+    var revenueLastMonth = completedOrders.filter(function(d){
+      var c = d.data().createdAt; var cd = c && c.toDate ? c.toDate() : (c ? new Date(c) : null);
+      return cd && cd >= startOfLastMonth && cd < startOfThisMonth;
+    }).reduce(function(s,d){ return s + sellerNetOf(d.data()); }, 0);
+    if (e('sd-stat-this-month')) e('sd-stat-this-month').textContent = '₦' + revenueThisMonth.toLocaleString();
+    var monthBadge = e('sd-stat-month-badge');
+    if (monthBadge) {
+      if (revenueLastMonth > 0) {
+        var pctChange = Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100);
+        monthBadge.textContent = (pctChange >= 0 ? '+' : '') + pctChange + '%';
+        monthBadge.style.color = pctChange >= 0 ? 'var(--green)' : 'var(--red)';
+        monthBadge.style.background = pctChange >= 0 ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+        monthBadge.style.display = '';
+      } else {
+        monthBadge.style.display = 'none';
+      }
+    }
     // Pending orders (awaiting seller action)
     var pending = oSnap.docs.filter(function(d){ var st=d.data().status; return st==='pending'||st==='paid'; }).length;
     if (e('sd-stat-pending')) e('sd-stat-pending').textContent = pending;
@@ -13441,8 +13567,6 @@ window.mktBuyNow = function(id, event) {
   if (event) event.stopPropagation();
   var p = (window._allProducts || []).find(function(x){ return (x._id||x.id) === id; });
   if (!p) return;
-  var auth = window._auth;
-  if (!auth || !auth.currentUser) { showToast('Please sign in to buy.'); showPage('login'); return; }
   var item = Object.assign({}, p, { qty: 1, photo: (p.photos && p.photos[0]) || p.photo || '' });
   openCheckoutPage([item]);
 };
@@ -14462,7 +14586,9 @@ window.CO2_DELIVERY_FEE_NGN = 1500;
 
 window.openCheckoutPage = function(items) {
   var auth = window._auth;
-  if (!auth || !auth.currentUser) { showToast('Please sign in to checkout.'); showPage('login'); return; }
+  var user = auth && auth.currentUser;
+  // Guests can check out too — no forced sign-in wall. Their contact info
+  // is captured in the guest card below instead of pulled from an account.
   if (!items || !items.length) { showToast('Nothing to check out.'); return; }
   window._co2Items = items;
   window._co2PayMethod = 'all';
@@ -14481,6 +14607,13 @@ window.openCheckoutPage = function(items) {
   if (e('co2-state')) e('co2-state').value = '';
   if (e('co2-phone')) e('co2-phone').value = u.phone || '';
   if (e('co2-location-status')) e('co2-location-status').textContent = '';
+
+  var guestCard = e('co2-guest-card');
+  if (guestCard) guestCard.style.display = user ? 'none' : '';
+  if (!user) {
+    if (e('co2-guest-name')) e('co2-guest-name').value = '';
+    if (e('co2-guest-email')) e('co2-guest-email').value = '';
+  }
 
   var hasPhysical = items.some(function(i){ var t=i.productType||i.type||'physical'; return t==='physical'||t==='vehicle'; });
   var delivSec = e('co2-delivery-card');
@@ -14572,11 +14705,22 @@ window.co2RenderSummary = function() {
 window.co2SubmitOrder = async function() {
   var auth = window._auth;
   var user = auth && auth.currentUser;
-  if (!user) { showToast('Please sign in.'); showPage('login'); return; }
   var items = window._co2Items || [];
   if (!items.length) { showToast('Your cart is empty.'); return; }
   var profile = window._currentUser || {};
   var e = function(id){ return document.getElementById(id); };
+
+  // Guest checkout — no account needed, just a valid email so the order
+  // can be shown to them later if they sign up with the same address.
+  var guestName = '', guestEmail = '';
+  if (!user) {
+    guestName  = (e('co2-guest-name')||{}).value ? e('co2-guest-name').value.trim() : '';
+    guestEmail = (e('co2-guest-email')||{}).value ? e('co2-guest-email').value.trim() : '';
+    if (!guestName) { showToast('⚠️ Enter your full name.'); return; }
+    if (!guestEmail || guestEmail.indexOf('@') === -1) { showToast('⚠️ Enter a valid email address.'); return; }
+  }
+  var buyerEmail = user ? user.email : guestEmail;
+  var buyerName  = user ? (profile.fullName || user.displayName || 'Buyer') : guestName;
 
   var fname  = (e('co2-fname')||{}).value ? e('co2-fname').value.trim() : '';
   var lname  = (e('co2-lname')||{}).value ? e('co2-lname').value.trim() : '';
@@ -14611,7 +14755,7 @@ window.co2SubmitOrder = async function() {
 
   var total = window._co2Total || 0;
   var amountKobo = Math.round(total * 100);
-  var ref = 'ZULA_' + Date.now() + '_' + user.uid.slice(0,6);
+  var ref = 'ZULA_' + Date.now() + '_' + (user ? user.uid.slice(0,6) : 'GUEST' + Math.random().toString(36).slice(2,8));
 
   // Paystack channel restriction — real feature, matches the chosen payment method
   var channelsMap = {
@@ -14624,14 +14768,14 @@ window.co2SubmitOrder = async function() {
   if (paystackOk && keyOk) {
     var handler = PaystackPop.setup({
       key:      window.PAYSTACK_PUBLIC_KEY,
-      email:    user.email,
+      email:    buyerEmail,
       amount:   amountKobo,
       currency: (items[0] && items[0].currency === 'USD') ? 'USD' : 'NGN',
       ref:      ref,
       channels: channels,
-      metadata: { buyerId: user.uid, itemCount: items.length },
+      metadata: { buyerId: user ? user.uid : null, buyerEmail: buyerEmail, itemCount: items.length },
       callback: function(response) {
-        co2SaveOrders(items, user, profile, response.reference, 'paid', delivery);
+        co2SaveOrders(items, user, profile, response.reference, 'paid', delivery, buyerName, buyerEmail);
       },
       onClose: function() { showToast('Payment cancelled.'); }
     });
@@ -14639,19 +14783,19 @@ window.co2SubmitOrder = async function() {
   } else if (!paystackOk) {
     showToast('⚠️ Payment system is still loading — please check your internet connection and try again in a moment.');
   } else {
-    await co2SaveOrders(items, user, profile, ref, 'pending', delivery);
+    await co2SaveOrders(items, user, profile, ref, 'pending', delivery, buyerName, buyerEmail);
     showToast('📋 Order placed! Add your Paystack key to enable live payments.');
   }
 };
 
-async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
+async function co2SaveOrders(items, user, profile, payRef, status, delivery, guestBuyerName, guestBuyerEmail) {
   var db = window._db, fns = window._fns;
   try {
     var deliveryFee = window._co2DeliveryFee || 0;
     var creditApplied = window._co2CreditApplied || 0;
     var serviceFeeTotal = window._co2ServiceFee || 0;
     var affRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
-    if (affRef === user.uid) affRef = null; // no self-referral commission
+    if (user && affRef === user.uid) affRef = null; // no self-referral commission
     var orderSubtotal = items.reduce(function(s,i){ return s + Number(i.price||0)*(i.qty||1); }, 0) + deliveryFee;
 
     for (var i = 0; i < items.length; i++) {
@@ -14696,9 +14840,9 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery) {
         currency:     p.currency || 'NGN',
         sellerId:     p.sellerId,
         sellerName:   p.sellerName || '',
-        buyerId:      user.uid,
-        buyerName:    profile.fullName || user.displayName || 'Buyer',
-        buyerEmail:   user.email,
+        buyerId:      user ? user.uid : null,
+        buyerName:    user ? (profile.fullName || user.displayName || 'Buyer') : guestBuyerName,
+        buyerEmail:   user ? user.email : guestBuyerEmail,
         paymentRef:   payRef,
         status:       status,
         createdAt:    fns.serverTimestamp(),
@@ -15312,8 +15456,6 @@ window.pdChangeQty = function(delta) {
 window.pdBuyNow = function() {
   var p = window._currentProduct;
   if (!p) return;
-  var auth = window._auth;
-  if (!auth || !auth.currentUser) { showToast('Please sign in to buy.'); showPage('login'); return; }
   var item = Object.assign({}, p, {
     qty: window._pdQty || 1,
     photo: (p.photos && p.photos[0]) || p.photo || '',
