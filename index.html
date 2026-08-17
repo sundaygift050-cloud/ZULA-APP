@@ -2387,9 +2387,15 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       <nav class="hdr-nav" style="gap:22px;">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-        <a onclick="openWishlist()" title="Wishlist">🤍</a>
-        <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔<span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-        <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile-v2')">?</div>
+        <span id="pd-nav-loggedin" style="display:none;align-items:center;gap:22px;">
+          <a onclick="openWishlist()" title="Wishlist">🤍</a>
+          <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔<span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
+          <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile-v2')">?</div>
+        </span>
+        <span id="pd-nav-guest" style="display:none;align-items:center;gap:10px;">
+          <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
+          <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Join free</button>
+        </span>
       </nav>
     </div>
   </header>
@@ -4324,12 +4330,14 @@ if (_kycOrigShowPage) {
   <header class="hdr">
     <div class="wrap hdr-inner">
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
-      <nav class="hdr-nav" id="myprofile-nav-loggedin" style="display:none;">
+      <nav class="hdr-nav" id="myprofile-nav-loggedin" style="display:none;gap:18px;align-items:center;">
         <a onclick="showPage('marketplace')">Marketplace</a>
+        <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile-in" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="showPage('profile-v2')">My Account</a>
         <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile-v2')">?</div>
       </nav>
-      <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;">
+      <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;align-items:center;">
+        <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
         <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Join free</button>
       </nav>
@@ -5196,6 +5204,7 @@ onAuthStateChanged(auth, async (user) => {
       window._currentUser = { email: user.email, firstName: '' };
     }
     updateNavAvatar();
+    zulaUpdateGuestNav(user);
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
     setTimeout(function(){ if (typeof sidebarSync === 'function') sidebarSync(); }, 600);
@@ -5227,8 +5236,22 @@ onAuthStateChanged(auth, async (user) => {
     if (window._notifPollInterval) { clearInterval(window._notifPollInterval); window._notifPollInterval = null; }
     var badge = document.getElementById('nav-notif-badge');
     if (badge) badge.style.display = 'none';
+    zulaUpdateGuestNav(null);
   }
 });
+
+// Toggle the "logged in" vs "guest" icon groups in headers that carry both
+// (currently the product detail page) — mirrors the pattern already used
+// on the public profile header (myprofile-nav-loggedin/-guest).
+function zulaUpdateGuestNav(user) {
+  var pairs = [['pd-nav-loggedin', 'pd-nav-guest']];
+  pairs.forEach(function(p) {
+    var loggedInEl = document.getElementById(p[0]);
+    var guestEl = document.getElementById(p[1]);
+    if (loggedInEl) loggedInEl.style.display = user ? 'inline-flex' : 'none';
+    if (guestEl) guestEl.style.display = user ? 'none' : 'inline-flex';
+  });
+}
 
 function updateNavAvatar() {
   const u = window._currentUser;
@@ -5304,6 +5327,12 @@ window.doSignup = function() {
   const btn = document.getElementById('signup-btn');
   btn.disabled = true; btn.textContent = 'Creating account…';
   const inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
+  // No personal invite link? Fall back to whichever seller/affiliate storefront
+  // link brought this visitor in (?ref=...) — someone who bought as a guest
+  // through a shared product/store link and now signs up should still be
+  // recorded as that person's referral, not just credited on the one order.
+  const affRefForSignup = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
+  const signupReferrer = inviteRef || affRefForSignup;
   createUserWithEmailAndPassword(auth, email, pass)
     .then(r => {
       const user = r.user;
@@ -5317,12 +5346,17 @@ window.doSignup = function() {
           followersCount: 0, followingCount: 0,
           isAffiliate: false, affiliateStatus: 'none',
           referralCredit: 0,
-          referredBy: (inviteRef && inviteRef !== user.uid) ? inviteRef : null,
+          referredBy: (signupReferrer && signupReferrer !== user.uid) ? signupReferrer : null,
         })
       ]).then(() => {
-        if (inviteRef && inviteRef !== user.uid) {
+        // Any order placed as a guest with this exact email (e.g. checked out
+        // from a shared store link before creating an account) gets claimed
+        // by the new account so it shows up under "My Orders" — matches the
+        // promise made on the checkout page itself.
+        if (typeof zulaClaimGuestOrders === 'function') zulaClaimGuestOrders(user.uid, email);
+        if (signupReferrer && signupReferrer !== user.uid) {
           return addDoc(collection(db, 'referrals'), {
-            referrerId: inviteRef,
+            referrerId: signupReferrer,
             referredUid: user.uid,
             referredName: fullName,
             referredEmail: email,
@@ -7564,6 +7598,16 @@ window.pv2RenderListingsGrid = async function(sellerId, containerId, opts) {
     var docs = lsnap.docs;
     if (opts.activeOnly) docs = docs.filter(function(d) { return d.data().status !== 'draft'; });
     if (opts.countElId) { var ce = document.getElementById(opts.countElId); if (ce) ce.textContent = docs.length; }
+    // A visitor landing straight on a shared storefront link (no prior visit
+    // to the marketplace grid) has an empty window._allProducts cache — and
+    // mktBuyNow()/mktAddToCart() look products up from that cache. Merge
+    // what we just fetched in so Buy/Cart work immediately from this page too.
+    window._allProducts = window._allProducts || [];
+    docs.forEach(function(d) {
+      if (!window._allProducts.some(function(x){ return (x._id||x.id) === d.id; })) {
+        window._allProducts.push(Object.assign({ _id: d.id }, d.data()));
+      }
+    });
     if (!docs.length) {
       listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;">' +
         (opts.emptyMsg || 'No listings yet.') + '</div>';
@@ -10455,7 +10499,7 @@ function cartSave() { localStorage.setItem('zula_cart', JSON.stringify(_cart)); 
 function wishSave() { localStorage.setItem('zula_wishlist', JSON.stringify(_wishlist)); }
 function cartUpdateBadge() {
   var count = _cart.reduce(function(s,i){ return s + (i.qty||1); }, 0);
-  ['cart-badge','cart-badge-wish','dock-cart-badge'].forEach(function(id) {
+  ['cart-badge','cart-badge-wish','dock-cart-badge','cart-badge-myprofile','cart-badge-myprofile-in'].forEach(function(id) {
     var badge = document.getElementById(id);
     if (badge) { badge.textContent = count; badge.style.display = _cart.length ? 'inline-block' : 'none'; }
   });
@@ -16060,6 +16104,29 @@ function zulaCaptureRefParams() {
 }
 document.addEventListener('DOMContentLoaded', zulaCaptureRefParams);
 zulaCaptureRefParams();
+
+// ── Claim guest orders on signup ──────────────────────────────────
+// Guest checkout stores buyerId:null + the buyer's typed email on the
+// order. When that same person later creates an account with the same
+// email, find those orders and attach them to the new uid so they show
+// up under "My Orders" — this is exactly what the checkout page promises
+// ("Sign up later with this same email to see this order in My Orders").
+window.zulaClaimGuestOrders = function(uid, email) {
+  try {
+    var db = window._db, fns = window._fns;
+    if (!db || !fns || !email) return;
+    fns.getDocs(fns.query(fns.collection(db, 'orders'), fns.where('buyerEmail', '==', email)))
+      .then(function(snap) {
+        snap.docs.forEach(function(d) {
+          var data = d.data();
+          if (!data.buyerId) {
+            fns.updateDoc(d.ref, { buyerId: uid }).catch(function(){});
+          }
+        });
+      })
+      .catch(function(e) { console.error('zulaClaimGuestOrders:', e); });
+  } catch(e) {}
+};
 
 // ── Nav label: Referral → Affiliate ──────────────────────────────
 window.affUpdateNav = function() {
