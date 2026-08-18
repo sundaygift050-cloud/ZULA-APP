@@ -6081,6 +6081,9 @@ window.avatarApplyPhoto = function(url) {
       pv2Av.textContent = ((u2.firstName||u2.fullName||'')[0]||'?').toUpperCase();
     }
   }
+  // Sidebar footer identity (bottom-left avatar) reads window._currentUser
+  // directly, so just re-run it now that photoUrl is updated in memory.
+  if (typeof sidebarSync === 'function') sidebarSync();
 };
 
 // ── 5. SOCIAL SHARING on product detail page ────────────────────
@@ -6900,7 +6903,10 @@ window.loadProfileV2 = async function() {
   if (el('pv2-bio'))     el('pv2-bio').textContent      = profile.bio || '';
   if (el('pv2-email'))   el('pv2-email').textContent    = user.email + ' · ' + joined;
   if (el('pv2-location')) el('pv2-location').textContent = profile.location ? '📍 ' + profile.location : '📍 Location not set';
-  if (el('nav-avatar-v2')) el('nav-avatar-v2').textContent = initials;
+  if (el('nav-avatar-v2')) {
+    if (profile.photoUrl) el('nav-avatar-v2').innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else el('nav-avatar-v2').textContent = initials;
+  }
 
   if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
   if (el('pv2-verify-btn')) el('pv2-verify-btn').style.display = profile.sellerVerified ? 'none' : '';
@@ -7105,6 +7111,12 @@ function showPage(name) {
   const profile = window._currentUser || {};
   const initials = profile.firstName ? profile.firstName[0].toUpperCase() : (user ? (user.email||'?')[0].toUpperCase() : '?');
   const el = id => document.getElementById(id);
+  const setAvatarEl = function(id) {
+    var elx = el(id);
+    if (!elx) return;
+    if (profile.photoUrl) elx.innerHTML = '<img src="'+profile.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else elx.textContent = initials;
+  };
 
   // Page-specific loaders
   if (name === 'marketplace')      { if(typeof loadProducts==='function') loadProducts(); }
@@ -7116,7 +7128,7 @@ function showPage(name) {
   if (name === 'verifstatus')      { if(typeof loadVerifStatus==='function') loadVerifStatus(); }
   if (name === 'messaging') {
     if(typeof loadConversations==='function') loadConversations();
-    if(el('nav-avatar-chat')) el('nav-avatar-chat').textContent = initials;
+    setAvatarEl('nav-avatar-chat');
   }
   if (name === 'settings') {
     if(el('st-email-display')) el('st-email-display').textContent = user ? user.email : '-';
@@ -7124,13 +7136,13 @@ function showPage(name) {
     if(el('st-phone') && profile.phone)    el('st-phone').value = profile.phone;
     if(el('st-bio') && profile.bio)        el('st-bio').value   = profile.bio;
     if(el('st-handle') && profile.handle)  el('st-handle').value = profile.handle;
-    if(el('nav-avatar-settings')) el('nav-avatar-settings').textContent = initials;
+    setAvatarEl('nav-avatar-settings');
   }
   if (name === 'notifications') {
-    if(el('nav-avatar-notif')) el('nav-avatar-notif').textContent = initials;
+    setAvatarEl('nav-avatar-notif');
   }
   if (name === 'verifstatus' || name === 'verif') {
-    if(el('nav-avatar-verif')) el('nav-avatar-verif').textContent = initials;
+    setAvatarEl('nav-avatar-verif');
   }
 }
 
@@ -8447,7 +8459,10 @@ window.loadSellerDashboardPage = async function() {
   if (el('sdnav-verif-badge')) el('sdnav-verif-badge').style.display = (!u.sellerVerified && !u.verifSubmitted) ? 'inline-block' : 'none';
   // Avatar
   const initials = (u.fullName || u.firstName || '?')[0].toUpperCase();
-  if (el('nav-avatar-seller-dash')) el('nav-avatar-seller-dash').textContent = initials;
+  if (el('nav-avatar-seller-dash')) {
+    if (u.photoUrl) el('nav-avatar-seller-dash').innerHTML = '<img src="'+u.photoUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else el('nav-avatar-seller-dash').textContent = initials;
+  }
   // Load stats + overview products
   try {
     const fns = window._fns;
