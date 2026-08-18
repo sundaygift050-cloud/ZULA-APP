@@ -4,6 +4,21 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ZÚLA — Everything in One Place</title>
+<meta name="description" content="Buy and sell anything on ZÚLA — physical products, digital goods and courses, with escrow-protected payments." />
+<!-- Baseline social preview (Facebook, WhatsApp, Twitter/X, Telegram, iMessage, Slack, etc).
+     This is the fallback every link uses. It is NOT per-seller/per-product —
+     see /middleware.js for that (dynamic previews need it, a static HTML
+     file alone can't do it because crawlers don't run JavaScript). -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="ZÚLA" />
+<meta property="og:title" content="ZÚLA — Everything in One Place" />
+<meta property="og:description" content="Buy and sell anything on ZÚLA — physical products, digital goods and courses, with escrow-protected payments." />
+<meta property="og:image" content="https://zula-app-silk.vercel.app/og-default.png" />
+<meta property="og:url" content="https://zula-app-silk.vercel.app/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="ZÚLA — Everything in One Place" />
+<meta name="twitter:description" content="Buy and sell anything on ZÚLA — physical products, digital goods and courses, with escrow-protected payments." />
+<meta name="twitter:image" content="https://zula-app-silk.vercel.app/og-default.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -4336,7 +4351,7 @@ if (_kycOrigShowPage) {
 <div class="page" id="page-myprofile">
   <header class="hdr">
     <div class="wrap hdr-inner">
-      <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
+      <div class="logo" onclick="(window._auth && window._auth.currentUser) ? showPage('marketplace') : showPage('home')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav" id="myprofile-nav-loggedin" style="display:none;gap:18px;align-items:center;">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile-in" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
