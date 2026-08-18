@@ -2177,24 +2177,6 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         </div>
         <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔 <span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <div class="avatar-btn" id="nav-avatar" onclick="toggleAdminDropdown(event)">?</div>
-        <!-- Admin/user dropdown -->
-        <div id="user-dropdown" style="display:none;position:absolute;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
-          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
-            <div style="font-size:14px;font-weight:700;color:var(--text);" id="dropdown-name">—</div>
-            <div style="font-size:12px;color:var(--text3);" id="dropdown-email">—</div>
-          </div>
-          <div style="padding:6px 0;">
-            <div class="dd-item dd-affiliate-mobile" onclick="affNavClick();closeDropdown()">💰 Affiliate</div>
-            <div class="dd-item" onclick="showPage('settings');closeDropdown()">⚙️ Settings</div>
-            <div class="dd-item" onclick="showPage('locationverif');closeDropdown()">📍 Location</div>
-            <div class="dd-item" onclick="showPage('language');closeDropdown()">🌐 Language</div>
-            <div class="dd-item" onclick="showPage('twofa');closeDropdown()">🔐 2FA</div>
-            <div class="dd-item" id="dd-admin-item" style="display:none;" onclick="showPage('admin');closeDropdown()">🛡 Admin panel</div>
-          </div>
-          <div style="padding:6px 0;border-top:1px solid var(--border);">
-            <div class="dd-item" style="color:var(--red);" onclick="zulaSignOut();closeDropdown()">→ Sign out</div>
-          </div>
-        </div>
       </nav>
     </div>
   </header>
@@ -2415,7 +2397,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
           <a onclick="showPage('marketplace')">Marketplace</a>
           <a onclick="openWishlist()" title="Wishlist">🤍</a>
           <a onclick="notifOpen()" style="position:relative;" title="Notifications">🔔<span id="nav-notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--red,#e53935);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-          <div class="avatar-btn" id="nav-avatar-product" onclick="showPage('profile-v2')">?</div>
+          <div class="avatar-btn" id="nav-avatar-product" onclick="toggleAdminDropdown(event)">?</div>
         </span>
         <span id="pd-nav-guest" style="display:none;align-items:center;gap:10px;">
           <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
@@ -4219,7 +4201,7 @@ if (_kycOrigShowPage) {
         <a onclick="showPage('messages')">✉️ Messages</a>
         <a onclick="showPage('notifications')">🔔</a>
         <a onclick="showPage('settings')">⚙️</a>
-        <div class="avatar-btn" id="nav-avatar-v2" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-v2" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -4359,7 +4341,7 @@ if (_kycOrigShowPage) {
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile-in" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <a onclick="showPage('profile-v2')">My Account</a>
-        <div class="avatar-btn" id="nav-avatar-myprofile" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-myprofile" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
       <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;align-items:center;">
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
@@ -4485,7 +4467,7 @@ if (_kycOrigShowPage) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
-        <div class="avatar-btn" id="nav-avatar-chat" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-chat" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -4564,7 +4546,7 @@ if (_kycOrigShowPage) {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('profile-v2')">Profile</a>
-        <div class="avatar-btn" id="nav-avatar-notif" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-notif" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -4597,7 +4579,7 @@ if (_kycOrigShowPage) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="goBackSmart('profile-v2')">← Profile</a>
-        <div class="avatar-btn" id="nav-avatar-settings" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-settings" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -5059,7 +5041,7 @@ window.showPage = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="goBackSmart('profile-v2')">← Profile</a>
-        <div class="avatar-btn" id="nav-avatar-verif" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-verif" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -8869,7 +8851,7 @@ window.saveManualLocation = async function() {
       <nav class="hdr-nav">
         <a onclick="showPage('marketplace')">Marketplace</a>
         <a onclick="showPage('messaging')">💬</a>
-        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-seller-dash" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -12261,7 +12243,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="goBackSmart('marketplace')">← Marketplace</a>
-        <div class="avatar-btn" id="nav-avatar-myorders" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-myorders" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -12419,7 +12401,7 @@ window.sdTab = function(name) {
       <nav class="hdr-nav">
         <a onclick="goBackSmart('marketplace')">← Marketplace</a>
         <a onclick="openCart()" style="position:relative;">🛒 <span id="cart-badge-wish" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
-        <div class="avatar-btn" id="nav-avatar-wish" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-wish" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -12457,7 +12439,7 @@ window.sdTab = function(name) {
       <div class="logo" onclick="showPage('marketplace')" style="cursor:pointer;">ZÚ<span>LA</span></div>
       <nav class="hdr-nav">
         <a onclick="goBackSmart('marketplace')">← Keep shopping</a>
-        <div class="avatar-btn" id="nav-avatar-cart" onclick="showPage('profile-v2')">?</div>
+        <div class="avatar-btn" id="nav-avatar-cart" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
     </div>
   </header>
@@ -17829,6 +17811,29 @@ document.addEventListener('DOMContentLoaded', function() { setTimeout(sidebarSyn
 })();
 
 </script>
+
+<!-- Global account dropdown (avatar click) — lives outside every .page so it
+     is always in the DOM and works identically no matter which page is
+     active, fixed to the viewport so it's never clipped by a page's layout. -->
+<div id="user-dropdown" style="display:none;position:fixed;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+    <div style="font-size:14px;font-weight:700;color:var(--text);" id="dropdown-name">—</div>
+    <div style="font-size:12px;color:var(--text3);" id="dropdown-email">—</div>
+  </div>
+  <div style="padding:6px 0;">
+    <div class="dd-item" onclick="goBackSmart('marketplace');closeDropdown()">← Back</div>
+    <div class="dd-item" onclick="showPage('profile-v2');closeDropdown()">👤 My profile</div>
+    <div class="dd-item dd-affiliate-mobile" onclick="affNavClick();closeDropdown()">💰 Affiliate</div>
+    <div class="dd-item" onclick="showPage('settings');closeDropdown()">⚙️ Settings</div>
+    <div class="dd-item" onclick="showPage('locationverif');closeDropdown()">📍 Location</div>
+    <div class="dd-item" onclick="showPage('language');closeDropdown()">🌐 Language</div>
+    <div class="dd-item" onclick="showPage('twofa');closeDropdown()">🔐 2FA</div>
+    <div class="dd-item" id="dd-admin-item" style="display:none;" onclick="showPage('admin');closeDropdown()">🛡 Admin panel</div>
+  </div>
+  <div style="padding:6px 0;border-top:1px solid var(--border);">
+    <div class="dd-item" style="color:var(--red);" onclick="zulaSignOut();closeDropdown()">→ Sign out</div>
+  </div>
+</div>
 
 </body>
 </html>
