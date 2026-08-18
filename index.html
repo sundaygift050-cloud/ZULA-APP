@@ -2285,6 +2285,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <option value="price_asc">Price: low to high</option>
         <option value="price_desc">Price: high to low</option>
         <option value="rating">Highest rated</option>
+        <option value="most_reviewed">Most reviewed</option>
         <option value="name">Name A–Z</option>
       </select>
     </div>
@@ -2379,6 +2380,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <option value="price_asc">Price: low to high</option>
         <option value="price_desc">Price: high to low</option>
         <option value="rating">Highest rated</option>
+        <option value="most_reviewed">Most reviewed</option>
         <option value="name">Name A–Z</option>
       </select>
     </div>
@@ -10988,12 +10990,16 @@ window.openProduct = async function(productId) {
     // "You might also like" — real live products from the same category
     if (typeof pdLoadRelated === 'function') pdLoadRelated(p);
 
-    // Write review button — available to any signed-in buyer (not the
-    // seller). Reviews from people who actually bought the item get a
-    // "Verified Purchase" badge (checked and stored at submit time below),
-    // but a purchase is no longer required just to leave a review at all.
+    // Write review button — only shown to a signed-in buyer who has
+    // actually purchased this product (not the seller). This used to be
+    // available to anyone signed in, with "Verified Purchase" just a
+    // badge — now a purchase is required to review at all.
     if (user && user.uid !== p.sellerId && el('pd-write-review-btn')) {
-      el('pd-write-review-btn').style.display = '';
+      try {
+        var ordCheckSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',productId), fns.where('buyerId','==',user.uid)));
+        var hasPurchased = ordCheckSnap.docs.some(function(d) { var s = d.data().status; return s === 'paid' || s === 'completed'; });
+        if (hasPurchased) el('pd-write-review-btn').style.display = '';
+      } catch(e) {}
     }
 
     // Engagement (views/likes/comments) — called directly here, right after
@@ -11152,6 +11158,21 @@ window.pdLoadReviews = async function(productId) {
       el.appendChild(card);
     });
     pdUpdateStars(total/count, count);
+    // Self-healing backfill: keep the product doc's avgRating/reviewCount
+    // in sync with reality every time reviews are loaded, not just on new
+    // submissions — covers any reviews that existed before this aggregate
+    // tracking was added, so ratings start appearing on cards without
+    // needing a one-off data migration.
+    try {
+      var liveAvg = Math.round((total/count) * 10) / 10;
+      if (p && (p.avgRating !== liveAvg || p.reviewCount !== count)) {
+        await fns.updateDoc(fns.doc(db, 'products', productId), { avgRating: liveAvg, reviewCount: count });
+        if (window._currentProduct && window._currentProduct.id === productId) {
+          window._currentProduct.avgRating = liveAvg;
+          window._currentProduct.reviewCount = count;
+        }
+      }
+    } catch(e) {}
   } catch(e) { console.error('pdLoadReviews:', e); el.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Could not load reviews.</div>'; }
 };
 
@@ -11201,13 +11222,16 @@ window.pdSubmitReview = async function() {
   if (!text) { showToast('Please write something in your review.'); return; }
   try {
     var profile = window._currentUser || {};
-    // Verified Purchase — checked once here at submit time (cheaper than
-    // re-checking every reviewer's order history on every page render).
+    // Verified Purchase check — now also the gate for being allowed to
+    // review at all, not just a badge. Re-checked here even though the
+    // button is already hidden for non-purchasers, so this can't be
+    // bypassed by calling the function directly.
     var isVerifiedPurchase = false;
     try {
       var ordSnap2 = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',p.id), fns.where('buyerId','==',user.uid)));
-      isVerifiedPurchase = !ordSnap2.empty;
+      isVerifiedPurchase = ordSnap2.docs.some(function(d) { var s = d.data().status; return s === 'paid' || s === 'completed'; });
     } catch(e) {}
+    if (!isVerifiedPurchase) { showToast('❌ You need to have purchased this item to review it.'); return; }
     await fns.addDoc(fns.collection(db,'reviews'), {
       productId:    p.id,
       sellerId:     p.sellerId,
@@ -11225,6 +11249,24 @@ window.pdSubmitReview = async function() {
       body: (profile.fullName||'A buyer') + ' reviewed ' + p.name + ': "' + text.slice(0,80) + (text.length>80?'…':'') + '"',
       read: false, createdAt: fns.serverTimestamp(),
     });
+    // Recompute and store this product's average rating + review count
+    // directly on the product doc. The marketplace grid, "most reviewed"
+    // sort, and every product card read these two fields straight off the
+    // product — without this, a rating never showed up anywhere except
+    // the product's own page, no matter how many reviews existed.
+    try {
+      var allRevsSnap = await fns.getDocs(fns.query(fns.collection(db,'reviews'), fns.where('productId','==',p.id)));
+      var allRatings = allRevsSnap.docs.map(function(d){ return Number(d.data().rating) || 0; });
+      var newAvg = allRatings.length ? (allRatings.reduce(function(a,b){return a+b;},0) / allRatings.length) : 0;
+      await fns.updateDoc(fns.doc(db, 'products', p.id), {
+        avgRating: Math.round(newAvg * 10) / 10,
+        reviewCount: allRatings.length,
+      });
+      if (window._currentProduct && window._currentProduct.id === p.id) {
+        window._currentProduct.avgRating = newAvg;
+        window._currentProduct.reviewCount = allRatings.length;
+      }
+    } catch(e) { console.error('review aggregate update:', e); }
     document.getElementById('pd-review-form').style.display = 'none';
     document.getElementById('pd-review-text').value = '';
     showToast('✅ Review submitted!');
@@ -13628,6 +13670,7 @@ function applyActiveFilters(products) {
     if (sort === 'price_asc')  return aNgn - bNgn;
     if (sort === 'price_desc') return bNgn - aNgn;
     if (sort === 'rating')     return (Number(b.avgRating)||0) - (Number(a.avgRating)||0);
+    if (sort === 'most_reviewed') return (Number(b.reviewCount)||0) - (Number(a.reviewCount)||0);
     if (sort === 'name')       return (a.name||'').localeCompare(b.name||'');
     return 0; // newest: Firestore already returns newest-first
   });
@@ -16646,7 +16689,7 @@ window.referralLoadStats = async function() {
   var db = window._db, fns = window._fns, auth = window._auth;
   var user = auth && auth.currentUser;
   if (!user) { showPage('login'); return; }
-  var link = window.location.origin + window.location.pathname + '?invite=' + user.uid;
+  var link = window.location.origin + window.location.pathname + '?invite=' + user.uid.slice(0, window.SHORT_ID_LEN || 7);
   var el = document.getElementById('ref-link'); if (el) el.value = link;
   try {
     var snap = await fns.getDocs(fns.query(fns.collection(db,'referrals'), fns.where('referrerId','==',user.uid)));
