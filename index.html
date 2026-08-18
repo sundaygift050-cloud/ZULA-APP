@@ -4362,6 +4362,7 @@ if (_kycOrigShowPage) {
         <div class="avatar-btn" id="nav-avatar-myprofile" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
       <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;align-items:center;">
+        <span id="myprofile-currency-badge" title="Prices are shown in your local currency" style="font-size:12px;font-weight:700;color:var(--text3);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;">🌍 NGN</span>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
         <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Join free</button>
@@ -5163,7 +5164,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc,
          getDocs, query, orderBy, serverTimestamp, where, onSnapshot,
          updateDoc, arrayUnion, arrayRemove, increment, deleteDoc,
-         writeBatch, deleteField }
+         writeBatch, deleteField, documentId, limit }
          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -5339,7 +5340,7 @@ window.doLogin = function() {
     .finally(() => { btn.disabled = false; btn.textContent = 'Sign in →'; });
 };
 
-window.doSignup = function() {
+window.doSignup = async function() {
   const firstName = document.getElementById('su-fname').value.trim();
   const lastName  = document.getElementById('su-lname').value.trim();
   const email     = document.getElementById('su-email').value.trim();
@@ -5351,12 +5352,16 @@ window.doSignup = function() {
   if (!agree)     { showToast('⚠️ Please agree to the Terms of Service.'); return; }
   const btn = document.getElementById('signup-btn');
   btn.disabled = true; btn.textContent = 'Creating account…';
-  const inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
+  let inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
   // No personal invite link? Fall back to whichever seller/affiliate storefront
   // link brought this visitor in (?ref=...) — someone who bought as a guest
   // through a shared product/store link and now signs up should still be
   // recorded as that person's referral, not just credited on the one order.
-  const affRefForSignup = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
+  let affRefForSignup = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
+  // Referral/store links are shortened codes (see SHORT_ID_LEN) — resolve
+  // back to the real full uid before using it anywhere.
+  if (inviteRef) inviteRef = await zulaResolveShortId(inviteRef, 'users');
+  if (affRefForSignup) affRefForSignup = await zulaResolveShortId(affRefForSignup, 'users');
   const signupReferrer = inviteRef || affRefForSignup;
   createUserWithEmailAndPassword(auth, email, pass)
     .then(r => {
@@ -5414,11 +5419,13 @@ window.doSignup = function() {
 // in), claim any guest orders placed with that email, and record referral
 // attribution the same way doSignup() does.
 function zulaOAuthSignIn(provider, providerName) {
-  const inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
-  const affRefForSignup = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
-  const signupReferrer = inviteRef || affRefForSignup;
+  let inviteRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_invite_ref', 60) : null;
+  let affRefForSignup = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
   signInWithPopup(auth, provider)
     .then(async (r) => {
+      if (inviteRef) inviteRef = await zulaResolveShortId(inviteRef, 'users');
+      if (affRefForSignup) affRefForSignup = await zulaResolveShortId(affRefForSignup, 'users');
+      const signupReferrer = inviteRef || affRefForSignup;
       const user = r.user;
       const email = user.email || '';
       const fullName = user.displayName || '';
@@ -6953,6 +6960,31 @@ window.loadProfileV2 = async function() {
   pv2LoadOrders();
 };
 
+// ── Short link resolution ──────────────────────────────────────────
+// Firebase UIDs are ~28 characters — too long to share comfortably. Every
+// store/affiliate link generator below outputs just the first 7 characters
+// instead (see SHORT_ID_LEN). Since Firestore document IDs support range
+// queries, a short code can be resolved back to its full UID with a single
+// "starts with" query on the document ID itself — no separate lookup table
+// needed. Anything already 20+ characters is treated as a full ID already
+// (so old, un-shortened links people already shared keep working).
+window.SHORT_ID_LEN = 7;
+window.zulaResolveShortId = async function(code, collectionName) {
+  if (!code) return code;
+  if (code.length >= 20) return code; // already a full UID, nothing to resolve
+  try {
+    var db = window._db;
+    var snap = await getDocs(query(
+      collection(db, collectionName || 'users'),
+      where(documentId(), '>=', code),
+      where(documentId(), '<', code + '\uf8ff'),
+      limit(1)
+    ));
+    if (!snap.empty) return snap.docs[0].id;
+  } catch (e) { console.error('zulaResolveShortId:', e); }
+  return code; // fall back to the raw value if nothing matched
+};
+
 // ── LOAD MY PUBLIC PROFILE (myprofile page) ───────────────────────
 window.loadMyProfile = async function() {
   const currentAuthUser = auth.currentUser;
@@ -6960,8 +6992,11 @@ window.loadMyProfile = async function() {
   const guestNav = document.getElementById('myprofile-nav-guest');
   if (loggedInNav) loggedInNav.style.display = currentAuthUser ? 'flex' : 'none';
   if (guestNav) guestNav.style.display = currentAuthUser ? 'none' : 'flex';
+  var currBadge = document.getElementById('myprofile-currency-badge');
+  if (currBadge) currBadge.textContent = '🌍 ' + (window._displayCurrency || 'NGN');
   const params = new URLSearchParams(window.location.search);
-  const sellerParam = params.get('seller');
+  const sellerParamRaw = params.get('seller');
+  const sellerParam = sellerParamRaw ? await zulaResolveShortId(sellerParamRaw, 'users') : null;
   // Viewing a shared storefront link (?seller=uid) always shows that seller,
   // even to a visitor who isn't signed in. viewPeerProfile() (e.g. "View
   // profile" from a chat) takes priority over both — it just navigated
@@ -7342,7 +7377,17 @@ window.calcPaystackFee = function(amount, currency) {
   amount = Number(amount) || 0;
   if (amount <= 0) return 0;
   if ((currency || 'NGN') !== 'NGN') {
-    return Math.round(amount * 0.039 + 100); // international card rate, no cap
+    // Paystack's international-card rate is ~3.9% + a small fixed fee.
+    // That fixed fee has to be in the SAME currency as `amount` — it was
+    // previously hardcoded as a flat "100" regardless of currency, which
+    // meant a $30 order got a $100 flat fee slapped on top of it (a
+    // >300% "service fee"). Convert a sane ~$0.30-equivalent flat fee
+    // into whatever currency this order is actually in instead.
+    var flatUsd = 0.30;
+    var flatInCurrency = (typeof window.convertPrice === 'function')
+      ? (function(){ var savedCur = window._displayCurrency; window._displayCurrency = currency; var v = window.convertPrice(flatUsd, 'USD'); window._displayCurrency = savedCur; return v; })()
+      : flatUsd;
+    return Math.round((amount * 0.039 + flatInCurrency) * 100) / 100;
   }
   var flat = amount < 2500 ? 0 : 100; // Paystack waives the flat ₦100 under ₦2,500
   var fee = amount * 0.015 + flat;
@@ -7658,7 +7703,8 @@ document.addEventListener('click', function(e) {
 window.copyStoreLink = function() {
   var auth = window._auth, user = auth && auth.currentUser;
   if (!user) { showToast('Please sign in first.'); return; }
-  var url = window.location.origin + window.location.pathname + '?seller=' + user.uid;
+  var shortId = user.uid.slice(0, window.SHORT_ID_LEN || 7);
+  var url = window.location.origin + window.location.pathname + '?seller=' + shortId;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(function() {
       showToast('🔗 Store link copied! Paste it anywhere.');
@@ -10751,7 +10797,7 @@ window.openProduct = async function(productId) {
     var el = function(id){ return document.getElementById(id); };
     if (el('pd-title')) el('pd-title').textContent = p.name || '';
     if (el('pd-seller')) el('pd-seller').textContent = 'By ' + (p.sellerName || 'Seller');
-    if (el('pd-price')) el('pd-price').textContent = (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
+    if (el('pd-price')) el('pd-price').textContent = typeof formatPrice === 'function' ? formatPrice(p.price, p.currency) : (p.currency||'NGN') + ' ' + Number(p.price||0).toLocaleString();
     if (el('pd-desc')) el('pd-desc').textContent = p.description || '';
 
     // Breadcrumb
@@ -10932,7 +10978,7 @@ window.openProduct = async function(productId) {
       var symAff = {NGN:'₦',USD:'$',GHS:'¢',KES:'KSh',ZAR:'R'}[(p.currency||'NGN')] || '';
       var earnAmount = Math.round(Number(p.price||0) * (commissionPct/100));
       if (el('pd-commission-amount')) el('pd-commission-amount').textContent = symAff + earnAmount.toLocaleString();
-      var affLink = window.location.origin + '?ref=' + user.uid + '&product=' + productId;
+      var affLink = window.location.origin + '?ref=' + user.uid.slice(0, window.SHORT_ID_LEN || 7) + '&product=' + productId;
       if (el('pd-affiliate-link')) el('pd-affiliate-link').value = affLink;
     }
 
@@ -14847,13 +14893,23 @@ function co2CalcDeliveryFee(items) {
 window.co2RenderSummary = function() {
   var items = window._co2Items || [];
   var wrap = document.getElementById('co2-summary-items');
-  var subtotal = items.reduce(function(s,i){ return s + Number(i.price||0) * (i.qty||1); }, 0);
-  var deliveryFee = co2CalcDeliveryFee(items);
+  // Charge the buyer in THEIR currency, not whatever currency each seller
+  // happened to list the item in — a Nigerian buyer should see and pay
+  // Naira end-to-end, even for a course a seller priced in USD. Convert
+  // every line with the same convertPrice() the marketplace grid already
+  // uses, which itself follows window._displayCurrency (auto-set from the
+  // buyer's detected location).
+  var currency = window._displayCurrency || 'NGN';
+  var toDisplay = function(amount, fromCurrency) {
+    return (typeof window.convertPrice === 'function') ? window.convertPrice(amount, fromCurrency) : Number(amount || 0);
+  };
+  var subtotal = items.reduce(function(s,i){ return s + toDisplay(i.price, i.currency) * (i.qty||1); }, 0);
+  var deliveryFeeNgn = co2CalcDeliveryFee(items); // flat delivery fees are set in NGN
+  var deliveryFee = toDisplay(deliveryFeeNgn, 'NGN');
   var u = window._currentUser || {};
-  var availableCredit = Number(u.referralCredit || 0);
+  var availableCredit = toDisplay(Number(u.referralCredit || 0), 'NGN'); // referral credit is stored in NGN
   var creditApplied = Math.min(availableCredit, subtotal + deliveryFee);
   var baseTotal = Math.max(0, subtotal + deliveryFee - creditApplied);
-  var currency = (items[0] && items[0].currency) || 'NGN';
   // Paystack's own processing cost is charged to the buyer on top of the order
   // total — the seller's payout is never reduced to cover it. See calcPaystackFee
   // for the exact, currently-accurate Paystack Nigeria fee structure.
@@ -14863,12 +14919,12 @@ window.co2RenderSummary = function() {
   if (wrap) {
     wrap.innerHTML = items.map(function(item) {
       var img = item.photo ? ('<img src="'+item.photo+'">') : ('<span>'+(item.emoji||'📦')+'</span>');
-      var lineTotal = Number(item.price||0) * (item.qty||1);
+      var lineTotal = toDisplay(item.price, item.currency) * (item.qty||1);
       return '<div class="co-summary-item">' +
         '<div class="co-summary-thumb">'+img+'</div>' +
         '<div style="flex:1;min-width:0;"><div class="co-summary-name">'+(item.name||'Product')+'</div>' +
         '<div class="co-summary-meta">'+co2TypeLabel(item)+'</div></div>' +
-        '<div class="co-summary-price">'+(item.currency||'NGN')+' '+lineTotal.toLocaleString()+'</div>' +
+        '<div class="co-summary-price">'+currency+' '+lineTotal.toLocaleString()+'</div>' +
         '</div>';
     }).join('');
   }
@@ -14892,6 +14948,7 @@ window.co2RenderSummary = function() {
   var payBtn = e('co2-pay-btn');
   if (payBtn) payBtn.textContent = 'Pay ' + currency + ' ' + total.toLocaleString() + ' →';
   window._co2Total = total;
+  window._co2Currency = currency;
   window._co2DeliveryFee = deliveryFee;
   window._co2CreditApplied = creditApplied;
   window._co2ServiceFee = serviceFee;
@@ -14949,6 +15006,7 @@ window.co2SubmitOrder = async function() {
   co2RenderSummary();
 
   var total = window._co2Total || 0;
+  var chargeCurrency = window._co2Currency || 'NGN';
   var amountKobo = Math.round(total * 100);
   var ref = 'ZULA_' + Date.now() + '_' + (user ? user.uid.slice(0,6) : 'GUEST' + Math.random().toString(36).slice(2,8));
 
@@ -14965,7 +15023,12 @@ window.co2SubmitOrder = async function() {
       key:      window.PAYSTACK_PUBLIC_KEY,
       email:    buyerEmail,
       amount:   amountKobo,
-      currency: (items[0] && items[0].currency === 'USD') ? 'USD' : 'NGN',
+      // Charge in the buyer's own currency (already computed above by
+      // co2RenderSummary from their detected location) — NOT whatever
+      // currency the seller happened to list the item in. This is also
+      // what fixes bank transfer / USSD actually being available, since
+      // those Paystack channels only work in NGN.
+      currency: chargeCurrency,
       ref:      ref,
       channels: channels,
       metadata: { buyerId: user ? user.uid : null, buyerEmail: buyerEmail, itemCount: items.length },
@@ -14990,6 +15053,7 @@ async function co2SaveOrders(items, user, profile, payRef, status, delivery, gue
     var creditApplied = window._co2CreditApplied || 0;
     var serviceFeeTotal = window._co2ServiceFee || 0;
     var affRef = (typeof zulaGetStoredRef === 'function') ? zulaGetStoredRef('zula_aff_ref', 30) : null;
+    if (affRef && typeof zulaResolveShortId === 'function') affRef = await zulaResolveShortId(affRef, 'users');
     if (user && affRef === user.uid) affRef = null; // no self-referral commission
     var orderSubtotal = items.reduce(function(s,i){ return s + Number(i.price||0)*(i.qty||1); }, 0) + deliveryFee;
 
@@ -16385,6 +16449,7 @@ window.affSubmitApplication = async function() {
 
   if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
   var inviteRef = zulaGetStoredRef('zula_invite_ref', 60);
+  if (inviteRef && typeof zulaResolveShortId === 'function') inviteRef = await zulaResolveShortId(inviteRef, 'users');
   try {
     var cred = await fns.createUserWithEmailAndPassword(auth, email, pass);
     var newUser = cred.user;
@@ -16446,7 +16511,7 @@ window.affLoadHub = async function() {
   var u = window._currentUser || {};
   if (!u.isAffiliate) { showPage('affiliate-signin'); return; }
 
-  var affCode = u.affiliateCode || user.uid;
+  var affCode = (u.affiliateCode || user.uid).slice(0, window.SHORT_ID_LEN || 7);
   var link = window.location.origin + window.location.pathname + '?ref=' + affCode;
   var linkEl = document.getElementById('affhub-link'); if (linkEl) linkEl.value = link;
 
@@ -16536,7 +16601,7 @@ window.affLoadHub = async function() {
 window.affGetProductLink = function(productId) {
   var u = window._currentUser || {};
   var auth = window._auth;
-  var code = u.affiliateCode || (auth.currentUser && auth.currentUser.uid);
+  var code = (u.affiliateCode || (auth.currentUser && auth.currentUser.uid) || '').slice(0, window.SHORT_ID_LEN || 7);
   var link = window.location.origin + window.location.pathname + '?ref=' + code + '&product=' + productId;
   navigator.clipboard.writeText(link).then(function(){ showToast('🔗 Affiliate link copied!'); }).catch(function(){ showToast(link); });
 };
@@ -16623,6 +16688,7 @@ window.refShare = function(channel) {
 window.zulaTrackAffiliateClick = async function(affId, productId) {
   var db = window._db, fns = window._fns, auth = window._auth;
   if (!db || !fns || !affId) return;
+  if (typeof zulaResolveShortId === 'function') affId = await zulaResolveShortId(affId, 'users');
   var user = auth && auth.currentUser;
   if (user && user.uid === affId) return; // ignore self-clicks
   try {
