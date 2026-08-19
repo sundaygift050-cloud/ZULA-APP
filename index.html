@@ -807,6 +807,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
 .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;}
 .tag-green{background:rgba(39,201,122,.15);color:var(--green);}
 .tag-gold{background:rgba(245,200,66,.15);color:var(--gold);}
+.tag-seller-big{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:800;background:rgba(39,201,122,.18);color:var(--green);border:1px solid rgba(39,201,122,.4);}
 .tag-red{background:rgba(240,82,82,.15);color:var(--red);}
 
 /* ADD PRODUCT */
@@ -2187,8 +2188,6 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <input placeholder="Search products…" oninput="filterProducts(this.value)">
       </div>
       <nav class="hdr-nav" style="gap:22px;">
-        <div class="mkt-hdr-link" onclick="showPage('my-orders')"><span class="ico">📦</span>Orders</div>
-        <div class="mkt-hdr-link" onclick="openWishlist()"><span class="ico">🤍</span>Favourites</div>
         <div class="mkt-hdr-link" onclick="openCart()" style="position:relative;">
           <span class="ico">🛒</span>Cart
           <span id="cart-badge" style="display:none;position:absolute;top:-4px;right:2px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span>
@@ -4255,7 +4254,7 @@ if (_kycOrigShowPage) {
       <div class="p-bio-line" id="pv2-location">📍 —</div>
       <div class="p-bio-line" id="pv2-bio" style="margin-top:6px;color:var(--text);"></div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
-        <span class="tag tag-green" id="pv2-buyer-badge">✅ Verified buyer</span>
+        <span class="tag tag-green" id="pv2-buyer-badge" style="display:none;">✅ Verified buyer</span>
         <span class="tag tag-gold" id="pv2-seller-badge" style="display:none;">🛍 Verified seller</span>
         <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;background:rgba(56,152,236,.1);border:1px solid rgba(56,152,236,.2);color:#5ba8f5;">🌐 English</span>
       </div>
@@ -4364,10 +4363,19 @@ if (_kycOrigShowPage) {
         <div class="avatar-btn" id="nav-avatar-myprofile" onclick="toggleAdminDropdown(event)">?</div>
       </nav>
       <nav class="hdr-nav" id="myprofile-nav-guest" style="display:none;gap:10px;align-items:center;">
-        <span id="myprofile-currency-badge" title="Prices are shown in your local currency" style="font-size:12px;font-weight:700;color:var(--text3);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;">🌍 NGN</span>
         <a onclick="openCart()" style="position:relative;" title="Cart">🛒<span id="cart-badge-myprofile" style="display:none;position:absolute;top:-4px;right:-6px;background:var(--accent-grad);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;"></span></a>
         <button class="btn btn-ghost btn-sm" onclick="showPage('login')">Sign in</button>
         <button class="btn btn-primary btn-sm" onclick="showPage('signup')">Join free</button>
+        <select id="myprofile-currency-select" title="Choose your currency" onchange="zulaMyprofileSetCurrency(this.value)" style="font-size:12px;font-weight:700;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:999px;padding:6px 10px;cursor:pointer;">
+          <option value="NGN">🌍 NGN ₦</option>
+          <option value="USD">🌍 USD $</option>
+          <option value="GBP">🌍 GBP £</option>
+          <option value="EUR">🌍 EUR €</option>
+          <option value="CAD">🌍 CAD C$</option>
+          <option value="GHS">🌍 GHS ₵</option>
+          <option value="KES">🌍 KES KSh</option>
+          <option value="ZAR">🌍 ZAR R</option>
+        </select>
       </nav>
     </div>
   </header>
@@ -6935,7 +6943,23 @@ window.loadProfileV2 = async function() {
     else el('nav-avatar-v2').textContent = initials;
   }
 
-  if (profile.sellerVerified && el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'inline-block';
+  // Show at most ONE of buyer/seller badge — verified seller takes
+  // priority (shown big, in green). Otherwise, only show "verified buyer"
+  // once they've actually completed a purchase — not by default.
+  if (el('pv2-buyer-badge')) el('pv2-buyer-badge').style.display = 'none';
+  if (el('pv2-seller-badge')) el('pv2-seller-badge').style.display = 'none';
+  if (profile.sellerVerified) {
+    var sellerBadgeEl = el('pv2-seller-badge');
+    if (sellerBadgeEl) {
+      sellerBadgeEl.className = 'tag-seller-big';
+      sellerBadgeEl.innerHTML = '✅ Verified seller';
+      sellerBadgeEl.style.display = 'inline-flex';
+    }
+  } else if (user) {
+    zulaHasVerifiedPurchase(user.uid).then(function(has) {
+      if (has && el('pv2-buyer-badge')) el('pv2-buyer-badge').style.display = 'inline-block';
+    });
+  }
   if (el('pv2-verify-btn')) el('pv2-verify-btn').style.display = profile.sellerVerified ? 'none' : '';
 
   // Counts
@@ -6994,8 +7018,8 @@ window.loadMyProfile = async function() {
   const guestNav = document.getElementById('myprofile-nav-guest');
   if (loggedInNav) loggedInNav.style.display = currentAuthUser ? 'flex' : 'none';
   if (guestNav) guestNav.style.display = currentAuthUser ? 'none' : 'flex';
-  var currBadge = document.getElementById('myprofile-currency-badge');
-  if (currBadge) currBadge.textContent = '🌍 ' + (window._displayCurrency || 'NGN');
+  var currSelect = document.getElementById('myprofile-currency-select');
+  if (currSelect) currSelect.value = window._displayCurrency || 'NGN';
   const params = new URLSearchParams(window.location.search);
   const sellerParamRaw = params.get('seller');
   const sellerParam = sellerParamRaw ? await zulaResolveShortId(sellerParamRaw, 'users') : null;
@@ -7052,11 +7076,18 @@ window.loadMyProfile = async function() {
   if (el('owner-bio'))  el('owner-bio').textContent  = profile.bio || 'No bio yet.';
   if (el('owner-joined')) el('owner-joined').textContent = joined || '—';
 
-  // Badges
+  // Badges — show at most one of buyer/seller (seller takes priority, big
+  // green badge), plus location if set. Never show "verified buyer" unless
+  // they've actually completed a purchase.
   const badgesEl = el('owner-badges');
   if (badgesEl) {
-    let badges = '<span class="tag tag-green">✅ Verified buyer</span>';
-    if (profile.sellerVerified) badges += ' <span class="tag tag-gold">🛍 Verified seller</span>';
+    let badges = '';
+    if (profile.sellerVerified) {
+      badges = '<span class="tag-seller-big">✅ Verified seller</span>';
+    } else {
+      const hasPurchased = await zulaHasVerifiedPurchase(targetUid);
+      if (hasPurchased) badges = '<span class="tag tag-green">✅ Verified buyer</span>';
+    }
     if (profile.location) badges += ' <span class="tag tag-green">📍 Location verified</span>';
     badgesEl.innerHTML = badges;
   }
@@ -8805,8 +8836,60 @@ window.selectLang = function(el, name, flag) {
   _selectedLang = name;
   // Update language badges everywhere
   ['v2-lang-name','banner-lang-name'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = name; });
-  showToast('🌐 Language set to ' + name);
+  localStorage.setItem('zula_lang_name', name);
+  zulaApplyTranslation(name);
 };
+
+// ── Real, whole-app translation via Google's website translator ─────
+// Hand-translating every string in this app would mean maintaining a
+// dictionary for thousands of pieces of UI text (plus everything sellers
+// type in for their own listings) — not realistic to keep accurate. This
+// uses Google's translation engine to actually translate the whole
+// rendered page, live, whichever language is picked — including content
+// that loads in dynamically as you navigate the app.
+var ZULA_LANG_CODES = {
+  'English':'en','French':'fr','Spanish':'es','Portuguese':'pt','German':'de',
+  'Italian':'it','Arabic':'ar','Swahili':'sw','Chinese':'zh-CN','Hindi':'hi',
+  'Japanese':'ja','Russian':'ru','Turkish':'tr','Dutch':'nl','Korean':'ko',
+};
+
+window.zulaApplyTranslation = function(langName) {
+  var code = ZULA_LANG_CODES[langName] || 'en';
+  if (code === 'en') {
+    // Revert to original — Google's widget only supports this by clearing
+    // its language cookie and reloading.
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
+    showToast('🌐 Switching back to English…');
+    setTimeout(function(){ location.reload(); }, 400);
+    return;
+  }
+  var trySelect = function(attemptsLeft) {
+    var select = document.querySelector('#google_translate_element select.goog-te-combo');
+    if (select) {
+      select.value = code;
+      select.dispatchEvent(new Event('change'));
+      showToast('🌐 Translating to ' + langName + '…');
+    } else if (attemptsLeft > 0) {
+      setTimeout(function(){ trySelect(attemptsLeft - 1); }, 400);
+    } else {
+      showToast('⚠️ Translation is still loading — try again in a moment.');
+    }
+  };
+  trySelect(10);
+};
+
+// Restore whichever language was picked last time, on every page load.
+(function() {
+  try {
+    var saved = localStorage.getItem('zula_lang_name');
+    if (saved && saved !== 'English') {
+      window.addEventListener('load', function() {
+        setTimeout(function(){ zulaApplyTranslation(saved); }, 1500);
+      });
+    }
+  } catch (e) {}
+})();
 
 window.filterLangs = function(val) {
   document.querySelectorAll('#lang-list .lang-option').forEach(item => {
@@ -15964,6 +16047,20 @@ window.setCurrency = function(code, symbol) {
   if (typeof cartRender === 'function') cartRender();
   if (typeof wishlistRender === 'function') wishlistRender();
   if (typeof updateFilterCurrencyLabels === 'function') updateFilterCurrencyLabels();
+  // Keep the store-link page's currency picker and listings in sync too
+  var mpSelect = document.getElementById('myprofile-currency-select');
+  if (mpSelect) mpSelect.value = code;
+  if (document.getElementById('page-myprofile') && document.getElementById('page-myprofile').classList.contains('active') && typeof loadMyProfile === 'function') {
+    loadMyProfile();
+  }
+};
+
+// Currency symbols for each supported code — used by the store-link page's
+// currency picker (a guest choosing their own country/currency, not just
+// defaulting to Nigeria).
+window.zulaMyprofileSetCurrency = function(code) {
+  var symbols = { NGN:'₦', USD:'$', GBP:'£', EUR:'€', CAD:'C$', GHS:'₵', KES:'KSh', ZAR:'R' };
+  setCurrency(code, symbols[code] || '');
 };
 
 // Sync currency button highlight on settings page load
@@ -16358,6 +16455,15 @@ window.goSignupWithEmail = function(email) {
     var f = document.getElementById('su-email');
     if (f && email) f.value = email;
   }, 60);
+};
+
+window.zulaHasVerifiedPurchase = async function(uid) {
+  if (!uid) return false;
+  try {
+    var db = window._db, fns = window._fns;
+    var snap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('buyerId','==',uid)));
+    return snap.docs.some(function(d) { var s = d.data().status; return s === 'paid' || s === 'completed'; });
+  } catch (e) { console.error('zulaHasVerifiedPurchase:', e); return false; }
 };
 
 window.zulaClaimGuestOrders = function(uid, email) {
@@ -17957,6 +18063,24 @@ document.addEventListener('DOMContentLoaded', function() { setTimeout(sidebarSyn
 <!-- Global account dropdown (avatar click) — lives outside every .page so it
      is always in the DOM and works identically no matter which page is
      active, fixed to the viewport so it's never clipped by a page's layout. -->
+<!-- Google website-translate widget (hidden UI, used only as a translation
+     engine — see zulaApplyTranslation() for how the language picker drives
+     it). Kept invisible; ZÚLA's own language page is the only UI shown. -->
+<div id="google_translate_element" style="position:absolute;top:-9999px;left:-9999px;"></div>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style>
+  /* Hide every bit of Google's own translate chrome (top banner, highlight
+     tooltips) — we only want the translation itself, driven by our UI. */
+  .goog-te-banner-frame, .skiptranslate > iframe { display: none !important; }
+  body { top: 0 !important; }
+  .goog-text-highlight { background: none !important; box-shadow: none !important; }
+</style>
+
 <div id="user-dropdown" style="display:none;position:fixed;top:60px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:220px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
   <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
     <div style="font-size:14px;font-weight:700;color:var(--text);" id="dropdown-name">—</div>
