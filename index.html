@@ -5330,6 +5330,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     updateNavAvatar();
     zulaUpdateGuestNav(user);
+    updateLandingNav(user);
     document.body.classList.add('zula-logged-in');
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
@@ -5363,6 +5364,7 @@ onAuthStateChanged(auth, async (user) => {
     var badge = document.getElementById('nav-notif-badge');
     if (badge) badge.style.display = 'none';
     zulaUpdateGuestNav(null);
+    updateLandingNav(null);
     document.body.classList.remove('zula-logged-in');
     document.body.classList.remove('has-mobile-dock');
   }
