@@ -647,18 +647,15 @@ body.sidebar-push-72 .sd-content{max-width:1720px;}
    Filters panel (collapsed = .mkt-layout.filters-collapsed):
      both open      → 4 columns (default, defined earlier)
      either one shut → 5 columns
-     both shut       → 6 columns
-   Real min-widths gate each step so columns never get too cramped. */
-@media(min-width:1300px){
-  body.sidebar-push-72 #page-marketplace .mkt-layout:not(.filters-collapsed) .pgrid,
-  body:not(.sidebar-push-72) #page-marketplace .mkt-layout.filters-collapsed .pgrid{
-    grid-template-columns:repeat(5,1fr);
-  }
+     both shut       → 6 columns, all in one row
+   No extra screen-width gate on top of this — once both panels are
+   tucked away there's enough freed-up space for 6 to actually fit. */
+body.sidebar-push-72 #page-marketplace .mkt-layout:not(.filters-collapsed) .pgrid,
+body:not(.sidebar-push-72) #page-marketplace .mkt-layout.filters-collapsed .pgrid{
+  grid-template-columns:repeat(5,1fr);
 }
-@media(min-width:1600px){
-  body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
-    grid-template-columns:repeat(6,1fr);
-  }
+body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
+  grid-template-columns:repeat(6,1fr);
 }
 
 /* Split BUY / CART buttons, styled like the reference app's rounded pill CTA */
@@ -695,19 +692,19 @@ body.sidebar-push-72 .sd-content{max-width:1720px;}
   #page-marketplace .wrap{padding-left:12px;padding-right:12px;}
   #page-marketplace .hdr-search{display:none;}
   #page-marketplace .mkt-cat-nav-btn{display:none;}
-  #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
-  #page-marketplace .pcard-body{padding:9px 9px 11px;}
-  #page-marketplace .pcard-name{font-size:12px;height:32px;}
-  #page-marketplace .pcard-price{font-size:14px;}
-  #page-marketplace .pcard-orig-price{font-size:10.5px;}
-  #page-marketplace .pcard-btn-row{gap:5px;}
-  #page-marketplace .pcard-buy-btn, #page-marketplace .pcard-cart-btn{font-size:10.5px;padding:7px 0;}
-  #page-marketplace .pcard-hot-badge, #page-marketplace .pcard-discount-badge, #page-marketplace .pcard-new-badge{font-size:9px;padding:2px 6px;}
+  #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:8px;}
+  #page-marketplace .pcard-body{padding:8px 8px 10px;}
+  #page-marketplace .pcard-name{font-size:11px;height:30px;}
+  #page-marketplace .pcard-price{font-size:12.5px;}
+  #page-marketplace .pcard-orig-price{font-size:9.5px;}
+  #page-marketplace .pcard-btn-row{gap:4px;}
+  #page-marketplace .pcard-buy-btn, #page-marketplace .pcard-cart-btn{font-size:9.5px;padding:6px 0;}
+  #page-marketplace .pcard-hot-badge, #page-marketplace .pcard-discount-badge, #page-marketplace .pcard-new-badge{font-size:8px;padding:2px 5px;}
 }
 
 /* Small phone (≤400px) */
 @media(max-width:400px){
-  #page-marketplace .pgrid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:6px;}
   #page-marketplace .mkt-flash-lbl{font-size:10px;}
   #page-marketplace .mkt-flash-clock{font-size:10px;padding:2px 5px;}
   #page-marketplace .mkt-flash-sub{display:none;}
@@ -988,11 +985,11 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   /* Marketplace */
   .mkt-layout{ gap:16px; padding:16px 0 40px; }
   .filter-panel{ padding:14px; }
-  .pgrid{ grid-template-columns:repeat(2,1fr); gap:10px; }
-  .pcard-img{ height:140px; font-size:28px; }
-  .pcard-body{ padding:10px 10px; }
-  .pcard-name{ font-size:12.5px; }
-  .pcard-price{ font-size:13px; }
+  .pgrid{ grid-template-columns:repeat(3,1fr); gap:8px; }
+  .pcard-img{ height:110px; font-size:24px; }
+  .pcard-body{ padding:8px 8px; }
+  .pcard-name{ font-size:11px; }
+  .pcard-price{ font-size:12px; }
   .mkt-topbar h2{ font-size:16px; }
 
   /* Product detail */
