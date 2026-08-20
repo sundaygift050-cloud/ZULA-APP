@@ -315,18 +315,62 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 
 @media(max-width:720px){
   body.sidebar-push-240,body.sidebar-push-72{padding-left:0;}
-  .app-sidebar{width:260px;transform:translateX(-100%);box-shadow:0 0 40px rgba(0,0,0,.5);}
-  .app-sidebar.mobile-open{transform:translateX(0);}
-  .app-sidebar.collapsed{width:260px;}
-  .app-sidebar.collapsed .sidebar-logo{display:block;}
-  .app-sidebar.collapsed .sidebar-item{justify-content:flex-start;padding:11px 13px;}
-  .app-sidebar.collapsed .sidebar-item .lbl{display:block;}
-  .app-sidebar.collapsed .sidebar-footer{justify-content:flex-start;padding:14px 16px;}
-  .app-sidebar.collapsed .sidebar-footer-info{display:block;}
-  .sidebar-hamburger{display:flex;}
-  .sidebar-collapse-btn{display:none;}
-  .sidebar-close-btn{display:flex !important;}
+  /* No slide-in sidebar on phones at all — the bottom dock (below) is the
+     entire mobile navigation now. Sidebar is desktop/laptop-only. */
+  .app-sidebar{display:none !important;}
+  .sidebar-hamburger{display:none !important;}
+  .sidebar-overlay{display:none !important;}
 }
+
+/* ── Mobile bottom dock ── phone-only tab bar, replaces needing to open
+   the slide-in sidebar for everyday navigation. Hidden entirely above
+   the mobile breakpoint (that's what the desktop left sidebar is for). */
+@media(max-width:720px){
+  body.has-mobile-dock{padding-bottom:64px;}
+  .mobile-dock{
+    display:flex !important;position:fixed;left:0;right:0;bottom:0;z-index:500;
+    background:var(--surface2);border-top:1px solid var(--border2);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
+    box-shadow:0 -4px 20px rgba(0,0,0,.35);
+  }
+  .sidebar-hamburger{display:none !important;}
+}
+.mobile-dock{display:none;}
+.dock-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:6px 2px;border-radius:10px;cursor:pointer;color:var(--text3);transition:color .15s,background .15s;
+}
+.dock-item.active{color:#fff;background:rgba(124,58,237,.18);}
+.dock-item .dock-ic{font-size:19px;line-height:1;}
+.dock-item .dock-dots{font-size:16px;font-weight:900;letter-spacing:1px;}
+.dock-item .dock-lbl{font-size:10px;font-weight:600;}
+.dock-badge{
+  position:absolute;top:2px;right:14px;background:var(--red,#e53935);color:#fff;
+  font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;min-width:14px;text-align:center;
+}
+
+/* "More" bottom sheet */
+.dock-more-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;}
+.dock-more-overlay.open{display:flex;align-items:flex-end;}
+.dock-more-sheet{
+  width:100%;background:var(--surface2);border-radius:18px 18px 0 0;padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -8px 32px rgba(0,0,0,.5);
+}
+.dock-more-hd{
+  display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;
+  font-size:18px;font-weight:800;color:var(--text);
+}
+.dock-more-close{
+  background:var(--bg3);border:1px solid var(--border2);color:var(--text);width:32px;height:32px;
+  border-radius:50%;font-size:15px;cursor:pointer;
+}
+.dock-more-item{
+  display:flex;align-items:center;gap:14px;padding:15px 20px;font-size:15px;font-weight:600;
+  color:var(--text);cursor:pointer;
+}
+.dock-more-item:active{background:var(--bg3);}
+.dock-more-item .ic{font-size:18px;width:22px;text-align:center;}
+
 /* Mobile-only affiliate entry inside the profile dropdown (still used by some pages) */
 .dd-affiliate-mobile{display:none;}
 @media(max-width:760px){ .dd-affiliate-mobile{display:flex !important;} }
@@ -1747,6 +1791,45 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
   </div>
 </nav>
+
+<!-- ================================================================
+     MOBILE BOTTOM DOCK — phone-only tab bar (hidden on desktop/tablet).
+     4 primary tabs + a "More" tab that opens a bottom sheet with
+     everything else (Affiliate, Settings, Admin, Sign out) — same
+     pattern as the Overview/Trading/Orders/Payouts/More reference.
+     ================================================================ -->
+<nav class="mobile-dock" id="mobile-dock" style="display:none;">
+  <div class="dock-item" data-dockpage="marketplace" onclick="sidebarNav('marketplace')">
+    <span class="dock-ic">🛍️</span><span class="dock-lbl">Marketplace</span>
+  </div>
+  <div class="dock-item" data-dockpage="seller-dashboard" onclick="sidebarNav('seller-dashboard')">
+    <span class="dock-ic">🏪</span><span class="dock-lbl">Seller</span>
+  </div>
+  <div class="dock-item" data-dockpage="profile-v2" onclick="sidebarNav('profile-v2')">
+    <span class="dock-ic">👤</span><span class="dock-lbl">Profile</span>
+  </div>
+  <div class="dock-item" data-dockpage="messaging" onclick="sidebarNav('messaging')" style="position:relative;">
+    <span class="dock-ic">💬</span><span class="dock-lbl">Messenger</span>
+    <span class="dock-badge" id="dock-msg-badge" style="display:none;"></span>
+  </div>
+  <div class="dock-item" id="dock-more-btn" onclick="zulaOpenMoreSheet()">
+    <span class="dock-ic dock-dots">•••</span><span class="dock-lbl">More</span>
+  </div>
+</nav>
+
+<!-- "More" bottom sheet -->
+<div class="dock-more-overlay" id="dock-more-overlay" onclick="zulaCloseMoreSheet(event)">
+  <div class="dock-more-sheet" id="dock-more-sheet">
+    <div class="dock-more-hd">
+      <span>More</span>
+      <button class="dock-more-close" onclick="zulaCloseMoreSheet()">✕</button>
+    </div>
+    <div class="dock-more-item" onclick="zulaCloseMoreSheet();affNavClick()"><span class="ic">💰</span>Affiliate</div>
+    <div class="dock-more-item" data-dockpage="settings" onclick="zulaCloseMoreSheet();sidebarNav('settings')"><span class="ic">⚙️</span>Settings</div>
+    <div class="dock-more-item" id="dock-more-admin-item" style="display:none;" onclick="zulaCloseMoreSheet();goAdmin()"><span class="ic">🛡</span>Admin</div>
+    <div class="dock-more-item" style="color:var(--red);" onclick="zulaCloseMoreSheet();zulaSignOut()"><span class="ic">→</span>Sign out</div>
+  </div>
+</div>
 
 
 <!-- ================================================================
@@ -6439,6 +6522,11 @@ window.loadConversations = async function() {
       if (totalUnread > 0) { badge.textContent = totalUnread > 9 ? '9+' : totalUnread; badge.style.display = 'inline-block'; }
       else { badge.style.display = 'none'; }
     }
+    const dockBadge = document.getElementById('dock-msg-badge');
+    if (dockBadge) {
+      if (totalUnread > 0) { dockBadge.textContent = totalUnread > 9 ? '9+' : totalUnread; dockBadge.style.display = 'inline-block'; }
+      else { dockBadge.style.display = 'none'; }
+    }
   } catch(e) {
     console.error(e);
     const msg = '<div style="padding:20px;color:var(--text3);font-size:13px;">Could not load conversations.</div>';
@@ -7677,9 +7765,11 @@ function _showAdminNavIfNeeded() {
   const adminLink = document.getElementById('admin-nav-link');
   const ddAdmin   = document.getElementById('dd-admin-item');
   const dockAdmin = document.getElementById('sidebar-admin-item');
+  const moreAdmin = document.getElementById('dock-more-admin-item');
   if (adminLink) adminLink.style.display = 'inline';
   if (ddAdmin)   ddAdmin.style.display   = 'block';
   if (dockAdmin) dockAdmin.style.display = 'flex';
+  if (moreAdmin) moreAdmin.style.display = 'flex';
 }
 
 window._selectedType = 'Physical';
@@ -7931,6 +8021,8 @@ window.toggleAdminDropdown = function(e) {
     if (ddAdmin) ddAdmin.style.display = isAdmin() ? 'block' : 'none';
     const dockAdminDD = document.getElementById('sidebar-admin-item');
     if (dockAdminDD) dockAdminDD.style.display = isAdmin() ? 'flex' : 'none';
+    const moreAdminDD = document.getElementById('dock-more-admin-item');
+    if (moreAdminDD) moreAdminDD.style.display = isAdmin() ? 'flex' : 'none';
     // Close when clicking outside
     setTimeout(() => document.addEventListener('click', closeDropdown, { once: true }), 50);
   }
@@ -17731,6 +17823,7 @@ window.showPage = function(name) {
       if (p && p.id) pdLoadEngagement(p.id, p.sellerId);
     }, 150);
   }
+  if (typeof zulaDockSetActive === 'function') zulaDockSetActive(name);
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -17911,6 +18004,40 @@ window.sidebarOpenMobile = sidebarOpenMobile;
 window.sidebarCloseMobile = sidebarCloseMobile;
 window.sidebarNav = sidebarNav;
 
+// ── Mobile bottom dock ──────────────────────────────────────────────
+// Highlights whichever tab matches the current page. Pages that don't
+// have their own dedicated tab (checkout, settings sub-pages, etc.) just
+// leave every tab unhighlighted rather than guessing at a "closest" one.
+window.zulaDockSetActive = function(pageName) {
+  document.querySelectorAll('.dock-item[data-dockpage]').forEach(function(item) {
+    item.classList.toggle('active', item.getAttribute('data-dockpage') === pageName);
+  });
+  var moreBtn = document.getElementById('dock-more-btn');
+  if (moreBtn) moreBtn.classList.toggle('active', pageName === 'settings');
+  // Keep the page from being hidden behind the fixed dock — only while
+  // actually on a phone-sized screen (the dock is display:none above 720px).
+  if (window.innerWidth <= 720) document.body.classList.add('has-mobile-dock');
+  else document.body.classList.remove('has-mobile-dock');
+};
+
+window.zulaOpenMoreSheet = function() {
+  var overlay = document.getElementById('dock-more-overlay');
+  if (overlay) overlay.classList.add('open');
+};
+window.zulaCloseMoreSheet = function(e) {
+  // Clicking the sheet itself shouldn't close it — only the dark backdrop
+  // or an actual menu item (which calls this explicitly without an event).
+  if (e && e.target && e.target.closest && e.target.closest('.dock-more-sheet')) return;
+  var overlay = document.getElementById('dock-more-overlay');
+  if (overlay) overlay.classList.remove('open');
+};
+window.addEventListener('resize', function() {
+  if (typeof zulaDockSetActive === 'function') {
+    var activeEl = document.querySelector('.page.active');
+    zulaDockSetActive(activeEl ? activeEl.id.replace('page-','') : '');
+  }
+});
+
 function sidebarSync() {
   try {
     var sb = document.getElementById('app-sidebar');
@@ -17951,6 +18078,8 @@ function sidebarSync() {
     // dropdown already uses.
     var sidebarAdmin = document.getElementById('sidebar-admin-item');
     if (sidebarAdmin) sidebarAdmin.style.display = (typeof isAdmin === 'function' && isAdmin()) ? 'flex' : 'none';
+    var moreAdminSb = document.getElementById('dock-more-admin-item');
+    if (moreAdminSb) moreAdminSb.style.display = (typeof isAdmin === 'function' && isAdmin()) ? 'flex' : 'none';
 
     // Footer identity — avatar, name, verified-seller status
     if (user) {
