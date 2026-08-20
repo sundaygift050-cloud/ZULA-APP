@@ -326,8 +326,14 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
    the slide-in sidebar for everyday navigation. Hidden entirely above
    the mobile breakpoint (that's what the desktop left sidebar is for). */
 @media(max-width:720px){
-  body.has-mobile-dock{padding-bottom:64px;}
-  .mobile-dock{
+  body.has-mobile-dock{padding-bottom:0;}
+  body.zula-logged-in.has-mobile-dock{padding-bottom:64px;}
+  /* Guests never get the dock — it's app navigation (Marketplace, Seller,
+     Profile, Messenger), and a signed-out visitor shouldn't be able to
+     browse into the app from the public landing page before signing up.
+     Requires body.zula-logged-in, set on real auth state, not just "on a
+     phone". */
+  body.zula-logged-in .mobile-dock{
     display:flex !important;position:fixed;left:0;right:0;bottom:0;z-index:500;
     background:var(--surface2);border-top:1px solid var(--border2);
     padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
@@ -5324,6 +5330,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     updateNavAvatar();
     zulaUpdateGuestNav(user);
+    document.body.classList.add('zula-logged-in');
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
     setTimeout(function(){ if (typeof sidebarSync === 'function') sidebarSync(); }, 600);
@@ -5356,6 +5363,8 @@ onAuthStateChanged(auth, async (user) => {
     var badge = document.getElementById('nav-notif-badge');
     if (badge) badge.style.display = 'none';
     zulaUpdateGuestNav(null);
+    document.body.classList.remove('zula-logged-in');
+    document.body.classList.remove('has-mobile-dock');
   }
 });
 
