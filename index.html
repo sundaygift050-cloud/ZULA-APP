@@ -642,7 +642,24 @@ body.sidebar-push-72 .sd-content{max-width:1720px;}
 @media(min-width:1100px) and (max-width:1399px){#page-marketplace .pgrid{grid-template-columns:repeat(4,1fr);}}
 /* Sidebar collapsed → extra width freed up → use it for a 5th column
    instead of leaving it as dead space next to the grid. */
-@media(min-width:1300px){body.sidebar-push-72 #page-marketplace .pgrid{grid-template-columns:repeat(5,1fr);}}
+/* Product grid columns react to BOTH space-saving toggles on this page —
+   the main left sidebar (collapsed = body.sidebar-push-72) and the
+   Filters panel (collapsed = .mkt-layout.filters-collapsed):
+     both open      → 4 columns (default, defined earlier)
+     either one shut → 5 columns
+     both shut       → 6 columns
+   Real min-widths gate each step so columns never get too cramped. */
+@media(min-width:1300px){
+  body.sidebar-push-72 #page-marketplace .mkt-layout:not(.filters-collapsed) .pgrid,
+  body:not(.sidebar-push-72) #page-marketplace .mkt-layout.filters-collapsed .pgrid{
+    grid-template-columns:repeat(5,1fr);
+  }
+}
+@media(min-width:1600px){
+  body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
+    grid-template-columns:repeat(6,1fr);
+  }
+}
 
 /* Split BUY / CART buttons, styled like the reference app's rounded pill CTA */
 #page-marketplace .pcard-btn-row{display:flex;gap:6px;}
