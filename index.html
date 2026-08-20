@@ -5291,13 +5291,13 @@ window._auth = auth;
 function updateLandingNav(user) {
   var links = document.getElementById('lp-nav-links');
   var guest = document.getElementById('lp-nav-guest');
-  if (user) {
-    if (links) links.style.display = 'flex';
-    if (guest) guest.style.display = 'none';
-  } else {
-    if (links) links.style.display = 'none';
-    if (guest) guest.style.display = 'flex';
-  }
+  // The home page is the public marketing page — it should always show
+  // Sign in / Join free, never the logged-in app links (Home/Browse/
+  // Affiliate/Sell), even if the visitor happens to still be logged in
+  // from a previous session. Same rule as the mobile dock: no app
+  // navigation on public entry pages.
+  if (links) links.style.display = 'none';
+  if (guest) guest.style.display = 'flex';
 }
 
 window._db   = db;
@@ -5337,6 +5337,21 @@ onAuthStateChanged(auth, async (user) => {
     zulaUpdateGuestNav(user);
     updateLandingNav(user);
     document.body.classList.add('zula-logged-in');
+    // Resume wherever this session left off, instead of always landing
+    // back on the homepage — but never override an actual deep link
+    // (?seller=, ?product=, ?ref=, ?invite=) or repeat this on a later
+    // token refresh within the same page load.
+    try {
+      var _urlParams = new URLSearchParams(window.location.search);
+      var _hasDeepLink = _urlParams.get('seller') || _urlParams.get('product') || _urlParams.get('ref') || _urlParams.get('invite');
+      if (!_hasDeepLink && !window._zulaResumedPage) {
+        window._zulaResumedPage = true;
+        var _lastPage = localStorage.getItem('zula_last_page');
+        if (_lastPage && document.getElementById('page-' + _lastPage)) {
+          showPage(_lastPage);
+        }
+      }
+    } catch(e) {}
     if (typeof loadConversations === 'function') setTimeout(loadConversations, 800);
     setTimeout(_showAdminNavIfNeeded, 600);
     setTimeout(function(){ if (typeof sidebarSync === 'function') sidebarSync(); }, 600);
@@ -5578,6 +5593,8 @@ window.zulaSignInWithFacebook = function() { zulaOAuthSignIn(new FacebookAuthPro
 window.zulaSignOut = function() {
   signOut(auth).then(() => {
     window._currentUser = null;
+    try { localStorage.removeItem('zula_last_page'); } catch(e) {}
+    window._zulaResumedPage = false;
     showToast('👋 Signed out.');
     showPage('home');
   });
@@ -17840,6 +17857,14 @@ window.showPage = function(name) {
     }, 150);
   }
   if (typeof zulaDockSetActive === 'function') zulaDockSetActive(name);
+  // Remember where you are, so refreshing (or a dropped connection) while
+  // signed in returns you here instead of bouncing back to the homepage.
+  // Home/login/signup are never worth "resuming into" — those are entry
+  // points, not somewhere a logged-in session should snap back to.
+  try {
+    var NOT_RESUMABLE = ['home','login','signup','verify-email','forgot-password'];
+    if (NOT_RESUMABLE.indexOf(name) === -1) localStorage.setItem('zula_last_page', name);
+  } catch(e) {}
 };
 
 // ══════════════════════════════════════════════════════════════════
