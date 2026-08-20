@@ -339,6 +339,11 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
     padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
     box-shadow:0 -4px 20px rgba(0,0,0,.35);
   }
+  /* Even if already signed in, the public/marketing entry pages (home,
+     login, signup) should never show the app dock — it only appears once
+     you're actually inside the app (Marketplace, Seller, Profile, etc). */
+  body.zula-on-public-page .mobile-dock{display:none !important;}
+  body.zula-on-public-page.has-mobile-dock{padding-bottom:0 !important;}
   .sidebar-hamburger{display:none !important;}
 }
 .mobile-dock{display:none;}
@@ -18025,6 +18030,11 @@ window.zulaDockSetActive = function(pageName) {
   });
   var moreBtn = document.getElementById('dock-more-btn');
   if (moreBtn) moreBtn.classList.toggle('active', pageName === 'settings');
+  // Public/marketing entry pages never show the dock, even for someone
+  // who's technically still logged in from a previous session — it only
+  // appears once you're actually inside the app.
+  var PUBLIC_PAGES = ['home', 'login', 'signup', 'verify-email', 'forgot-password'];
+  document.body.classList.toggle('zula-on-public-page', PUBLIC_PAGES.indexOf(pageName) !== -1);
   // Keep the page from being hidden behind the fixed dock — only while
   // actually on a phone-sized screen (the dock is display:none above 720px).
   if (window.innerWidth <= 720) document.body.classList.add('has-mobile-dock');
@@ -18048,6 +18058,15 @@ window.addEventListener('resize', function() {
     zulaDockSetActive(activeEl ? activeEl.id.replace('page-','') : '');
   }
 });
+// The very first page shown (Home) is marked active directly in the raw
+// HTML, not via a showPage() call — so nothing would otherwise run the
+// public-page check before auth state resolves. Run it once immediately.
+(function() {
+  var activeEl = document.querySelector('.page.active');
+  if (activeEl && typeof zulaDockSetActive === 'function') {
+    zulaDockSetActive(activeEl.id.replace('page-', ''));
+  }
+})();
 
 function sidebarSync() {
   try {
