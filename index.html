@@ -652,10 +652,10 @@ body.sidebar-push-72 .sd-content{max-width:1720px;}
    tucked away there's enough freed-up space for 6 to actually fit. */
 body.sidebar-push-72 #page-marketplace .mkt-layout:not(.filters-collapsed) .pgrid,
 body:not(.sidebar-push-72) #page-marketplace .mkt-layout.filters-collapsed .pgrid{
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(5,1fr) !important;
 }
 body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns:repeat(6,1fr) !important;
 }
 
 /* Split BUY / CART buttons, styled like the reference app's rounded pill CTA */
@@ -689,7 +689,7 @@ body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
 
 /* Phone (≤640px) */
 @media(max-width:640px){
-  #page-marketplace .wrap{padding-left:12px;padding-right:12px;}
+  #page-marketplace .wrap{padding-left:8px;padding-right:8px;}
   #page-marketplace .hdr-search{display:none;}
   #page-marketplace .mkt-cat-nav-btn{display:none;}
   #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:8px;}
@@ -704,6 +704,7 @@ body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
 
 /* Small phone (≤400px) */
 @media(max-width:400px){
+  #page-marketplace .wrap{padding-left:6px;padding-right:6px;}
   #page-marketplace .pgrid{grid-template-columns:repeat(3,1fr);gap:6px;}
   #page-marketplace .mkt-flash-lbl{font-size:10px;}
   #page-marketplace .mkt-flash-clock{font-size:10px;padding:2px 5px;}
@@ -2326,7 +2327,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
   </div>
 
   <div class="mkt-layout" id="mkt-layout-grid">
-  <div class="wrap" style="padding:10px 28px 50px;">
+  <div class="wrap" style="padding:10px 0 50px;">
 
     <!-- Top-5 seller leaderboard — rotates one entry every 5s. Published by
          admin (Admin → Leaderboard → Publish to Marketplace). Falls back to
