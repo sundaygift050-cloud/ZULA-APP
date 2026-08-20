@@ -382,6 +382,23 @@ body.sidebar-push-240,body.sidebar-push-72{transition:padding-left .22s ease;}
 .dock-more-item:active{background:var(--bg3);}
 .dock-more-item .ic{font-size:18px;width:22px;text-align:center;}
 
+/* Mobile sticky Buy/Cart bar on the product page */
+.pd-sticky-actions{display:none;}
+@media(max-width:720px){
+  .pd-sticky-actions{
+    display:flex !important;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:499;
+    background:var(--surface2);border-top:1px solid var(--border2);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+    box-shadow:0 -4px 20px rgba(0,0,0,.35);
+  }
+  .pd-sticky-actions .btn{flex:1;padding:12px 0;font-size:14px;}
+  /* Sit above the app dock, not underneath it, when the dock is showing */
+  body.zula-logged-in:not(.zula-on-public-page) .pd-sticky-actions{bottom:56px;}
+  /* Leave room at the bottom of the page so this bar never covers the
+     last bit of content (reviews, escrow notice, etc). */
+  #page-product{padding-bottom:66px;}
+}
+
 /* Mobile-only affiliate entry inside the profile dropdown (still used by some pages) */
 .dd-affiliate-mobile{display:none;}
 @media(max-width:760px){ .dd-affiliate-mobile{display:flex !important;} }
@@ -713,7 +730,8 @@ body.sidebar-push-72 #page-marketplace .mkt-layout.filters-collapsed .pgrid{
 
 /* MARKETPLACE */
 .mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:28px 0 60px;transition:grid-template-columns .2s ease;}
-.mkt-layout.filters-collapsed{grid-template-columns:76px 1fr;}
+.mkt-layout.filters-collapsed{grid-template-columns:1fr;}
+.mkt-layout.filters-collapsed .filter-panel{display:none;}
 @media(max-width:860px){.mkt-layout{grid-template-columns:1fr;}}
 .filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;height:fit-content;}
 .filter-panel h3{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
@@ -2387,7 +2405,9 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
     </div>
     <div class="mkt-topbar">
       <h2>All products <span class="result-count" id="result-count" style="font-weight:400;"></span></h2>
-      <select id="filter-sort-top" class="mkt-sort-select" onchange="document.getElementById('filter-sort').value=this.value;applyFilters();">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="filter-reopen-btn" onclick="mktToggleFiltersCollapse()" style="display:none;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);">🔍 Filters</button>
+        <select id="filter-sort-top" class="mkt-sort-select" onchange="document.getElementById('filter-sort').value=this.value;applyFilters();">
         <option value="newest">Most Popular</option>
         <option value="newest">Newest first</option>
         <option value="price_asc">Price: low to high</option>
@@ -2396,6 +2416,7 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
         <option value="most_reviewed">Most reviewed</option>
         <option value="name">Name A–Z</option>
       </select>
+      </div>
     </div>
     <div class="pgrid" id="products-grid"></div>
     <div class="mkt-pagination" id="mkt-pagination"></div>
@@ -2700,6 +2721,14 @@ html[data-theme="light"] #page-marketplace .mkt-page-btn{box-shadow:var(--shadow
       </div>
     </div>
   </footer>
+
+  <!-- Mobile-only sticky Buy/Cart bar — pinned to the bottom of the screen
+       so these are always reachable on a phone regardless of scroll
+       position or how tall the product images/description are. -->
+  <div class="pd-sticky-actions" id="pd-sticky-actions">
+    <button class="btn btn-ghost" onclick="pdAddToCart()">🛒 Cart</button>
+    <button class="btn btn-primary" onclick="pdBuyNow()">Buy now</button>
+  </div>
 </div>
 
 <!-- ================================================================
@@ -11158,6 +11187,7 @@ window.openProduct = async function(productId) {
     var isOwner = user && user.uid === p.sellerId;
     if (el('pd-buy-btn')) el('pd-buy-btn').style.display = (p.productType === 'realestate' || isOwner) ? 'none' : '';
     if (el('pd-cart-btn')) el('pd-cart-btn').style.display = (p.productType === 'realestate' || isOwner) ? 'none' : '';
+    if (el('pd-sticky-actions')) el('pd-sticky-actions').style.display = (p.productType === 'realestate' || isOwner) ? 'none' : '';
     if (el('pd-view-btn')) el('pd-view-btn').style.display = p.productType === 'realestate' ? '' : 'none';
     if (el('pd-watch-btn')) el('pd-watch-btn').style.display = 'none';
     if (p.productType === 'course' && user) {
@@ -14341,9 +14371,15 @@ window.mktToggleFiltersCollapse = function() {
   // leaving the collapsed filter column sitting there empty — and swap to
   // a slim icon-only rail (matching the main sidebar's own collapse style)
   // instead of squeezing "Filters" text into a too-narrow column.
+  // Fully hide the filter panel when collapsed (rather than leaving a
+  // slim rail behind) so the product grid reclaims that entire width —
+  // no dead space left over. A small pill button takes its place for
+  // reopening it.
   if (grid) grid.classList.toggle('filters-collapsed', !collapsed);
   if (fullHeader) fullHeader.style.display = collapsed ? 'flex' : 'none';
-  if (miniBtn) miniBtn.style.display = collapsed ? 'none' : 'flex';
+  if (miniBtn) miniBtn.style.display = 'none';
+  var reopenBtn = document.getElementById('filter-reopen-btn');
+  if (reopenBtn) reopenBtn.style.display = collapsed ? 'none' : 'inline-flex';
 };
 
 document.addEventListener('DOMContentLoaded', function() {
