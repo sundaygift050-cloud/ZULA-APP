@@ -11036,6 +11036,26 @@ window.openProduct = async function(productId) {
     window._currentProduct = p;
     if (typeof checkFlashSaleExpiry === 'function') checkFlashSaleExpiry([p]);
 
+    // Review-eligibility check — deliberately run as its own independent
+    // task, not nested inside the rest of this function's shared try block.
+    // It used to sit much later in this function, which meant if ANYTHING
+    // else on the page threw first (a related-products fetch, a tracking
+    // pixel, engagement stats, anything), this code was skipped entirely
+    // and the "Write a Review" button would just silently never appear —
+    // with no error, nothing in the console, nothing to debug.
+    (async function() {
+      var user = auth && auth.currentUser;
+      var btn = document.getElementById('pd-write-review-btn');
+      if (!user || !btn || user.uid === p.sellerId) return;
+      try {
+        var ordCheckSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',productId), fns.where('buyerId','==',user.uid)));
+        var hasPurchased = ordCheckSnap.docs.some(function(d) { var s = d.data().status; return s === 'paid' || s === 'completed'; });
+        if (hasPurchased) btn.style.display = '';
+      } catch(e) {
+        console.error('Review-eligibility check failed:', e);
+      }
+    })();
+
     // Fire the seller's configured tracking pixels (if any) for this view.
     // Wrapped separately and never awaited — a slow/broken pixel provider
     // must never delay or break the product page rendering below.
@@ -11238,18 +11258,6 @@ window.openProduct = async function(productId) {
 
     // "You might also like" — real live products from the same category
     if (typeof pdLoadRelated === 'function') pdLoadRelated(p);
-
-    // Write review button — only shown to a signed-in buyer who has
-    // actually purchased this product (not the seller). This used to be
-    // available to anyone signed in, with "Verified Purchase" just a
-    // badge — now a purchase is required to review at all.
-    if (user && user.uid !== p.sellerId && el('pd-write-review-btn')) {
-      try {
-        var ordCheckSnap = await fns.getDocs(fns.query(fns.collection(db,'orders'), fns.where('productId','==',productId), fns.where('buyerId','==',user.uid)));
-        var hasPurchased = ordCheckSnap.docs.some(function(d) { var s = d.data().status; return s === 'paid' || s === 'completed'; });
-        if (hasPurchased) el('pd-write-review-btn').style.display = '';
-      } catch(e) {}
-    }
 
     // Engagement (views/likes/comments) — called directly here, right after
     // window._currentProduct is confirmed set, instead of relying on the
